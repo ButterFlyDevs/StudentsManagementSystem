@@ -1,3 +1,6 @@
 [submodule "BD_Replica"]
 	path = BD_Replica
 	url = git@github.com:neon520/SMS-BDyReplica.git
+[submodule "Servidores_Balanceador"]
+	path = Servidores_Balanceador
+	url = https://github.com/JA-Gonz/SMS_Servidores_Balanceador
