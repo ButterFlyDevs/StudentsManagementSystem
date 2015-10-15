@@ -29,15 +29,3 @@ class HelloWorldTest(unittest.TestCase):
         response = app.get('/hello')
         self.assertEqual(response.content_type, 'text/plain')
         self.assertIn('Hello Testing World!', response.body)
-
-
-class HelloWorldTest2(unittest.TestCase):
-    def test_index(self):
-        """Tests that the index page for the application
-
-        The page should be served as: Content-Type: text/plain
-        The body content should contain the string: Hello world!
-        """
-        response = app.get('/hello')
-        self.assertEqual(response.content_type, 'text/plain')
-        self.assertIn('Hello Testing World!', response.body)
