@@ -7,8 +7,6 @@ import webapp2
 import cgi
 
 
-
-
 #from model import Alumno (No funciona)
 from tools.GestorAlumnos import GestorAlumnos
 from tools.GestorProfesores import GestorProfesores
@@ -55,6 +53,7 @@ class RegistroAlumnos(webapp2.RequestHandler):
 
         if not(nombreUsuario and apellidosUsuario):
             template=template_env.get_template('templates/registroalumnos.html')
+            template=template_env.get_template('templates/formulario.html')
             self.response.out.write(template.render())
         else:
             #Grabamos los datos en la base de datos.
@@ -65,86 +64,19 @@ class RegistroAlumnos(webapp2.RequestHandler):
             self.response.out.write(self.request.get('nombre'))
             self.response.out.write('</pre></body></html>')
 
-class RegistroProfesores(webapp2.RequestHandler):
-
-    def get(self):
-
-        #Siempre antes de cargar una página se cargará la cookie de la sesión de usuario
-        session = get_current_session()
-
-        template=template_env.get_template('templates/registroprofesores.html')
-        self.response.out.write(template.render())
-
-
-
-    def post(self):
-
-        username=self.request.get('username')
-        userpassword=self.request.get('userpassword')
-
-        #Si los campos de login de usuario NO están vacíos es que se está logueando un usuario.
-        if(username!='' and userpassword!=''):
-            print 'Intentando logear a ',username,' con pass: ', userpassword
-
-
-            #Si esos campos están rellenos lo que se quiere hacer es loguear, por tanto hay que:
-
-            #1. Comprobar si el usuario está en el sistema.
-
-            #2. En el caso de que sea así crear su sesión para que se mantenga durante toda su navegación en el sistema.
-
-
-            self.get()
-
-        #Si por el contrario si están vacío no se está logueando al usuario sino usando otro formulario.
-
-        else:
-            def validaTexto(texto):
-                if len(texto)>0:
-                    return True
-                else:
-                    return False
-
-
-            nombreUsuario = validaTexto(self.request.get('nombre'))
-            apellidosUsuario = validaTexto(self.request.get('apellidos'))
-
-            if not(nombreUsuario and apellidosUsuario):
-                template=template_env.get_template('templates/registroprofesores.html')
-                self.response.out.write(template.render())
-            else:
-                #Grabamos los datos en la base de datos.
-                GestorProfesores.nuevoProfesor(self.request.get('nombre'), self.request.get('apellidos'), self.request.get('dni'))
-
-                #Enviamos mensaje de aceptación.
-                self.response.out.write('<html><body>You wrote:<pre>')
-                self.response.out.write(nombreUsuario)
-                self.response.out.write('</pre></body></html>')
-
-
 class Alumnos(webapp2.RequestHandler):
 
     def get(self):
 
         #Obtenemos todos los Alumnos registrados en el sistema.
         resultados = GestorAlumnos.getAlumnos()
+        alumnos = Alumno.query()
+        resultados= alumnos.fetch(10)
 
-        templateVars = {"alumnos" : resultados}
+        FAVORITES = [ "chocolates", "lunar eclipses", "rabbits" ]
+        templateVars = {"favorites" : resultados}
 
         template = template_env.get_template('templates/alumnos.html')
-        #Cargamos la plantilla y le pasamos los datos cargardos
-        self.response.out.write(template.render(templateVars))
-
-class Profesores(webapp2.RequestHandler):
-
-    def get(self):
-
-        #Obtenemos todos los Alumnos registrados en el sistema.
-        resultados = GestorProfesores.getProfesores()
-
-        templateVars = {"profesores" : resultados}
-
-        template = template_env.get_template('templates/profesores.html')
         #Cargamos la plantilla y le pasamos los datos cargardos
         self.response.out.write(template.render(templateVars))
 
@@ -160,30 +92,16 @@ class MainPage(webapp2.RequestHandler):
         '''
         self.response.out.write(template.render())
 
-class HelloWorldHandler(webapp2.RequestHandler):
-   def get(self):
+class Hello(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.out.write('Hello Testing World!')
 
-       session = get_current_session()
-
-       #Extraemos un valor de la sesión, el valor count.
-       count = session.get('count', 0)
-
-
-       #Ponemos un valor en la sesión.
-       session['count'] = count + 1
-
-       html=count,'times'
-
-       # Create the handler's response "Hello World!" in plain text.
-       self.response.headers['Content-Type'] = 'text/plain'
-       self.response.out.write(html)
 
 application = webapp2.WSGIApplication([
                                       ('/', MainPage),
-                                      ('/registroalumnos', RegistroAlumnos),
-                                      ('/registroprofesores', RegistroProfesores),
+                                      ('/form', Formulario),
                                       ('/alumnos', Alumnos),
-                                      ('/profesores', Profesores),
-                                      ('/hello', HelloWorldHandler)
+                                      ('/hello', Hello)
                                       ]
                                       ,debug=True)
