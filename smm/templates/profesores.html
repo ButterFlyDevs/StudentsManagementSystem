@@ -1,0 +1,22 @@
+{% extends "templates/base.html" %}
+
+{% block content %}
+
+           <div class="uk-h1">
+             Profesores registrados
+           </div>
+
+           <ul class="uk-list uk-list-striped">
+             {% for profesor in profesores %}
+               <li>
+                    {{ profesor.nombre }}
+
+                    {{ profesor.apellidos }}
+
+                    {{ profesor.dni }}
+
+               </li>
+             {% endfor %}
+          </ul>
+
+{% endblock %}

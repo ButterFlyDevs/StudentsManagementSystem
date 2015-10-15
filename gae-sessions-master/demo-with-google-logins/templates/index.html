@@ -1,0 +1,36 @@
+<html>
+<head><title>gae-sessions demo with Google logins</title></head>
+<body>
+<div style="width:800px; margin: 0 auto;">
+{% if msg %}<div style="color:red">{{ msg }}</div>{% endif %}
+
+<h1><a href="http://github.com/dound/gae-sessions">gae-sessions</a> demo with Google logins</h1>
+<p><b>Purpose</b>: Show gae-sessions in action and demonstrate its ability to
+  store both simple and complex data in session variables.  Also demonstrate how
+  gae-sessions can be integrated with app engine's Google Accounts Users API.</p>
+
+<div>
+{% if myuser %}
+  <p>Thanks for signing on {{ myuser.user.nickname }}.
+  You can <a href="/logout">logout here</a>.</p>
+
+  <table border="1">
+    <tr><th colspan="2"># of Visits</th></tr>
+    <tr><th>Prior to this sign-on</td> <td>{{ myuser.past_view_count }}</td></tr>
+    <tr><th>During this sign-on</td>   <td>{{ num_now }}</td></tr>
+  </table>
+{% else %}
+  <a href="{{ login_url }}">Login now using your Google account!</a>
+{% endif %}
+
+  <p><a href="/2">Go to another page</a> (your session data will be there too, of course)</p>
+</div>
+
+<hr/>
+<div style="text-align:center">
+  <a href="http://github.com/dound/gae-sessions">gae-sessions</a>
+  by <a href="http://www.dound.com">David Underhill</a>
+</div>
+</div>
+</body>
+</html>
