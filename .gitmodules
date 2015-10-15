@@ -1,0 +1,3 @@
+[submodule "BD_Replica"]
+	path = BD_Replica
+	url = git@github.com:neon520/SMS-BDyReplica.git
