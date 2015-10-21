@@ -8,7 +8,7 @@ import cgi
 
 
 #from model import Alumno (No funciona)
-from tools.GestorAlumnos import GestorAlumnos
+from tools.GestorAlumnosSQL import GestorAlumnos
 from tools.GestorProfesores import GestorProfesores
 from tools.GestorAsignaturas import GestorAsignaturas
 
