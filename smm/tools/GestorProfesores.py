@@ -13,7 +13,7 @@ class GestorProfesores:
         profesor = modeloProfesor()
         profesor.nombre = nombre
         profesor.apellidos = apellidos
-        profesor.dni = dni        
+        profesor.dni = dni
         profesor.put()
 
     @classmethod
@@ -21,3 +21,11 @@ class GestorProfesores:
         profesores = modeloProfesor.query()
         #GestorAlumnos.nuevosAlumnos()
         return profesores.fetch(100)
+
+    @classmethod
+    def compruebaProfesor(self, nombre, password):
+        print 'Comprobando',nombre,password
+        #Donde nombre será el campo nombre del profesor y la password su DNI
+        qry=modeloProfesor.query(modeloProfesor.nombre==nombre, modeloProfesor.dni==password)
+        if qry.count()==1:
+            return True

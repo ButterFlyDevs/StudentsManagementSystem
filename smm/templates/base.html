@@ -15,32 +15,66 @@
 
    <div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
 
-     <!-- Título de la página -->
-     <h1>Students Management System Prototype</h1>
-     <h3>Centro Juan XXXIII</h3>
-     <h4 class="uk-text-danger">DEVELOPING STATUS</h4>
+     <div class="uk-grid">
+
+        <div class="uk-width-7-10">
+
+           <!-- Título y subtitulo de la página -->
+           <h1>Students Management System Prototype</h1>
+           <h3>Centro Juan XXXIII</h3>
+           <h4 class="uk-text-danger">DEVELOPING STATUS</h4>
+
+        </div>
+
+        <div class="uk-width-3-10">
+
+           <!--Sección de LOGIN-->
+           <!--Si el usuario se encuentra logueado en el sistema se pasara una variable con su nombre para que se muestre -->
+           {% if userAlias %}
+
+              <form method="get" action="logoff.py">
+                <!-- Iconito de perfil con acceso directo a la zona de perfil -->
+                <a class="uk-icon-user uk-icon-large uk-margin-right" href="/perfil"></a>
+                  <!--Ponemos el nombre del usuario-->
+                  {{userAlias}}
+                <a class="uk-button-medium" href="/salir">Salir</a>
+              </form>
+
+           <!--Si el usuario no se encuentra logueado en el sistema se muestra la sección de login habitual -->
+           {% else %}
+
+               <!--Formulario de login -->
+               <form id="login" name="login" method="post" class="uk-panel uk-panel-box uk-form">
+                   <input type="hidden" name="tipo" value="login">
+                   <!-- Antigua forma de renderizar todo de golpe: ${formularioLogin.render()} -->
+
+                   <div class="uk-text-small"> <!-- Para que el texto sea pequeño -->
+                      <!--Icono de usuario -->
+                      <i class="uk-icon-user uk-icon-large uk-margin-right"></i>
+                      <!--Campo de nombre-->
+                      <input name="username" type="text" placeholder="Nombre">
+                     <!--Campo del password-->
+                     <input name="userpassword" type="text" placeholder="Contraseña">
+                     <br>
+                      <input type="submit" class="uk-button uk-button-primary uk-margin-top" value="Entrar" name="user-action-login">
+                      <a class="uk-button uk-button-primary uk-margin-top" href="/registro">Registrarse</a>
+
+                   </div>
+               </form>
+
+           {% endif %}
+
+          </div>
+    </div> <!--Final del grid -->
+
+     <!--
+     {% if userAlias %}
+     <h1>me huele el pito a canela</h1>
+     {{ userAlias }}
+     {% endif %}
+     -->
 
 
-     <!--Formulario de login -->
-     <form id="login" name="login" method="post" class="uk-panel uk-panel-box uk-form">
-         <input type="hidden" name="tipo" value="login">
-         <!-- Antigua forma de renderizar todo de golpe: ${formularioLogin.render()} -->
-
-         <div class="uk-text-small"> <!-- Para que el texto sea pequeño -->
-            <!--Icono de usuario -->
-            <i class="uk-icon-user uk-icon-large uk-margin-right"></i>
-            <!--Campo de nombre-->
-            <input name="username" type="text" placeholder="Nombre">
-           <!--Campo del password-->
-           <input name="userpassword" type="text" placeholder="Contraseña">
-           <br>
-            <input type="submit" class="uk-button uk-button-primary uk-margin-top" value="Entrar" name="user-action-login">
-            <a class="uk-button uk-button-primary uk-margin-top" href="/registro">Registrarse</a>
-
-         </div>
-
-
-     </form>
 
 
      <!--Menú de navegación-->
@@ -64,6 +98,17 @@
                <ul class="uk-nav uk-nav-dropdown">
                    <li><a href="/registroprofesores">Registro</a></li>
                    <li><a href="/profesores">Listado</a></li>
+
+               </ul>
+           </div>
+       </li>
+
+       <li data-uk-dropdown="{mode:'click'}">
+           <a href="#">Asignaturas <i class="uk-icon-caret-down"></i></a>
+           <div class="uk-dropdown uk-dropdown-small">
+               <ul class="uk-nav uk-nav-dropdown">
+                   <li><a href="/registroasignaturas">Registro</a></li>
+                   <li><a href="/asignaturas">Listado</a></li>
 
                </ul>
            </div>

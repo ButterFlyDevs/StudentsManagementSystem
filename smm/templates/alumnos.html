@@ -2,16 +2,15 @@
 
 {% block content %}
 
+        <div class="uk-h1">
+          Alumnos registrados
+        </div>
 
-           <div class="uk-h1">
-             Alumnos registrados
-           </div>
 
-
-           <ul class="uk-list uk-list-striped">
-             {% for alumno in alumnos %}
-               <li>{{ alumno.nombre }} {{ alumno.apellidos }} </li>
-             {% endfor %}
-          </ul>
+        <ul class="uk-list uk-list-striped">
+          {% for alumno in alumnos %}
+            <li>{{ alumno.nombre }} {{ alumno.apellidos }} </li>
+          {% endfor %}
+        </ul>
 
 {% endblock %}

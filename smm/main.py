@@ -10,6 +10,7 @@ import cgi
 #from model import Alumno (No funciona)
 from tools.GestorAlumnos import GestorAlumnos
 from tools.GestorProfesores import GestorProfesores
+from tools.GestorAsignaturas import GestorAsignaturas
 
 #Vamos a usar el manejador de forms WTForms
 
@@ -29,6 +30,38 @@ template_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.getcwd()))
 
 
+class RegistroAsignaturas(webapp2.RequestHandler):
+
+    def get(self):
+
+        template=template_env.get_template('templates/registroasignaturas.html')
+        self.response.out.write(template.render())
+
+
+
+    def post(self):
+
+        def validaTexto(texto):
+            if len(texto)>0:
+                return True
+            else:
+                return False
+
+
+        nombreAsignatura = validaTexto(self.request.get('nombre'))
+        nombreGrupo = validaTexto(self.request.get('grupo'))
+
+        if not(nombreAsignatura and nombreGrupo):
+            template=template_env.get_template('templates/registroasignaturas.html')
+            self.response.out.write(template.render())
+        else:
+            #Grabamos los datos en la base de datos.
+            GestorAsignaturas.nuevaAsignatura(self.request.get('nombre'), self.request.get('grupo'))
+
+            #Enviamos mensaje de aceptación.
+            self.response.out.write('<html><body>You wrote:<pre>')
+            self.response.out.write(self.request.get('nombre'))
+            self.response.out.write('</pre></body></html>')
 
 class RegistroAlumnos(webapp2.RequestHandler):
 
@@ -53,7 +86,6 @@ class RegistroAlumnos(webapp2.RequestHandler):
 
         if not(nombreUsuario and apellidosUsuario):
             template=template_env.get_template('templates/registroalumnos.html')
-            template=template_env.get_template('templates/formulario.html')
             self.response.out.write(template.render())
         else:
             #Grabamos los datos en la base de datos.
@@ -147,6 +179,18 @@ class Profesores(webapp2.RequestHandler):
         #Cargamos la plantilla y le pasamos los datos cargardos
         self.response.out.write(template.render(templateVars))
 
+class Asignaturas(webapp2.RequestHandler):
+
+    def get(self):
+
+        #Obtenemos todos los Alumnos registrados en el sistema.
+        resultados = GestorAsignaturas.getAsignaturas()
+
+        templateVars = {"asignaturas" : resultados}
+
+        template = template_env.get_template('templates/asignaturas.html')
+        #Cargamos la plantilla y le pasamos los datos cargardos
+        self.response.out.write(template.render(templateVars))
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -183,7 +227,9 @@ application = webapp2.WSGIApplication([
                                       ('/', MainPage),
                                       ('/registroalumnos', RegistroAlumnos),
                                       ('/registroprofesores', RegistroProfesores),
+                                      ('/registroasignaturas', RegistroAsignaturas),
                                       ('/alumnos', Alumnos),
+                                      ('/asignaturas', Asignaturas),
                                       ('/profesores', Profesores),
                                       ('/hello', HelloWorldHandler)
                                       ]
