@@ -1,37 +1,43 @@
 # -*- coding: utf-8 -*-
 import MySQLdb
-from Alumno import *
+from Profesor import *
 
 '''Clase controladora de alumnos. Que usando la clase que define el modelo de Alumno (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
 '''
-class GestorAlumnos:
+class GestorProfesores:
+
 
     @classmethod
-    def nuevoAlumno(self, nombre, dni):
+    def nuevoProfesor(self, nombre, dni):
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
-        query="INSERT INTO Alumno values("+"'"+nombre+"', "+"'"+dni+"');"
+        query="insert into Profesor values("+"'"+nombre+"', "+"'"+dni+"');"
         cursor = db.cursor()
         cursor.execute(query);
         db.commit()
         cursor.close()
         db.close()
+
+
     @classmethod
-    def getAlumnos(self):
+    def getProfesores(self):
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm");
 
         cursor = db.cursor()
-        query="select * from Alumno";
+
+        query="select * from Profesor";
+
         cursor.execute(query);
+
         row = cursor.fetchone()
 
         lista = []
 
         while row is not None:
-            alumno = Alumno()
-            alumno.nombre=row[0]
-            alumno.apellidos=row[1]
-            lista.append(alumno)
+            prf = Profesor()
+            prf.nombre=row[0]
+            prf.dni=row[1]
+            lista.append(prf)
             #print row[0], row[1]
             row = cursor.fetchone()
 

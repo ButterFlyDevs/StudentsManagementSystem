@@ -9,8 +9,8 @@ import cgi
 
 #from model import Alumno (No funciona)
 from tools.GestorAlumnosSQL import GestorAlumnos
-from tools.GestorProfesores import GestorProfesores
-from tools.GestorAsignaturas import GestorAsignaturas
+from tools.GestorProfesoresSQL import GestorProfesores
+from tools.GestorAsignaturasSQL import GestorAsignaturas
 
 #Vamos a usar el manejador de forms WTForms
 
@@ -37,8 +37,6 @@ class RegistroAsignaturas(webapp2.RequestHandler):
         template=template_env.get_template('templates/registroasignaturas.html')
         self.response.out.write(template.render())
 
-
-
     def post(self):
 
         def validaTexto(texto):
@@ -49,14 +47,14 @@ class RegistroAsignaturas(webapp2.RequestHandler):
 
 
         nombreAsignatura = validaTexto(self.request.get('nombre'))
-        nombreGrupo = validaTexto(self.request.get('grupo'))
+        idAsignatura = validaTexto(self.request.get('id'))
 
-        if not(nombreAsignatura and nombreGrupo):
+        if not(nombreAsignatura and idAsignatura):
             template=template_env.get_template('templates/registroasignaturas.html')
             self.response.out.write(template.render())
         else:
             #Grabamos los datos en la base de datos.
-            GestorAsignaturas.nuevaAsignatura(self.request.get('nombre'), self.request.get('grupo'))
+            GestorAsignaturas.nuevaAsignatura(self.request.get('nombre'), self.request.get('id'))
 
             #Enviamos mensaje de aceptación.
             self.response.out.write('<html><body>You wrote:<pre>')
@@ -71,7 +69,6 @@ class RegistroAlumnos(webapp2.RequestHandler):
         self.response.out.write(template.render())
 
 
-
     def post(self):
 
         def validaTexto(texto):
@@ -82,14 +79,14 @@ class RegistroAlumnos(webapp2.RequestHandler):
 
 
         nombreUsuario = validaTexto(self.request.get('nombre'))
-        apellidosUsuario = validaTexto(self.request.get('apellidos'))
+        dniUsuario = validaTexto(self.request.get('dni'))
 
-        if not(nombreUsuario and apellidosUsuario):
+        if not(nombreUsuario and dniUsuario):
             template=template_env.get_template('templates/registroalumnos.html')
             self.response.out.write(template.render())
         else:
             #Grabamos los datos en la base de datos.
-            GestorAlumnos.nuevoAlumno(self.request.get('nombre'), self.request.get('apellidos'))
+            GestorAlumnos.nuevoAlumno(self.request.get('nombre'), self.request.get('dni'))
 
             #Enviamos mensaje de aceptación.
             self.response.out.write('<html><body>You wrote:<pre>')
@@ -138,14 +135,14 @@ class RegistroProfesores(webapp2.RequestHandler):
 
 
             nombreUsuario = validaTexto(self.request.get('nombre'))
-            apellidosUsuario = validaTexto(self.request.get('apellidos'))
+            dniUsuario = validaTexto(self.request.get('dni'))
 
-            if not(nombreUsuario and apellidosUsuario):
+            if not(nombreUsuario and dniUsuario):
                 template=template_env.get_template('templates/registroprofesores.html')
                 self.response.out.write(template.render())
             else:
                 #Grabamos los datos en la base de datos.
-                GestorProfesores.nuevoProfesor(self.request.get('nombre'), self.request.get('apellidos'), self.request.get('dni'))
+                GestorProfesores.nuevoProfesor(self.request.get('nombre'), self.request.get('dni'))
 
                 #Enviamos mensaje de aceptación.
                 self.response.out.write('<html><body>You wrote:<pre>')
