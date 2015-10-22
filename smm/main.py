@@ -227,17 +227,52 @@ class DetallesProfesor(webapp2.RequestHandler):
 
 
 
+
 '''
 En esta vamos a intentar hacer lo mismo que en la primera pero sin que la información
 se vea en la URL de la página y para eso usaremos post.
 '''
 class DetallesProfesor2(webapp2.RequestHandler):
-    def get(self):
-        self.response.write("2ª funcion")
 
+    def get(self):
+        self.response.write("No debería haber nada aquí :)")
+
+    #Por post nos llegan los datos de la petición de un profesor.
     def post(self):
-        dniUsuario = self.request.get('dniProfesor')
-        self.response.write(dniUsuario)
+        #Extraemos el profesor por el que nos preguntan del formulario con .get y el nombre del campo y creamos
+        #un objeto de tipo profesor que le pasaremos al html para que se muestre allí.
+
+        #Si se está haciendo petición por la información de un profesor
+
+        #Si se está haciendo petición por otros datos
+        tipo=self.request.get('tipo')
+
+
+        if tipo=="":
+
+            dniProfesor = self.request.get('dniProfesor')
+            profesor = GestorProfesores.getProfesor(dniProfesor)
+            templateVars = {"profesor" : profesor}
+            template = template_env.get_template('templates/detallesProfesor.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
+
+
+        if tipo=="alumnos":
+
+            dniProfesor = self.request.get('dniProfesor')
+            profesor = GestorProfesores.getProfesor(dniProfesor)
+
+            alumnosALosQueDaClaseElProfesor = GestorProfesores.getAlumnosProfesor(dniProfesor)
+
+            templateVars = {"profesor" : profesor,
+                            "alumnos" : alumnosALosQueDaClaseElProfesor}
+            template = template_env.get_template('templates/detallesProfesor.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
+        #self.response.write(dniProfesor)
 
 application = webapp2.WSGIApplication([
                                       ('/', MainPage),

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import MySQLdb
 from Profesor import *
+from Alumno import *
 
 '''Clase controladora de alumnos. Que usando la clase que define el modelo de Alumno (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
@@ -19,6 +20,59 @@ class GestorProfesores:
         db.close()
 
 
+    '''
+    Devuelve todos los Alumnos a los que un profesor le da clase
+    '''
+    @classmethod
+    def getAlumnosProfesor(self, dniProfesor):
+        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        cursor = db.cursor()
+        query="select Alumno.*  from Profesor, Imparte, Cursa, Alumno where Profesor.dni=Imparte.dniProfesor and Imparte.idAsignatura=Cursa.idAsignatura and Cursa.dniAlumno=Alumno.dni and Profesor.dni='"+dniProfesor+"';"
+
+        cursor.execute(query);
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            alumno = Alumno()
+            alumno.nombre=row[0]
+            alumno.apellidos=row[1]
+            lista.append(alumno)
+            #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
+
+
+    @classmethod
+    def getProfesor(self, dniProfesor):
+        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        cursor = db.cursor()
+        print "dniProfesor="+dniProfesor
+        query="select * from Profesor where dni='"+dniProfesor+"';"
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+
+        prf = Profesor()
+        prf.nombre=row[0]
+        prf.apellidos=row[1]
+        prf.dni=row[2]
+        prf.municipio=row[3]
+        prf.provincia=row[4]
+        prf.domicilio=row[5]
+        prf.email=row[6]
+        prf.telefono=row[7]
+
+        cursor.close()
+        db.close()
+
+        return prf
+
     @classmethod
     def getProfesores(self):
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm");
@@ -36,7 +90,14 @@ class GestorProfesores:
         while row is not None:
             prf = Profesor()
             prf.nombre=row[0]
-            prf.dni=row[1]
+            prf.apellidos=row[1]
+            prf.dni=row[2]
+            prf.municipio=row[3]
+            prf.provincia=row[4]
+            prf.domicilio=row[5]
+            prf.email=row[6]
+            prf.telefono=row[7]
+
             lista.append(prf)
             #print row[0], row[1]
             row = cursor.fetchone()

@@ -6,4 +6,11 @@ class Profesor:
 
     def __init__(self):
         self.nombre = ""
+        self.apellidos = ""
         self.dni = ""
+        self.municipio=""
+        self.provincia=""
+        self.domicilio=""
+        self.email=""
+        self.telefono=""
+        
