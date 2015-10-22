@@ -220,6 +220,25 @@ class HelloWorldHandler(webapp2.RequestHandler):
 
        self.response.out.write('Hello Testing World!')
 
+class DetallesProfesor(webapp2.RequestHandler):
+    def get(self, dniProfesor):
+        self.response.write('This is the ProductHandler. '
+            'The product id is %s' % dniProfesor)
+
+
+
+'''
+En esta vamos a intentar hacer lo mismo que en la primera pero sin que la información
+se vea en la URL de la página y para eso usaremos post.
+'''
+class DetallesProfesor2(webapp2.RequestHandler):
+    def get(self):
+        self.response.write("2ª funcion")
+
+    def post(self):
+        dniUsuario = self.request.get('dniProfesor')
+        self.response.write(dniUsuario)
+
 application = webapp2.WSGIApplication([
                                       ('/', MainPage),
                                       ('/registroalumnos', RegistroAlumnos),
@@ -228,6 +247,12 @@ application = webapp2.WSGIApplication([
                                       ('/alumnos', Alumnos),
                                       ('/asignaturas', Asignaturas),
                                       ('/profesores', Profesores),
-                                      ('/hello', HelloWorldHandler)
+                                      ('/hello', HelloWorldHandler),
+                                      #Estamos usando una expresión regular para poder coger parámetros por la URL.
+                                      #La idea es poder enviar desde el html un parametro a get de DetallesProfsor para que
+                                      #muestre la info detallada de ese profesor. Problema: que la información pasada
+                                      #se muestra en la barra del navegador pues forma parte de la URL
+                                      (r'/detallesProfesor/(\w+)', DetallesProfesor),
+                                      ('/detallesProfesor2', DetallesProfesor2)
                                       ]
                                       ,debug=True)

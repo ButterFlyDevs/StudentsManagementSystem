@@ -2,6 +2,14 @@
 
 {% block content %}
 
+
+          <script type="text/javascript">
+            function submitform(){
+              //alert(arguments[0]);
+              document.getElementById("envioDatos"+arguments[0]).submit();
+            }
+          </script>
+
            <div class="uk-h1">
              Profesores registrados
            </div>
@@ -9,14 +17,23 @@
            <ul class="uk-list uk-list-striped">
              {% for profesor in profesores %}
                <li>
-                    {{ profesor.nombre }}
 
-                    {{ profesor.apellidos }}
+                 <!--
+                 Para conseguir enviar por post datos sin que tenga que usarse un form probablemente
+                 tengamos que usar JavaScript
+                 -->
+                 <form id="envioDatos{{ profesor.nombre }}" action="/detallesProfesor2" method="post">
+                   <input type="hidden" name="dniProfesor" value="{{ profesor.dni }}"/>
+                 </form>
 
-                    {{ profesor.dni }}
+                 <a href="javascript: submitform('{{ profesor.nombre }}')">{{ profesor.nombre }}</a>
+
+                 {{ profesor.dni }}
+
 
                </li>
              {% endfor %}
           </ul>
+
 
 {% endblock %}
