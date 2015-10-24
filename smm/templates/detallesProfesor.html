@@ -31,23 +31,19 @@
  </div>
 
  <br>
- <nav class="uk-navbar">
+ <form id="alumnos" action="/detallesProfesor2" method="post">
+   <!--Para que la página completa cargue bien le pasamos el tipo de datos que queremos mostrar y el dni del profesor-->
+   <input type="hidden" name="tipo" value="alumnos"/>
+   <input type="hidden" name="dniProfesor" value="{{profesor.dni}}"/>
+ </form>
 
-     <ul class="uk-navbar-nav">
-
-         <form id="alumnos" action="/detallesProfesor2" method="post">
-           <!--Para que la página completa cargue bien le pasamos el tipo de datos que queremos mostrar y el dni del profesor-->
-           <input type="hidden" name="tipo" value="alumnos"/>
-           <input type="hidden" name="dniProfesor" value="{{profesor.dni}}"/>
-         </form>
-         <li class="uk-active"><a href="javascript: submitform('alumnos')">Alumnos</a></li>
+ <ul class="uk-tab" >
+   <li class="uk-active"><a href="javascript: submitform('alumnos')">Alumnos</a></li>
+   <li class="uk-disabled"><a href="javascript: submitform()">Asignaturas</a></li>
+ </ul>
 
 
-         <li><a href="javascript: submitform()">Asignaturas</a></li>
 
-     </ul>
-
- </nav>
 
  <!--Si se han pasado alumnos a la plantilla los vamos a listar -->
  {% if alumnos %}
