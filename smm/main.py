@@ -339,6 +339,49 @@ class DetallesAsignatura(webapp2.RequestHandler):
             #Cargamos la plantilla y le pasamos los datos cargardos
             self.response.out.write(template.render(templateVars))
 
+        if tipo == "herramientas":
+
+            #Dentro de esta sección podríamos hacer otra subsección con otro selección de tipo, como:
+
+            #tipoHerramienta=herramientaMatriculacion, por ejemplo
+
+
+            #Obtenemos los alumnos matriculados en esa asignatura
+            alumnosMatriculados = GestorAsignaturas.getAlumnosMatriculados(self.request.get('idAsignatura'))
+
+            #Obtenemos la información de la asignatura para seguir mostrándola
+            asignatura = GestorAsignaturas.getAsignatura(self.request.get('idAsignatura'))
+            #Enviamos el activador de la sección de Herramientas, para que se renderice esa zona
+
+            #Una vez dentro de herramientas seleccionamos el tipo que queramos.
+            tipoHerramienta = self.request.get('tipoHerramienta')
+
+            '''
+            Cuando no se haya seleccionado tipo de herramienta y se entre por primera vez para no mostrar el espacio
+            vacío mostramos la herramienta de matriculación.
+            '''
+            if tipoHerramienta == '':
+                print "no hay tipo de herramienta"
+                tipoHerramienta = 'mat'
+
+            #tipoHerramienta='desmat'
+            print "tipoHerramienta"+str(tipoHerramienta)+"<-"
+
+            '''
+            Nomenclatura de la sección de herramientas:
+            mat-> sección de matriculación
+            desmat -> sección de desmatriculación
+            del -> sección de eliminación de la asignatura.
+            '''
+
+            templateVars = {"asignatura" : asignatura,
+                            "herramienta" : tipoHerramienta,
+                            "alumnosParaMatricular" : alumnosMatriculados}
+
+            template = template_env.get_template('templates/detallesAsignatura.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
 
 '''
 En esta vamos a intentar hacer lo mismo que en la primera pero sin que la información
