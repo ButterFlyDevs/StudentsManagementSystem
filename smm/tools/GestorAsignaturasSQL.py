@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import MySQLdb
 from Asignatura import *
+from Profesor import *
+from Alumno import *
 
 '''Clase controladora de alumnos. Que usando la clase que define el modelo de Alumno (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
@@ -17,6 +19,75 @@ class GestorAsignaturas:
         db.commit()
         cursor.close()
         db.close()
+
+
+    @classmethod
+    def getAlumnosMatriculados(self, idAsignatura):
+        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        cursor = db.cursor()
+        query="select Alumno.* from Alumno, Cursa, Asignatura where Alumno.dni=Cursa.dniAlumno and Cursa.idAsignatura=Asignatura.id and Asignatura.id='"+idAsignatura+"';"
+
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            alumno = Alumno()
+            alumno.nombre=row[0]
+            alumno.dni=row[1]
+            lista.append(alumno)
+            #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
+
+    @classmethod
+    def getProfesoresQueImpartenLaAsignatura(self, idAsignatura):
+        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        cursor = db.cursor()
+        query="select Profesor.*  from Profesor, Imparte, Asignatura where Profesor.dni=Imparte.dniProfesor and Imparte.idAsignatura=Asignatura.id and Asignatura.id='"+idAsignatura+"';"
+
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            prf = Profesor()
+            prf.nombre=row[0]
+            prf.apellidos=row[1]
+            #El profesor tiene más atributos pero no los vamos a usar en principio.
+            lista.append(prf)
+            #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
+
+
+    @classmethod
+    def getAsignatura(self, idAsignatura):
+        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        cursor = db.cursor()
+        query="select * from Asignatura where id='"+idAsignatura+"';"
+
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        asig = Asignatura()
+        asig.nombre=row[0]
+        asig.id=row[1]
+
+        cursor.close()
+        db.close()
+
+        return asig
 
 
     @classmethod

@@ -2,6 +2,7 @@
 import MySQLdb
 from Profesor import *
 from Alumno import *
+from Asignatura import *
 
 '''Clase controladora de alumnos. Que usando la clase que define el modelo de Alumno (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
@@ -18,6 +19,33 @@ class GestorProfesores:
         db.commit()
         cursor.close()
         db.close()
+
+
+    '''
+    Devuelve todas las asignaturas en las que da clase el profesor.
+    '''
+    @classmethod
+    def getAsignaturasImpartidasProfesor(self, dniProfesor):
+        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        cursor = db.cursor()
+        query="select Asignatura.*  from Profesor, Imparte, Asignatura where Profesor.dni=Imparte.dniProfesor and Imparte.idAsignatura=Asignatura.id and Profesor.dni='"+dniProfesor+"';"
+
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            asg = Asignatura()
+            asg.nombre=row[0]
+            lista.append(asg)
+            #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
 
 
     '''

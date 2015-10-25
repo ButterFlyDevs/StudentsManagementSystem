@@ -6,7 +6,6 @@ import os
 import webapp2
 import cgi
 
-
 #from model import Alumno (No funciona)
 from tools.GestorAlumnosSQL import GestorAlumnos
 from tools.GestorProfesoresSQL import GestorProfesores
@@ -23,12 +22,8 @@ nuestra aplicación. La librería fue iniciada por Guido van Rsossum.
 
 from gaesessions import get_current_session
 
-
-
-
 template_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.getcwd()))
-
 
 class RegistroAsignaturas(webapp2.RequestHandler):
 
@@ -181,9 +176,9 @@ class Asignaturas(webapp2.RequestHandler):
     def get(self):
 
         #Obtenemos todos los Alumnos registrados en el sistema.
-        resultados = GestorAsignaturas.getAsignaturas()
+        asignaturas = GestorAsignaturas.getAsignaturas()
 
-        templateVars = {"asignaturas" : resultados}
+        templateVars = {"asignaturas" : asignaturas}
 
         template = template_env.get_template('templates/asignaturas.html')
         #Cargamos la plantilla y le pasamos los datos cargardos
@@ -226,6 +221,123 @@ class DetallesProfesor(webapp2.RequestHandler):
             'The product id is %s' % dniProfesor)
 
 
+'''
+En esta vamos a intentar hacer lo mismo que en la primera pero sin que la información
+se vea en la URL de la página y para eso usaremos post.
+'''
+class DetallesAlumno(webapp2.RequestHandler):
+
+    #Por post nos llegan los datos de la petición de un profesor.
+    def post(self):
+        #Extraemos el profesor por el que nos preguntan del formulario con .get y el nombre del campo y creamos
+        #un objeto de tipo profesor que le pasaremos al html para que se muestre allí.
+
+        #Si se está haciendo petición por la información de un profesor
+
+        #Si se está haciendo petición por otros datos
+        tipo=self.request.get('tipo')
+
+
+        #Si no se especifica tipo de petición de información se quiere mostrar sólo la información del profesor.
+        if tipo=="":
+
+            dniAlumno = self.request.get('dniAlumno')
+            print "DNI ALUMNO -> "+dniAlumno
+            alumno = GestorAlumnos.getAlumno(dniAlumno)
+            templateVars = {"alumno" : alumno}
+            template = template_env.get_template('templates/detallesAlumno.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
+
+        #Si se ha hecho post y el formulario incluye el campo tipo alumnos lo que se pide es que se muestre
+        # la información de alumnos en la misma página.
+        if tipo=="profesores":
+
+            #Obtenemos la información del alumno para seguir mostrándola.
+            dniAlumno = self.request.get('dniAlumno')
+            alumno = GestorAlumnos.getAlumno(dniAlumno)
+
+            #Obtenemos los profesores que imparten clase a ese alumno
+            profesoresQueImpartenClaseAlAlumno = GestorAlumnos.getProfesoresAlumno(dniAlumno)
+
+            templateVars = {"alumno" : alumno,
+                            "profesores" : profesoresQueImpartenClaseAlAlumno}
+            template = template_env.get_template('templates/detallesAlumno.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
+
+        if tipo=="asignaturas":
+
+            #Obtenemos la información del alumno para seguir mostrándola.
+            dniAlumno = self.request.get('dniAlumno')
+            alumno = GestorAlumnos.getAlumno(dniAlumno)
+
+            asignaturasMatriculadas = GestorAlumnos.getAsignaturasMatriculadas(dniAlumno)
+
+            templateVars = {"alumno" : alumno,
+                            "asignaturas" : asignaturasMatriculadas}
+            template = template_env.get_template('templates/detallesAlumno.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
+
+class DetallesAsignatura(webapp2.RequestHandler):
+
+    #Por post nos llegan los datos de la petición de un profesor.
+    def post(self):
+        #Extraemos el profesor por el que nos preguntan del formulario con .get y el nombre del campo y creamos
+        #un objeto de tipo profesor que le pasaremos al html para que se muestre allí.
+
+        #Si se está haciendo petición por la información de un profesor
+
+        #Si se está haciendo petición por otros datos
+        tipo=self.request.get('tipo')
+
+
+        #Si no se especifica tipo de petición de información se quiere mostrar sólo la información del profesor.
+        if tipo=="":
+
+            idAsignatura = self.request.get('idAsignatura')
+            asignatura = GestorAsignaturas.getAsignatura(idAsignatura)
+            templateVars = {"asignatura" : asignatura}
+            template = template_env.get_template('templates/detallesAsignatura.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
+
+        #Si se ha hecho post y el formulario incluye el campo tipo alumnos lo que se pide es que se muestre
+        # la información de alumnos en la misma página.
+        if tipo=="profesores":
+
+            #Obtenemos la información de la asignatura para seguir mostrándola
+            asignatura = GestorAsignaturas.getAsignatura(self.request.get('idAsignatura'))
+
+            #Obtenemos los profesores que imparten esa asignatura:
+            profesoresQueImpartenLaAsignatura = GestorAsignaturas.getProfesoresQueImpartenLaAsignatura(self.request.get('idAsignatura'))
+
+            templateVars = {"asignatura" : asignatura,
+                            "profesores" : profesoresQueImpartenLaAsignatura}
+            template = template_env.get_template('templates/detallesAsignatura.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
+
+        if tipo=="alumnos":
+
+            #Obtenemos la información de la asignatura para seguir mostrándola
+            asignatura = GestorAsignaturas.getAsignatura(self.request.get('idAsignatura'))
+
+            #Obtenemos los alumnos matriculados en esa asignatura
+            alumnosMatriculados = GestorAsignaturas.getAlumnosMatriculados(self.request.get('idAsignatura'))
+
+            templateVars = {"asignatura" : asignatura,
+                            "alumnos" : alumnosMatriculados}
+
+            template = template_env.get_template('templates/detallesAsignatura.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
 
 
 '''
@@ -248,6 +360,7 @@ class DetallesProfesor2(webapp2.RequestHandler):
         tipo=self.request.get('tipo')
 
 
+        #Si no se especifica tipo de petición de información se quiere mostrar sólo la información del profesor.
         if tipo=="":
 
             dniProfesor = self.request.get('dniProfesor')
@@ -258,12 +371,13 @@ class DetallesProfesor2(webapp2.RequestHandler):
             self.response.out.write(template.render(templateVars))
 
 
-
+        #Si se ha hecho post y el formulario incluye el campo tipo alumnos lo que se pide es que se muestre
+        # la información de alumnos en la misma página.
         if tipo=="alumnos":
-
             dniProfesor = self.request.get('dniProfesor')
+            #Obtenemos el objeto profesor para que siga mostrandose en la página.
             profesor = GestorProfesores.getProfesor(dniProfesor)
-
+            #Obtenemos los alumnos a los que imparte clase ese profesor:
             alumnosALosQueDaClaseElProfesor = GestorProfesores.getAlumnosProfesor(dniProfesor)
 
             templateVars = {"profesor" : profesor,
@@ -271,6 +385,18 @@ class DetallesProfesor2(webapp2.RequestHandler):
             template = template_env.get_template('templates/detallesProfesor.html')
             #Cargamos la plantilla y le pasamos los datos cargardos
             self.response.out.write(template.render(templateVars))
+
+
+        if tipo=="asignaturas":
+            dniProfesor = self.request.get('dniProfesor')
+            profesor = GestorProfesores.getProfesor(dniProfesor)
+            asignaturasImpatidasPorProfesor = GestorProfesores.getAsignaturasImpartidasProfesor(dniProfesor)
+            templateVars = {"profesor" : profesor,
+                            "asignaturas" : asignaturasImpatidasPorProfesor}
+            template = template_env.get_template('templates/detallesProfesor.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
 
         #self.response.write(dniProfesor)
 
@@ -288,6 +414,8 @@ application = webapp2.WSGIApplication([
                                       #muestre la info detallada de ese profesor. Problema: que la información pasada
                                       #se muestra en la barra del navegador pues forma parte de la URL
                                       (r'/detallesProfesor/(\w+)', DetallesProfesor),
-                                      ('/detallesProfesor2', DetallesProfesor2)
+                                      ('/detallesProfesor2', DetallesProfesor2),
+                                      ('/detallesAlumno', DetallesAlumno),
+                                      ('/detallesAsignatura', DetallesAsignatura)
                                       ]
                                       ,debug=True)

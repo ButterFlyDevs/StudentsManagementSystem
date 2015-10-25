@@ -1,3 +1,11 @@
+<!--Ejecutador de submits específicos.-->
+<script type="text/javascript">
+  function submitform(){
+    //alert(arguments[0]);
+    document.getElementById("envioDatos"+arguments[0]).submit();
+  }
+</script>
+
 {% extends "templates/base.html" %}
 
 {% block content %}
@@ -9,7 +17,15 @@
 
         <ul class="uk-list uk-list-striped">
           {% for alumno in alumnos %}
-            <li>{{ alumno.nombre }} {{ alumno.apellidos }} </li>
+            <li>
+              <form id="envioDatos{{ alumno.nombre }}" action="/detallesAlumno" method="post">
+                <input type="hidden" name="dniAlumno" value="{{ alumno.dni }}"/>
+              </form>
+
+              <a href="javascript: submitform('{{ alumno.nombre }}')">{{ alumno.nombre }}</a>
+
+              {{ alumno.dni }}
+            </li>
           {% endfor %}
         </ul>
 

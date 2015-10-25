@@ -1,3 +1,13 @@
+<!--Ejecutador de submits específicos.-->
+<script type="text/javascript">
+  function submitform(){
+    //Alerta para depuración.
+    //alert(arguments[0]);
+    document.getElementById("envioDatos"+arguments[0]).submit();
+  }
+</script>
+
+
 {% extends "templates/base.html" %}
 
 {% block content %}
@@ -7,11 +17,18 @@
                        Asignaturas registradas
                      </div>
 
+                    <ul class="uk-list uk-list-striped">
+                      {% for asignatura in asignaturas %}
+                        <li>
+                          <form id="envioDatos{{ asignatura.id }}" action="/detallesAsignatura" method="post">
+                            <input type="hidden" name="idAsignatura" value="{{ asignatura.id }}"/>
+                          </form>
 
-                     <ul class="uk-list uk-list-striped">
-                       {% for asignatura in asignaturas %}
-                         <li>{{ asignatura.nombre }} {{ asignatura.id }} </li>
-                       {% endfor %}
+                          <a href="javascript: submitform('{{ asignatura.id }}')">{{ asignatura.nombre }}</a>
+
+                          {{ asignatura.id }}
+                        </li>
+                      {% endfor %}
                     </ul>
 
 {% endblock %}

@@ -13,14 +13,12 @@
 
   <div class="uk-block uk-block-muted">
      <div class="uk-container">
-     <h2>{{ profesor.nombre }}</h2>
+     <h2>{{ alumno.nombre }}</h2>
 
          <div class="uk-grid uk-grid-match" data-uk-grid-margin>
              <div class="uk-width-medium-1-3">
                  <div class="uk-panel">
-                   <div class="uk-text-muted"> {{ profesor.apellidos }} </div>
-                   <div class="uk-text-muted"> {{ profesor.dni }} </div>
-                   <div class="uk-text-muted"> {{ profesor.domicilio }} </div>
+                   <div class="uk-text-muted"> {{ alumno.dni }} </div>
                  </div>
              </div>
              <div class="uk-width-medium-1-3">
@@ -34,25 +32,25 @@
 
 
  <!-- Menú inferior de opciones -->
-     <form id="alumnos" action="/detallesProfesor2" method="post">
+     <form id="profesores" action="/detallesAlumno" method="post">
        <!--Para que la página completa cargue bien le pasamos el tipo de datos que queremos mostrar y el dni del profesor-->
-       <input type="hidden" name="tipo" value="alumnos"/>
-       <input type="hidden" name="dniProfesor" value="{{profesor.dni}}"/>
+       <input type="hidden" name="tipo" value="profesores"/>
+       <input type="hidden" name="dniAlumno" value="{{alumno.dni}}"/>
      </form>
-     <form id="asignaturas" action="/detallesProfesor2" method="post">
+     <form id="asignaturas" action="/detallesAlumno" method="post">
        <!--Para que la página completa cargue bien le pasamos el tipo de datos que queremos mostrar y el dni del profesor-->
        <input type="hidden" name="tipo" value="asignaturas"/>
-       <input type="hidden" name="dniProfesor" value="{{profesor.dni}}"/>
+       <input type="hidden" name="dniAlumno" value="{{alumno.dni}}"/>
      </form>
 
      <ul class="uk-tab" >
 
-       {% if alumnos %}
+       {% if profesores %}
         <li class="uk-active">
        {% else %}
         <li class="uk-disable">
        {% endif %}
-         <a href="javascript: submitform('alumnos')">Alumnos</a>
+         <a href="javascript: submitform('profesores')">Profesores</a>
        </li>
 
        <!--La clase usada depende de si esa pesataña está seleccionada o no para que de esa sensación de selección en la vista-->
@@ -68,28 +66,26 @@
      </ul>
 <!-- Fin menu inferir de opciones -->
 
-
-
- <!--Si se han pasado alumnos a la plantilla los vamos a listar -->
- {% if alumnos %}
-        <br>
-        <div class="uk-text-muted">Alumnos a los que imparte clase {{ profesor.nombre }} :</div>
-        <!--Para listarlos recorremos la lista de objetos pasada-->
-        <ul class="uk-list uk-list-line">
-          {% for alumno in alumnos %}
-            <li>{{ alumno.nombre }}  {{ alumno.apellidos }} </li>
-          {% endfor %}
-        </ul>
+<!--Si se han pasado alumnos a la plantilla los vamos a listar -->
+{% if profesores %}
+       <br>
+       <div class="uk-text-muted">Profesores que imparten clase a {{ alumno.nombre }} :</div>
+       <!--Para listarlos recorremos la lista de objetos pasada-->
+       <ul class="uk-list uk-list-line">
+         {% for profesor in profesores %}
+           <li>{{ profesor.nombre }}  {{ profesor.apellidos }} </li>
+         {% endfor %}
+       </ul>
 {% endif %}
 
-<!--Si se han pasado asignaturas las vamos a listar -->
+<!--Si se han pasado alumnos a la plantilla los vamos a listar -->
 {% if asignaturas %}
        <br>
-       <div class="uk-text-muted">Asignaturas que imparte {{ profesor.nombre }} :</div>
+       <div class="uk-text-muted">Asignaturas en las que se encuentra matriculado {{ alumno.nombre }} :</div>
        <!--Para listarlos recorremos la lista de objetos pasada-->
        <ul class="uk-list uk-list-line">
          {% for asignatura in asignaturas %}
-           <li>{{ asignatura.nombre }}  {{ asignatura.apellidos }} </li>
+           <li>{{ asignatura.nombre }}  {{ asignatura.id }} </li>
          {% endfor %}
        </ul>
 {% endif %}
