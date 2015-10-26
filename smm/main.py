@@ -383,6 +383,52 @@ class DetallesAsignatura(webapp2.RequestHandler):
             self.response.out.write(template.render(templateVars))
 
 
+        if tipo == "borradoAsignatura":
+
+            #Borramos la asignatura
+            asignatura = GestorAsignaturas.delAsignatura(self.request.get('idAsignatura'))
+
+            #Obtenemos todas las asignaturas registrados en el sistema.
+            asignaturas = GestorAsignaturas.getAsignaturas()
+
+            mensaje="eliminacion"
+
+            templateVars = {"asignaturas" : asignaturas,
+                            "mensaje" : mensaje}
+
+            template = template_env.get_template('templates/asignaturas.html')
+            #Cargamos la plantilla y le pasamos los datos cargardos
+            self.response.out.write(template.render(templateVars))
+
+
+
+class SubidaAlumnosCSV(webapp2.RequestHandler):
+
+    def post(self):
+        file = self.request.get('fichero')
+        import csv
+        import sys
+
+        f = open(file, 'r')
+        csv.register_dialect('prueba', delimiter=',')
+        reader = csv.reader(f, dialect='prueba')
+
+        for i in range(10):
+                row = reader.next()
+                nombre = row[0]
+                nombreDividido = nombre.split(',')
+                if len(nombreDividido)==2:
+                        #print nombreDividido[1],nombreDividido[0]
+                        nombre=unicode(nombreDividido[1], errors='replace')
+                        apellidos=unicode(nombreDividido[0], errors='replace')
+
+                    #    GestorAlumnos.nuevoAlumno(nombre, apellidos)
+
+                else:
+                        print nombreDividido[0]
+
+
+
 '''
 En esta vamos a intentar hacer lo mismo que en la primera pero sin que la información
 se vea en la URL de la página y para eso usaremos post.
@@ -459,6 +505,7 @@ application = webapp2.WSGIApplication([
                                       (r'/detallesProfesor/(\w+)', DetallesProfesor),
                                       ('/detallesProfesor2', DetallesProfesor2),
                                       ('/detallesAlumno', DetallesAlumno),
-                                      ('/detallesAsignatura', DetallesAsignatura)
+                                      ('/detallesAsignatura', DetallesAsignatura),
+                                      ('/subidaAlumnosCSV', SubidaAlumnosCSV)
                                       ]
                                       ,debug=True)

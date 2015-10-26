@@ -7,7 +7,6 @@
   }
 </script>
 
-
 {% extends "templates/base.html" %}
 
 {% block content %}
@@ -30,5 +29,12 @@
                         </li>
                       {% endfor %}
                     </ul>
+
+
+                    {% if mensaje=="eliminacion"%}
+                    "Mensaje emergente avisando de que se ha eliminado" (Sólo se muestra cuando se viene de eliminar una)
+                    {% endif %}
+
+
 
 {% endblock %}

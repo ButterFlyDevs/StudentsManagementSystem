@@ -5,6 +5,7 @@
   <script>
     function submitform(){
       //Entre paréntesis introducimos el id del elemento que queremos hacer submit
+      //alert(arguments[0])
       document.getElementById(arguments[0]).submit();
     }
   </script>
@@ -173,27 +174,15 @@
         En esta sección podrá matricular a cualquier alumno del sistema en esta asignatura,
         a continuación se muestran todos los estudiantes registrados no matricualdos en {{asignatura.nombre}} : {{asignatura.id}} .
 
-
-        <!--Para listarlos recorremos la lista de objetos pasada-->
-        <br>
-        <br>
-        <ul class="uk-list uk-list-line">
-          {% for alumno in alumnosParaMatricular %}
-            <!--Añadimos un icono antes del nombre y el dni del alumno -->
-            <li>
-              <div class="uk-icon-child uk-icon-medium"></div> {{ alumno.nombre }}  {{ alumno.dni }}
-            </li>
-          {% endfor %}
-        </ul>
-
-        <br>
-
         <div class="uk-alert uk-alert-success" data-uk-alert>
           <a href="#" class="uk-alert-close uk-close"></a>
           <p>Esta funcionalidad está en fase de desarrollo.</p>
         </div>
 
     </div>
+
+
+
     {% endif %}
 
 
@@ -230,6 +219,14 @@
         <button class="uk-button-danger" data-uk-modal="{target:'#modal6'}">Borrar Asignatura</button>
 
         <!--Implementación del menú emergente de confirmación de elminación de asignatura -->
+
+        <form id="borradoAsignatura" action="/detallesAsignatura" method="post">
+          <!--Para que la página completa cargue bien le pasamos el tipo de datos que queremos mostrar y el dni del profesor-->
+          <input type="hidden" name="tipo" value="borradoAsignatura"/>
+          <input type="hidden" name="idAsignatura" value="{{asignatura.id}}"/>
+        </form>
+
+
         <div id="modal6" class="uk-modal">
             <div class="uk-modal-dialog">
                 <button type="button" class="uk-modal-close uk-close"></button>
@@ -246,7 +243,7 @@
                 </p>
                 <div class="uk-modal-footer uk-text-right">
                     <button type="button" class="uk-button uk-modal-close">Cancelar</button>
-                    <button type="button" class="uk-button uk-button-danger">Borrar</button>
+                    <button type="submit" class="uk-button uk-button-danger" form="borradoAsignatura">Borrar</button>
 
                     <!--
                     Aquí tendremos que llamar a post para que borre la asignatura con el id de la asignatura que estamos manejando.
@@ -268,6 +265,44 @@
   </div><!--Fin de la división del grid-->
 
 
+  {% if herramienta == "mat" %}
+      <div class="uk-grid">
+                <!--Primera sección del grid: MENU de OPCIONES-->
+                <div class="uk-width-medium-5-10">
+                    <!--Para listarlos recorremos la lista de objetos pasada-->
+                    <br>
+                    Todos los estudiantes
+                    <br>
+                    <ul class="uk-list uk-list-line">
+                      {% for alumno in alumnosParaMatricular %}
+                        <!--Añadimos un icono antes del nombre y el dni del alumno -->
+                        <li>
+                          <div class="uk-icon-child uk-icon-medium"></div> {{ alumno.nombre }}  {{ alumno.dni }} Matricular
+                        </li>
+                      {% endfor %}
+                    </ul>
+
+                    <br>
+                </div>
+
+                <div class="uk-width-medium-5-10">
+                    <!--Para listarlos recorremos la lista de objetos pasada-->
+                    <br>
+                    Estudiantes matriculados en {{asignatura.nombre}}
+                    <br>
+                    <ul class="uk-list uk-list-line">
+                      {% for alumno in alumnosParaMatricular %}
+                        <!--Añadimos un icono antes del nombre y el dni del alumno -->
+                        <li>
+                          <div class="uk-icon-child uk-icon-medium"></div> {{ alumno.nombre }}  {{ alumno.dni }}
+                        </li>
+                      {% endfor %}
+                    </ul>
+
+                    <br>
+                </div>
+    </div><!--Fin del subgrid-->
+    {% endif %}
 
 {% endif %}
 

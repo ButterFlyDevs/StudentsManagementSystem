@@ -20,6 +20,16 @@ class GestorAsignaturas:
         cursor.close()
         db.close()
 
+    @classmethod
+    def delAsignatura(self, idAsignatura):
+        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        cursor = db.cursor()
+        query="delete from Asignatura where id='"+idAsignatura+"';"
+        cursor = db.cursor()
+        cursor.execute(query);
+        db.commit()
+        cursor.close()
+        db.close()
 
     @classmethod
     def getAlumnosMatriculados(self, idAsignatura):
@@ -69,6 +79,8 @@ class GestorAsignaturas:
         db.close()
 
         return lista
+
+
 
 
     @classmethod

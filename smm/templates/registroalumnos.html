@@ -44,4 +44,16 @@
       </fieldset>
 
 
+      <br>
+
+      <!--Sección de subida de ficheros -->
+      <legend>Registro masivo a través de ficheros con formato </legend>
+
+      <br>
+      <form action="/subidaAlumnosCSV" class="form-horizontal" enctype="multipart/form-data" method="post">
+          <input multiple id="file" name="fichero" type="file">
+          <button type="submit" class="uk-button-primary">Analizar</button>
+      </form>
+
+
 {% endblock %}
