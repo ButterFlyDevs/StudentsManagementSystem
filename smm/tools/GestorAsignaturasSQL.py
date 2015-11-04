@@ -33,6 +33,11 @@ class GestorAsignaturas:
 
     @classmethod
     def getAlumnosMatriculados(self, idAsignatura):
+        '''
+        Según el modelo ER v01 (mysqlfiles/ERv01.jpg) una asignatura siempre está asociada a un grupo y es a esta
+        asociación Grupo-Asignatura a la que se matricula un Alumno, por tanto, tenemos que extraer todos los grupos
+        en los que se imparte esa asignatura y todos los alumnos que cursan esa asignatura en esos grupos.
+        '''
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
         query="select Alumno.* from Alumno, Cursa, Asignatura where Alumno.dni=Cursa.dniAlumno and Cursa.idAsignatura=Asignatura.id and Asignatura.id='"+idAsignatura+"';"
