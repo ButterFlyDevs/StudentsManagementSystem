@@ -85,21 +85,22 @@ class GestorProfesores:
         cursor.execute(query)
         row = cursor.fetchone()
 
-
-        prf = Profesor()
-        prf.nombre=row[0]
-        prf.apellidos=row[1]
-        prf.dni=row[2]
-        prf.municipio=row[3]
-        prf.provincia=row[4]
-        prf.domicilio=row[5]
-        prf.email=row[6]
-        prf.telefono=row[7]
+        while row is not None:
+            prf = Profesor()
+            prf.nombre=row[0]
+            prf.apellidos=row[1]
+            prf.dni=row[2]
+            prf.municipio=row[3]
+            prf.provincia=row[4]
+            prf.domicilio=row[5]
+            prf.email=row[6]
+            prf.telefono=row[7]
+            return prf
 
         cursor.close()
         db.close()
 
-        return prf
+        return None
 
     @classmethod
     def getProfesores(self):

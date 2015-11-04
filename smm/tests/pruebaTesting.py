@@ -7,9 +7,8 @@ class AllUniqueTests(unittest.TestCase):
 
   def test_all_unique(self):
 
-    self.assertTrue (all_unique(""))
-    self.assertTrue (all_unique("a"))
-
+    self.assertTrue (GestorAlumnos.insertarAlumno(""))
+    self.assertTrue (GestorAlumnos.insertaAlumno("a"))
 
 
 

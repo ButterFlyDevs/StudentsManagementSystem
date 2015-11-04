@@ -28,9 +28,13 @@ template_env = jinja2.Environment(
 class RegistroAsignaturas(webapp2.RequestHandler):
 
     def get(self):
+        session = get_current_session()
+        nombreUsuario=session.get('nombre',None)
+
+        templateVars = {"sesion" : True, "userAlias":nombreUsuario}
 
         template=template_env.get_template('templates/registroasignaturas.html')
-        self.response.out.write(template.render())
+        self.response.out.write(template.render(templateVars))
 
     def post(self):
 
@@ -60,8 +64,13 @@ class RegistroAlumnos(webapp2.RequestHandler):
 
     def get(self):
 
+        session = get_current_session()
+        nombreUsuario=session.get('nombre',None)
+
+        templateVars = {"sesion" : True, "userAlias":nombreUsuario}
+
         template=template_env.get_template('templates/registroalumnos.html')
-        self.response.out.write(template.render())
+        self.response.out.write(template.render(templateVars))
 
 
     def post(self):
@@ -90,17 +99,22 @@ class RegistroAlumnos(webapp2.RequestHandler):
 
 class RegistroProfesores(webapp2.RequestHandler):
 
-    def get(self):
+    def get(self,mensaje='None'):
 
         #Siempre antes de cargar una página se cargará la cookie de la sesión de usuario
         session = get_current_session()
-
+        nombreUsuario=session.get('nombre',None)
+        templateVars = {"sesion" : True, "userAlias":nombreUsuario}
         template=template_env.get_template('templates/registroprofesores.html')
-        self.response.out.write(template.render())
+
+        self.response.out.write(template.render(templateVars))
 
 
 
     def post(self):
+
+
+        session = get_current_session()
 
         username=self.request.get('username')
         userpassword=self.request.get('userpassword')
@@ -113,12 +127,21 @@ class RegistroProfesores(webapp2.RequestHandler):
             #Si esos campos están rellenos lo que se quiere hacer es loguear, por tanto hay que:
 
             #1. Comprobar si el usuario está en el sistema.
+            #Vamos a usar el password como contraseña
+            profesorLogeado=GestorProfesores.getProfesor(userpassword);
 
             #2. En el caso de que sea así crear su sesión para que se mantenga durante toda su navegación en el sistema.
+            if(profesorLogeado!=None):
+                print "Profesor logueado"
 
-
-            self.get()
-
+                #Introducimos el nombre y el dni del usuario logueado en la sesión.
+                session['nombre']='juan'
+                session['dni']='45601217'
+                self.get('')
+            else:
+                print "Profesor desconocido en el sistema"
+                session.terminate()
+                self.get('error')
         #Si por el contrario si están vacío no se está logueando al usuario sino usando otro formulario.
 
         else:
@@ -149,10 +172,14 @@ class Alumnos(webapp2.RequestHandler):
 
     def get(self):
 
+        session = get_current_session()
+        nombreUsuario=session.get('nombre',None)
+
+
         #Obtenemos todos los Alumnos registrados en el sistema.
         resultados = GestorAlumnos.getAlumnos()
 
-        templateVars = {"alumnos" : resultados}
+        templateVars = {"sesion" : True, "userAlias":nombreUsuario, "alumnos" : resultados }
 
         template = template_env.get_template('templates/alumnos.html')
         #Cargamos la plantilla y le pasamos los datos cargardos
@@ -162,10 +189,13 @@ class Profesores(webapp2.RequestHandler):
 
     def get(self):
 
+        session = get_current_session()
+        nombreUsuario=session.get('nombre',None)
+
         #Obtenemos todos los Alumnos registrados en el sistema.
         resultados = GestorProfesores.getProfesores()
 
-        templateVars = {"profesores" : resultados}
+        templateVars = {"sesion":True, "userAlias":nombreUsuario, "profesores" : resultados}
 
         template = template_env.get_template('templates/profesores.html')
         #Cargamos la plantilla y le pasamos los datos cargardos
@@ -175,25 +205,79 @@ class Asignaturas(webapp2.RequestHandler):
 
     def get(self):
 
+        session = get_current_session()
+        nombreUsuario=session.get('nombre',None)
+
         #Obtenemos todos los Alumnos registrados en el sistema.
         asignaturas = GestorAsignaturas.getAsignaturas()
 
-        templateVars = {"asignaturas" : asignaturas}
+        templateVars = {"sesion" : True, "userAlias":nombreUsuario, "asignaturas" : asignaturas}
 
         template = template_env.get_template('templates/asignaturas.html')
         #Cargamos la plantilla y le pasamos los datos cargardos
         self.response.out.write(template.render(templateVars))
 
-class MainPage(webapp2.RequestHandler):
-    def get(self):
+class Inicio(webapp2.RequestHandler):
+    def get(self, mensaje=None):
+
         template = template_env.get_template('templates/inicio.html')
-        '''
-        user = self.session.get('user')
-        template_values = {
-            'user': user
-            }
-        '''
-        self.response.out.write(template.render())
+
+        session = get_current_session()
+
+        nombreUsuario=session.get('nombre',None)
+
+        if session.is_active():
+            nombreUsuario=session.get('nombre',None)
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario}
+            self.response.out.write(template.render(templateVars))
+        else:
+            #No hay sesión de usuario válida y se muestra la pantalla de inicio estática con mensaje de error
+            templateVars = {"sesion" : None, "errorLogin" : mensaje}
+            self.response.out.write(template.render(templateVars))
+
+    def post(self):
+
+
+        session = get_current_session()
+
+        username=self.request.get('username')
+        userpassword=self.request.get('userpassword')
+
+        #Si los campos de login de usuario NO están vacíos es que se está logueando un usuario.
+        if(username!='' and userpassword!=''):
+            print 'Intentando logear a ',username,' con pass: ', userpassword
+
+
+            #Si esos campos están rellenos lo que se quiere hacer es loguear, por tanto hay que:
+
+            #1. Comprobar si el usuario está en el sistema.
+            #Vamos a usar el password como contraseña
+            profesorLogeado=GestorProfesores.getProfesor(userpassword);
+
+            #2. En el caso de que sea así crear su sesión para que se mantenga durante toda su navegación en el sistema.
+            if(profesorLogeado!=None):
+                print "Profesor logueado"
+
+                #Introducimos el nombre y el dni del usuario logueado en la sesión.
+                session['nombre']='juan'
+                session['dni']='45601217'
+                self.get()
+            else:
+                print "Profesor desconocido en el sistema"
+                session.terminate()
+                self.get('error')
+        #Si por el contrario si están vacío no se está logueando al usuario porque no se está introduciendo nada:
+        else:
+            self.get('error')
+
+
+
+class Salir(webapp2.RequestHandler):
+    def get(self):
+        session = get_current_session()
+        if session.is_active():
+            session.terminate()
+        self.redirect('/')
 
 class HelloWorldHandler(webapp2.RequestHandler):
    def get(self):
@@ -229,6 +313,12 @@ class DetallesAlumno(webapp2.RequestHandler):
 
     #Por post nos llegan los datos de la petición de un profesor.
     def post(self):
+
+
+        session = get_current_session()
+        nombreUsuario=session.get('nombre',None)
+
+
         #Extraemos el profesor por el que nos preguntan del formulario con .get y el nombre del campo y creamos
         #un objeto de tipo profesor que le pasaremos al html para que se muestre allí.
 
@@ -244,7 +334,7 @@ class DetallesAlumno(webapp2.RequestHandler):
             dniAlumno = self.request.get('dniAlumno')
             print "DNI ALUMNO -> "+dniAlumno
             alumno = GestorAlumnos.getAlumno(dniAlumno)
-            templateVars = {"alumno" : alumno}
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"alumno" : alumno}
             template = template_env.get_template('templates/detallesAlumno.html')
             #Cargamos la plantilla y le pasamos los datos cargardos
             self.response.out.write(template.render(templateVars))
@@ -261,7 +351,7 @@ class DetallesAlumno(webapp2.RequestHandler):
             #Obtenemos los profesores que imparten clase a ese alumno
             profesoresQueImpartenClaseAlAlumno = GestorAlumnos.getProfesoresAlumno(dniAlumno)
 
-            templateVars = {"alumno" : alumno,
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"alumno" : alumno,
                             "profesores" : profesoresQueImpartenClaseAlAlumno}
             template = template_env.get_template('templates/detallesAlumno.html')
             #Cargamos la plantilla y le pasamos los datos cargardos
@@ -276,7 +366,7 @@ class DetallesAlumno(webapp2.RequestHandler):
 
             asignaturasMatriculadas = GestorAlumnos.getAsignaturasMatriculadas(dniAlumno)
 
-            templateVars = {"alumno" : alumno,
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"alumno" : alumno,
                             "asignaturas" : asignaturasMatriculadas}
             template = template_env.get_template('templates/detallesAlumno.html')
             #Cargamos la plantilla y le pasamos los datos cargardos
@@ -287,6 +377,10 @@ class DetallesAsignatura(webapp2.RequestHandler):
 
     #Por post nos llegan los datos de la petición de un profesor.
     def post(self):
+
+        session = get_current_session()
+        nombreUsuario=session.get('nombre',None)
+
         #Extraemos el profesor por el que nos preguntan del formulario con .get y el nombre del campo y creamos
         #un objeto de tipo profesor que le pasaremos al html para que se muestre allí.
 
@@ -301,7 +395,7 @@ class DetallesAsignatura(webapp2.RequestHandler):
 
             idAsignatura = self.request.get('idAsignatura')
             asignatura = GestorAsignaturas.getAsignatura(idAsignatura)
-            templateVars = {"asignatura" : asignatura}
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"asignatura" : asignatura}
             template = template_env.get_template('templates/detallesAsignatura.html')
             #Cargamos la plantilla y le pasamos los datos cargardos
             self.response.out.write(template.render(templateVars))
@@ -317,7 +411,7 @@ class DetallesAsignatura(webapp2.RequestHandler):
             #Obtenemos los profesores que imparten esa asignatura:
             profesoresQueImpartenLaAsignatura = GestorAsignaturas.getProfesoresQueImpartenLaAsignatura(self.request.get('idAsignatura'))
 
-            templateVars = {"asignatura" : asignatura,
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"asignatura" : asignatura,
                             "profesores" : profesoresQueImpartenLaAsignatura}
             template = template_env.get_template('templates/detallesAsignatura.html')
             #Cargamos la plantilla y le pasamos los datos cargardos
@@ -332,7 +426,7 @@ class DetallesAsignatura(webapp2.RequestHandler):
             #Obtenemos los alumnos matriculados en esa asignatura
             alumnosMatriculados = GestorAsignaturas.getAlumnosMatriculados(self.request.get('idAsignatura'))
 
-            templateVars = {"asignatura" : asignatura,
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"asignatura" : asignatura,
                             "alumnos" : alumnosMatriculados}
 
             template = template_env.get_template('templates/detallesAsignatura.html')
@@ -374,7 +468,7 @@ class DetallesAsignatura(webapp2.RequestHandler):
             del -> sección de eliminación de la asignatura.
             '''
 
-            templateVars = {"asignatura" : asignatura,
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"asignatura" : asignatura,
                             "herramienta" : tipoHerramienta,
                             "alumnosParaMatricular" : alumnosMatriculados}
 
@@ -440,6 +534,10 @@ class DetallesProfesor2(webapp2.RequestHandler):
 
     #Por post nos llegan los datos de la petición de un profesor.
     def post(self):
+
+        session = get_current_session()
+        nombreUsuario=session.get('nombre',None)
+
         #Extraemos el profesor por el que nos preguntan del formulario con .get y el nombre del campo y creamos
         #un objeto de tipo profesor que le pasaremos al html para que se muestre allí.
 
@@ -454,7 +552,7 @@ class DetallesProfesor2(webapp2.RequestHandler):
 
             dniProfesor = self.request.get('dniProfesor')
             profesor = GestorProfesores.getProfesor(dniProfesor)
-            templateVars = {"profesor" : profesor}
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"profesor" : profesor}
             template = template_env.get_template('templates/detallesProfesor.html')
             #Cargamos la plantilla y le pasamos los datos cargardos
             self.response.out.write(template.render(templateVars))
@@ -469,7 +567,7 @@ class DetallesProfesor2(webapp2.RequestHandler):
             #Obtenemos los alumnos a los que imparte clase ese profesor:
             alumnosALosQueDaClaseElProfesor = GestorProfesores.getAlumnosProfesor(dniProfesor)
 
-            templateVars = {"profesor" : profesor,
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"profesor" : profesor,
                             "alumnos" : alumnosALosQueDaClaseElProfesor}
             template = template_env.get_template('templates/detallesProfesor.html')
             #Cargamos la plantilla y le pasamos los datos cargardos
@@ -480,7 +578,7 @@ class DetallesProfesor2(webapp2.RequestHandler):
             dniProfesor = self.request.get('dniProfesor')
             profesor = GestorProfesores.getProfesor(dniProfesor)
             asignaturasImpatidasPorProfesor = GestorProfesores.getAsignaturasImpartidasProfesor(dniProfesor)
-            templateVars = {"profesor" : profesor,
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario,"profesor" : profesor,
                             "asignaturas" : asignaturasImpatidasPorProfesor}
             template = template_env.get_template('templates/detallesProfesor.html')
             #Cargamos la plantilla y le pasamos los datos cargardos
@@ -490,7 +588,7 @@ class DetallesProfesor2(webapp2.RequestHandler):
         #self.response.write(dniProfesor)
 
 application = webapp2.WSGIApplication([
-                                      ('/', MainPage),
+                                      ('/', Inicio),
                                       ('/registroalumnos', RegistroAlumnos),
                                       ('/registroprofesores', RegistroProfesores),
                                       ('/registroasignaturas', RegistroAsignaturas),
@@ -506,6 +604,7 @@ application = webapp2.WSGIApplication([
                                       ('/detallesProfesor2', DetallesProfesor2),
                                       ('/detallesAlumno', DetallesAlumno),
                                       ('/detallesAsignatura', DetallesAsignatura),
-                                      ('/subidaAlumnosCSV', SubidaAlumnosCSV)
+                                      ('/subidaAlumnosCSV', SubidaAlumnosCSV),
+                                      ('/salir',Salir)
                                       ]
                                       ,debug=True)

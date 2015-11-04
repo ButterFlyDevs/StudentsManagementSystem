@@ -58,7 +58,11 @@
                      <input name="userpassword" type="text" placeholder="Contraseña">
                      <br>
                       <input type="submit" class="uk-button uk-button-primary uk-margin-top" value="Entrar" name="user-action-login">
-                      <a class="uk-button uk-button-primary uk-margin-top" href="/registro">Registrarse</a>
+
+
+                      {% if errorLogin %}
+                        <div class="uk-alert uk-alert-danger">Error de login</div>
+                      {% endif %}
 
                    </div>
                </form>
@@ -69,16 +73,12 @@
     </div>
     <!--Final del grid -->
 
-     <!--
-     {% if userAlias %}
-     <h1>me huele el pito a canela</h1>
-     {{ userAlias }}
-     {% endif %}
-     -->
 
 
 
 
+    <!--Sólo cuando hay una sessión activa válida de un usuario se muestra el menú de opciones-->
+    {% if sesion %}
      <!--Menú de navegación-->
      <ul class="uk-subnav uk-subnav-line">
 
@@ -119,6 +119,7 @@
 
      </ul>
 
+    {% endif %}
 
     {% block content %}{% endblock %}
 
