@@ -4,7 +4,7 @@ python:
 
 #dependencias requeridas:
 install:
-  sudo pip install nose
+  sudo pip install nosegae
 
 
 #comando para ejecutar los test:
