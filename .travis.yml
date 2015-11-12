@@ -6,6 +6,8 @@ python:
 install:
   - sudo pip install nosegae
   - sudo pip install webtest
+  - sudo pip install MySQL-python
+
 
 
 #comando para ejecutar los test:
