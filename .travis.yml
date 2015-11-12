@@ -3,7 +3,8 @@ python:
   - "2.7"
 
 #dependencias requeridas:
-#install:
+install:
+  sudo pip install nose
 
 
 #comando para ejecutar los test:
