@@ -3,8 +3,10 @@ python:
   - "2.7"
 
 #dependencias requeridas:
-install:
-  pip install nose
+#install:
+
 
 #comando para ejecutar los test:
 script: nosetests --with-gae --gae-lib-root ../google_appengine
+
+#*Pre-installed packages Travis CI installs the following packages by default in each virtualenv: pytest nose mock
