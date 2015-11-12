@@ -3,7 +3,7 @@ from webtest import TestApp
 import unittest
 import main
 
-#app = TestApp(main.application)
+app = TestApp(main.application)
 
 '''
 Cada una de las clases será un test que tendrá que pasar la ejecución.
