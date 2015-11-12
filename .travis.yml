@@ -3,7 +3,8 @@ python:
   - "2.7"
 
 #dependencias requeridas:
-#install
+install:
+  pip install nose
 
 #comando para ejecutar los test:
-script: smm/nosetests --with-gae --gae-lib-root ../google_appengine
+script: nosetests --with-gae --gae-lib-root ../google_appengine
