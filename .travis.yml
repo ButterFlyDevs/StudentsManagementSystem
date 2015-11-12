@@ -5,6 +5,7 @@ python:
 #dependencias requeridas:
 install:
   sudo pip install nosegae
+  sudo pip install webtest
 
 
 #comando para ejecutar los test:
