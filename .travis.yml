@@ -10,7 +10,7 @@ install:
 
 
 
-#comando para ejecutar los test:
+#comando para ejecutar los tests:
 script: nosetests -w smm/ --with-gae --gae-lib-root google_appengine/
 
 

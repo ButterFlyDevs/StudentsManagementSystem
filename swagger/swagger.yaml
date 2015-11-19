@@ -1,0 +1,105 @@
+swagger: '2.0'
+info:
+  title: Uber API
+  description: Move your app forward with the Uber API
+  version: 1.0.0
+host: api.udssdr.com
+schemes:
+  - https
+basePath: /v1
+produces:
+  - application/json
+
+paths:
+  /products:
+    get:
+      summary: Product Types
+      description: |
+        The Products endpoint returns information about the *Uber* products
+        offered at a given location. The response includes the display name
+        and other details about each product, and lists the products in the
+        proper display order.
+      parameters:
+        - name: latitude
+          in: query
+          description: Latitude component of location.
+          required: true
+          type: number
+          format: double
+        - name: longitude
+          in: query
+          description: Longitude component of location.
+          required: true
+          type: number
+          format: double
+      tags:
+        - Products
+      responses:
+        '200':
+          description: An array of products
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Product'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /profesores:
+    get:
+      summary: Lista de profesores
+      description: |
+        Devuelve todos los profesors almacenados
+        en el sistema.
+      responses:
+        '200':
+          description: An array of products
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Profesor'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+
+  Profesor:
+    description: La representación de un profesor
+    type: object
+    properties:
+      nombre:
+        type: string
+      apellidos:
+        type: string
+
+  Product:
+    type: object
+    properties:
+      product_id:
+        type: string
+        description: 'Unique identifier representing a specific product for a given latitude & longitude. For example, uberX in San Francisco will have a different product_id than uberX in Los Angeles.'
+      description:
+        type: string
+        description: Description of product.
+      display_name:
+        type: string
+        description: Display name of product.
+      capacity:
+        type: string
+        description: 'Capacity of product. For example, 4 people.'
+      image:
+        type: string
+        description: Image URL representing the product.
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

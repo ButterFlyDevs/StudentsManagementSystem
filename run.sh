@@ -1,5 +1,5 @@
 #!/bin/bash
 #Lanzamos el servidor:
-google_appengine/dev_appserver.py smm/
+google_appengine/dev_appserver.py sms/
 
 
