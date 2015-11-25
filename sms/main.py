@@ -6,13 +6,16 @@ import os
 import webapp2
 import cgi
 
+
 #from model import Alumno (No funcion
 
 #from tools.gestorElephantDB.GestorProfesoresSQL import GestorProfesores
 
-from tools.GestorAlumnosSQL import GestorAlumnos
-from tools.GestorProfesoresSQL import GestorProfesores
-from tools.GestorAsignaturasSQL import GestorAsignaturas
+from tools.gestorMicroservicioDB.GestorAlumnos import GestorAlumnos
+
+#from tools.GestorAlumnosSQL import GestorAlumnos
+#from tools.GestorProfesoresSQL import GestorProfesores
+#from tools.GestorAsignaturasSQL import GestorAsignaturas
 
 #Vamos a usar el manejador de forms WTForms
 
@@ -173,20 +176,35 @@ class RegistroProfesores(webapp2.RequestHandler):
 
 class Alumnos(webapp2.RequestHandler):
 
-    def get(self):
+    #Devuelve la vista general de la sección de alumnos
+    def get(self, vista=None):
 
         session = get_current_session()
         nombreUsuario=session.get('nombre',None)
 
-
         #Obtenemos todos los Alumnos registrados en el sistema.
         resultados = GestorAlumnos.getAlumnos()
 
-        templateVars = {"sesion" : True, "userAlias":nombreUsuario, "alumnos" : resultados }
+        #print "main"+resultados.nombre
+
+
+        templateVars = {"sesion" : True, "userAlias":nombreUsuario, "alumnos" : resultados, "alumno":"hola"}
+
 
         template = template_env.get_template('templates/alumnos.html')
         #Cargamos la plantilla y le pasamos los datos cargardos
         self.response.out.write(template.render(templateVars))
+
+        #self.response.out.write(resultados.apellidos)
+
+
+    #Gestiona las peticiones de los submenús:
+    def post(self):
+        #Enviamos las peticiones con detalles al get
+        print "hello"
+
+
+
 
 class Profesores(webapp2.RequestHandler):
 
@@ -591,20 +609,111 @@ class DetallesProfesor2(webapp2.RequestHandler):
 
         #self.response.write(dniProfesor)
 
+
+'''
+Esta clase no sólo da acceso a la aplicación en si sino que además discierne entre las vistas
+que carga dependiendo del rol y de los permisos de acceso que tenga el usuario en concreto.
+'''
+class SMS(webapp2.RequestHandler):
+    def get(self):
+
+        #En esta sección se deberá cargar una plantilla u otra dependiendo del tipo de
+        #usuario que se esté logueando, ya que no será la misma vista para el administrador
+        #que para el psicólogo o un profesor.
+
+        #Por ahora el único usuario que se puede registrar es el administrador del sistema.
+        template = template_env.get_template('templates/admin_inicio.html')
+
+        session = get_current_session()
+
+        nombreUsuario=session.get('nombre',None)
+
+        if session.is_active():
+            nombreUsuario=session.get('nombre',None)
+            templateVars = {"sesion" : True, "userAlias":nombreUsuario}
+            self.response.out.write(template.render(templateVars))
+        else:
+            #No hay sesión de usuario válida y se muestra la pantalla de inicio estática con mensaje de error
+            templateVars = {"sesion" : None, "errorLogin" : mensaje}
+            self.response.out.write(template.render(templateVars))
+
+
+
+
+
+
+
 class Login(webapp2.RequestHandler):
 
-    def get(self):
-        template = template_env.get_template('templates/login.html')
-        #Cargamos la plantilla y le pasamos los datos cargardos
-        self.response.out.write(template.render())
+    def get(self, mensaje=None):
 
+        #Se selecciona la plantilla a cargar
+        template = template_env.get_template('templates/login.html')
+
+        if mensaje=='error':
+            print "hay un mensaje de error que tratar"
+            templateVars={"errorLogin" : mensaje}
+            #Mandamos a renderizar la plantilla con el mensaje de error
+            self.response.out.write(template.render(templateVars))
+        else:
+            #Mandamos a renderizar sin el error
+            self.response.out.write(template.render())
+
+    def post(self):
+
+        session = get_current_session()
+
+        #Recuperamos el nombre y la contraseña de usuario desde el form de login.
+        nombreusuario=self.request.get('nombreusuario')
+        passusuario=self.request.get('passusuario')
+
+        print nombreusuario+passusuario
+
+        #Si los campos de login de usuario NO están vacíos es que se está logueando un usuario.
+        if(nombreusuario!='' and passusuario!=''):
+            print 'Intentando logear a ',nombreusuario,' con pass: ', passusuario
+
+            #Si esos campos están rellenos lo que se quiere hacer es loguear, por tanto hay que:
+
+            #1. Comprobar si el usuario está en el sistema.
+
+            #Vamos a usar el password como contraseña
+
+            if nombreusuario=='juan' and passusuario=='677164459':
+                usuarioLogueado=True
+            else:
+                usuarioLogueado=False
+
+            #profesorLogeado=GestorProfesores.getProfesor(userpassword);
+
+            #2. En el caso de que sea así crear su sesión para que se mantenga durante toda su navegación en el sistema.
+            if(usuarioLogueado):
+                print "Usuario logueado"
+
+                #Introducimos el nombre y el dni del usuario logueado en la sesión.
+                session['nombre']='juan'
+                session['password']='45601217'
+
+                #self.get('')
+                self.redirect('/sms')
+
+                #Logueado el usuario y cargados sus datos de sesión se envía al usuario a la pantalla de inicio de la aplicación.
+
+            else:
+                print "Usuario desconocido en el sistema"
+                session.terminate()
+                self.get('error')
+        #Si por el contrario si están vacío no se está logueando al usuario porque no se está introduciendo nada:
+        else:
+            self.get('error')
 
 
 
 
 application = webapp2.WSGIApplication([
-                                      ('/', Inicio),
-                                      ('/login', Login),
+                                      ('/', Inicio), #Pantalla inicial con info general de la app, no del centro.
+                                      ('/login', Login), #Pantalla de login
+                                      ('/sms', SMS), #Pantalla de inicio de SMS
                                       ('/registroalumnos', RegistroAlumnos),
                                       ('/registroprofesores', RegistroProfesores),
                                       ('/registroasignaturas', RegistroAsignaturas),
