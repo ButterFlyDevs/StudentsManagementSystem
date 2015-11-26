@@ -44,7 +44,7 @@ class GestorAlumnos:
             al.apellidos= a['apellidos']
             listaTemplate.append(al)
         '''
-        r = requests.get('http://localhost:8001/alumnos/todos')
+        r = requests.get('http://localhost:8001/alumnos')
         print "salida de la petición: "
         print r.text
 
