@@ -11,7 +11,7 @@ import cgi
 
 #from tools.gestorElephantDB.GestorProfesoresSQL import GestorProfesores
 
-from tools.gestorMicroservicioDB.GestorAlumnos import GestorAlumnos
+from tools.interfazMicroservicioDB.GestorAlumnos import GestorAlumnos
 
 #from tools.GestorAlumnosSQL import GestorAlumnos
 #from tools.GestorProfesoresSQL import GestorProfesores

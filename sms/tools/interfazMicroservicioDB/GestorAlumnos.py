@@ -6,11 +6,6 @@ import json
 '''Clase controladora de alumnos. Que usando la clase que define el modelo de Alumno (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
 '''
-
-url='http://localhost:'
-port='8001'
-
-
 class Payload(object):
     def __init__(self, j):
         self.__dict__ = json.loads(j)
@@ -49,7 +44,7 @@ class GestorAlumnos:
             al.apellidos= a['apellidos']
             listaTemplate.append(al)
         '''
-        r = requests.get(url+port+'/alumnos/todos')
+        r = requests.get('http://localhost:8001/alumnos/todos')
         print "salida de la petición: "
         print r.text
 
