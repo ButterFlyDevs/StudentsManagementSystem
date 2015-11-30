@@ -639,10 +639,6 @@ class SMS(webapp2.RequestHandler):
 
 
 
-
-
-
-
 class Login(webapp2.RequestHandler):
 
     def get(self, mensaje=None):
@@ -708,10 +704,59 @@ class Login(webapp2.RequestHandler):
             self.get('error')
 
 
+'''
+Un objeto de tipo cursos es una lista de cursos cuyo cada curso es una lista de grupos donde cada grupo es una lista de estudiantes.
+'''
+class cursos(object):
+
+    def __init__(self):
+        listaCursos = []
+
+    def addCurso(nombre, listaGrupos):
+
+
+
+class ControlEstudiantes(webapp2.RequestHandler):
+
+    #Usamos un parámetro por defecto opción que servirá para elegir el tipo de vista a ver según el estado de la navegación.
+    def get(self, opcion=None):
+        #Se selecciona la plantilla a cargar
+        template = template_env.get_template('templates/controlEstudiantes.html')
+
+        #Usamos variable pasadas a la plantilla para seleccionar que partes de esta ver en función del estado de
+        #navegación del usuario por la herramienta de control de estudiantes.
+        if(opcion==None):
+            templateVars = {"general" : True}
+        elif(opcion=='realizarControl'):
+
+            # Para realizar un control cargamos un objeto que tenga almacenado los cursos a los
+            # que el usuario imparte clase y por cada curso a todo los grupos.
+
+
+            templateVars = {"realizarControl" : True, "realizarControlMenu" : True}
+
+        self.response.out.write(template.render(templateVars))
+
+    def post(self):
+
+        #Recogemos el tipo de petición
+        print "call post"
+        botonPulsado=self.request.get('nombreBoton')
+
+        if botonPulsado=='realizarControl': #Ciframos y enviamos a la interfaz
+            self.get('realizarControl')
+            print "call acceder"
+
+        '''
+        template = template_env.get_template('templates/controlEstudiantes.html')
+        templateVars = {"realizarControl": True}
+        self.response.out.write(template.render(templateVars))
+        '''
 
 
 application = webapp2.WSGIApplication([
                                       ('/', Inicio), #Pantalla inicial con info general de la app, no del centro.
+                                      ('/controlEstudiantes', ControlEstudiantes), #Ventana de control de Estudiantes
                                       ('/login', Login), #Pantalla de login
                                       ('/sms', SMS), #Pantalla de inicio de SMS
                                       ('/registroalumnos', RegistroAlumnos),
