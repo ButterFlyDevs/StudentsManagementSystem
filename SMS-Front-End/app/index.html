@@ -1,0 +1,90 @@
+<!doctype html>
+<html ng-app="myAppModule">
+  <head>
+    <link rel="stylesheet" href="/css/app.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-route.js"></script>
+
+    <script src="https://apis.google.com/js/client.js"></script>
+
+    <!-- <script src="/js/app.js"></script> -->
+    <script src="/js/myAppModule.js"></script>
+
+  </head>
+  <body>
+
+    <header>
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">My Website</a>
+            </div>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><i class="fa fa-home"></i> Home</a></li>
+                <li><a href="#about"><i class="fa fa-shield"></i> About</a></li>
+                <li><a href="#contact"><i class="fa fa-comment"></i> Contact</a></li>
+            </ul>
+
+        </div>
+    </nav>
+</header>
+
+
+
+
+    <!--
+    <h1>AngularJS Guest List</h1>
+    <pre class="status" ng-bind="status"></pre>
+    <div ng-view></div>
+  -->
+    <div ng-app="">
+
+
+      <!--LUGAR DONDE SE INJECTARÁ EL CONTENIDO SEGÚN EL routeProvider -->
+      <div ng-view>
+      </div>
+
+      <p>Input something in the input box:</p>
+      <p>Name : <input type="text" ng-model="name" placeholder="Enter name here"></p>
+      <h1>Hello {{name}}</h1>
+
+      <!--
+      Aquí tenemos un controlador embebido en el HTML que se llama con la directiva ng-controller.
+      -->
+
+          <script>
+            function MyFirstCtrl($scope) {
+              var employees = ['Catherine Grant', 'Monica Grant',
+                'Christopher Grant', 'Jennifer Grant'
+              ];
+              $scope.ourEmployees = employees;
+            }
+          </script>
+          <div ng-controller='MyFirstCtrl'>
+
+            <h2>Number of Employees: {{ ourEmployees.length}}</h2>
+            <p ng-repeat="employee in ourEmployees">{{employee | lowercase}}</p>
+
+          </div>
+
+      <!--
+      Pero también podemos tenerlo en otro documento, por eso hemos llamado a la aplicación myAppModule y hemos
+      importado el script donde se encuentra el controlador:
+        <script src="/js/myAppModule.js"></script>
+      -->
+      <!--
+      <div ng-controller='ControladorEjemplo'>
+
+        <h2>Number of Empleados: {{ nuestrosEmpleados.length}}</h2>
+        <p ng-repeat="empleado in nuestrosEmpleados">{{empleado | lowercase}}</p>
+
+      </div>
+     -->
+
+
+
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,13 @@
+
+
+<h1>Home Page</h1>
+<div ng-controller='ControladorEjemplo'>
+
+
+  <h1>retorno API: {{ APIcall }}</h1>
+
+  <h2>Number of Empleados: {{ nuestrosEmpleados.length}}</h2>
+  <p ng-repeat="empleado in nuestrosEmpleados">{{empleado | lowercase}}</p>
+
+</div>
+<p>{{ message }}</p>
