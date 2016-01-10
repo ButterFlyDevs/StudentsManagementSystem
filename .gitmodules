@@ -1,7 +1,0 @@
-[submodule "BD_Replica"]
-	path = BD_Replica
-	url = git@github.com:neon520/SMS-BDyReplica.git
-
-[submodule "SMS_Estadisticas"]
-	path = SMS_Estadisticas
-	url = https://github.com/JA-Gonz/SMS_Estadisticas
