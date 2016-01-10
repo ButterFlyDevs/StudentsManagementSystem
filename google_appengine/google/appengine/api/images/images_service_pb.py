@@ -220,8 +220,12 @@ class Transform(ProtocolBuffer.ProtocolMessage):
   crop_to_fit_ = 0
   has_crop_offset_x_ = 0
   crop_offset_x_ = 0.5
+  has_crop_offset_x_set_ = 0
+  crop_offset_x_set_ = 0
   has_crop_offset_y_ = 0
   crop_offset_y_ = 0.5
+  has_crop_offset_y_set_ = 0
+  crop_offset_y_set_ = 0
   has_rotate_ = 0
   rotate_ = 0
   has_horizontal_flip_ = 0
@@ -326,6 +330,19 @@ class Transform(ProtocolBuffer.ProtocolMessage):
 
   def has_crop_offset_x(self): return self.has_crop_offset_x_
 
+  def crop_offset_x_set(self): return self.crop_offset_x_set_
+
+  def set_crop_offset_x_set(self, x):
+    self.has_crop_offset_x_set_ = 1
+    self.crop_offset_x_set_ = x
+
+  def clear_crop_offset_x_set(self):
+    if self.has_crop_offset_x_set_:
+      self.has_crop_offset_x_set_ = 0
+      self.crop_offset_x_set_ = 0
+
+  def has_crop_offset_x_set(self): return self.has_crop_offset_x_set_
+
   def crop_offset_y(self): return self.crop_offset_y_
 
   def set_crop_offset_y(self, x):
@@ -338,6 +355,19 @@ class Transform(ProtocolBuffer.ProtocolMessage):
       self.crop_offset_y_ = 0.5
 
   def has_crop_offset_y(self): return self.has_crop_offset_y_
+
+  def crop_offset_y_set(self): return self.crop_offset_y_set_
+
+  def set_crop_offset_y_set(self, x):
+    self.has_crop_offset_y_set_ = 1
+    self.crop_offset_y_set_ = x
+
+  def clear_crop_offset_y_set(self):
+    if self.has_crop_offset_y_set_:
+      self.has_crop_offset_y_set_ = 0
+      self.crop_offset_y_set_ = 0
+
+  def has_crop_offset_y_set(self): return self.has_crop_offset_y_set_
 
   def rotate(self): return self.rotate_
 
@@ -491,7 +521,9 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     if (x.has_height_set()): self.set_height_set(x.height_set())
     if (x.has_crop_to_fit()): self.set_crop_to_fit(x.crop_to_fit())
     if (x.has_crop_offset_x()): self.set_crop_offset_x(x.crop_offset_x())
+    if (x.has_crop_offset_x_set()): self.set_crop_offset_x_set(x.crop_offset_x_set())
     if (x.has_crop_offset_y()): self.set_crop_offset_y(x.crop_offset_y())
+    if (x.has_crop_offset_y_set()): self.set_crop_offset_y_set(x.crop_offset_y_set())
     if (x.has_rotate()): self.set_rotate(x.rotate())
     if (x.has_horizontal_flip()): self.set_horizontal_flip(x.horizontal_flip())
     if (x.has_vertical_flip()): self.set_vertical_flip(x.vertical_flip())
@@ -518,8 +550,12 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     if self.has_crop_to_fit_ and self.crop_to_fit_ != x.crop_to_fit_: return 0
     if self.has_crop_offset_x_ != x.has_crop_offset_x_: return 0
     if self.has_crop_offset_x_ and self.crop_offset_x_ != x.crop_offset_x_: return 0
+    if self.has_crop_offset_x_set_ != x.has_crop_offset_x_set_: return 0
+    if self.has_crop_offset_x_set_ and self.crop_offset_x_set_ != x.crop_offset_x_set_: return 0
     if self.has_crop_offset_y_ != x.has_crop_offset_y_: return 0
     if self.has_crop_offset_y_ and self.crop_offset_y_ != x.crop_offset_y_: return 0
+    if self.has_crop_offset_y_set_ != x.has_crop_offset_y_set_: return 0
+    if self.has_crop_offset_y_set_ and self.crop_offset_y_set_ != x.crop_offset_y_set_: return 0
     if self.has_rotate_ != x.has_rotate_: return 0
     if self.has_rotate_ and self.rotate_ != x.rotate_: return 0
     if self.has_horizontal_flip_ != x.has_horizontal_flip_: return 0
@@ -556,7 +592,9 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     if (self.has_height_set_): n += 3
     if (self.has_crop_to_fit_): n += 2
     if (self.has_crop_offset_x_): n += 5
+    if (self.has_crop_offset_x_set_): n += 3
     if (self.has_crop_offset_y_): n += 5
+    if (self.has_crop_offset_y_set_): n += 3
     if (self.has_rotate_): n += 1 + self.lengthVarInt64(self.rotate_)
     if (self.has_horizontal_flip_): n += 2
     if (self.has_vertical_flip_): n += 2
@@ -578,7 +616,9 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     if (self.has_height_set_): n += 3
     if (self.has_crop_to_fit_): n += 2
     if (self.has_crop_offset_x_): n += 5
+    if (self.has_crop_offset_x_set_): n += 3
     if (self.has_crop_offset_y_): n += 5
+    if (self.has_crop_offset_y_set_): n += 3
     if (self.has_rotate_): n += 1 + self.lengthVarInt64(self.rotate_)
     if (self.has_horizontal_flip_): n += 2
     if (self.has_vertical_flip_): n += 2
@@ -599,7 +639,9 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     self.clear_height_set()
     self.clear_crop_to_fit()
     self.clear_crop_offset_x()
+    self.clear_crop_offset_x_set()
     self.clear_crop_offset_y()
+    self.clear_crop_offset_y_set()
     self.clear_rotate()
     self.clear_horizontal_flip()
     self.clear_vertical_flip()
@@ -667,6 +709,12 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     if (self.has_crop_bottom_y_set_):
       out.putVarInt32(872)
       out.putBoolean(self.crop_bottom_y_set_)
+    if (self.has_crop_offset_x_set_):
+      out.putVarInt32(896)
+      out.putBoolean(self.crop_offset_x_set_)
+    if (self.has_crop_offset_y_set_):
+      out.putVarInt32(904)
+      out.putBoolean(self.crop_offset_y_set_)
 
   def OutputPartial(self, out):
     if (self.has_width_):
@@ -723,6 +771,12 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     if (self.has_crop_bottom_y_set_):
       out.putVarInt32(872)
       out.putBoolean(self.crop_bottom_y_set_)
+    if (self.has_crop_offset_x_set_):
+      out.putVarInt32(896)
+      out.putBoolean(self.crop_offset_x_set_)
+    if (self.has_crop_offset_y_set_):
+      out.putVarInt32(904)
+      out.putBoolean(self.crop_offset_y_set_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -781,6 +835,12 @@ class Transform(ProtocolBuffer.ProtocolMessage):
       if tt == 872:
         self.set_crop_bottom_y_set(d.getBoolean())
         continue
+      if tt == 896:
+        self.set_crop_offset_x_set(d.getBoolean())
+        continue
+      if tt == 904:
+        self.set_crop_offset_y_set(d.getBoolean())
+        continue
 
 
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
@@ -795,7 +855,9 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     if self.has_height_set_: res+=prefix+("height_set: %s\n" % self.DebugFormatBool(self.height_set_))
     if self.has_crop_to_fit_: res+=prefix+("crop_to_fit: %s\n" % self.DebugFormatBool(self.crop_to_fit_))
     if self.has_crop_offset_x_: res+=prefix+("crop_offset_x: %s\n" % self.DebugFormatFloat(self.crop_offset_x_))
+    if self.has_crop_offset_x_set_: res+=prefix+("crop_offset_x_set: %s\n" % self.DebugFormatBool(self.crop_offset_x_set_))
     if self.has_crop_offset_y_: res+=prefix+("crop_offset_y: %s\n" % self.DebugFormatFloat(self.crop_offset_y_))
+    if self.has_crop_offset_y_set_: res+=prefix+("crop_offset_y_set: %s\n" % self.DebugFormatBool(self.crop_offset_y_set_))
     if self.has_rotate_: res+=prefix+("rotate: %s\n" % self.DebugFormatInt32(self.rotate_))
     if self.has_horizontal_flip_: res+=prefix+("horizontal_flip: %s\n" % self.DebugFormatBool(self.horizontal_flip_))
     if self.has_vertical_flip_: res+=prefix+("vertical_flip: %s\n" % self.DebugFormatBool(self.vertical_flip_))
@@ -819,7 +881,9 @@ class Transform(ProtocolBuffer.ProtocolMessage):
   kheight_set = 102
   kcrop_to_fit = 11
   kcrop_offset_x = 12
+  kcrop_offset_x_set = 112
   kcrop_offset_y = 13
+  kcrop_offset_y_set = 113
   krotate = 3
   khorizontal_flip = 4
   kvertical_flip = 5
@@ -852,7 +916,9 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     102: "height_set",
     108: "crop_right_x_set",
     109: "crop_bottom_y_set",
-  }, 109)
+    112: "crop_offset_x_set",
+    113: "crop_offset_y_set",
+  }, 113)
 
   _TYPES = _BuildTagLookupTable({
     0: ProtocolBuffer.Encoder.NUMERIC,
@@ -874,7 +940,9 @@ class Transform(ProtocolBuffer.ProtocolMessage):
     102: ProtocolBuffer.Encoder.NUMERIC,
     108: ProtocolBuffer.Encoder.NUMERIC,
     109: ProtocolBuffer.Encoder.NUMERIC,
-  }, 109, ProtocolBuffer.Encoder.MAX_TYPE)
+    112: ProtocolBuffer.Encoder.NUMERIC,
+    113: ProtocolBuffer.Encoder.NUMERIC,
+  }, 113, ProtocolBuffer.Encoder.MAX_TYPE)
 
 
   _STYLE = """"""
@@ -885,6 +953,8 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
   content_ = ""
   has_blob_key_ = 0
   blob_key_ = ""
+  has_blob_key_set_ = 0
+  blob_key_set_ = 0
   has_width_ = 0
   width_ = 0
   has_height_ = 0
@@ -919,6 +989,19 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
 
   def has_blob_key(self): return self.has_blob_key_
 
+  def blob_key_set(self): return self.blob_key_set_
+
+  def set_blob_key_set(self, x):
+    self.has_blob_key_set_ = 1
+    self.blob_key_set_ = x
+
+  def clear_blob_key_set(self):
+    if self.has_blob_key_set_:
+      self.has_blob_key_set_ = 0
+      self.blob_key_set_ = 0
+
+  def has_blob_key_set(self): return self.has_blob_key_set_
+
   def width(self): return self.width_
 
   def set_width(self, x):
@@ -950,6 +1033,7 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
     assert x is not self
     if (x.has_content()): self.set_content(x.content())
     if (x.has_blob_key()): self.set_blob_key(x.blob_key())
+    if (x.has_blob_key_set()): self.set_blob_key_set(x.blob_key_set())
     if (x.has_width()): self.set_width(x.width())
     if (x.has_height()): self.set_height(x.height())
 
@@ -959,6 +1043,8 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
     if self.has_content_ and self.content_ != x.content_: return 0
     if self.has_blob_key_ != x.has_blob_key_: return 0
     if self.has_blob_key_ and self.blob_key_ != x.blob_key_: return 0
+    if self.has_blob_key_set_ != x.has_blob_key_set_: return 0
+    if self.has_blob_key_set_ and self.blob_key_set_ != x.blob_key_set_: return 0
     if self.has_width_ != x.has_width_: return 0
     if self.has_width_ and self.width_ != x.width_: return 0
     if self.has_height_ != x.has_height_: return 0
@@ -977,6 +1063,7 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
     n = 0
     n += self.lengthString(len(self.content_))
     if (self.has_blob_key_): n += 1 + self.lengthString(len(self.blob_key_))
+    if (self.has_blob_key_set_): n += 3
     if (self.has_width_): n += 1 + self.lengthVarInt64(self.width_)
     if (self.has_height_): n += 1 + self.lengthVarInt64(self.height_)
     return n + 1
@@ -987,6 +1074,7 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
       n += 1
       n += self.lengthString(len(self.content_))
     if (self.has_blob_key_): n += 1 + self.lengthString(len(self.blob_key_))
+    if (self.has_blob_key_set_): n += 3
     if (self.has_width_): n += 1 + self.lengthVarInt64(self.width_)
     if (self.has_height_): n += 1 + self.lengthVarInt64(self.height_)
     return n
@@ -994,6 +1082,7 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
   def Clear(self):
     self.clear_content()
     self.clear_blob_key()
+    self.clear_blob_key_set()
     self.clear_width()
     self.clear_height()
 
@@ -1009,6 +1098,9 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
     if (self.has_height_):
       out.putVarInt32(32)
       out.putVarInt32(self.height_)
+    if (self.has_blob_key_set_):
+      out.putVarInt32(816)
+      out.putBoolean(self.blob_key_set_)
 
   def OutputPartial(self, out):
     if (self.has_content_):
@@ -1023,6 +1115,9 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
     if (self.has_height_):
       out.putVarInt32(32)
       out.putVarInt32(self.height_)
+    if (self.has_blob_key_set_):
+      out.putVarInt32(816)
+      out.putBoolean(self.blob_key_set_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -1039,6 +1134,9 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
       if tt == 32:
         self.set_height(d.getVarInt32())
         continue
+      if tt == 816:
+        self.set_blob_key_set(d.getBoolean())
+        continue
 
 
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
@@ -1049,6 +1147,7 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
     res=""
     if self.has_content_: res+=prefix+("content: %s\n" % self.DebugFormatString(self.content_))
     if self.has_blob_key_: res+=prefix+("blob_key: %s\n" % self.DebugFormatString(self.blob_key_))
+    if self.has_blob_key_set_: res+=prefix+("blob_key_set: %s\n" % self.DebugFormatBool(self.blob_key_set_))
     if self.has_width_: res+=prefix+("width: %s\n" % self.DebugFormatInt32(self.width_))
     if self.has_height_: res+=prefix+("height: %s\n" % self.DebugFormatInt32(self.height_))
     return res
@@ -1059,6 +1158,7 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
 
   kcontent = 1
   kblob_key = 2
+  kblob_key_set = 102
   kwidth = 3
   kheight = 4
 
@@ -1068,7 +1168,8 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
     2: "blob_key",
     3: "width",
     4: "height",
-  }, 4)
+    102: "blob_key_set",
+  }, 102)
 
   _TYPES = _BuildTagLookupTable({
     0: ProtocolBuffer.Encoder.NUMERIC,
@@ -1076,7 +1177,8 @@ class ImageData(ProtocolBuffer.ProtocolMessage):
     2: ProtocolBuffer.Encoder.STRING,
     3: ProtocolBuffer.Encoder.NUMERIC,
     4: ProtocolBuffer.Encoder.NUMERIC,
-  }, 4, ProtocolBuffer.Encoder.MAX_TYPE)
+    102: ProtocolBuffer.Encoder.NUMERIC,
+  }, 102, ProtocolBuffer.Encoder.MAX_TYPE)
 
 
   _STYLE = """"""
@@ -1098,10 +1200,14 @@ class InputSettings(ProtocolBuffer.ProtocolMessage):
 
   has_correct_exif_orientation_ = 0
   correct_exif_orientation_ = 0
+  has_correct_exif_orientation_set_ = 0
+  correct_exif_orientation_set_ = 0
   has_parse_metadata_ = 0
   parse_metadata_ = 0
   has_transparent_substitution_rgb_ = 0
   transparent_substitution_rgb_ = 0
+  has_transparent_substitution_rgb_set_ = 0
+  transparent_substitution_rgb_set_ = 0
 
   def __init__(self, contents=None):
     if contents is not None: self.MergeFromString(contents)
@@ -1118,6 +1224,19 @@ class InputSettings(ProtocolBuffer.ProtocolMessage):
       self.correct_exif_orientation_ = 0
 
   def has_correct_exif_orientation(self): return self.has_correct_exif_orientation_
+
+  def correct_exif_orientation_set(self): return self.correct_exif_orientation_set_
+
+  def set_correct_exif_orientation_set(self, x):
+    self.has_correct_exif_orientation_set_ = 1
+    self.correct_exif_orientation_set_ = x
+
+  def clear_correct_exif_orientation_set(self):
+    if self.has_correct_exif_orientation_set_:
+      self.has_correct_exif_orientation_set_ = 0
+      self.correct_exif_orientation_set_ = 0
+
+  def has_correct_exif_orientation_set(self): return self.has_correct_exif_orientation_set_
 
   def parse_metadata(self): return self.parse_metadata_
 
@@ -1145,21 +1264,40 @@ class InputSettings(ProtocolBuffer.ProtocolMessage):
 
   def has_transparent_substitution_rgb(self): return self.has_transparent_substitution_rgb_
 
+  def transparent_substitution_rgb_set(self): return self.transparent_substitution_rgb_set_
+
+  def set_transparent_substitution_rgb_set(self, x):
+    self.has_transparent_substitution_rgb_set_ = 1
+    self.transparent_substitution_rgb_set_ = x
+
+  def clear_transparent_substitution_rgb_set(self):
+    if self.has_transparent_substitution_rgb_set_:
+      self.has_transparent_substitution_rgb_set_ = 0
+      self.transparent_substitution_rgb_set_ = 0
+
+  def has_transparent_substitution_rgb_set(self): return self.has_transparent_substitution_rgb_set_
+
 
   def MergeFrom(self, x):
     assert x is not self
     if (x.has_correct_exif_orientation()): self.set_correct_exif_orientation(x.correct_exif_orientation())
+    if (x.has_correct_exif_orientation_set()): self.set_correct_exif_orientation_set(x.correct_exif_orientation_set())
     if (x.has_parse_metadata()): self.set_parse_metadata(x.parse_metadata())
     if (x.has_transparent_substitution_rgb()): self.set_transparent_substitution_rgb(x.transparent_substitution_rgb())
+    if (x.has_transparent_substitution_rgb_set()): self.set_transparent_substitution_rgb_set(x.transparent_substitution_rgb_set())
 
   def Equals(self, x):
     if x is self: return 1
     if self.has_correct_exif_orientation_ != x.has_correct_exif_orientation_: return 0
     if self.has_correct_exif_orientation_ and self.correct_exif_orientation_ != x.correct_exif_orientation_: return 0
+    if self.has_correct_exif_orientation_set_ != x.has_correct_exif_orientation_set_: return 0
+    if self.has_correct_exif_orientation_set_ and self.correct_exif_orientation_set_ != x.correct_exif_orientation_set_: return 0
     if self.has_parse_metadata_ != x.has_parse_metadata_: return 0
     if self.has_parse_metadata_ and self.parse_metadata_ != x.parse_metadata_: return 0
     if self.has_transparent_substitution_rgb_ != x.has_transparent_substitution_rgb_: return 0
     if self.has_transparent_substitution_rgb_ and self.transparent_substitution_rgb_ != x.transparent_substitution_rgb_: return 0
+    if self.has_transparent_substitution_rgb_set_ != x.has_transparent_substitution_rgb_set_: return 0
+    if self.has_transparent_substitution_rgb_set_ and self.transparent_substitution_rgb_set_ != x.transparent_substitution_rgb_set_: return 0
     return 1
 
   def IsInitialized(self, debug_strs=None):
@@ -1169,21 +1307,27 @@ class InputSettings(ProtocolBuffer.ProtocolMessage):
   def ByteSize(self):
     n = 0
     if (self.has_correct_exif_orientation_): n += 1 + self.lengthVarInt64(self.correct_exif_orientation_)
+    if (self.has_correct_exif_orientation_set_): n += 3
     if (self.has_parse_metadata_): n += 2
     if (self.has_transparent_substitution_rgb_): n += 1 + self.lengthVarInt64(self.transparent_substitution_rgb_)
+    if (self.has_transparent_substitution_rgb_set_): n += 3
     return n
 
   def ByteSizePartial(self):
     n = 0
     if (self.has_correct_exif_orientation_): n += 1 + self.lengthVarInt64(self.correct_exif_orientation_)
+    if (self.has_correct_exif_orientation_set_): n += 3
     if (self.has_parse_metadata_): n += 2
     if (self.has_transparent_substitution_rgb_): n += 1 + self.lengthVarInt64(self.transparent_substitution_rgb_)
+    if (self.has_transparent_substitution_rgb_set_): n += 3
     return n
 
   def Clear(self):
     self.clear_correct_exif_orientation()
+    self.clear_correct_exif_orientation_set()
     self.clear_parse_metadata()
     self.clear_transparent_substitution_rgb()
+    self.clear_transparent_substitution_rgb_set()
 
   def OutputUnchecked(self, out):
     if (self.has_correct_exif_orientation_):
@@ -1195,6 +1339,12 @@ class InputSettings(ProtocolBuffer.ProtocolMessage):
     if (self.has_transparent_substitution_rgb_):
       out.putVarInt32(24)
       out.putVarInt32(self.transparent_substitution_rgb_)
+    if (self.has_correct_exif_orientation_set_):
+      out.putVarInt32(808)
+      out.putBoolean(self.correct_exif_orientation_set_)
+    if (self.has_transparent_substitution_rgb_set_):
+      out.putVarInt32(824)
+      out.putBoolean(self.transparent_substitution_rgb_set_)
 
   def OutputPartial(self, out):
     if (self.has_correct_exif_orientation_):
@@ -1206,6 +1356,12 @@ class InputSettings(ProtocolBuffer.ProtocolMessage):
     if (self.has_transparent_substitution_rgb_):
       out.putVarInt32(24)
       out.putVarInt32(self.transparent_substitution_rgb_)
+    if (self.has_correct_exif_orientation_set_):
+      out.putVarInt32(808)
+      out.putBoolean(self.correct_exif_orientation_set_)
+    if (self.has_transparent_substitution_rgb_set_):
+      out.putVarInt32(824)
+      out.putBoolean(self.transparent_substitution_rgb_set_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -1219,6 +1375,12 @@ class InputSettings(ProtocolBuffer.ProtocolMessage):
       if tt == 24:
         self.set_transparent_substitution_rgb(d.getVarInt32())
         continue
+      if tt == 808:
+        self.set_correct_exif_orientation_set(d.getBoolean())
+        continue
+      if tt == 824:
+        self.set_transparent_substitution_rgb_set(d.getBoolean())
+        continue
 
 
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
@@ -1228,8 +1390,10 @@ class InputSettings(ProtocolBuffer.ProtocolMessage):
   def __str__(self, prefix="", printElemNumber=0):
     res=""
     if self.has_correct_exif_orientation_: res+=prefix+("correct_exif_orientation: %s\n" % self.DebugFormatInt32(self.correct_exif_orientation_))
+    if self.has_correct_exif_orientation_set_: res+=prefix+("correct_exif_orientation_set: %s\n" % self.DebugFormatBool(self.correct_exif_orientation_set_))
     if self.has_parse_metadata_: res+=prefix+("parse_metadata: %s\n" % self.DebugFormatBool(self.parse_metadata_))
     if self.has_transparent_substitution_rgb_: res+=prefix+("transparent_substitution_rgb: %s\n" % self.DebugFormatInt32(self.transparent_substitution_rgb_))
+    if self.has_transparent_substitution_rgb_set_: res+=prefix+("transparent_substitution_rgb_set: %s\n" % self.DebugFormatBool(self.transparent_substitution_rgb_set_))
     return res
 
 
@@ -1237,22 +1401,28 @@ class InputSettings(ProtocolBuffer.ProtocolMessage):
     return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
 
   kcorrect_exif_orientation = 1
+  kcorrect_exif_orientation_set = 101
   kparse_metadata = 2
   ktransparent_substitution_rgb = 3
+  ktransparent_substitution_rgb_set = 103
 
   _TEXT = _BuildTagLookupTable({
     0: "ErrorCode",
     1: "correct_exif_orientation",
     2: "parse_metadata",
     3: "transparent_substitution_rgb",
-  }, 3)
+    101: "correct_exif_orientation_set",
+    103: "transparent_substitution_rgb_set",
+  }, 103)
 
   _TYPES = _BuildTagLookupTable({
     0: ProtocolBuffer.Encoder.NUMERIC,
     1: ProtocolBuffer.Encoder.NUMERIC,
     2: ProtocolBuffer.Encoder.NUMERIC,
     3: ProtocolBuffer.Encoder.NUMERIC,
-  }, 3, ProtocolBuffer.Encoder.MAX_TYPE)
+    101: ProtocolBuffer.Encoder.NUMERIC,
+    103: ProtocolBuffer.Encoder.NUMERIC,
+  }, 103, ProtocolBuffer.Encoder.MAX_TYPE)
 
 
   _STYLE = """"""
@@ -2079,6 +2249,8 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
   has_output_ = 0
   has_color_ = 0
   color_ = -1
+  has_color_set_ = 0
+  color_set_ = 0
 
   def __init__(self, contents=None):
     self.output_ = OutputSettings()
@@ -2131,6 +2303,19 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
 
   def has_color(self): return self.has_color_
 
+  def color_set(self): return self.color_set_
+
+  def set_color_set(self, x):
+    self.has_color_set_ = 1
+    self.color_set_ = x
+
+  def clear_color_set(self):
+    if self.has_color_set_:
+      self.has_color_set_ = 0
+      self.color_set_ = 0
+
+  def has_color_set(self): return self.has_color_set_
+
 
   def MergeFrom(self, x):
     assert x is not self
@@ -2138,6 +2323,7 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
     if (x.has_height()): self.set_height(x.height())
     if (x.has_output()): self.mutable_output().MergeFrom(x.output())
     if (x.has_color()): self.set_color(x.color())
+    if (x.has_color_set()): self.set_color_set(x.color_set())
 
   def Equals(self, x):
     if x is self: return 1
@@ -2149,6 +2335,8 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
     if self.has_output_ and self.output_ != x.output_: return 0
     if self.has_color_ != x.has_color_: return 0
     if self.has_color_ and self.color_ != x.color_: return 0
+    if self.has_color_set_ != x.has_color_set_: return 0
+    if self.has_color_set_ and self.color_set_ != x.color_set_: return 0
     return 1
 
   def IsInitialized(self, debug_strs=None):
@@ -2174,6 +2362,7 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
     n += self.lengthVarInt64(self.height_)
     n += self.lengthString(self.output_.ByteSize())
     if (self.has_color_): n += 1 + self.lengthVarInt64(self.color_)
+    if (self.has_color_set_): n += 3
     return n + 3
 
   def ByteSizePartial(self):
@@ -2188,6 +2377,7 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
       n += 1
       n += self.lengthString(self.output_.ByteSizePartial())
     if (self.has_color_): n += 1 + self.lengthVarInt64(self.color_)
+    if (self.has_color_set_): n += 3
     return n
 
   def Clear(self):
@@ -2195,6 +2385,7 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
     self.clear_height()
     self.clear_output()
     self.clear_color()
+    self.clear_color_set()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(8)
@@ -2207,6 +2398,9 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
     if (self.has_color_):
       out.putVarInt32(32)
       out.putVarInt32(self.color_)
+    if (self.has_color_set_):
+      out.putVarInt32(832)
+      out.putBoolean(self.color_set_)
 
   def OutputPartial(self, out):
     if (self.has_width_):
@@ -2222,6 +2416,9 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
     if (self.has_color_):
       out.putVarInt32(32)
       out.putVarInt32(self.color_)
+    if (self.has_color_set_):
+      out.putVarInt32(832)
+      out.putBoolean(self.color_set_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -2241,6 +2438,9 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
       if tt == 32:
         self.set_color(d.getVarInt32())
         continue
+      if tt == 832:
+        self.set_color_set(d.getBoolean())
+        continue
 
 
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
@@ -2256,6 +2456,7 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
       res+=self.output_.__str__(prefix + "  ", printElemNumber)
       res+=prefix+">\n"
     if self.has_color_: res+=prefix+("color: %s\n" % self.DebugFormatInt32(self.color_))
+    if self.has_color_set_: res+=prefix+("color_set: %s\n" % self.DebugFormatBool(self.color_set_))
     return res
 
 
@@ -2266,6 +2467,7 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
   kheight = 2
   koutput = 3
   kcolor = 4
+  kcolor_set = 104
 
   _TEXT = _BuildTagLookupTable({
     0: "ErrorCode",
@@ -2273,7 +2475,8 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
     2: "height",
     3: "output",
     4: "color",
-  }, 4)
+    104: "color_set",
+  }, 104)
 
   _TYPES = _BuildTagLookupTable({
     0: ProtocolBuffer.Encoder.NUMERIC,
@@ -2281,7 +2484,8 @@ class ImagesCanvas(ProtocolBuffer.ProtocolMessage):
     2: ProtocolBuffer.Encoder.NUMERIC,
     3: ProtocolBuffer.Encoder.STRING,
     4: ProtocolBuffer.Encoder.NUMERIC,
-  }, 4, ProtocolBuffer.Encoder.MAX_TYPE)
+    104: ProtocolBuffer.Encoder.NUMERIC,
+  }, 104, ProtocolBuffer.Encoder.MAX_TYPE)
 
 
   _STYLE = """"""

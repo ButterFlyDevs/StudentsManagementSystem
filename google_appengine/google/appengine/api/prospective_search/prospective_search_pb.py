@@ -63,6 +63,8 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
   type_ = 0
   has_meaning_ = 0
   meaning_ = 0
+  has_meaning_set_ = 0
+  meaning_set_ = 0
 
   def __init__(self, contents=None):
     if contents is not None: self.MergeFromString(contents)
@@ -106,12 +108,26 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
 
   def has_meaning(self): return self.has_meaning_
 
+  def meaning_set(self): return self.meaning_set_
+
+  def set_meaning_set(self, x):
+    self.has_meaning_set_ = 1
+    self.meaning_set_ = x
+
+  def clear_meaning_set(self):
+    if self.has_meaning_set_:
+      self.has_meaning_set_ = 0
+      self.meaning_set_ = 0
+
+  def has_meaning_set(self): return self.has_meaning_set_
+
 
   def MergeFrom(self, x):
     assert x is not self
     if (x.has_name()): self.set_name(x.name())
     if (x.has_type()): self.set_type(x.type())
     if (x.has_meaning()): self.set_meaning(x.meaning())
+    if (x.has_meaning_set()): self.set_meaning_set(x.meaning_set())
 
   def Equals(self, x):
     if x is self: return 1
@@ -121,6 +137,8 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
     if self.has_type_ and self.type_ != x.type_: return 0
     if self.has_meaning_ != x.has_meaning_: return 0
     if self.has_meaning_ and self.meaning_ != x.meaning_: return 0
+    if self.has_meaning_set_ != x.has_meaning_set_: return 0
+    if self.has_meaning_set_ and self.meaning_set_ != x.meaning_set_: return 0
     return 1
 
   def IsInitialized(self, debug_strs=None):
@@ -140,6 +158,7 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
     n += self.lengthString(len(self.name_))
     n += self.lengthVarInt64(self.type_)
     if (self.has_meaning_): n += 1 + self.lengthVarInt64(self.meaning_)
+    if (self.has_meaning_set_): n += 3
     return n + 2
 
   def ByteSizePartial(self):
@@ -151,12 +170,14 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
       n += 1
       n += self.lengthVarInt64(self.type_)
     if (self.has_meaning_): n += 1 + self.lengthVarInt64(self.meaning_)
+    if (self.has_meaning_set_): n += 3
     return n
 
   def Clear(self):
     self.clear_name()
     self.clear_type()
     self.clear_meaning()
+    self.clear_meaning_set()
 
   def OutputUnchecked(self, out):
     out.putVarInt32(10)
@@ -166,6 +187,9 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
     if (self.has_meaning_):
       out.putVarInt32(24)
       out.putVarInt32(self.meaning_)
+    if (self.has_meaning_set_):
+      out.putVarInt32(824)
+      out.putBoolean(self.meaning_set_)
 
   def OutputPartial(self, out):
     if (self.has_name_):
@@ -177,6 +201,9 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
     if (self.has_meaning_):
       out.putVarInt32(24)
       out.putVarInt32(self.meaning_)
+    if (self.has_meaning_set_):
+      out.putVarInt32(824)
+      out.putBoolean(self.meaning_set_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -190,6 +217,9 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
       if tt == 24:
         self.set_meaning(d.getVarInt32())
         continue
+      if tt == 824:
+        self.set_meaning_set(d.getBoolean())
+        continue
 
 
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
@@ -201,6 +231,7 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
     if self.has_name_: res+=prefix+("name: %s\n" % self.DebugFormatString(self.name_))
     if self.has_type_: res+=prefix+("type: %s\n" % self.DebugFormatInt32(self.type_))
     if self.has_meaning_: res+=prefix+("meaning: %s\n" % self.DebugFormatInt32(self.meaning_))
+    if self.has_meaning_set_: res+=prefix+("meaning_set: %s\n" % self.DebugFormatBool(self.meaning_set_))
     return res
 
 
@@ -210,20 +241,23 @@ class SchemaEntry(ProtocolBuffer.ProtocolMessage):
   kname = 1
   ktype = 2
   kmeaning = 3
+  kmeaning_set = 103
 
   _TEXT = _BuildTagLookupTable({
     0: "ErrorCode",
     1: "name",
     2: "type",
     3: "meaning",
-  }, 3)
+    103: "meaning_set",
+  }, 103)
 
   _TYPES = _BuildTagLookupTable({
     0: ProtocolBuffer.Encoder.NUMERIC,
     1: ProtocolBuffer.Encoder.STRING,
     2: ProtocolBuffer.Encoder.NUMERIC,
     3: ProtocolBuffer.Encoder.NUMERIC,
-  }, 3, ProtocolBuffer.Encoder.MAX_TYPE)
+    103: ProtocolBuffer.Encoder.NUMERIC,
+  }, 103, ProtocolBuffer.Encoder.MAX_TYPE)
 
 
   _STYLE = """"""

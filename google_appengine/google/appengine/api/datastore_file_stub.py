@@ -468,7 +468,10 @@ class DatastoreFileStub(datastore_stub_util.BaseDatastore,
     far in that counter's ID space.
     """
     if self.__datastore_file and self.__datastore_file != '/dev/null':
-      for encoded_entity in self.__ReadPickled(self.__datastore_file):
+      entities = self.__ReadPickled(self.__datastore_file)
+      if entities and isinstance(entities[-1], (int, long)):
+        self._commit_timestamp = int(entities.pop())
+      for encoded_entity in entities:
         try:
           entity = entity_pb.EntityProto(encoded_entity)
           record = datastore_stub_util._FromStorageEntity(entity)
@@ -514,6 +517,7 @@ class DatastoreFileStub(datastore_stub_util.BaseDatastore,
       encoded = []
       for kind_dict in self.__entities_by_kind.values():
         encoded.extend(entity.encoded_protobuf for entity in kind_dict.values())
+      encoded.append(self._GetReadTimestamp())
 
       self.__WritePickled(encoded, self.__datastore_file)
 
@@ -654,8 +658,7 @@ class DatastoreFileStub(datastore_stub_util.BaseDatastore,
     return dict((k, e.record)
                 for (k, e) in self.__entities_by_group[eg_k].iteritems())
 
-  def _GetQueryCursor(self, query, filters, orders, index_list,
-                      filter_predicate=None):
+  def _GetQueryCursor(self, query, filters, orders, index_list):
     app_id = query.app()
     namespace = query.name_space()
 
@@ -672,22 +675,22 @@ class DatastoreFileStub(datastore_stub_util.BaseDatastore,
       if pseudo_kind:
 
         (results, filters, orders) = pseudo_kind.Query(query, filters, orders)
+        results = map(datastore_stub_util.EntityRecord, results)
       elif query.has_kind():
-        results = [entity.record.entity for entity in
-                   self.__entities_by_kind[app_ns, query.kind()].values()]
+        stored_entities = self.__entities_by_kind[app_ns, query.kind()].values()
+        results = [stored_entity.record for stored_entity in stored_entities]
       else:
         results = []
         for (cur_app_ns, _), entities in self.__entities_by_kind.iteritems():
           if cur_app_ns == app_ns:
-            results.extend(entity.record.entity
-                           for entity in entities.itervalues())
+            results.extend(entity.record for entity in entities.itervalues())
     except KeyError:
       results = []
     finally:
       self.__entities_lock.release()
 
     return datastore_stub_util._ExecuteQuery(results, query, filters, orders,
-                                             index_list, filter_predicate)
+                                             index_list)
 
   def _SetIdCounter(self, id_space, value):
     """Set the ID counter for id_space to value."""

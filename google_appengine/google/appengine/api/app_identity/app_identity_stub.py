@@ -190,6 +190,14 @@ class AppIdentityServiceStub(apiproxy_stub.APIProxyStub):
           private_key_path=private_key_path,
           oauth_url=oauth_url)
     elif sys.version_info >= (2, 6):
+
+
+
+
+
+      import six
+      if six._importer not in sys.meta_path:
+        sys.meta_path.append(six._importer)
       from oauth2client import client
       from google.appengine.api.app_identity import app_identity_defaultcredentialsbased_stub as ai_stub
       try:

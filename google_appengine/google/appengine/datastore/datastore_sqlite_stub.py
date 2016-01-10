@@ -109,6 +109,10 @@ CREATE TABLE IF NOT EXISTS IdSeq (
 CREATE TABLE IF NOT EXISTS ScatteredIdCounters (
   prefix TEXT NOT NULL PRIMARY KEY,
   next_id INT NOT NULL);
+
+CREATE TABLE IF NOT EXISTS CommitTimestamps (
+  prefix TEXT NOT NULL PRIMARY KEY,
+  commit_timestamp INT NOT NULL);
 """
 
 _NAMESPACE_SCHEMA = """
@@ -236,7 +240,7 @@ def _DedupingEntityGenerator(cursor):
     storage_entity = entity_pb.EntityProto(row_entity)
     record = datastore_stub_util._FromStorageEntity(storage_entity)
     record = datastore_stub_util.LoadRecord(record)
-    yield record.entity
+    yield record
 
 
 def _ProjectionPartialEntityGenerator(cursor):
@@ -271,7 +275,7 @@ def _ProjectionPartialEntityGenerator(cursor):
       prop_to_add.set_multiple(False)
 
     datastore_stub_util.PrepareSpecialPropertiesForLoad(entity)
-    yield entity
+    yield datastore_stub_util.EntityRecord(entity)
 
 
 def MakeEntityForQuery(query, *path):
@@ -366,7 +370,8 @@ class KindPseudoKind(object):
       for row in c.fetchall():
         kinds.append(MakeEntityForQuery(query, self.name, ToUtf8(row[0])))
 
-      cursor = datastore_stub_util._ExecuteQuery(kinds, query, [], [], [])
+      records = map(datastore_stub_util.EntityRecord, kinds)
+      cursor = datastore_stub_util._ExecuteQuery(records, query, [], [], [])
     finally:
       self._stub._ReleaseConnection(conn)
 
@@ -476,7 +481,8 @@ class PropertyPseudoKind(object):
       if property_pb:
         properties.append(property_pb)
 
-      cursor = datastore_stub_util._ExecuteQuery(properties, query, [], [], [])
+      records = map(datastore_stub_util.EntityRecord, properties)
+      cursor = datastore_stub_util._ExecuteQuery(records, query, [], [], [])
     finally:
       self._stub._ReleaseConnection(conn)
 
@@ -522,8 +528,8 @@ class NamespacePseudoKind(object):
           ns_id = datastore_types._EMPTY_NAMESPACE_ID
         namespace_entities.append(MakeEntityForQuery(query, self.name, ns_id))
 
-    return datastore_stub_util._ExecuteQuery(namespace_entities, query,
-                                             [], [], [])
+    records = map(datastore_stub_util.EntityRecord, namespace_entities)
+    return datastore_stub_util._ExecuteQuery(records, query, [], [], [])
 
 class DatastoreSqliteStub(datastore_stub_util.BaseDatastore,
                           apiproxy_stub.APIProxyStub,
@@ -654,6 +660,12 @@ class DatastoreSqliteStub(datastore_stub_util.BaseDatastore,
           'INSERT OR IGNORE INTO ScatteredIdCounters VALUES (?, ?)',
           (prefix, 1))
     self.__connection.commit()
+
+    c = self.__connection.execute(
+        'SELECT commit_timestamp FROM CommitTimestamps WHERE prefix = ""')
+    row = c.fetchone()
+    if row:
+      self._commit_timestamp = row[0]
 
 
 
@@ -943,6 +955,10 @@ class DatastoreSqliteStub(datastore_stub_util.BaseDatastore,
       conn.executemany(
           'INSERT INTO "%s!EntitiesByProperty" VALUES (?, ?, ?, ?)' % prefix,
           RowGenerator(group))
+
+  def __PersistCommitTimestamp(self, conn, timestamp):
+    conn.execute('INSERT OR REPLACE INTO "CommitTimestamps" VALUES ("", ?)',
+                 (timestamp,))
 
   def MakeSyncCall(self, service, call, request, response, request_id=None):
     """The main RPC entry point. service must be 'datastore_v3'."""
@@ -1255,6 +1271,7 @@ class DatastoreSqliteStub(datastore_stub_util.BaseDatastore,
       self.__InsertEntities(conn, [entity_stored])
 
       self.__InsertIndexEntries(conn, [record.entity])
+      self.__PersistCommitTimestamp(conn, self._GetReadTimestamp())
     finally:
       self._ReleaseConnection(conn)
 
@@ -1279,6 +1296,7 @@ class DatastoreSqliteStub(datastore_stub_util.BaseDatastore,
     try:
       self.__DeleteIndexEntries(conn, [key])
       self.__DeleteEntityRows(conn, [key], 'Entities')
+      self.__PersistCommitTimestamp(conn, self._GetReadTimestamp())
     finally:
       self._ReleaseConnection(conn)
 
@@ -1311,8 +1329,7 @@ class DatastoreSqliteStub(datastore_stub_util.BaseDatastore,
 
       self._ReleaseConnection(conn)
 
-  def _GetQueryCursor(self, query, filters, orders, index_list,
-                      filter_predicate=None):
+  def _GetQueryCursor(self, query, filters, orders, index_list):
     """Returns a query cursor for the provided query.
 
     Args:
@@ -1320,9 +1337,6 @@ class DatastoreSqliteStub(datastore_stub_util.BaseDatastore,
       filters: A list of filters that override the ones found on query.
       orders: A list of orders that override the ones found on query.
       index_list: A list of indexes used by the query.
-      filter_predicate: an additional filter of type
-          datastore_query.FilterPredicate. This is passed along to implement V4
-          specific filters without changing the entire stub.
 
     Returns:
       A QueryCursor object.
@@ -1360,17 +1374,10 @@ class DatastoreSqliteStub(datastore_stub_util.BaseDatastore,
               conn.execute(sql_stmt, params))
         else:
           db_cursor = _DedupingEntityGenerator(conn.execute(sql_stmt, params))
-        dsquery = datastore_stub_util._MakeQuery(query, filters, orders,
-                                                 filter_predicate)
+        dsquery = datastore_stub_util._MakeQuery(query, filters, orders)
 
-        filtered_entities = [r for r in db_cursor]
-
-
-        if filter_predicate:
-          filtered_entities = filter(filter_predicate, filtered_entities)
-
-        cursor = datastore_stub_util.ListCursor(
-            query, dsquery, orders, index_list, filtered_entities)
+        cursor = datastore_stub_util.ListCursor(query, dsquery, orders,
+                                                index_list, list(db_cursor))
       finally:
         self._ReleaseConnection(conn)
     return cursor

@@ -1,0 +1,14 @@
+application: simple-sample
+
+dispatch:
+# Default module serves the typical web resources and all static resources.
+- url: "*/favicon.ico"
+  module: APIGateway
+
+# Send all mobile traffic to the mobile frontend.
+- url: "*/microservicio1/*"
+  module: microservicio1
+
+# Send all work to the one static backend.
+- url: "*/microservicio2/*"
+  module: microservicio2

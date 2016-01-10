@@ -3353,6 +3353,8 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
 
   has_app_id_ = 0
   app_id_ = ""
+  has_database_ = 0
+  database_ = ""
   has_id_ = 0
   id_ = 0
   has_definition_ = 0
@@ -3386,6 +3388,19 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
       self.app_id_ = ""
 
   def has_app_id(self): return self.has_app_id_
+
+  def database(self): return self.database_
+
+  def set_database(self, x):
+    self.has_database_ = 1
+    self.database_ = x
+
+  def clear_database(self):
+    if self.has_database_:
+      self.has_database_ = 0
+      self.database_ = ""
+
+  def has_database(self): return self.has_database_
 
   def id(self): return self.id_
 
@@ -3505,6 +3520,7 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
   def MergeFrom(self, x):
     assert x is not self
     if (x.has_app_id()): self.set_app_id(x.app_id())
+    if (x.has_database()): self.set_database(x.database())
     if (x.has_id()): self.set_id(x.id())
     if (x.has_definition()): self.mutable_definition().MergeFrom(x.definition())
     if (x.has_state()): self.set_state(x.state())
@@ -3519,6 +3535,8 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
     if x is self: return 1
     if self.has_app_id_ != x.has_app_id_: return 0
     if self.has_app_id_ and self.app_id_ != x.app_id_: return 0
+    if self.has_database_ != x.has_database_: return 0
+    if self.has_database_ and self.database_ != x.database_: return 0
     if self.has_id_ != x.has_id_: return 0
     if self.has_id_ and self.id_ != x.id_: return 0
     if self.has_definition_ != x.has_definition_: return 0
@@ -3564,6 +3582,7 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
   def ByteSize(self):
     n = 0
     n += self.lengthString(len(self.app_id_))
+    if (self.has_database_): n += 1 + self.lengthString(len(self.database_))
     n += self.lengthVarInt64(self.id_)
     n += self.lengthString(self.definition_.ByteSize())
     n += self.lengthVarInt64(self.state_)
@@ -3581,6 +3600,7 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
     if (self.has_app_id_):
       n += 1
       n += self.lengthString(len(self.app_id_))
+    if (self.has_database_): n += 1 + self.lengthString(len(self.database_))
     if (self.has_id_):
       n += 1
       n += self.lengthVarInt64(self.id_)
@@ -3601,6 +3621,7 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
 
   def Clear(self):
     self.clear_app_id()
+    self.clear_database()
     self.clear_id()
     self.clear_definition()
     self.clear_state()
@@ -3639,6 +3660,9 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
     if (self.has_error_message_):
       out.putVarInt32(90)
       out.putPrefixedString(self.error_message_)
+    if (self.has_database_):
+      out.putVarInt32(98)
+      out.putPrefixedString(self.database_)
 
   def OutputPartial(self, out):
     if (self.has_app_id_):
@@ -3672,6 +3696,9 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
     if (self.has_error_message_):
       out.putVarInt32(90)
       out.putPrefixedString(self.error_message_)
+    if (self.has_database_):
+      out.putVarInt32(98)
+      out.putPrefixedString(self.database_)
 
   def TryMerge(self, d):
     while d.avail() > 0:
@@ -3709,6 +3736,9 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
       if tt == 90:
         self.set_error_message(d.getPrefixedString())
         continue
+      if tt == 98:
+        self.set_database(d.getPrefixedString())
+        continue
 
 
       if (tt == 0): raise ProtocolBuffer.ProtocolBufferDecodeError
@@ -3718,6 +3748,7 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
   def __str__(self, prefix="", printElemNumber=0):
     res=""
     if self.has_app_id_: res+=prefix+("app_id: %s\n" % self.DebugFormatString(self.app_id_))
+    if self.has_database_: res+=prefix+("database: %s\n" % self.DebugFormatString(self.database_))
     if self.has_id_: res+=prefix+("id: %s\n" % self.DebugFormatInt64(self.id_))
     if self.has_definition_:
       res+=prefix+"definition <\n"
@@ -3742,6 +3773,7 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
     return tuple([sparse.get(i, default) for i in xrange(0, 1+maxtag)])
 
   kapp_id = 1
+  kdatabase = 12
   kid = 2
   kdefinition = 3
   kstate = 4
@@ -3764,7 +3796,8 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
     9: "disabled_index",
     10: "workflow_state",
     11: "error_message",
-  }, 11)
+    12: "database",
+  }, 12)
 
   _TYPES = _BuildTagLookupTable({
     0: ProtocolBuffer.Encoder.NUMERIC,
@@ -3778,7 +3811,8 @@ class CompositeIndex(ProtocolBuffer.ProtocolMessage):
     9: ProtocolBuffer.Encoder.NUMERIC,
     10: ProtocolBuffer.Encoder.NUMERIC,
     11: ProtocolBuffer.Encoder.STRING,
-  }, 11, ProtocolBuffer.Encoder.MAX_TYPE)
+    12: ProtocolBuffer.Encoder.STRING,
+  }, 12, ProtocolBuffer.Encoder.MAX_TYPE)
 
 
   _STYLE = """"""

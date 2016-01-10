@@ -752,7 +752,7 @@ def ConfigureRemoteApiForOAuth(
             access_token=None,
             client_id=None,
             client_secret=None,
-            scope=None,
+            scope=_OAUTH_SCOPES,
             refresh_token=None,
             credential_file=None,
             credentials=credentials))

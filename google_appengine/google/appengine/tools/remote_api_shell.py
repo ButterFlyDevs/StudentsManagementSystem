@@ -121,8 +121,6 @@ def main(_):
   parser.add_option('--secure', dest='secure', action='store_true',
                     default=False, help=('Use HTTPS when communicating '
                                          'with the server.'))
-  parser.add_option('--oauth2', dest='oauth2', action='store_true',
-                    default=False, help='Use OAuth2 for credentials.')
   (options, args) = parser.parse_args()
 
 
@@ -149,8 +147,13 @@ def main(_):
     if len(args) == 2:
 
       path = args[1]
-  remote_api_shell(servername, appid, path, options.secure, options.oauth2,
-                   appengine_rpc.HttpRpcServer)
+  remote_api_shell(
+      servername=servername,
+      appid=appid,
+      path=path,
+      secure=options.secure,
+      rpc_server_factory=appengine_rpc.HttpRpcServer,
+      oauth2=True)
 
 
 if __name__ == '__main__':

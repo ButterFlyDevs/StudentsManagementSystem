@@ -39,6 +39,10 @@ class EmptyConfigurationFile(Error):
   """Tried to load empty configuration file"""
 
 
+class ModuleAndServiceDefined(Error):
+  """Configuration has both 'module' and 'service' instead of just one."""
+
+
 class MultipleConfigurationFile(Error):
   """Tried to load configuration file with multiple AppInfo objects"""
 
@@ -99,8 +103,8 @@ class MissingApiConfig(Error):
   """Raised if an api_endpoint handler is configured but no api_config."""
 
 
-class RuntimeDoesNotSupportLibraries(Error):
-  """Raised when 'libraries' is used in a runtime that does not support it."""
+class LibrariesNotSupported(Error):
+  """Raised if libraries are used outside of classic python27."""
 
 
 class DuplicateLibrary(Error):

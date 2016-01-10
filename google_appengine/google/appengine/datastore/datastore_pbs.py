@@ -43,18 +43,26 @@ from google.appengine.datastore import entity_pb
 from google.appengine.datastore import datastore_v4_pb
 from google.appengine.datastore import entity_v4_pb
 
+_MIN_CLOUD_DATASTORE_VERSION = (3, 0, 0, 'b1')
 _CLOUD_DATASTORE_ENABLED = False
+
 try:
   
   
   import googledatastore
-  _CLOUD_DATASTORE_ENABLED = True
+
+  if googledatastore.VERSION >= _MIN_CLOUD_DATASTORE_VERSION:
+    _CLOUD_DATASTORE_ENABLED = True
 except ImportError:
   pass
+except AttributeError:
 
-MISSING_CLOUD_DATASTORE_MESSAGE = ('Could not import googledatastore. This '
-                                   'library must be installed to use the '
-                                   'Cloud Datastore API.')
+  pass
+
+MISSING_CLOUD_DATASTORE_MESSAGE = (
+    'Could not import googledatastore. This library must be installed with '
+    'version >= %s to use the Cloud Datastore API.' %
+    '.'.join([str(v) for v in _MIN_CLOUD_DATASTORE_VERSION]))
 
 
 MEANING_ATOM_CATEGORY = 1
@@ -207,6 +215,23 @@ def is_complete_v3_key(v3_key):
   last_element = v3_key.path().element_list()[-1]
   return ((last_element.has_id() and last_element.id() != 0) or
           (last_element.has_name() and last_element.name() != ''))
+
+
+def get_v1_mutation_key_and_entity(v1_mutation):
+  """Returns the v1 key and entity for a v1 mutation proto, if applicable.
+
+  Args:
+    v1_mutation: a googledatastore.Mutation
+
+  Returns:
+    a tuple (googledatastore.Key for this mutation,
+             googledatastore.Entity or None if the mutation is a deletion)
+  """
+  if v1_mutation.HasField('delete'):
+    return v1_mutation.delete, None
+  else:
+    v1_entity = getattr(v1_mutation, v1_mutation.WhichOneof('operation'))
+    return v1_entity.key, v1_entity
 
 
 def is_valid_utf8(s):

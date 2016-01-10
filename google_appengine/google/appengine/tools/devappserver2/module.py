@@ -47,25 +47,18 @@ from google.appengine.tools.devappserver2 import blob_image
 from google.appengine.tools.devappserver2 import blob_upload
 from google.appengine.tools.devappserver2 import channel
 from google.appengine.tools.devappserver2 import constants
-from google.appengine.tools.devappserver2 import custom_runtime
 from google.appengine.tools.devappserver2 import endpoints
 from google.appengine.tools.devappserver2 import errors
 from google.appengine.tools.devappserver2 import file_watcher
 from google.appengine.tools.devappserver2 import gcs_server
-from google.appengine.tools.devappserver2 import go_runtime
 from google.appengine.tools.devappserver2 import http_proxy
 from google.appengine.tools.devappserver2 import http_runtime
 from google.appengine.tools.devappserver2 import http_runtime_constants
 from google.appengine.tools.devappserver2 import instance
-try:
-  from google.appengine.tools.devappserver2 import java_runtime
-except ImportError:
-  java_runtime = None
 from google.appengine.tools.devappserver2 import login
-from google.appengine.tools.devappserver2 import php_runtime
-from google.appengine.tools.devappserver2 import python_runtime
 from google.appengine.tools.devappserver2 import request_rewriter
 from google.appengine.tools.devappserver2 import runtime_config_pb2
+from google.appengine.tools.devappserver2 import runtime_factories
 from google.appengine.tools.devappserver2 import start_response_utils
 from google.appengine.tools.devappserver2 import static_files_handler
 from google.appengine.tools.devappserver2 import thread_executor
@@ -139,6 +132,8 @@ _FILESAPI_DEPRECATION_WARNING_GO = (
     ' is available here: https://cloud.google.com/appengine/docs/deprecations'
     '/files_api')
 
+_ALLOWED_RUNTIMES_ENV2 = (
+    'python-compat', 'java-compat', 'java7', 'go', 'custom')
 
 def _static_files_regex_from_handlers(handlers):
   patterns = []
@@ -189,19 +184,6 @@ class _ScriptHandler(url_handler.UserConfiguredURLHandler):
 class Module(object):
   """The abstract base for all instance pool implementations."""
 
-  _RUNTIME_INSTANCE_FACTORIES = {
-      'go': go_runtime.GoRuntimeInstanceFactory,
-      'php55': php_runtime.PHPRuntimeInstanceFactory,
-      'python': python_runtime.PythonRuntimeInstanceFactory,
-      'python27': python_runtime.PythonRuntimeInstanceFactory,
-      'custom': custom_runtime.CustomRuntimeInstanceFactory,
-  }
-  if java_runtime:
-    _RUNTIME_INSTANCE_FACTORIES.update({
-        'java': java_runtime.JavaRuntimeInstanceFactory,
-        'java7': java_runtime.JavaRuntimeInstanceFactory,
-    })
-
   _MAX_REQUEST_WAIT_TIME = 10
 
   def _get_wait_time(self):
@@ -226,19 +208,26 @@ class Module(object):
 
     Raises:
       RuntimeError: if the configuration specifies an unknown runtime.
+      errors.InvalidAppConfigError: if using removed runtimes for env: 2
     """
     runtime = module_configuration.runtime
     if runtime == 'vm':
       runtime = module_configuration.effective_runtime
+      # NOTE(bryanmau): b/24139391
+      # If in env: 2, users either use a compat runtime or custom.
+      if module_configuration.env == '2':
+        if runtime not in _ALLOWED_RUNTIMES_ENV2:
+          raise errors.InvalidAppConfigError(
+              'In env: 2, only the following runtimes '
+              'are allowed: {0}'.format(allowed_runtimes))
 
-    # TODO: a bad runtime should be caught before we get here.
-    if runtime not in self._RUNTIME_INSTANCE_FACTORIES:
+    if runtime not in runtime_factories.FACTORIES:
       raise RuntimeError(
           'Unknown runtime %r; supported runtimes are %s.' %
           (runtime,
            ', '.join(
-               sorted(repr(k) for k in self._RUNTIME_INSTANCE_FACTORIES))))
-    instance_factory = self._RUNTIME_INSTANCE_FACTORIES[runtime]
+               sorted(repr(k) for k in runtime_factories.FACTORIES))))
+    instance_factory = runtime_factories.FACTORIES[runtime]
     return instance_factory(
         request_data=self._request_data,
         runtime_config_getter=self._get_runtime_config,
@@ -322,10 +311,6 @@ class Module(object):
       A runtime_config_pb2.Config instance representing the configuration to be
       passed to an instance. NOTE: This does *not* include the instance_id
       field, which must be populated elsewhere.
-
-    Raises:
-      ValueError: The runtime type is "custom" with vm: true and
-        --custom_entrypoint is not specified.
     """
     runtime_config = runtime_config_pb2.Config()
     runtime_config.app_id = self._module_configuration.application
@@ -372,11 +357,7 @@ class Module(object):
     if self._vm_config:
       runtime_config.vm_config.CopyFrom(self._vm_config)
       if self._module_configuration.effective_runtime == 'custom':
-        if not self._custom_config.custom_entrypoint:
-          raise ValueError('The --custom_entrypoint flag must be set for '
-                           'custom runtimes')
-        else:
-          runtime_config.custom_config.CopyFrom(self._custom_config)
+        runtime_config.custom_config.CopyFrom(self._custom_config)
 
     runtime_config.vm = self._module_configuration.runtime == 'vm'
 
@@ -385,7 +366,7 @@ class Module(object):
   def _maybe_restart_instances(self, config_changed, file_changed):
     """Restarts instances. May avoid some restarts depending on policy.
 
-    One of config_changed or file_changed must be True.
+    If neither config_changed or file_changed is True, returns immediately.
 
     Args:
       config_changed: True if the configuration for the application has changed.
@@ -412,6 +393,14 @@ class Module(object):
 
   def _handle_changes(self, timeout=0):
     """Handle file or configuration changes."""
+    # Check for file changes first, because they can trigger config changes.
+    file_changes = self._watcher.changes(timeout)
+    if file_changes:
+      logging.info(
+          '[%s] Detected file changes:\n  %s', self.name,
+          '\n  '.join(sorted(file_changes)))
+      self._instance_factory.files_changed()
+
     # Always check for config and file changes because checking also clears
     # pending changes.
     config_changes = self._module_configuration.check_for_updates()
@@ -419,13 +408,6 @@ class Module(object):
       handlers = self._create_url_handlers()
       with self._handler_lock:
         self._handlers = handlers
-
-    file_changes = self._watcher.changes(timeout)
-    if file_changes:
-      logging.info(
-          '[%s] Detected file changes:\n  %s', self.name,
-          '\n  '.join(sorted(file_changes)))
-      self._instance_factory.files_changed()
 
     if config_changes & _RESTART_INSTANCES_CONFIG_CHANGES:
       self._instance_factory.configuration_changed(config_changes)
@@ -478,9 +460,10 @@ class Module(object):
           Python runtime-specific configuration. If None then defaults are used.
       java_config: A runtime_config_pb2.JavaConfig instance containing
           Java runtime-specific configuration. If None then defaults are used.
-      custom_config: A runtime_config_pb2.CustomConfig instance. If None, or
-          'custom_entrypoint' is not set, then attempting to instantiate a
-          custom runtime module will result in an error.
+      custom_config: A runtime_config_pb2.CustomConfig instance. If 'runtime'
+          is set then we switch to another runtime.  Otherwise, we use the
+          custom_entrypoint to start the app.  If neither or both are set,
+          then we will throw an error.
       cloud_sql_config: A runtime_config_pb2.CloudSQL instance containing the
           required configuration for local Google Cloud SQL development. If None
           then Cloud SQL will not be available.
@@ -505,6 +488,10 @@ class Module(object):
           directive.
       threadsafe_override: If not None, ignore the YAML file value of threadsafe
           and use this value instead.
+
+    Raises:
+      errors.InvalidAppConfigError: For runtime: custom, either mistakenly set
+        both --custom_entrypoint and --runtime or neither.
     """
     self._module_configuration = module_configuration
     self._name = module_configuration.module_name
@@ -531,6 +518,20 @@ class Module(object):
     self._use_mtime_file_watcher = use_mtime_file_watcher
     self._default_version_port = default_version_port
     self._port_registry = port_registry
+
+    if self.effective_runtime == 'custom':
+      if self._custom_config.runtime and self._custom_config.custom_entrypoint:
+        raise errors.InvalidAppConfigError(
+            'Cannot set both --runtime and --custom_entrypoint.')
+      elif self._custom_config.runtime:
+        actual_runtime = self._custom_config.runtime
+        self._module_configuration.effective_runtime = actual_runtime
+      elif not self._custom_config.custom_entrypoint:
+        raise errors.InvalidAppConfigError(
+            'Must set either --runtime or --custom_entrypoint.  For a '
+            'standard runtime, set the --runtime flag with one of %s.  '
+            'For a custom runtime, set the --custom_entrypoint with a '
+            'command to start your app.' % runtime_factories.valid_runtimes())
 
     self._instance_factory = self._create_instance_factory(
         self._module_configuration)

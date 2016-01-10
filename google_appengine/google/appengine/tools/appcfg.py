@@ -578,12 +578,28 @@ def MigratePython27Notice():
   Prints a message to sys.stdout. The caller should have tested that the user is
   using Python 2.5, so as not to spuriously display this message.
   """
-  print (
+  ErrorUpdate(
       'WARNING: This application is using the Python 2.5 runtime, which is '
       'deprecated! It should be updated to the Python 2.7 runtime as soon as '
       'possible, which offers performance improvements and many new features. '
       'Learn how simple it is to migrate your application to Python 2.7 at '
       'https://developers.google.com/appengine/docs/python/python25/migrate27.')
+
+
+def MigratePageSpeedNotice():
+  """Tells the user that PageSpeed service is deprecated.
+
+  Encourages the user to remove PageSpeed configs from their app.yaml file.
+
+  Prints a message to sys.stdout. The caller should have tested that the user
+  has pagespeed configurations in their app.yaml file.
+  """
+  ErrorUpdate(
+      'WARNING: This application contains PageSpeed related configurations, '
+      'which is deprecated! Those configurations will stop working after '
+      'December 1, 2015. Read '
+      'https://cloud.google.com/appengine/docs/adminconsole/pagespeed#disabling-pagespeed'
+      ' to learn how to disable PageSpeed.')
 
 
 class IndexDefinitionUpload(object):
@@ -3759,6 +3775,7 @@ class AppCfgApp(object):
     rpcserver = self._GetRpcServer()
     all_files = [self.basepath] + self.args
     has_python25_version = False
+    has_pagespeed = False
 
     for yaml_path in all_files:
       file_name = os.path.basename(yaml_path)
@@ -3770,6 +3787,9 @@ class AppCfgApp(object):
       if module_yaml.runtime == 'python':
         has_python25_version = True
 
+      if module_yaml.pagespeed:
+        has_pagespeed = True
+
 
 
       if not module_yaml.module and file_name != 'app.yaml':
@@ -3779,6 +3799,8 @@ class AppCfgApp(object):
       self.UpdateVersion(rpcserver, self.basepath, module_yaml, file_name)
     if has_python25_version:
       MigratePython27Notice()
+    if has_pagespeed:
+      MigratePageSpeedNotice()
 
   def Update(self):
     """Updates and deploys a new appversion and global app configs."""
@@ -3871,6 +3893,8 @@ class AppCfgApp(object):
 
     if appyaml.runtime == 'python':
       MigratePython27Notice()
+    if appyaml.pagespeed:
+      MigratePageSpeedNotice()
 
 
     if self.options.backends:

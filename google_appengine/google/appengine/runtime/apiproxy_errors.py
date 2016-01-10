@@ -40,7 +40,11 @@ class ArgumentError(Error):
 
 
 class DeadlineExceededError(Error):
-  """Raised by APIProxy calls if the call took too long to respond."""
+  """Raised by APIProxy calls if the call took too long to respond.
+
+  Not to be confused with runtime.DeadlineExceededError.
+  That one is raised when the overall HTTP response deadline is exceeded.
+  """
 
 
 class CancelledError(Error):
