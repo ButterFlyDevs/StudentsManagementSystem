@@ -80,6 +80,47 @@ class HelloWorldApi(remote.Service):
         return Greeting(message=request.message * request.times)
 
 
+#########  INTENTO DE IMPLEMENTACIÓN DE UN METODO POST
+
+    @endpoints.method(Alumno,MensajeRespuesta,
+                     path='nuevoalumno', http_method='POST',
+                     name='greetings.insertaralumno')
+    def insertar_alumno(self, request):
+
+        print "POST EN CLOUDPOINTS"
+        print str(request)
+
+        #Una vez que tenemos los datos aquí los enviamos al servicio que gestiona la base de datos.
+        #Podemos imprimir por pantalla los datos recolectados
+        print request.nombre
+        print request.dni
+
+        #Nos conectamos al modulo para enviarle los mismos
+        from google.appengine.api import modules
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="alumnos"
+
+
+        from google.appengine.api import urlfetch
+        import urllib
+
+        form_fields = {
+          "nombre": request.nombre,
+          "dni": request.dni,
+        }
+
+        form_data = urllib.urlencode(form_fields)
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        return MensajeRespuesta(message="Todo OK man!")
+
+######### FIN DE INTENTO
+
+
+
 ######################
 
     '''

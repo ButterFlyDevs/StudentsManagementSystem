@@ -9,6 +9,7 @@ import jsonpickle
 
 class Alumnos(webapp2.RequestHandler):
 
+    # curl -X GET http://localhost:8002/alumnos
     def get(self):
 
         #Se está pidiendo que se devuelvan todos los alumnos
@@ -27,6 +28,27 @@ class Alumnos(webapp2.RequestHandler):
         #Los enviamos
         self.response.write(obj)
 
+    # curl -d "nombre=JuanAntonio&dni=456320" -X POST http://localhost:8002/alumnos
+    #Gestión de las peticiones post.
+    def post(self):
+
+        print ("post in alumnos")
+        print self.request.get('nombre')
+        print self.request.get('dni')
+
+        #Grabamos los datos en la base de datos:
+
+        GestorAlumnos.nuevoAlumno(self.request.get('nombre'), self.request.get('dni'))
+
+
+        #Recogemos los atributos de la petición y los imprimimos
+        self.response.write("nombre: "+self.request.get('nombre')+"\n")
+        self.response.write("dni: "+self.request.get('dni')+"\n")
+        '''
+        Salida:
+        nombre: JuanAntonio
+        dni: 456320
+        '''
 
 app = webapp2.WSGIApplication([
     ('/alumnos', Alumnos)

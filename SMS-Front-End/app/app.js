@@ -37,10 +37,12 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
          })
 
          // nested list with just some random string data
-         .state('estudiantes.paragraph', {
-             url: '/paragraph',
+         .state('estudiantes.nuevo', {
+             url: '/nuevo',
              //Podemos meter directamente texto desde aquí
-             template: 'I could sure use a drink right now.'
+             //template: 'I could sure use a drink right now.'
+             templateUrl: 'estudiantes-nuevo.html',
+             controller: 'ControladorNuevoEstudiante'
          })
 
         // ABOUT PAGE AND MULTIPLE NAMED VIEWS =================================
@@ -49,6 +51,28 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
             url:'/about',
             template: 'This is an another page'
         });
+
+});
+
+
+/*
+Controlador que manejará los datos del formulario enviándolos al servidor.
+*/
+routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
+  $scope.addAlumno = function(){
+    console.log("lamando a addAlumno()");
+    console.log($scope.alumno);
+    console.log($scope.alumno.nombre)
+
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', null, ROOT);
+
+    gapi.client.helloworld.greetings.insertaralumno({'nombre':$scope.alumno.nombre,'dni':$scope.alumno.dni}).execute(function(resp){
+      console.log(resp);
+    });
+
+  };
+
 
 });
 
