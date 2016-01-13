@@ -2,8 +2,11 @@
 import webapp2
 import json
 from tools.GestorAlumnosSQL import GestorAlumnos
+import jsonpickle
 
 ## CLASE QUE PROCESA EL RECURSO /alumnos usando una forma estandar de uso  de parámetros.
+#Responde a http://localhost:8002/alumnos o  curl -X GET http://localhost:8002/alumnos
+
 class Alumnos(webapp2.RequestHandler):
 
     def get(self):
@@ -17,8 +20,12 @@ class Alumnos(webapp2.RequestHandler):
         for alumno in listaAlumnos:
             salida+= str(json.dumps(alumno.__dict__))
 
+        #print "Imprimiendo lista de alumnos"
+        obj = jsonpickle.encode(listaAlumnos)
+        #print str(obj)
+
         #Los enviamos
-        self.response.write(salida)
+        self.response.write(obj)
 
 
 app = webapp2.WSGIApplication([

@@ -10,6 +10,9 @@ import endpoints
 from protorpc import messages
 from protorpc import message_types
 from protorpc import remote
+import os
+
+import jsonpickle
 
 
 # TODO: Replace the following lines with client IDs obtained from the APIs
@@ -35,12 +38,17 @@ Como vemos, no aparecen argumentos en el cuerpo de la petición ya que se trata
 de una petición de tipo GET.
 '''
 
+class Alumno(messages.Message):
+    nombre = messages.StringField(1)
+    dni = messages.StringField(2)
+
+class ListaAlumnos(messages.Message):
+    alumnos = messages.MessageField(Alumno, 1, repeated=True)
 
 
 class Greeting(messages.Message):
     """Greeting that stores a message."""
     message = messages.StringField(1)
-
 
 class GreetingCollection(messages.Message):
     """Collection of Greetings."""
@@ -71,6 +79,9 @@ class HelloWorldApi(remote.Service):
     def greetings_multiply(self, request):
         return Greeting(message=request.message * request.times)
 
+
+######################
+
     '''
     # curl -X GET localhost:8080/_ah/api/helloworld/v1/hellogreeting
     @endpoints.method(message_types.VoidMessage, GreetingCollection,
@@ -83,7 +94,7 @@ class HelloWorldApi(remote.Service):
         return STORED_GREETINGS
     '''
 
-    @endpoints.method(message_types.VoidMessage, Greeting,
+    @endpoints.method(message_types.VoidMessage, ListaAlumnos,
                       #path=nombre del recurso a llamar
                       path='hellogreeting', http_method='GET',
                       #Puede que sea la forma en la que se llama desde la api:
@@ -115,8 +126,40 @@ class HelloWorldApi(remote.Service):
         #Llamamos al microservicio y recibimos los resultados con URLFetch
         result = urlfetch.fetch(url)
 
+        #Vamos a intentar consumir los datos en JSON y convertirlos a un mensje enviable :)
+
+        print "IMPRESION DE LOS DATOS RECIBIDOS"
+        print result.content
+        listaAlumnos = jsonpickle.decode(result.content)
+
+        for alumno in listaAlumnos:
+            print "nombre: "+str(alumno.get('nombre'))
+            print "dni: "+str(alumno.get('dni'))
+
+        '''
+        miListaAlumnos=ListaAlumnos()
+        miListaAlumnos.alumnos = listaAlumnos
+        '''
+
+        alumnosItems= []
+
+        for alumno in listaAlumnos:
+            alumnosItems.append(Alumno( nombre=str(alumno.get('nombre')), dni=str(alumno.get('dni'))  ))
+
+        '''
+        greetingItems.append(Greeting(message='hello world2'))
+        greetingItems.append(Greeting(message='goodbye world2'))
+        STORED_GREETINGS2=GreetingCollection(items=greetingItems)
+        '''
+
         #Los adaptamos al tipo de mensaje y enviamos
-        return Greeting(message=str(result.content))
+        #return Greeting(message=str(result.content))
+        return ListaAlumnos(alumnos=alumnosItems)
+
+
+##################
+
+
 
 
     ID_RESOURCE = endpoints.ResourceContainer(
