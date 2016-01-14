@@ -9,5 +9,7 @@
 
   <h2>Estudiantes en el sistema.</h2>
   <ul class="uk-list-line">
-      <li ng-repeat="alumno in alumnos">{{ alumno.nombre }} - {{ alumno.dni }}</li>
+      <!-- Mostramos todos los alumnos cargados por el controlador, convirtiendo cada uno además
+      en un enlace a la ventana propia del estudiante, además pasamos el identificador  como parámetro en la URL-->
+      <li ng-repeat="alumno in alumnos"><a ui-sref="estudiantes.detalles-estudiante({estudianteID: {{alumno.dni}}})">{{ alumno.nombre }} - {{ alumno.dni }}</a></li>
   </ul>

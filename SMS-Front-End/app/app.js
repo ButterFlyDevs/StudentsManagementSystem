@@ -21,7 +21,7 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
 
         .state('estudiantes.main', {
             url: '/main',
-            templateUrl: 'partial-home-main.html',
+            templateUrl: 'estudiantes-main.html',
         })
 
               // nested list with custom controller
@@ -34,6 +34,15 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
                  $scope.dogs = ['Bernese', 'Husky', 'Goldendoodle'];
              }
              */
+         })
+
+
+
+
+         .state('estudiantes.detalles-estudiante',{
+           url: '/detalle/:estudianteID',
+           templateUrl: 'estudiantes-detalle.html',
+           controller: 'ControladorDetallesEstudiante'
          })
 
          // nested list with just some random string data
@@ -76,6 +85,26 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
 
 });
 
+routerApp.controller('ControladorDetallesEstudiante', function($scope, $stateParams){
+
+  //Rescatamos el id de la url y la enviamos con el scope a la vista
+  //$scope.id = $stateParams.estudianteID;
+  $scope.id=$stateParams.estudianteID;
+
+  //Mockearemos un poco:
+
+  var Estudiante = new Object();
+  Estudiante.edad = "15";
+  Estudiante.nombre = "Eduardo Manos Tijeras";
+  Estudiante.localidad = "Granada";
+  Estudiante.curso = "2º ESO";
+  Estudiante.telefono="999-99-99-99"
+  Estudiante.link_foto="http://maitegarcianieto.com/Fotos/Cine/Eduardo%20Manostijeras/Eduardo%20Manostijeras-7.jpg"
+
+  $scope.es = Estudiante;
+
+
+})
 
 routerApp.controller('ControladorEjemplo', function ($scope) {
 
