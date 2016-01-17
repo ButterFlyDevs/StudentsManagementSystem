@@ -69,15 +69,18 @@ Controlador que manejará los datos del formulario enviándolos al servidor.
 */
 routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
   $scope.addAlumno = function(){
-    console.log("lamando a addAlumno()");
-    console.log($scope.alumno);
-    console.log($scope.alumno.nombre)
+    //console.log("lamando a addAlumno()");
+    //console.log($scope.alumno);
+    //console.log($scope.alumno.nombre)
 
     var ROOT = 'http://localhost:8001/_ah/api';
     gapi.client.load('helloworld', 'v1', null, ROOT);
 
     gapi.client.helloworld.greetings.insertaralumno({'nombre':$scope.alumno.nombre,'dni':$scope.alumno.dni}).execute(function(resp){
-      console.log(resp);
+      //Mostramos por consola la respuesta del servidor
+      console.log(resp.message);
+      $scope.respuesta=resp.message;
+      $scope.$apply();
     });
 
   };
@@ -101,7 +104,22 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
   Estudiante.telefono="999-99-99-99"
   Estudiante.link_foto="http://maitegarcianieto.com/Fotos/Cine/Eduardo%20Manostijeras/Eduardo%20Manostijeras-7.jpg"
 
+  //En realidad debería de llamarse a la api para conseguir todos los datos del usuario.
   $scope.es = Estudiante;
+
+  //Implementación de las acciones que se producen cuando el botón de eliminar se pulsa.
+  $scope.ButtonClick = function(){
+    console.log("Pulsado boton de eliminar")
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', null, ROOT);
+
+    gapi.client.helloworld.greetings.eliminaralumno({'dni':'sf'}).execute(function(resp){
+      //Mostramos por consola la respuesta del servidor
+      console.log(resp.message);
+      $scope.respuesta=resp.message;
+      $scope.$apply();
+    });
+  }
 
 
 })

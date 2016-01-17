@@ -111,13 +111,78 @@ class HelloWorldApi(remote.Service):
           "dni": request.dni,
         }
 
+        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
         form_data = urllib.urlencode(form_fields)
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
 
+        print "RESULTADOS DE PETICION AL M1: "
+        print result.content
 
-        return MensajeRespuesta(message="Todo OK man!")
+        #return MensajeRespuesta(message="Todo OK man!")
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
 
 ######### FIN DE INTENTO
+
+#########  INTENTO DE IMPLEMENTACIÓN DE UN METODO DELETE para eliminar un alumno
+
+    @endpoints.method(Alumno,MensajeRespuesta,
+                     path='eliminaralumno', http_method='DELETE',
+                     name='greetings.eliminaralumno')
+    def eliminar_alumno(self, request):
+
+        print "POST EN CLOUDPOINTS"
+        print str(request)
+
+        #Una vez que tenemos los datos aquí los enviamos al servicio que gestiona la base de datos.
+        #Podemos imprimir por pantalla los datos recolectados
+        print "MENSAJE RECIBIDO EN ENDPOINTS"+request.dni
+
+        #Nos conectamos al modulo para enviarle los mismos
+        from google.appengine.api import modules
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="alumnos"
+
+
+        from google.appengine.api import urlfetch
+        import urllib
+
+        form_fields = {
+          "dni": request.dni,
+        }
+
+        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        form_data = urllib.urlencode(form_fields)
+
+        '''
+        Parece que urlfetch da problemas a al hora de pasar parámetros (payload) cuando se trata del
+        método DELETE.
+        Extracto de la doc:
+        payload: POST, PUT, or PATCH payload (implies method is not GET, HEAD, or DELETE). this is ignored if the method is not POST, PUT, or PATCH.
+        Además no somos los primeros en encontrarse este problema:
+        http://grokbase.com/t/gg/google-appengine/13bvr5qjyq/is-there-any-reason-that-urlfetch-delete-method-does-not-support-a-payload
+
+        Según la última cuestión puede que tengamos que usar POST
+
+        '''
+
+        #EL problema queda aquí, a expensas de ver si podemos usar DELETE o tenemos que realizar un apaño con post
+        #usando algún parámetro que indique si se debe eliminar.
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.DELETE)
+
+        print "RESULTADOS DE PETICION AL M1: "
+        print result.content
+
+        #return MensajeRespuesta(message="Todo OK man!")
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
+
+######### FIN DE INTENTO
+
+
+
 
 
 
