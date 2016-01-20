@@ -75,8 +75,6 @@ class GestorAlumnos:
 
             alumno.nombre=row[0]
             alumno.dni=row[1]
-            #print alumno.nombre
-            #print alumno.dni
             lista.append(alumno)
             #print row[0], row[1]
             row = cursor.fetchone()
@@ -90,21 +88,35 @@ class GestorAlumnos:
 
     @classmethod
     def getAlumno(self, dniAlumno):
+        """
+        Recupera toda la información de un alumno en concreto a través de la clave primaria, su DNI.        
+        """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
         query="select * from Alumno where dni='"+dniAlumno+"';"
 
-        cursor.execute(query)
-        row = cursor.fetchone()
-
-        alm = Alumno()
-        alm.nombre=row[0]
-        alm.dni=row[1]
+        try:
+            salida = cursor.execute(query);
+            row = cursor.fetchone()
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
 
         cursor.close()
         db.close()
 
-        return alm
+        if salida==1:
+            alm = Alumno()
+            alm.nombre=row[0]
+            alm.dni=row[1]
+            return alm
+        if salida==0:
+            return 'Elemento no encontrado'
 
     @classmethod
     def delAlumno(self, dniAlumno):

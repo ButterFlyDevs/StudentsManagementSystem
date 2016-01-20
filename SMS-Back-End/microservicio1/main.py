@@ -12,26 +12,41 @@ class Alumnos(webapp2.RequestHandler):
     """Manejador de peticiones a Alumnos"""
 
     # curl -X GET http://localhost:8002/alumnos
+
+    '''
+    Si quisiéramos pasar parámetros
+    # curl -d "dni=454545" -X GET -G  http://localhost:8080/alumnos
+    que equivale a hacer la peticion a http://localhost:8080/alumnos?dni=9    
+    '''
+
     def get(self):
         """
-        Devuelve una lista con todos los alumnos almacenados en la base de datos.
+        Gestiona las peticiones de tipo get (DAME-QUIERO) al recurso Alumnos
         """
+        #Si no se pasa como parámetro nada, se está pidiendo una lista simplificada de todos los alumnos de la base de datos.
+        if(self.request.get('dni')==''):
+            #Se está pidiendo que se devuelvan todos los alumnos
+            listaAlumnos = GestorAlumnos.getAlumnos()
 
-        #Se está pidiendo que se devuelvan todos los alumnos
-        listaAlumnos = GestorAlumnos.getAlumnos()
 
+            #Una vez que tenemos la lista de aĺumnos convertimos los datos a JSON para enviarlos
+            salida=""
+            for alumno in listaAlumnos:
+                salida+= str(json.dumps(alumno.__dict__))
 
-        #Una vez que tenemos la lista de aĺumnos convertimos los datos a JSON para enviarlos
-        salida=""
-        for alumno in listaAlumnos:
-            salida+= str(json.dumps(alumno.__dict__))
+            #print "Imprimiendo lista de alumnos"
+            obj = jsonpickle.encode(listaAlumnos)
+            #print str(obj)
 
-        #print "Imprimiendo lista de alumnos"
-        obj = jsonpickle.encode(listaAlumnos)
-        #print str(obj)
+            #Los enviamos
+            self.response.write(obj)
 
-        #Los enviamos
-        self.response.write(obj)
+        #En otro caso, se está pasando el dni del que se quiere toda su información al completo.
+        else:
+            #Recuperamos el alumno pedido.
+            alumno = GestorAlumnos.getAlumno(self.request.get('dni'))
+            #Enviamos el resultado en formato JSON
+            self.response.write(jsonpickle.encode(alumno))
 
     # curl -d "nombre=JuanAntonio&dni=456320" -X POST http://localhost:8002/alumnos
     #Gestión de las peticiones post.

@@ -42,6 +42,9 @@ class Alumno(messages.Message):
     nombre = messages.StringField(1)
     dni = messages.StringField(2)
 
+class DNI(messages.Message):
+    dni = messages.StringField(1)
+
 class ListaAlumnos(messages.Message):
     alumnos = messages.MessageField(Alumno, 1, repeated=True)
 
@@ -184,6 +187,17 @@ class HelloWorldApi(remote.Service):
 
 
 
+    ### PRUEBA DE LLAMADA A ENDPOINT A MÉTODO GET CON PARÁMETROS
+
+    # Se podría llamar así:
+    # curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos?dni=9
+    @endpoints.method(DNI, Alumno, path='alumnos', http_method='GET', name='greetings.getAlumno')
+    def getAlumno(self,request):
+        print "GET CON PARÁMETROS EN ENDPOINT"
+        #Cogemos el dni pasado por parámetro y lo devolvemos para comprobar que funciona.
+        return Alumno(nombre='SALIDA', dni=request.dni)
+    ###
+
 
 
 ######################
@@ -217,9 +231,9 @@ class HelloWorldApi(remote.Service):
         import urllib2
         from google.appengine.api import modules
 
-        #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL sola.
+        #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
-        #Añadimos el servicio al que queremos conectarnos.
+        #Añadimos el recurso al que queremos conectarnos.
         url+="alumnos"
         print str(url)
         #result = urllib2.urlopen(url)

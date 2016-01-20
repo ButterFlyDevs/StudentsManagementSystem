@@ -7,3 +7,8 @@ class Alumno:
     def __init__(self):
         self.nombre = ""
         self.dni = ""
+        self.direccion = ""
+        self.localidad = ""
+        self.provincia = ""
+        self.fecha_nac = ""
+        self.telefono = ""
