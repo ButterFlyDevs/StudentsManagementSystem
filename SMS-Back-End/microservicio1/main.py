@@ -16,7 +16,7 @@ class Alumnos(webapp2.RequestHandler):
     '''
     Si quisiéramos pasar parámetros
     # curl -d "dni=454545" -X GET -G  http://localhost:8080/alumnos
-    que equivale a hacer la peticion a http://localhost:8080/alumnos?dni=9    
+    que equivale a hacer la peticion a http://localhost:8080/alumnos?dni=9
     '''
 
     def get(self):
@@ -25,6 +25,8 @@ class Alumnos(webapp2.RequestHandler):
         """
         #Si no se pasa como parámetro nada, se está pidiendo una lista simplificada de todos los alumnos de la base de datos.
         if(self.request.get('dni')==''):
+
+            print ("GET ALL ALUMNOS #######################")
             #Se está pidiendo que se devuelvan todos los alumnos
             listaAlumnos = GestorAlumnos.getAlumnos()
 
@@ -43,8 +45,18 @@ class Alumnos(webapp2.RequestHandler):
 
         #En otro caso, se está pasando el dni del que se quiere toda su información al completo.
         else:
+            print ("GET UN ALUMNO #######################")
             #Recuperamos el alumno pedido.
             alumno = GestorAlumnos.getAlumno(self.request.get('dni'))
+
+            if(alumno!='Elemento no encontrado'):
+                print "FECHA NACIMIENTO"
+                #Tenemos que hacer esto para que no haya problemas al codificar con JSON el tipo de dato fecha nacimiento
+                alumno.fecha_nac=str(alumno.fecha_nac)
+                print alumno.fecha_nac
+
+            #Si se trata de un error entonces se envía el error que nos devuelve el GestorAlumnos directamente
+
             #Enviamos el resultado en formato JSON
             self.response.write(jsonpickle.encode(alumno))
 

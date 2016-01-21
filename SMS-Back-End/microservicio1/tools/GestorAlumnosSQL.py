@@ -89,7 +89,7 @@ class GestorAlumnos:
     @classmethod
     def getAlumno(self, dniAlumno):
         """
-        Recupera toda la información de un alumno en concreto a través de la clave primaria, su DNI.        
+        Recupera TODA la información de un alumno en concreto a través de la clave primaria, su DNI.
         """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
@@ -111,9 +111,17 @@ class GestorAlumnos:
         db.close()
 
         if salida==1:
+            #Como se trata de toda la información al completo usaremos todos los campos de la clase alumno.
+            #La api del mservicio envia estos datos en JSON sin comprobar nada
             alm = Alumno()
             alm.nombre=row[0]
             alm.dni=row[1]
+            alm.direccion=row[2]
+            alm.localidad=row[3]
+            alm.provincia=row[4]
+            alm.fecha_nac=row[5]
+            alm.telefono=row[6]
+
             return alm
         if salida==0:
             return 'Elemento no encontrado'
