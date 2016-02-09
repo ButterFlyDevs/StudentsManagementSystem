@@ -2,57 +2,37 @@
 """
 Last mod: Feb 2016
 @author: Juan A. Fernández
-@about: Fichero de creación de la interfaz de interacción con la entidad Alumno de la base de datos.
+@about: Fichero de creación de la interfaz de interacción con la entidad Asignatura de la base de datos.
 """
 
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
-from Alumno import *
+from Asignatura import *
 
-'''Clase controladora de alumnos. Que usando la clase que define el modelo de Alumno (la info en BD que de el se guarda)
+'''Clase controladora de Asignaturas. Que usando la clase que define el modelo de Asignatura (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
 '''
-class GestorAlumnos:
+class GestorAsignaturas:
     """
-    Manejador de alumnos de la base de datos.
+    Manejador de Asignaturas de la base de datos.
     """
 
     @classmethod
-    def nuevoAlumno(self, nombre, dni, direccion, localidad, provincia, fecha_nac, telefono):
-        """
-        Introduce un nuevo alumno en la base de datos.
-        Argumentos:
-        nombre -- Nombre completo del alumno
-        dni -- DNI del alumno, que será la clave de este.
+    def nuevaAsignatura(self, id, nombre):
 
-        Extra de prog:
-
-        Podríamos programarlo para que independientemente del número de parámetros se guardara en la base de datos,
-        así sólo habría que pasarle una lista y funcionaría siempre. Podría sen interesante.
-        O que los paŕametros así como sus nombrs se definieran en algún sitio donde poder conslutaros y así cualquier modificación
-        se hace solo en un lugar.
-
-        """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
-        #query="INSERT INTO Alumno values("+"'"+nombre+"', "+ "'"+dni+"');"
+        #query="INSERT INTO Asignatura values("+"'"+nombre+"', "+ "'"+dni+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
         nombre='\''+nombre+'\''
-        dni='\''+dni+'\''
-        direccion='\''+direccion+'\''
-        localidad='\''+localidad+'\''
-        provincia='\''+provincia+'\''
-        fecha_nac='\''+fecha_nac+'\''
-        telefono='\''+telefono+'\''
+        id='\''+id+'\''
 
-
-
-        query="INSERT INTO Alumno VALUES("+nombre+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nac+","+telefono+");"
+        query="INSERT INTO Asignatura VALUES("+id+","+nombre+");"
 
         cursor = db.cursor()
         salida =''
         '''
-        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el alumno con clave
+        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Asignatura con clave
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
         try:
@@ -77,7 +57,7 @@ class GestorAlumnos:
             return 'Elemento duplicado'
 
     @classmethod
-    def getAlumnos(self):
+    def getAsignaturas(self):
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm")
         cursor = db.cursor()
 
@@ -86,19 +66,27 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
 
-        query="select * from Alumno"
+        query="select * from Asignatura"
         cursor.execute(query)
         row = cursor.fetchone()
 
         lista = []
 
         while row is not None:
-            alumno = Alumno()
+            profesor = Asignatura()
             #print "LISTA SUPER CHACHI"
 
-            alumno.nombre=row[0]
-            alumno.dni=row[1]
-            lista.append(alumno)
+            Asignatura.nombre=row[0]
+            profesor.dni=row[1]
+            profesor.direccion=row[2];
+            profesor.localidad=row[3];
+            profesor.provincia=row[4];
+            profesor.fecha_nac=row[5];
+            profesor.telefonoA=row[6];
+            profesor.telefonoB=row[7];
+
+
+            lista.append(profesor)
             #print row[0], row[1]
             row = cursor.fetchone()
 
@@ -110,13 +98,13 @@ class GestorAlumnos:
         #Una de las opciones es convertirlo en un objeto y devolverlo
 
     @classmethod
-    def getAlumno(self, dniAlumno):
+    def getAsignatura(self, idAsignatura):
         """
-        Recupera TODA la información de un alumno en concreto a través de la clave primaria, su DNI.
+        Recupera TODA la información de un Asignatura en concreto a través de la clave primaria, su DNI.
         """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
-        query="select * from Alumno where dni='"+dniAlumno+"';"
+        query="select * from Asignatura where dni='"+idAsignatura+"';"
 
         try:
             salida = cursor.execute(query);
@@ -134,40 +122,37 @@ class GestorAlumnos:
         db.close()
 
         if salida==1:
-            #Como se trata de toda la información al completo usaremos todos los campos de la clase alumno.
+            #Como se trata de toda la información al completo usaremos todos los campos de la clase Asignatura.
             #La api del mservicio envia estos datos en JSON sin comprobar nada
-            alm = Alumno()
-            alm.nombre=row[0]
-            alm.dni=row[1]
-            alm.direccion=row[2]
-            alm.localidad=row[3]
-            alm.provincia=row[4]
-            alm.fecha_nac=row[5]
-            alm.telefono=row[6]
+            asignatura = Asignatura()
+            asignatura.id=row[0]
+            asignatura.nombre=row[1]
 
-            return alm
+
+            return asignatura
         if salida==0:
             return 'Elemento no encontrado'
 
     @classmethod
-    def modAlumno(self, dniAlumno, campoACambiar, nuevoValor):
+    def modAsignatura(self, idAsignatura, campoACambiar, nuevoValor):
         """
-        Esta función permite cambiar cualquier atributo de un alumno.
+        Esta función permite cambiar cualquier atributo de un Asignatura.
         Parámetros:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
         """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
-        dniAlumno='\''+dniAlumno+'\''
-        query="UPDATE Alumno SET "+campoACambiar+"="+nuevoValor+" WHERE dni="+dniAlumno+";"
+        idAsignatura='\''+idAsignatura+'\''
+        query="UPDATE Asignatura SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idAsignatura+";"
+        print query;
 
 
 
         cursor = db.cursor()
         salida =''
         '''
-        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el alumno con clave
+        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Asignatura con clave
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
         try:
@@ -194,11 +179,11 @@ class GestorAlumnos:
             return 'Elemento no encontrado'
 
     @classmethod
-    def delAlumno(self, dniAlumno):
-        #print "Intentado eliminar alumno con dni "+str(dniAlumno)
+    def delAsignatura(self, idAsignatura):
+        print "Intentado eliminar asignatura con id "+str(idAsignatura)
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Alumno where dni='"+dniAlumno+"';"
+        query="delete from Asignatura where id='"+idAsignatura+"';"
         salida =''
         try:
             salida = cursor.execute(query);
@@ -213,10 +198,10 @@ class GestorAlumnos:
 
 
 
-        #print str(cursor)
+        print str(cursor)
         db.commit()
 
-        #print cursor.fetchone()
+        print cursor.fetchone()
         cursor.close()
         db.close()
 
