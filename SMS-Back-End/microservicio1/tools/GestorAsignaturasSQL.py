@@ -9,6 +9,9 @@ import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 from Asignatura import *
 
+#Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
+v=0
+
 '''Clase controladora de Asignaturas. Que usando la clase que define el modelo de Asignatura (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
 '''
@@ -21,14 +24,15 @@ class GestorAsignaturas:
     def nuevaAsignatura(self, id, nombre):
 
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
-        #query="INSERT INTO Asignatura values("+"'"+nombre+"', "+ "'"+dni+"');"
+        #query="INSERT INTO Asignatura values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
         nombre='\''+nombre+'\''
         id='\''+id+'\''
 
         query="INSERT INTO Asignatura VALUES("+id+","+nombre+");"
-
+        if v:
+            print '\n'+query
         cursor = db.cursor()
         salida =''
         '''
@@ -67,6 +71,8 @@ class GestorAsignaturas:
         #-----------------------------#
 
         query="select * from Asignatura"
+        if v:
+            print '\n'+query
         cursor.execute(query)
         row = cursor.fetchone()
 
@@ -77,7 +83,7 @@ class GestorAsignaturas:
             #print "LISTA SUPER CHACHI"
 
             Asignatura.nombre=row[0]
-            profesor.dni=row[1]
+            profesor.id=row[1]
             profesor.direccion=row[2];
             profesor.localidad=row[3];
             profesor.provincia=row[4];
@@ -100,12 +106,13 @@ class GestorAsignaturas:
     @classmethod
     def getAsignatura(self, idAsignatura):
         """
-        Recupera TODA la información de un Asignatura en concreto a través de la clave primaria, su DNI.
+        Recupera TODA la información de un Asignatura en concreto a través de la clave primaria, su id.
         """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
-        query="select * from Asignatura where dni='"+idAsignatura+"';"
-
+        query="select * from Asignatura where id='"+idAsignatura+"';"
+        if v:
+            print '\n'+query
         try:
             salida = cursor.execute(query);
             row = cursor.fetchone()
@@ -145,9 +152,8 @@ class GestorAsignaturas:
         nuevoValor='\''+nuevoValor+'\''
         idAsignatura='\''+idAsignatura+'\''
         query="UPDATE Asignatura SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idAsignatura+";"
-        print query;
-
-
+        if v:
+            print '\n'+query
 
         cursor = db.cursor()
         salida =''
@@ -180,7 +186,8 @@ class GestorAsignaturas:
 
     @classmethod
     def delAsignatura(self, idAsignatura):
-        print "Intentado eliminar asignatura con id "+str(idAsignatura)
+        if v:
+            print "Intentado eliminar asignatura con id "+str(idAsignatura)
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
         query="delete from Asignatura where id='"+idAsignatura+"';"
@@ -196,12 +203,7 @@ class GestorAsignaturas:
             except IndexError:
                 print "MySQL Error: %s" % str(e)
 
-
-
-        print str(cursor)
         db.commit()
-
-        print cursor.fetchone()
         cursor.close()
         db.close()
 

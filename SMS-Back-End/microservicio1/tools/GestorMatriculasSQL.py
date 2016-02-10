@@ -2,51 +2,45 @@
 """
 Last mod: Feb 2016
 @author: Juan A. Fernández
-@about: Fichero de creación de la interfaz de interacción con la entidad Profesor de la base de datos.
+@about: Fichero de creación de la interfaz de interacción con la relacion Matricula de la base de datos.
 """
 
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
-from Profesor import *
+from Matricula import *
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=0
 
-'''Clase controladora de profesores. Que usando la clase que define el modelo de Profesor (la info en BD que de el se guarda)
+'''Clase controladora de Matriculas. Que usando la clase que define el modelo de Matricula (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
 '''
-class GestorProfesores:
+class GestorMatriculas:
     """
-    Manejador de Profesors de la base de datos.
+    Manejador de Matriculas de la base de datos.
     """
 
     @classmethod
-    def nuevoProfesor(self, nombre, dni, direccion, localidad, provincia, fecha_nac, telefonoA, telefonoB):
+    def nuevaMatricula(self, id_asignatura, id_curso, id_alumno):
 
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
-        #query="INSERT INTO Profesor values("+"'"+nombre+"', "+ "'"+dni+"');"
+        #query="INSERT INTO Matricula values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
-        nombre='\''+nombre+'\''
-        dni='\''+dni+'\''
-        direccion='\''+direccion+'\''
-        localidad='\''+localidad+'\''
-        provincia='\''+provincia+'\''
-        fecha_nac='\''+fecha_nac+'\''
-        telefonoA='\''+telefonoA+'\''
-        telefonoB='\''+telefonoB+'\''
+        id_asignatura='\''+id_asignatura+'\''
+        id_curso='\''+id_curso+'\''
+        id_alumno='\''+id_alumno+'\''
 
-        query="INSERT INTO Profesor VALUES("+nombre+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nac+","+telefonoA+","+telefonoB+");"
-
+        query="INSERT INTO Matricula VALUES("+id_asignatura+","+id_curso+","+id_alumno+");"
         if v:
             print '\n'+query
-
         cursor = db.cursor()
         salida =''
         '''
-        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Profesor con clave
+        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Matricula con clave
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
+
         try:
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
@@ -67,9 +61,12 @@ class GestorProfesores:
             return 'OK'
         if salida==1062:
             return 'Elemento duplicado'
+        if salida=='1452':
+            return 'Alguno de los elementos no existe'
+
 
     @classmethod
-    def getProfesores(self):
+    def getMatriculas(self):
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm")
         cursor = db.cursor()
 
@@ -78,7 +75,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
 
-        query="select * from Profesor"
+        query="select * from Matricula"
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -87,20 +84,12 @@ class GestorProfesores:
         lista = []
 
         while row is not None:
-            profesor = Profesor()
-            #print "LISTA SUPER CHACHI"
+            matricula = Matricula()
+            matricula.id_asignatura=row[0]
+            matricula.id_curso=row[1]
+            matricula.id_alumno=row[2]
 
-            profesor.nombre=row[0]
-            profesor.dni=row[1]
-            profesor.direccion=row[2];
-            profesor.localidad=row[3];
-            profesor.provincia=row[4];
-            profesor.fecha_nac=row[5];
-            profesor.telefonoA=row[6];
-            profesor.telefonoB=row[7];
-
-
-            lista.append(profesor)
+            lista.append(curso)
             #print row[0], row[1]
             row = cursor.fetchone()
 
@@ -112,17 +101,20 @@ class GestorProfesores:
         #Una de las opciones es convertirlo en un objeto y devolverlo
 
     @classmethod
-    def getProfesor(self, dniProfesor):
+    def getMatricula(self, id_asignatura, id_curso, id_alumno):
         """
-        Recupera TODA la información de un Profesor en concreto a través de la clave primaria, su DNI.
+        Recupera TODA la información de un Matricula en concreto a través de la clave primaria, su id.
         """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
-        query="select * from Profesor where dni='"+dniProfesor+"';"
 
+        id_asignatura='\''+id_asignatura+'\''
+        id_curso='\''+id_curso+'\''
+        id_alumno='\''+id_alumno+'\''
+
+        query="select * from Matricula where id_asignatura="+id_asignatura+" and id_curso="+id_curso+" and id_alumno="+id_alumno+";"
         if v:
             print '\n'+query
-
         try:
             salida = cursor.execute(query);
             row = cursor.fetchone()
@@ -131,6 +123,7 @@ class GestorProfesores:
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
                 print "Error number: "+str(e.args[0])
+                #Capturamos el error:
                 salida=e.args[0]
             except IndexError:
                 print "MySQL Error: %s" % str(e)
@@ -139,45 +132,45 @@ class GestorProfesores:
         db.close()
 
         if salida==1:
-            #Como se trata de toda la información al completo usaremos todos los campos de la clase Profesor.
+            #Como se trata de toda la información al completo usaremos todos los campos de la clase Matricula.
             #La api del mservicio envia estos datos en JSON sin comprobar nada
-            profesor = Profesor()
-            profesor.nombre=row[0]
-            profesor.dni=row[1]
-            profesor.direccion=row[2];
-            profesor.localidad=row[3];
-            profesor.provincia=row[4];
-            profesor.fecha_nac=row[5];
-            profesor.telefonoA=row[6];
-            profesor.telefonoB=row[7];
+            matricula = Matricula()
+            matricula.id_asignatura=row[0]
+            matricula.id_curso=row[1]
+            matricula.id_alumno=row[2]
 
-            return profesor
+            return matricula
         if salida==0:
             return 'Elemento no encontrado'
 
+    '''
     @classmethod
-    def modProfesor(self, dniProfesor, campoACambiar, nuevoValor):
+    def modMatricula(self, id_asignatura, id_curso, campoACambiar, nuevoValor):
         """
-        Esta función permite cambiar cualquier atributo de un Profesor.
+        Esta función permite cambiar cualquier atributo de una Matricula.
         Parámetros:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
+
+        Este caso puede ser delicado al tener sólo dos atributos y ambos ser claves foráneas. Por eso no permitiremos que
+        se haga, para modificar la relación antes tendremos que destruirla y volverla a crear.
+
         """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
-        dniProfesor='\''+dniProfesor+'\''
-        query="UPDATE Profesor SET "+campoACambiar+"="+nuevoValor+" WHERE dni="+dniProfesor+";"
+        id_asignatura='\''+id_asignatura+'\''
+        id_curso='\''+id_curso+'\''
+
+        query="UPDATE Matricula SET "+campoACambiar+"="+nuevoValor+" WHERE id_asignatura="+id_asignatura+" and id_curso="+id_curso+";"
         if v:
-            print '\n'+query;
-
-
+            print '\n'+query
 
         cursor = db.cursor()
         salida =''
         '''
-        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Profesor con clave
-        que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
-        '''
+        #Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Matricula con clave
+        #que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
+    '''
         try:
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
@@ -200,20 +193,21 @@ class GestorProfesores:
             return 'Elemento duplicado'
         elif salida==0:
             return 'Elemento no encontrado'
-
+    '''
     @classmethod
-    def delProfesor(self, dniProfesor):
-        #print "Intentado eliminar profesor con dni "+str(dniProfesor)
+    def delMatricula(self, id_asignatura, id_curso, id_alumno):
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Profesor where dni='"+dniProfesor+"';"
+        id_asignatura='\''+id_asignatura+'\''
+        id_curso='\''+id_curso+'\''
+        id_alumno='\''+id_alumno+'\''
+        query="delete from Matricula where id_asignatura="+id_asignatura+" and id_curso="+id_curso+" and id_alumno="+id_alumno+";"
         if v:
-            print '\n'+query
+            print query
         salida =''
         try:
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
-            # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
                 print "Error number: "+str(e.args[0])
@@ -221,12 +215,7 @@ class GestorProfesores:
             except IndexError:
                 print "MySQL Error: %s" % str(e)
 
-
-
-        #print str(cursor)
         db.commit()
-
-        #print cursor.fetchone()
         cursor.close()
         db.close()
 

@@ -2,49 +2,43 @@
 """
 Last mod: Feb 2016
 @author: Juan A. Fernández
-@about: Fichero de creación de la interfaz de interacción con la entidad Profesor de la base de datos.
+@about: Fichero de creación de la interfaz de interacción con la entidad Curso de la base de datos.
 """
 
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
-from Profesor import *
+from Curso import *
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=0
 
-'''Clase controladora de profesores. Que usando la clase que define el modelo de Profesor (la info en BD que de el se guarda)
+'''Clase controladora de Cursos. Que usando la clase que define el modelo de Curso (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
 '''
-class GestorProfesores:
+class GestorCursos:
     """
-    Manejador de Profesors de la base de datos.
+    Manejador de Cursos de la base de datos.
     """
 
     @classmethod
-    def nuevoProfesor(self, nombre, dni, direccion, localidad, provincia, fecha_nac, telefonoA, telefonoB):
+    def nuevoCurso(self, id, curso, grupo, nivel):
 
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
-        #query="INSERT INTO Profesor values("+"'"+nombre+"', "+ "'"+dni+"');"
+        #query="INSERT INTO Curso values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
-        nombre='\''+nombre+'\''
-        dni='\''+dni+'\''
-        direccion='\''+direccion+'\''
-        localidad='\''+localidad+'\''
-        provincia='\''+provincia+'\''
-        fecha_nac='\''+fecha_nac+'\''
-        telefonoA='\''+telefonoA+'\''
-        telefonoB='\''+telefonoB+'\''
+        id='\''+id+'\''
+        curso='\''+curso+'\''
+        grupo='\''+grupo+'\''
+        nivel='\''+nivel+'\''
 
-        query="INSERT INTO Profesor VALUES("+nombre+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nac+","+telefonoA+","+telefonoB+");"
-
+        query="INSERT INTO Curso VALUES("+id+","+curso+","+grupo+","+nivel+");"
         if v:
             print '\n'+query
-
         cursor = db.cursor()
         salida =''
         '''
-        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Profesor con clave
+        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Curso con clave
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
         try:
@@ -69,7 +63,7 @@ class GestorProfesores:
             return 'Elemento duplicado'
 
     @classmethod
-    def getProfesores(self):
+    def getCursos(self):
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm")
         cursor = db.cursor()
 
@@ -78,7 +72,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
 
-        query="select * from Profesor"
+        query="select * from Curso"
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -87,20 +81,14 @@ class GestorProfesores:
         lista = []
 
         while row is not None:
-            profesor = Profesor()
-            #print "LISTA SUPER CHACHI"
-
-            profesor.nombre=row[0]
-            profesor.dni=row[1]
-            profesor.direccion=row[2];
-            profesor.localidad=row[3];
-            profesor.provincia=row[4];
-            profesor.fecha_nac=row[5];
-            profesor.telefonoA=row[6];
-            profesor.telefonoB=row[7];
+            curso = Curso()
+            curso.id=row[0]
+            curso.curso=row[1]
+            curso.grupo=row[2];
+            curso.nivel=row[3];
 
 
-            lista.append(profesor)
+            lista.append(curso)
             #print row[0], row[1]
             row = cursor.fetchone()
 
@@ -112,17 +100,15 @@ class GestorProfesores:
         #Una de las opciones es convertirlo en un objeto y devolverlo
 
     @classmethod
-    def getProfesor(self, dniProfesor):
+    def getCurso(self, idCurso):
         """
-        Recupera TODA la información de un Profesor en concreto a través de la clave primaria, su DNI.
+        Recupera TODA la información de un Curso en concreto a través de la clave primaria, su id.
         """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
-        query="select * from Profesor where dni='"+dniProfesor+"';"
-
+        query="select * from Curso where id='"+idCurso+"';"
         if v:
             print '\n'+query
-
         try:
             salida = cursor.execute(query);
             row = cursor.fetchone()
@@ -139,43 +125,38 @@ class GestorProfesores:
         db.close()
 
         if salida==1:
-            #Como se trata de toda la información al completo usaremos todos los campos de la clase Profesor.
+            #Como se trata de toda la información al completo usaremos todos los campos de la clase Curso.
             #La api del mservicio envia estos datos en JSON sin comprobar nada
-            profesor = Profesor()
-            profesor.nombre=row[0]
-            profesor.dni=row[1]
-            profesor.direccion=row[2];
-            profesor.localidad=row[3];
-            profesor.provincia=row[4];
-            profesor.fecha_nac=row[5];
-            profesor.telefonoA=row[6];
-            profesor.telefonoB=row[7];
+            curso = Curso()
+            curso.id=row[0]
+            curso.curso=row[1]
+            curso.grupo=row[2]
+            curso.nivel=row[3]
 
-            return profesor
+
+            return curso
         if salida==0:
             return 'Elemento no encontrado'
 
     @classmethod
-    def modProfesor(self, dniProfesor, campoACambiar, nuevoValor):
+    def modCurso(self, idCurso, campoACambiar, nuevoValor):
         """
-        Esta función permite cambiar cualquier atributo de un Profesor.
+        Esta función permite cambiar cualquier atributo de un Curso.
         Parámetros:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
         """
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
-        dniProfesor='\''+dniProfesor+'\''
-        query="UPDATE Profesor SET "+campoACambiar+"="+nuevoValor+" WHERE dni="+dniProfesor+";"
+        idCurso='\''+idCurso+'\''
+        query="UPDATE Curso SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idCurso+";"
         if v:
-            print '\n'+query;
-
-
+            print '\n'+query
 
         cursor = db.cursor()
         salida =''
         '''
-        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Profesor con clave
+        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Curso con clave
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
         try:
@@ -202,13 +183,12 @@ class GestorProfesores:
             return 'Elemento no encontrado'
 
     @classmethod
-    def delProfesor(self, dniProfesor):
-        #print "Intentado eliminar profesor con dni "+str(dniProfesor)
+    def delCurso(self, idCurso):
+        if v:
+            print "Intentado eliminar Curso con id "+str(idCurso)
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Profesor where dni='"+dniProfesor+"';"
-        if v:
-            print '\n'+query
+        query="delete from Curso where id='"+idCurso+"';"
         salida =''
         try:
             salida = cursor.execute(query);
@@ -221,12 +201,7 @@ class GestorProfesores:
             except IndexError:
                 print "MySQL Error: %s" % str(e)
 
-
-
-        #print str(cursor)
         db.commit()
-
-        #print cursor.fetchone()
         cursor.close()
         db.close()
 

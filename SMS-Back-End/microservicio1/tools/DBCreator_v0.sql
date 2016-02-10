@@ -55,37 +55,58 @@ CREATE TABLE Asignatura(
 
 #Creación de la tabla Curso, ejemplo
 CREATE TABLE Curso(
+  #El id será la concatenación de los tres siguientes campos. Por ejemplo: 1AESO, 2CBACH (aunque en principio no se use)
+  id CHAR(22),
   curso INT(1),
   grupo CHAR(1),
   nivel CHAR(20),
-  PRIMARY KEY (curso)
+  PRIMARY KEY (id)
 );
 
 #Creacion de la tabla para los Grupos
 #Un grupo es la asociación de una asignatura y un curso, por ejemplo: 1ºESO-Francés que identifica perfectamente un grupo de alumnos.
-CREATE TABLE Grupo(
- #Añadimos la referencia de la entidad Asignatura
- id_asignatura CHAR REFERENCES Asignatura,
- #Añadimos la referencia de la entidad Curso
- id_curso INT REFERENCES Curso,
+CREATE TABLE Asocia(
+ id_asignatura CHAR(10),
+ id_curso CHAR(22),
+ #Especificamos que se trata de claves foráneas (claves primarias de otras tablas)
+ FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id),
+ FOREIGN KEY (id_curso) REFERENCES Curso(id),
+ #Especificamos la formación de la clave primaria en esta tabla.
  PRIMARY KEY (id_asignatura, id_curso)
 );
 
+#Si intentamos añadir una Asociación en Asocia y no tenemos los objetos previamente creandosno dará un error por incumplir las reglas de integridad referencial establecidas en la creación de la tablaCannot add or update a child row: a foreign key constraint fails, además del mensaje de error.Si tenemos creadas ambos datos no da problema.
+
+
+
 CREATE TABLE Imparte(
-  #Necesitamos una referncia del profesor:
-  id_profesor CHAR REFERENCES Profesor,
   #Añadimos la referencia de la entidad Asignatura
-  id_asignatura CHAR REFERENCES Asignatura,
+  id_asignatura CHAR(10),
   #Añadimos la referencia de la entidad Curso
-  id_curso INT REFERENCES Curso,
-  PRIMARY KEY (id_profesor, id_asignatura, id_curso)
+  id_curso CHAR(22),
+  #Necesitamos una referncia del profesor:
+  id_profesor CHAR(9),
+  #Especificamos que se trata de claves foráneas.
+  FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id),
+  FOREIGN KEY (id_curso) REFERENCES Curso(id),
+  FOREIGN KEY (id_profesor) REFERENCES Profesor(dni),
+  #Establecemos la clave primaria compuesta.
+  PRIMARY KEY (id_asignatura, id_curso, id_profesor)
 );
 
 CREATE TABLE Matricula(
-  id_alumno CHAR REFERENCES Alumno,
+
   #Añadimos la referencia de la entidad Asignatura
-  id_asignatura CHAR REFERENCES Asignatura,
+  id_asignatura CHAR(10),
   #Añadimos la referencia de la entidad Curso
-  id_curso INT REFERENCES Curso,
-  PRIMARY KEY (id_alumno, id_asignatura, id_curso)
+  id_curso CHAR(22),
+  #Necesitamos una referncia del alumno:
+  id_alumno CHAR(9),
+
+  #Especificamos que se trata de claves foráneas.
+  FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id),
+  FOREIGN KEY (id_curso) REFERENCES Curso(id),
+  FOREIGN KEY (id_alumno) REFERENCES Alumno(dni),
+  #Establecemos la clave primaria compuesta.
+  PRIMARY KEY (id_asignatura, id_curso, id_alumno)
 );
