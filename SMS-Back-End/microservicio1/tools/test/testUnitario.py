@@ -6,6 +6,11 @@ Usando la librería unittest, más info en: https://docs.python.org/2/library/un
 """
 
 import unittest
+#Para poder acceder a los ficheros en el directorio padre, los añadimos al path de python
+import sys, os
+sys.path.insert(0,os.pardir)
+
+from GestorAlumnosSQL import GestorAlumnos
 from GestorAlumnosSQL import GestorAlumnos
 from GestorProfesoresSQL import GestorProfesores
 from GestorAsignaturasSQL import GestorAsignaturas
@@ -13,12 +18,15 @@ from GestorCursosSQL import GestorCursos
 from GestorAsociacionesSQL import GestorAsociaciones
 from GestorImparteSQL import GestorImparte
 from GestorMatriculasSQL import GestorMatriculas
-
+import aprovisionadorDBconInterfaz
 #Las clases para la realización de los test debe heredar de unittest.TestCase
 
 ### ENTIDADES ###
 
 class TestEntidadAlumno(unittest.TestCase):
+    """
+    Testing sobre la entidad Alumno de la BD
+    """
 
     #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
     #La ejecución de los test se hace por orden alfabético, algo a tener en cuenta cuando queremos hacer ciertas acciones.
@@ -40,6 +48,43 @@ class TestEntidadAlumno(unittest.TestCase):
     def test_04_EliminacionAlumno(self):
         self.assertEqual(GestorAlumnos.delAlumno('8888'),'OK')
 
+    def test_05_NumeroAlumnos(self):
+        """
+        Comprueba que se obtiene de forma correcta el número de alumnos en la BD.
+        """
+        #Comprobamos que no existan.
+        cero=GestorAlumnos.getNumAlumnos()
+        #Creamos uno
+        GestorAlumnos.nuevoAlumno('Juan','8888','C/Mesita','Peligros','Granada','1900-2-1','3242123')
+        #Creamos otro
+        GestorAlumnos.nuevoAlumno('Juan','8889','C/Mesita','Peligros','Granada','1900-2-1','3242123')
+        #comprobamos el número
+        dos=GestorAlumnos.getNumAlumnos()
+        #Los eliminamos:
+        GestorAlumnos.delAlumno('8888')
+        GestorAlumnos.delAlumno('8889')
+        cero2=GestorAlumnos.getNumAlumnos();
+        resultado=False
+        if cero==0 and dos==2 and cero2==0:
+            resultado=True
+        self.assertEqual(resultado,True)
+
+    def test_06_ProfesoreQueImparteAAlumno(self):
+        #Ejecutamos el aprovisionamiento de la base de datos usando el aprovisionador. (la BD hasta ahora solo tiene la estructura, sin contenido)
+        aprovisionadorDBconInterfaz.aprovisiona()
+        profesores=GestorAlumnos.getProfesores('1')
+        #Devemos devolver la BD a su estado original (solo estructura)
+        print "Necesito acceso root a la base de datos, ¿Cuál es la contraseña?"
+        os.system('mysql -u root -p < ../DBCreator_v0.sql')
+        #Comprobamos que al alumno 3 le dan clase tres profesores, según el aprovisionamiento hecho y la función que lo comprueba.
+        self.assertEqual(len(profesores), 3)
+        '''
+        Para probar todas las relaciones, ya que la base de datos debe quedar en su estado original para que
+        el resto de test funcionen, puede que sea mejor juntarlas en un solo test, así se aprovisionará y restaurará
+        pidiéndonos la contraseña sólo una vez y no tantas como pruebas de joins queramos hacer como la de este test.
+        '''
+
+
 class TestEntidadProfesor(unittest.TestCase):
 
     #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
@@ -59,6 +104,7 @@ class TestEntidadProfesor(unittest.TestCase):
 
     def test_14_EliminacionProfesor(self):
         self.assertEqual(GestorProfesores.delProfesor('8888'),'OK')
+
 
 class TestEntidadAsignatura(unittest.TestCase):
 
@@ -259,11 +305,6 @@ class TestRelacionMatricula(unittest.TestCase):
             GestorCursos.delCurso('curso')
             GestorAlumnos.delAlumno('8888')
         self.assertEqual(salida,'OK')
-
-
-
-### PRUEBAS DE CONJUNTO ###
-#> insercciones, relaciones, reuniones y resultados esperados <#
 
 
 

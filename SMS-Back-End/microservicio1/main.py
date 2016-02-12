@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
+Created on 29 July 2012
+@author: Lisa Simpson
+"""
 import webapp2
 import json
 from tools.GestorAlumnosSQL import GestorAlumnos
@@ -9,7 +13,10 @@ import jsonpickle
 #Responde a http://localhost:8002/alumnos o  curl -X GET http://localhost:8002/alumnos
 
 class Alumnos(webapp2.RequestHandler):
-    """Manejador de peticiones a Alumnos"""
+    """
+    Manejador de peticiones a Alumnos
+    """
+
 
     # curl -X GET http://localhost:8002/alumnos
 

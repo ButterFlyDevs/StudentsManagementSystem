@@ -1,0 +1,642 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tools package &mdash; documentación de Microservicio1 - 1</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="documentación de Microservicio1 - 1" href="index.html"/>
+        <link rel="up" title="microservicio1" href="modules.html"/>
+        <link rel="next" title="tools.test package" href="tools.test.html"/>
+        <link rel="prev" title="tester module" href="tester.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Microservicio1
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">microservicio1</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="appengine_config.html">appengine_config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tester.html">tester module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">tools package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tools.test.html">tools.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.Alumno">tools.Alumno module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.Asignatura">tools.Asignatura module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.Asociacion">tools.Asociacion module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.Curso">tools.Curso module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.GestorAlumnosSQL">tools.GestorAlumnosSQL module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.GestorAsignaturasSQL">tools.GestorAsignaturasSQL module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.GestorAsociacionesSQL">tools.GestorAsociacionesSQL module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.GestorCursosSQL">tools.GestorCursosSQL module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.GestorImparteSQL">tools.GestorImparteSQL module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.GestorMatriculasSQL">tools.GestorMatriculasSQL module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.GestorProfesoresSQL">tools.GestorProfesoresSQL module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.Imparte">tools.Imparte module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.Matricula">tools.Matricula module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools.Profesor">tools.Profesor module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tools-aprovisionadordb-module">tools.aprovisionadorDB module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tools">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Microservicio1</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="modules.html">microservicio1</a> &raquo;</li>
+      
+    <li>tools package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/tools.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tools-package">
+<h1>tools package<a class="headerlink" href="#tools-package" title="Enlazar permanentemente con este título">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Enlazar permanentemente con este título">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tools.test.html">tools.test package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tools.test.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.test.html#tools-test-testunitario-module">tools.test.testUnitario module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.test.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Enlazar permanentemente con este título">¶</a></h2>
+</div>
+<div class="section" id="module-tools.Alumno">
+<span id="tools-alumno-module"></span><h2>tools.Alumno module<a class="headerlink" href="#module-tools.Alumno" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Clase controladora de alumnos. Que usando la clase que define el modelo de Alumno (la info en BD que de el se guarda)
+ofrece una interface de gestión que simplifica y abstrae el uso.</p>
+<dl class="class">
+<dt id="tools.Alumno.Alumno">
+<em class="property">class </em><code class="descclassname">tools.Alumno.</code><code class="descname">Alumno</code><a class="reference internal" href="_modules/tools/Alumno.html#Alumno"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.Alumno.Alumno" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tools.Asignatura">
+<span id="tools-asignatura-module"></span><h2>tools.Asignatura module<a class="headerlink" href="#module-tools.Asignatura" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Modelo de la entidad Asignatura, siguiendo el esquema de la base de datos</p>
+<dl class="class">
+<dt id="tools.Asignatura.Asignatura">
+<em class="property">class </em><code class="descclassname">tools.Asignatura.</code><code class="descname">Asignatura</code><a class="reference internal" href="_modules/tools/Asignatura.html#Asignatura"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.Asignatura.Asignatura" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tools.Asociacion">
+<span id="tools-asociacion-module"></span><h2>tools.Asociacion module<a class="headerlink" href="#module-tools.Asociacion" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Modelo de la relacion Asocia, siguiendo el esquema de la base de datos</p>
+<dl class="class">
+<dt id="tools.Asociacion.Asociacion">
+<em class="property">class </em><code class="descclassname">tools.Asociacion.</code><code class="descname">Asociacion</code><a class="reference internal" href="_modules/tools/Asociacion.html#Asociacion"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.Asociacion.Asociacion" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tools.Curso">
+<span id="tools-curso-module"></span><h2>tools.Curso module<a class="headerlink" href="#module-tools.Curso" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Modelo de la entidad Curso, siguiendo el esquema de la base de datos</p>
+<dl class="class">
+<dt id="tools.Curso.Curso">
+<em class="property">class </em><code class="descclassname">tools.Curso.</code><code class="descname">Curso</code><a class="reference internal" href="_modules/tools/Curso.html#Curso"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.Curso.Curso" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tools.GestorAlumnosSQL">
+<span id="tools-gestoralumnossql-module"></span><h2>tools.GestorAlumnosSQL module<a class="headerlink" href="#module-tools.GestorAlumnosSQL" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Fichero de creación de la interfaz de interacción con la entidad Alumno de la base de datos.</p>
+<p>Última modificación: Feb 2016</p>
+<dl class="class">
+<dt id="tools.GestorAlumnosSQL.GestorAlumnos">
+<em class="property">class </em><code class="descclassname">tools.GestorAlumnosSQL.</code><code class="descname">GestorAlumnos</code><a class="reference internal" href="_modules/tools/GestorAlumnosSQL.html#GestorAlumnos"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAlumnosSQL.GestorAlumnos" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Manejador de alumnos de la base de datos.</p>
+<dl class="classmethod">
+<dt id="tools.GestorAlumnosSQL.GestorAlumnos.delAlumno">
+<em class="property">classmethod </em><code class="descname">delAlumno</code><span class="sig-paren">(</span><em>dniAlumno</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAlumnosSQL.html#GestorAlumnos.delAlumno"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAlumnosSQL.GestorAlumnos.delAlumno" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAlumnosSQL.GestorAlumnos.getAlumno">
+<em class="property">classmethod </em><code class="descname">getAlumno</code><span class="sig-paren">(</span><em>dniAlumno</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAlumnosSQL.html#GestorAlumnos.getAlumno"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAlumnosSQL.GestorAlumnos.getAlumno" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Recupera <code class="docutils literal"><span class="pre">TODA</span></code> la información de un alumno en concreto a través de la clave primaria, su DNI.</p>
+<dl class="docutils">
+<dt>Argumentos:</dt>
+<dd>dniAlumno: El primer parámetro</dd>
+</dl>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAlumnosSQL.GestorAlumnos.getAlumnos">
+<em class="property">classmethod </em><code class="descname">getAlumnos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAlumnosSQL.html#GestorAlumnos.getAlumnos"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAlumnosSQL.GestorAlumnos.getAlumnos" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAlumnosSQL.GestorAlumnos.modAlumno">
+<em class="property">classmethod </em><code class="descname">modAlumno</code><span class="sig-paren">(</span><em>dniAlumno</em>, <em>campoACambiar</em>, <em>nuevoValor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAlumnosSQL.html#GestorAlumnos.modAlumno"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAlumnosSQL.GestorAlumnos.modAlumno" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta función permite cambiar cualquier atributo de un alumno.
+Parámetros:
+campoACambiar: nombre del atributo que se quiere cambiar
+nuevoValor: nuevo valor que se quiere guardar en ese campo.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAlumnosSQL.GestorAlumnos.nuevoAlumno">
+<em class="property">classmethod </em><code class="descname">nuevoAlumno</code><span class="sig-paren">(</span><em>nombre</em>, <em>dni</em>, <em>direccion</em>, <em>localidad</em>, <em>provincia</em>, <em>fecha_nac</em>, <em>telefono</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAlumnosSQL.html#GestorAlumnos.nuevoAlumno"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAlumnosSQL.GestorAlumnos.nuevoAlumno" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Introduce un nuevo alumno en la base de datos.
+Argumentos:
+nombre &#8211; Nombre completo del alumno
+dni &#8211; DNI del alumno, que será la clave de este.</p>
+<p>Extra de prog:</p>
+<p>Podríamos programarlo para que independientemente del número de parámetros se guardara en la base de datos,
+así sólo habría que pasarle una lista y funcionaría siempre. Podría sen interesante.
+O que los paŕametros así como sus nombrs se definieran en algún sitio donde poder conslutaros y así cualquier modificación
+se hace solo en un lugar.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.GestorAsignaturasSQL">
+<span id="tools-gestorasignaturassql-module"></span><h2>tools.GestorAsignaturasSQL module<a class="headerlink" href="#module-tools.GestorAsignaturasSQL" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Last mod: Feb 2016
+&#64;author: Juan A. Fernández
+&#64;about: Fichero de creación de la interfaz de interacción con la entidad Asignatura de la base de datos.</p>
+<dl class="class">
+<dt id="tools.GestorAsignaturasSQL.GestorAsignaturas">
+<em class="property">class </em><code class="descclassname">tools.GestorAsignaturasSQL.</code><code class="descname">GestorAsignaturas</code><a class="reference internal" href="_modules/tools/GestorAsignaturasSQL.html#GestorAsignaturas"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsignaturasSQL.GestorAsignaturas" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Manejador de Asignaturas de la base de datos.</p>
+<dl class="classmethod">
+<dt id="tools.GestorAsignaturasSQL.GestorAsignaturas.delAsignatura">
+<em class="property">classmethod </em><code class="descname">delAsignatura</code><span class="sig-paren">(</span><em>idAsignatura</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAsignaturasSQL.html#GestorAsignaturas.delAsignatura"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsignaturasSQL.GestorAsignaturas.delAsignatura" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAsignaturasSQL.GestorAsignaturas.getAsignatura">
+<em class="property">classmethod </em><code class="descname">getAsignatura</code><span class="sig-paren">(</span><em>idAsignatura</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAsignaturasSQL.html#GestorAsignaturas.getAsignatura"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsignaturasSQL.GestorAsignaturas.getAsignatura" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Recupera TODA la información de un Asignatura en concreto a través de la clave primaria, su id.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAsignaturasSQL.GestorAsignaturas.getAsignaturas">
+<em class="property">classmethod </em><code class="descname">getAsignaturas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAsignaturasSQL.html#GestorAsignaturas.getAsignaturas"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsignaturasSQL.GestorAsignaturas.getAsignaturas" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAsignaturasSQL.GestorAsignaturas.modAsignatura">
+<em class="property">classmethod </em><code class="descname">modAsignatura</code><span class="sig-paren">(</span><em>idAsignatura</em>, <em>campoACambiar</em>, <em>nuevoValor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAsignaturasSQL.html#GestorAsignaturas.modAsignatura"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsignaturasSQL.GestorAsignaturas.modAsignatura" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta función permite cambiar cualquier atributo de un Asignatura.
+Parámetros:
+campoACambiar: nombre del atributo que se quiere cambiar
+nuevoValor: nuevo valor que se quiere guardar en ese campo.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAsignaturasSQL.GestorAsignaturas.nuevaAsignatura">
+<em class="property">classmethod </em><code class="descname">nuevaAsignatura</code><span class="sig-paren">(</span><em>id</em>, <em>nombre</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAsignaturasSQL.html#GestorAsignaturas.nuevaAsignatura"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsignaturasSQL.GestorAsignaturas.nuevaAsignatura" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="tools.GestorAsignaturasSQL.v">
+<code class="descclassname">tools.GestorAsignaturasSQL.</code><code class="descname">v</code><em class="property"> = 0</em><a class="headerlink" href="#tools.GestorAsignaturasSQL.v" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clase controladora de Asignaturas. Que usando la clase que define el modelo de Asignatura (la info en BD que de el se guarda)
+ofrece una interface de gestión que simplifica y abstrae el uso.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.GestorAsociacionesSQL">
+<span id="tools-gestorasociacionessql-module"></span><h2>tools.GestorAsociacionesSQL module<a class="headerlink" href="#module-tools.GestorAsociacionesSQL" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Last mod: Feb 2016
+&#64;author: Juan A. Fernández
+&#64;about: Fichero de creación de la interfaz de interacción con la entidad Asociacion de la base de datos.</p>
+<dl class="class">
+<dt id="tools.GestorAsociacionesSQL.GestorAsociaciones">
+<em class="property">class </em><code class="descclassname">tools.GestorAsociacionesSQL.</code><code class="descname">GestorAsociaciones</code><a class="reference internal" href="_modules/tools/GestorAsociacionesSQL.html#GestorAsociaciones"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsociacionesSQL.GestorAsociaciones" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Manejador de Asociacions de la base de datos.</p>
+<dl class="classmethod">
+<dt id="tools.GestorAsociacionesSQL.GestorAsociaciones.delAsociacion">
+<em class="property">classmethod </em><code class="descname">delAsociacion</code><span class="sig-paren">(</span><em>id_asignatura</em>, <em>id_curso</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAsociacionesSQL.html#GestorAsociaciones.delAsociacion"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsociacionesSQL.GestorAsociaciones.delAsociacion" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAsociacionesSQL.GestorAsociaciones.getAsociacion">
+<em class="property">classmethod </em><code class="descname">getAsociacion</code><span class="sig-paren">(</span><em>id_asignatura</em>, <em>id_curso</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAsociacionesSQL.html#GestorAsociaciones.getAsociacion"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsociacionesSQL.GestorAsociaciones.getAsociacion" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Recupera TODA la información de un Asociacion en concreto a través de la clave primaria, su id.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAsociacionesSQL.GestorAsociaciones.getAsociaciones">
+<em class="property">classmethod </em><code class="descname">getAsociaciones</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAsociacionesSQL.html#GestorAsociaciones.getAsociaciones"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsociacionesSQL.GestorAsociaciones.getAsociaciones" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorAsociacionesSQL.GestorAsociaciones.nuevaAsociacion">
+<em class="property">classmethod </em><code class="descname">nuevaAsociacion</code><span class="sig-paren">(</span><em>id_asignatura</em>, <em>id_curso</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorAsociacionesSQL.html#GestorAsociaciones.nuevaAsociacion"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorAsociacionesSQL.GestorAsociaciones.nuevaAsociacion" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="tools.GestorAsociacionesSQL.v">
+<code class="descclassname">tools.GestorAsociacionesSQL.</code><code class="descname">v</code><em class="property"> = 0</em><a class="headerlink" href="#tools.GestorAsociacionesSQL.v" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clase controladora de Asociacions. Que usando la clase que define el modelo de Asociacion (la info en BD que de el se guarda)
+ofrece una interface de gestión que simplifica y abstrae el uso.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.GestorCursosSQL">
+<span id="tools-gestorcursossql-module"></span><h2>tools.GestorCursosSQL module<a class="headerlink" href="#module-tools.GestorCursosSQL" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Last mod: Feb 2016
+&#64;author: Juan A. Fernández
+&#64;about: Fichero de creación de la interfaz de interacción con la entidad Curso de la base de datos.</p>
+<dl class="class">
+<dt id="tools.GestorCursosSQL.GestorCursos">
+<em class="property">class </em><code class="descclassname">tools.GestorCursosSQL.</code><code class="descname">GestorCursos</code><a class="reference internal" href="_modules/tools/GestorCursosSQL.html#GestorCursos"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorCursosSQL.GestorCursos" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Manejador de Cursos de la base de datos.</p>
+<dl class="classmethod">
+<dt id="tools.GestorCursosSQL.GestorCursos.delCurso">
+<em class="property">classmethod </em><code class="descname">delCurso</code><span class="sig-paren">(</span><em>idCurso</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorCursosSQL.html#GestorCursos.delCurso"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorCursosSQL.GestorCursos.delCurso" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorCursosSQL.GestorCursos.getCurso">
+<em class="property">classmethod </em><code class="descname">getCurso</code><span class="sig-paren">(</span><em>idCurso</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorCursosSQL.html#GestorCursos.getCurso"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorCursosSQL.GestorCursos.getCurso" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Recupera TODA la información de un Curso en concreto a través de la clave primaria, su id.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorCursosSQL.GestorCursos.getCursos">
+<em class="property">classmethod </em><code class="descname">getCursos</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorCursosSQL.html#GestorCursos.getCursos"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorCursosSQL.GestorCursos.getCursos" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorCursosSQL.GestorCursos.modCurso">
+<em class="property">classmethod </em><code class="descname">modCurso</code><span class="sig-paren">(</span><em>idCurso</em>, <em>campoACambiar</em>, <em>nuevoValor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorCursosSQL.html#GestorCursos.modCurso"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorCursosSQL.GestorCursos.modCurso" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta función permite cambiar cualquier atributo de un Curso.
+Parámetros:
+campoACambiar: nombre del atributo que se quiere cambiar
+nuevoValor: nuevo valor que se quiere guardar en ese campo.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorCursosSQL.GestorCursos.nuevoCurso">
+<em class="property">classmethod </em><code class="descname">nuevoCurso</code><span class="sig-paren">(</span><em>id</em>, <em>curso</em>, <em>grupo</em>, <em>nivel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorCursosSQL.html#GestorCursos.nuevoCurso"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorCursosSQL.GestorCursos.nuevoCurso" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="tools.GestorCursosSQL.v">
+<code class="descclassname">tools.GestorCursosSQL.</code><code class="descname">v</code><em class="property"> = 0</em><a class="headerlink" href="#tools.GestorCursosSQL.v" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clase controladora de Cursos. Que usando la clase que define el modelo de Curso (la info en BD que de el se guarda)
+ofrece una interface de gestión que simplifica y abstrae el uso.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.GestorImparteSQL">
+<span id="tools-gestorimpartesql-module"></span><h2>tools.GestorImparteSQL module<a class="headerlink" href="#module-tools.GestorImparteSQL" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Last mod: Feb 2016
+&#64;author: Juan A. Fernández
+&#64;about: Fichero de creación de la interfaz de interacción con la relacion Imparte de la base de datos.</p>
+<dl class="class">
+<dt id="tools.GestorImparteSQL.GestorImparte">
+<em class="property">class </em><code class="descclassname">tools.GestorImparteSQL.</code><code class="descname">GestorImparte</code><a class="reference internal" href="_modules/tools/GestorImparteSQL.html#GestorImparte"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorImparteSQL.GestorImparte" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Manejador de Impartes de la base de datos.</p>
+<dl class="classmethod">
+<dt id="tools.GestorImparteSQL.GestorImparte.delImparte">
+<em class="property">classmethod </em><code class="descname">delImparte</code><span class="sig-paren">(</span><em>id_asignatura</em>, <em>id_curso</em>, <em>id_profesor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorImparteSQL.html#GestorImparte.delImparte"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorImparteSQL.GestorImparte.delImparte" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorImparteSQL.GestorImparte.getImparte">
+<em class="property">classmethod </em><code class="descname">getImparte</code><span class="sig-paren">(</span><em>id_asignatura</em>, <em>id_curso</em>, <em>id_profesor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorImparteSQL.html#GestorImparte.getImparte"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorImparteSQL.GestorImparte.getImparte" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Recupera TODA la información de un Imparte en concreto a través de la clave primaria, su id.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorImparteSQL.GestorImparte.getImpartes">
+<em class="property">classmethod </em><code class="descname">getImpartes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorImparteSQL.html#GestorImparte.getImpartes"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorImparteSQL.GestorImparte.getImpartes" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorImparteSQL.GestorImparte.nuevoImparte">
+<em class="property">classmethod </em><code class="descname">nuevoImparte</code><span class="sig-paren">(</span><em>id_asignatura</em>, <em>id_curso</em>, <em>id_profesor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorImparteSQL.html#GestorImparte.nuevoImparte"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorImparteSQL.GestorImparte.nuevoImparte" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="tools.GestorImparteSQL.v">
+<code class="descclassname">tools.GestorImparteSQL.</code><code class="descname">v</code><em class="property"> = 0</em><a class="headerlink" href="#tools.GestorImparteSQL.v" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clase controladora de Impartes. Que usando la clase que define el modelo de Imparte (la info en BD que de el se guarda)
+ofrece una interface de gestión que simplifica y abstrae el uso.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.GestorMatriculasSQL">
+<span id="tools-gestormatriculassql-module"></span><h2>tools.GestorMatriculasSQL module<a class="headerlink" href="#module-tools.GestorMatriculasSQL" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Last mod: Feb 2016
+&#64;author: Juan A. Fernández
+&#64;about: Fichero de creación de la interfaz de interacción con la relacion Matricula de la base de datos.</p>
+<dl class="class">
+<dt id="tools.GestorMatriculasSQL.GestorMatriculas">
+<em class="property">class </em><code class="descclassname">tools.GestorMatriculasSQL.</code><code class="descname">GestorMatriculas</code><a class="reference internal" href="_modules/tools/GestorMatriculasSQL.html#GestorMatriculas"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorMatriculasSQL.GestorMatriculas" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Manejador de Matriculas de la base de datos.</p>
+<dl class="classmethod">
+<dt id="tools.GestorMatriculasSQL.GestorMatriculas.delMatricula">
+<em class="property">classmethod </em><code class="descname">delMatricula</code><span class="sig-paren">(</span><em>id_asignatura</em>, <em>id_curso</em>, <em>id_alumno</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorMatriculasSQL.html#GestorMatriculas.delMatricula"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorMatriculasSQL.GestorMatriculas.delMatricula" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorMatriculasSQL.GestorMatriculas.getMatricula">
+<em class="property">classmethod </em><code class="descname">getMatricula</code><span class="sig-paren">(</span><em>id_asignatura</em>, <em>id_curso</em>, <em>id_alumno</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorMatriculasSQL.html#GestorMatriculas.getMatricula"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorMatriculasSQL.GestorMatriculas.getMatricula" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Recupera TODA la información de un Matricula en concreto a través de la clave primaria, su id.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorMatriculasSQL.GestorMatriculas.getMatriculas">
+<em class="property">classmethod </em><code class="descname">getMatriculas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorMatriculasSQL.html#GestorMatriculas.getMatriculas"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorMatriculasSQL.GestorMatriculas.getMatriculas" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorMatriculasSQL.GestorMatriculas.nuevaMatricula">
+<em class="property">classmethod </em><code class="descname">nuevaMatricula</code><span class="sig-paren">(</span><em>id_asignatura</em>, <em>id_curso</em>, <em>id_alumno</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorMatriculasSQL.html#GestorMatriculas.nuevaMatricula"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorMatriculasSQL.GestorMatriculas.nuevaMatricula" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="tools.GestorMatriculasSQL.v">
+<code class="descclassname">tools.GestorMatriculasSQL.</code><code class="descname">v</code><em class="property"> = 0</em><a class="headerlink" href="#tools.GestorMatriculasSQL.v" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clase controladora de Matriculas. Que usando la clase que define el modelo de Matricula (la info en BD que de el se guarda)
+ofrece una interface de gestión que simplifica y abstrae el uso.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.GestorProfesoresSQL">
+<span id="tools-gestorprofesoressql-module"></span><h2>tools.GestorProfesoresSQL module<a class="headerlink" href="#module-tools.GestorProfesoresSQL" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Last mod: Feb 2016
+&#64;author: Juan A. Fernández
+&#64;about: Fichero de creación de la interfaz de interacción con la entidad Profesor de la base de datos.</p>
+<dl class="class">
+<dt id="tools.GestorProfesoresSQL.GestorProfesores">
+<em class="property">class </em><code class="descclassname">tools.GestorProfesoresSQL.</code><code class="descname">GestorProfesores</code><a class="reference internal" href="_modules/tools/GestorProfesoresSQL.html#GestorProfesores"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorProfesoresSQL.GestorProfesores" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Manejador de Profesors de la base de datos.</p>
+<dl class="classmethod">
+<dt id="tools.GestorProfesoresSQL.GestorProfesores.delProfesor">
+<em class="property">classmethod </em><code class="descname">delProfesor</code><span class="sig-paren">(</span><em>dniProfesor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorProfesoresSQL.html#GestorProfesores.delProfesor"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorProfesoresSQL.GestorProfesores.delProfesor" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorProfesoresSQL.GestorProfesores.getProfesor">
+<em class="property">classmethod </em><code class="descname">getProfesor</code><span class="sig-paren">(</span><em>dniProfesor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorProfesoresSQL.html#GestorProfesores.getProfesor"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorProfesoresSQL.GestorProfesores.getProfesor" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Recupera TODA la información de un Profesor en concreto a través de la clave primaria, su DNI.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorProfesoresSQL.GestorProfesores.getProfesores">
+<em class="property">classmethod </em><code class="descname">getProfesores</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorProfesoresSQL.html#GestorProfesores.getProfesores"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorProfesoresSQL.GestorProfesores.getProfesores" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorProfesoresSQL.GestorProfesores.modProfesor">
+<em class="property">classmethod </em><code class="descname">modProfesor</code><span class="sig-paren">(</span><em>dniProfesor</em>, <em>campoACambiar</em>, <em>nuevoValor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorProfesoresSQL.html#GestorProfesores.modProfesor"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorProfesoresSQL.GestorProfesores.modProfesor" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Esta función permite cambiar cualquier atributo de un Profesor.
+Parámetros:
+campoACambiar: nombre del atributo que se quiere cambiar
+nuevoValor: nuevo valor que se quiere guardar en ese campo.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tools.GestorProfesoresSQL.GestorProfesores.nuevoProfesor">
+<em class="property">classmethod </em><code class="descname">nuevoProfesor</code><span class="sig-paren">(</span><em>nombre</em>, <em>dni</em>, <em>direccion</em>, <em>localidad</em>, <em>provincia</em>, <em>fecha_nac</em>, <em>telefonoA</em>, <em>telefonoB</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools/GestorProfesoresSQL.html#GestorProfesores.nuevoProfesor"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.GestorProfesoresSQL.GestorProfesores.nuevoProfesor" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="tools.GestorProfesoresSQL.v">
+<code class="descclassname">tools.GestorProfesoresSQL.</code><code class="descname">v</code><em class="property"> = 0</em><a class="headerlink" href="#tools.GestorProfesoresSQL.v" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd><p>Clase controladora de profesores. Que usando la clase que define el modelo de Profesor (la info en BD que de el se guarda)
+ofrece una interface de gestión que simplifica y abstrae el uso.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.Imparte">
+<span id="tools-imparte-module"></span><h2>tools.Imparte module<a class="headerlink" href="#module-tools.Imparte" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Modelo de la relacion Imparte, siguiendo el esquema de la base de datos</p>
+<dl class="class">
+<dt id="tools.Imparte.Imparte">
+<em class="property">class </em><code class="descclassname">tools.Imparte.</code><code class="descname">Imparte</code><a class="reference internal" href="_modules/tools/Imparte.html#Imparte"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.Imparte.Imparte" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tools.Matricula">
+<span id="tools-matricula-module"></span><h2>tools.Matricula module<a class="headerlink" href="#module-tools.Matricula" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Modelo de la relacion Matricula, siguiendo el esquema de la base de datos</p>
+<dl class="class">
+<dt id="tools.Matricula.Matricula">
+<em class="property">class </em><code class="descclassname">tools.Matricula.</code><code class="descname">Matricula</code><a class="reference internal" href="_modules/tools/Matricula.html#Matricula"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.Matricula.Matricula" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tools.Profesor">
+<span id="tools-profesor-module"></span><h2>tools.Profesor module<a class="headerlink" href="#module-tools.Profesor" title="Enlazar permanentemente con este título">¶</a></h2>
+<p>Modelo de la entidad profesor, siguiendo el esquema de la base de datos</p>
+<dl class="class">
+<dt id="tools.Profesor.Profesor">
+<em class="property">class </em><code class="descclassname">tools.Profesor.</code><code class="descname">Profesor</code><a class="reference internal" href="_modules/tools/Profesor.html#Profesor"><span class="viewcode-link">[fuente]</span></a><a class="headerlink" href="#tools.Profesor.Profesor" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="tools-aprovisionadordb-module">
+<h2>tools.aprovisionadorDB module<a class="headerlink" href="#tools-aprovisionadordb-module" title="Enlazar permanentemente con este título">¶</a></h2>
+</div>
+<div class="section" id="module-tools">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tools" title="Enlazar permanentemente con este título">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tools.test.html" class="btn btn-neutral float-right" title="tools.test package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tester.html" class="btn btn-neutral" title="tester module" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, ButterFly Devs.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/translations.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
