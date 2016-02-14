@@ -101,6 +101,23 @@ class TestEntidadProfesor(unittest.TestCase):
     def test_14_EliminacionProfesor(self):
         self.assertEqual(GestorProfesores.delProfesor('8888'),'OK')
 
+    def test_15_AlumnosALosQueDaClaseUnProfesor(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        size=len(GestorProfesores.getAlumnos('1'))
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        self.assertEqual(size,3)
+
+    def test_16_AsignaturasQueImparteUnProfesor(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        size=len(GestorProfesores.getAsignaturas('1'))
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        self.assertEqual(size,1)
+
+    def test_17_CursosEnLosQueImparteUnProfesor(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        size=len(GestorProfesores.getCursos('1'))
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        self.assertEqual(size,1)
 
 class TestEntidadAsignatura(unittest.TestCase):
 
@@ -243,6 +260,31 @@ class TestRelacionAsocia(unittest.TestCase):
             GestorAsignaturas.delAsignatura('fr')
             GestorCursos.delCurso('curso')
         self.assertEqual(salida,'OK')
+
+
+    def test_45_AlumnosMAtriculadosEnUnaAsignaturaYCurso(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        sizeA=len(GestorAsociaciones.getAlumnos('mt','1AESO'))
+        sizeB=len(GestorAsociaciones.getAlumnos('fr','1AESO'))
+        sizeC=len(GestorAsociaciones.getAlumnos('mt','1BESO'))
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        salida=False
+        if sizeA==1 and sizeB==3 and sizeC==3:
+            salida=True
+        self.assertEqual(salida,True)
+
+    def test_46_ProfesoresQueImpartenEnUnCursoYAsignatura(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        sizeA=len(GestorAsociaciones.getProfesores('mt','1AESO'))
+        sizeB=len(GestorAsociaciones.getProfesores('fr','1AESO'))
+        sizeC=len(GestorAsociaciones.getProfesores('mt','1BESO'))
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        salida=False
+        if sizeA==0 and sizeB==2 and sizeC==1:
+            salida=True
+        self.assertEqual(salida,True)
+
+
 
 class TestRelacionImparte(unittest.TestCase):
     '''

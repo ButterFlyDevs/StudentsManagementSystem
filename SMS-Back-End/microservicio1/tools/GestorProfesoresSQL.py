@@ -9,7 +9,10 @@ import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 from Profesor import *
 from Alumno import *
-
+from Asignatura import *
+from Curso import *
+#Uso de variables generales par la conexión a la BD.
+import dbParams
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=0
 
@@ -24,7 +27,7 @@ class GestorProfesores:
     @classmethod
     def nuevoProfesor(self, nombre, dni, direccion, localidad, provincia, fecha_nac, telefonoA, telefonoB):
 
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Profesor values("+"'"+nombre+"', "+ "'"+dni+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
@@ -71,7 +74,7 @@ class GestorProfesores:
 
     @classmethod
     def getProfesores(self):
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm")
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -117,7 +120,7 @@ class GestorProfesores:
         """
         Recupera TODA la información de un Profesor en concreto a través de la clave primaria, su DNI.
         """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
         query="select * from Profesor where dni='"+dniProfesor+"';"
 
@@ -164,7 +167,7 @@ class GestorProfesores:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
         """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         dniProfesor='\''+dniProfesor+'\''
         query="UPDATE Profesor SET "+campoACambiar+"="+nuevoValor+" WHERE dni="+dniProfesor+";"
@@ -205,7 +208,7 @@ class GestorProfesores:
     @classmethod
     def delProfesor(self, dniProfesor):
         #print "Intentado eliminar profesor con dni "+str(dniProfesor)
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
         query="delete from Profesor where dni='"+dniProfesor+"';"
         if v:
@@ -301,7 +304,7 @@ class GestorProfesores:
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
         query="select * from Imparte, Asignatura where Imparte.id_asignatura=Asignatura.id and id_profesor="+dniProfesor+";"
-        
+
         try:
             salida = cursor.execute(query);
         except MySQLdb.Error, e:

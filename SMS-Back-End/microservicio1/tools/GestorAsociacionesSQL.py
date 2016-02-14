@@ -8,7 +8,10 @@ Last mod: Feb 2016
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 from Asociacion import *
-
+from Alumno import *
+from Profesor import *
+#Uso de variables generales par la conexión a la BD.
+import dbParams
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=0
 
@@ -23,8 +26,7 @@ class GestorAsociaciones:
     @classmethod
     def nuevaAsociacion(self, id_asignatura, id_curso):
 
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
-        #query="INSERT INTO Asociacion values("+"'"+nombre+"', "+ "'"+id+"');"
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
         id_asignatura='\''+id_asignatura+'\''
@@ -66,7 +68,7 @@ class GestorAsociaciones:
 
     @classmethod
     def getAsociaciones(self):
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm")
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -103,7 +105,7 @@ class GestorAsociaciones:
         """
         Recupera TODA la información de un Asociacion en concreto a través de la clave primaria, su id.
         """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
         id_asignatura='\''+id_asignatura+'\''
@@ -219,3 +221,89 @@ class GestorAsociaciones:
             return 'OK'
         if salida==0:
             return 'Elemento no encontrado'
+
+    @classmethod
+    def getAlumnos(sef, id_asignatura, id_curso):
+        '''
+        Devuelve una lista con los alumnos matriculados en esa asignatura y grupo
+        '''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+
+        id_curso='\''+id_curso+'\''
+        id_asignatura='\''+id_asignatura+'\''
+        #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
+        query='select * from Matricula where id_asignatura='+id_asignatura+' and id_curso='+id_curso+';'
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        if salida>=0: #La consulta ha tenido exito
+            row = cursor.fetchone()
+            lista = []
+            while row is not None:
+                alumno = Alumno()
+                alumno.dni=row[2]
+                lista.append(alumno)
+                row = cursor.fetchone()
+
+            #Devolvemos la lista de profesores (incluso si no hay y está vacía)
+            return lista
+
+            cursor.close()
+            db.close()
+
+    @classmethod
+    def getProfesores(self, id_asignatura, id_curso):
+        '''
+        Devuelve todos los profesores que imparte esa asignatura a ese grupo
+        '''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+
+        id_curso='\''+id_curso+'\''
+        id_asignatura='\''+id_asignatura+'\''
+        #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
+        query='select * from Imparte where id_asignatura='+id_asignatura+' and id_curso='+id_curso+';'
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        if salida>=0: #La consulta ha tenido exito
+            row = cursor.fetchone()
+            lista = []
+            while row is not None:
+                profesor = Profesor()
+                profesor.dni=row[2]
+                lista.append(profesor)
+                row = cursor.fetchone()
+
+            #Devolvemos la lista de profesores (incluso si no hay y está vacía)
+            return lista
+
+            cursor.close()
+            db.close()
