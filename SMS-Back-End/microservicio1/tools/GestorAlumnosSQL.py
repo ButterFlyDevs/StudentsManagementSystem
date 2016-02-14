@@ -300,7 +300,7 @@ class GestorAlumnos:
                 salida=e.args[0]
             except IndexError:
                 print "MySQL Error: %s" % str(e)
-        
+
         if salida>=0: #La consulta ha tenido exito
             row = cursor.fetchone()
             lista = []
@@ -377,7 +377,7 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Matricula, Curso where Matricula.id_asignatura=Curso.id and id_alumno="+dniAlumno+";"
+        query="select * from Matricula, Curso where Matricula.id_curso=Curso.id and id_alumno="+dniAlumno+";"
 
         try:
             salida = cursor.execute(query);

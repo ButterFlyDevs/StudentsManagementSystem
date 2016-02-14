@@ -54,15 +54,11 @@ class TestEntidadAlumno(unittest.TestCase):
         """
         #Comprobamos que no existan.
         cero=GestorAlumnos.getNumAlumnos()
-        #Creamos uno
         GestorAlumnos.nuevoAlumno('Juan','8888','C/Mesita','Peligros','Granada','1900-2-1','3242123')
-        #Creamos otro
         GestorAlumnos.nuevoAlumno('Juan','8889','C/Mesita','Peligros','Granada','1900-2-1','3242123')
-        #comprobamos el número
         dos=GestorAlumnos.getNumAlumnos()
-        #Los eliminamos:
-        GestorAlumnos.delAlumno('8888')
         GestorAlumnos.delAlumno('8889')
+        GestorAlumnos.delAlumno('8888')
         cero2=GestorAlumnos.getNumAlumnos();
         resultado=False
         if cero==0 and dos==2 and cero2==0:
@@ -74,15 +70,15 @@ class TestEntidadAlumno(unittest.TestCase):
         aprovisionadorDBconInterfaz.aprovisiona()
         profesores=GestorAlumnos.getProfesores('1')
         #Devemos devolver la BD a su estado original (solo estructura)
-        print "Necesito acceso root a la base de datos, ¿Cuál es la contraseña?"
-        os.system('mysql -u root -p < ../DBCreator_v0.sql')
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
         #Comprobamos que al alumno 3 le dan clase tres profesores, según el aprovisionamiento hecho y la función que lo comprueba.
-        self.assertEqual(len(profesores), 3)
+        self.assertEqual(len(profesores), 2)
         '''
         Para probar todas las relaciones, ya que la base de datos debe quedar en su estado original para que
         el resto de test funcionen, puede que sea mejor juntarlas en un solo test, así se aprovisionará y restaurará
         pidiéndonos la contraseña sólo una vez y no tantas como pruebas de joins queramos hacer como la de este test.
         '''
+
 
 
 class TestEntidadProfesor(unittest.TestCase):
@@ -126,6 +122,25 @@ class TestEntidadAsignatura(unittest.TestCase):
     def test_24_EliminacionAsignatura(self):
         self.assertEqual(GestorAsignaturas.delAsignatura('mt3'),'OK')
 
+    def test_25_CursosDondeSeImparteAsignatura(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        size=len(GestorAsignaturas.getCursos('fr'))
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        self.assertEqual(size,1)
+
+    def test_26_ProfesoresQueImparteLaAsignatura(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        size=len(GestorAsignaturas.getProfesores('fr'))
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        self.assertEqual(size,2)
+
+    def test_27_AlumnosQueCursanLaAsignatura(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        size=len(GestorAsignaturas.getAlumnos('mt'))
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        self.assertEqual(size,4)
+
+
 class TestEntidadCurso(unittest.TestCase):
 
     #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
@@ -152,6 +167,29 @@ class TestEntidadCurso(unittest.TestCase):
 
     def test_34_EliminacionCurso(self):
         self.assertEqual(GestorCursos.delCurso('hhjj'),'OK')
+
+    def test_35_AsginaturasAsociadasAlCurso(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        size=len(GestorCursos.getAsignaturas('1AESO'))
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        self.assertEqual(size,1)
+
+    def test_36_AlumnosMatriculadosEnCurso(self):
+        aprovisionadorDBconInterfaz.aprovisiona()
+        size=len(GestorCursos.getAlumnos('1AESO'))
+        self.assertEqual(size,3)
+
+    def test_37_ProfesoresQueImpartenEnCurso(self):
+        a=len(GestorCursos.getProfesores('1AESO'))
+        b=len(GestorCursos.getProfesores('1BESO'))
+        print a
+        print b
+        salida=False
+        if a==2 and b==1:
+            salida=True
+        #Hemos aprovechado la inicialización anterior y restauramos aquí.
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+        self.assertEqual(salida,True)
 
 ### RELACIONES ###
 

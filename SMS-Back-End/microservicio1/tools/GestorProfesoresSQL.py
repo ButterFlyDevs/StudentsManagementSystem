@@ -8,6 +8,7 @@ Last mod: Feb 2016
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 from Profesor import *
+from Alumno import *
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=0
@@ -234,3 +235,146 @@ class GestorProfesores:
             return 'OK'
         if salida==0:
             return 'Elemento no encontrado'
+
+
+    @classmethod
+    def getAlumnos(self, dniProfesor):
+        """
+        Devuelve una lista con los alumnos al que imparte clase ese profesor.
+
+        Argumentos:
+
+            dniProfesor: El dni del profsor del que se pide la información.
+
+
+        Extra: ¿Se debería añadir la comprobación de existencia del profesor?
+
+        """
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
+        query="select * from Matricula, Imparte where Matricula.id_curso = Imparte.id_curso and Matricula.id_asignatura = Imparte.id_asignatura and id_profesor ="+dniProfesor+";"
+
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        if salida>=0: #La consulta ha tenido exito
+            row = cursor.fetchone()
+            lista = []
+            while row is not None:
+                alumno = Alumno()
+
+                alumno.dni=row[2]
+                lista.append(alumno)
+                #print row[0], row[1]
+                row = cursor.fetchone()
+
+            #Devolvemos la lista de profesores (incluso si no hay y está vacía)
+            return lista
+
+            cursor.close()
+            db.close()
+
+    @classmethod
+    def getAsignaturas(self, dniProfesor):
+        """Devuelve una lista con las asignaturas que ese profesor imparte.
+        """
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
+        query="select * from Imparte, Asignatura where Imparte.id_asignatura=Asignatura.id and id_profesor="+dniProfesor+";"
+        
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        print "SALIDA"+str(salida)
+        if salida>=0: #La consulta ha tenido exito
+            row = cursor.fetchone()
+            lista = []
+            while row is not None:
+                asignatura = Asignatura()
+                #En esta consulta el identificador de la asignatura se encuentra en la primera posicion.
+                asignatura.id=row[3]
+                asignatura.nombre=row[4]
+                lista.append(asignatura)
+                #print row[0], row[1]
+                row = cursor.fetchone()
+
+            #Devolvemos la lista de profesores (incluso si no hay y está vacía)
+            return lista
+
+            cursor.close()
+            db.close()
+
+    @classmethod
+    def getCursos(self, dniProfesor):
+        """
+        Devuelve una lista con cursos en los que ese profesor da clase, normalmente será al menos uno.
+        """
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
+        query="select * from Imparte, Curso where Imparte.id_curso=Curso.id and id_profesor="+dniProfesor+";"
+
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        print "SALIDA"+str(salida)
+        if salida>=0: #La consulta ha tenido exito
+            row = cursor.fetchone()
+            lista = []
+            while row is not None:
+                curso = Curso()
+                #En esta consulta el identificador de la asignatura se encuentra en la primera posicion.
+                curso.id=row[3]
+                curso.curso=row[4]
+                curso.grupo=row[5]
+                curso.nivel=row[6]
+                lista.append(curso)
+                #print row[0], row[1]
+                row = cursor.fetchone()
+
+            #Devolvemos la lista de profesores (incluso si no hay y está vacía)
+            return lista
+
+            cursor.close()
+            db.close()

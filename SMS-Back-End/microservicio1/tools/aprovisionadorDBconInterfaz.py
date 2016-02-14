@@ -45,13 +45,15 @@ def aprovisiona():
 
     #Matriculamos alumnos en las asignatura:
     GestorMatriculas.nuevaMatricula('fr','1AESO','1')
-    GestorMatriculas.nuevaMatricula('mt','1BESO','1') #Matriculamos al mismo en dos asignaturas
+    GestorMatriculas.nuevaMatricula('mt','1AESO','1') #Matriculamos al mismo en dos asignaturas
 
     GestorMatriculas.nuevaMatricula('fr','1AESO','2')
     GestorMatriculas.nuevaMatricula('fr','1AESO','3')
     GestorMatriculas.nuevaMatricula('mt','1BESO','4')
     GestorMatriculas.nuevaMatricula('mt','1BESO','5')
     GestorMatriculas.nuevaMatricula('mt','1BESO','6')
+
+
 
 
 if __name__ == '__main__':

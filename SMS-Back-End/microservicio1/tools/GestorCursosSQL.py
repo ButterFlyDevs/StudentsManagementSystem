@@ -8,6 +8,11 @@ Last mod: Feb 2016
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 from Curso import *
+from Asignatura import *
+from Alumno import *
+from Profesor import  *
+#Uso de variables generales par la conexión a la BD.
+import dbParams
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=0
@@ -23,7 +28,7 @@ class GestorCursos:
     @classmethod
     def nuevoCurso(self, id, curso, grupo, nivel):
 
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Curso values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
@@ -64,7 +69,7 @@ class GestorCursos:
 
     @classmethod
     def getCursos(self):
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm")
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -104,7 +109,7 @@ class GestorCursos:
         """
         Recupera TODA la información de un Curso en concreto a través de la clave primaria, su id.
         """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
         query="select * from Curso where id='"+idCurso+"';"
         if v:
@@ -146,7 +151,7 @@ class GestorCursos:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
         """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idCurso='\''+idCurso+'\''
         query="UPDATE Curso SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idCurso+";"
@@ -186,7 +191,7 @@ class GestorCursos:
     def delCurso(self, idCurso):
         if v:
             print "Intentado eliminar Curso con id "+str(idCurso)
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
         query="delete from Curso where id='"+idCurso+"';"
         salida =''
@@ -209,3 +214,117 @@ class GestorCursos:
             return 'OK'
         if salida==0:
             return 'Elemento no encontrado'
+
+    @classmethod
+    def getAsignaturas(self, idCurso):
+        """
+
+        Devuelve una lista con las asignaturas que están asociadas a ese curso.
+
+        Parámetros:
+
+            idCurso: identificador del curso del que se realiza la consulta.
+
+        Devuelve: Una lista de objetos de tipo asignatura
+
+        """
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        idCurso='\''+idCurso+'\''
+        query='select * from Asocia where id_curso='+idCurso+';'
+        if v:
+            print '\n'+query
+
+
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            asignatura = Asignatura()
+            asignatura.id=row[0]
+            lista.append(asignatura)
+            #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
+
+    @classmethod
+    def getAlumnos(self, idCurso):
+        '''
+        Devuelve una lista con los alumnos matriculados en esa asignatura.
+        '''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        idCurso='\''+idCurso+'\''
+        '''
+        Usamos la orden distinct para eliminar los duplicados de una consulta, en este caso id_alumno ya que aparecerá
+        que un mismo alumno está matriculado muchas veces en un mismo curso con asignaturas disintas, entonces para evitar
+        contabilizar esos repetidos, usamos esta orden.
+        '''
+        query='select distinct id_alumno from Matricula where id_curso='+idCurso+';'
+        if v:
+            print '\n'+query
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            alumno = Alumno()
+            alumno.id=row[0]
+
+            lista.append(alumno)
+            #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
+
+    @classmethod
+    def getProfesores(self, idCurso):
+        '''
+        Devuelve el número de profesores que están impartiendo clase en ese curso.
+        '''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        idCurso='\''+idCurso+'\''
+        query='select distinct id_profesor from Imparte where id_curso='+idCurso+';'
+        if v:
+            print '\n'+query
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            profesor = Profesor()
+            profesor.id=row[0]
+
+            lista.append(profesor)
+            #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista

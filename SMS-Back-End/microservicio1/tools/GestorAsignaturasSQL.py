@@ -8,6 +8,11 @@ Last mod: Feb 2016
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 from Asignatura import *
+from Curso import *
+from Profesor import *
+from Alumno import *
+#Uso de variables generales par la conexión a la BD.
+import dbParams
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=0
@@ -23,7 +28,7 @@ class GestorAsignaturas:
     @classmethod
     def nuevaAsignatura(self, id, nombre):
 
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Asignatura values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
@@ -62,7 +67,7 @@ class GestorAsignaturas:
 
     @classmethod
     def getAsignaturas(self):
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm")
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -79,20 +84,14 @@ class GestorAsignaturas:
         lista = []
 
         while row is not None:
-            profesor = Asignatura()
+            asignatura = Asignatura()
             #print "LISTA SUPER CHACHI"
 
-            Asignatura.nombre=row[0]
-            profesor.id=row[1]
-            profesor.direccion=row[2];
-            profesor.localidad=row[3];
-            profesor.provincia=row[4];
-            profesor.fecha_nac=row[5];
-            profesor.telefonoA=row[6];
-            profesor.telefonoB=row[7];
+            asignatura.id=row[0]
+            asignatura.nombre=row[1]
 
 
-            lista.append(profesor)
+            lista.append(asignatura)
             #print row[0], row[1]
             row = cursor.fetchone()
 
@@ -108,7 +107,7 @@ class GestorAsignaturas:
         """
         Recupera TODA la información de un Asignatura en concreto a través de la clave primaria, su id.
         """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
         query="select * from Asignatura where id='"+idAsignatura+"';"
         if v:
@@ -148,7 +147,7 @@ class GestorAsignaturas:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
         """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idAsignatura='\''+idAsignatura+'\''
         query="UPDATE Asignatura SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idAsignatura+";"
@@ -188,7 +187,7 @@ class GestorAsignaturas:
     def delAsignatura(self, idAsignatura):
         if v:
             print "Intentado eliminar asignatura con id "+str(idAsignatura)
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
         query="delete from Asignatura where id='"+idAsignatura+"';"
         salida =''
@@ -211,3 +210,108 @@ class GestorAsignaturas:
             return 'OK'
         if salida==0:
             return 'Elemento no encontrado'
+
+    @classmethod
+    def getCursos(self, idAsignatura):
+        '''
+        Devuelve una lista con todos los cursos donde se imparte la asignatura.
+        '''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        idAsignatura='\''+idAsignatura+'\''
+        query='select * from Asocia where id_asignatura='+idAsignatura+';'
+        if v:
+            print '\n'+query
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            curso = Curso()
+            #print "LISTA SUPER CHACHI"
+
+            curso.id=row[0]
+
+            lista.append(curso)
+            #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
+
+    @classmethod
+    def getProfesores(self, idAsignatura):
+        '''
+        Devuelve una lista con todos los profesores que imparte clase en esa asignatura.
+        '''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        idAsignatura='\''+idAsignatura+'\''
+        query='select distinct id_profesor from Imparte where id_asignatura='+idAsignatura+';'
+        if v:
+            print '\n'+query
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            profesor = Profesor()
+            profesor.dni=row[0]
+            lista.append(profesor)
+            #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
+
+    @classmethod
+    def getAlumnos(self, idAsignatura):
+        '''
+        Devuelve una lista con todos los alumnos matriculados en esa asignatura en total.
+        '''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        idAsignatura='\''+idAsignatura+'\''
+        '''
+        Con el distinct evitamos que si un alumno por casualidad esta matriculado en lengua de primero
+        y lengua de segundo porque así se permite se contabilice como dos alumnos en el recuento, lo que sería un error.
+        '''
+        query='select distinct id_alumno from Matricula where id_asignatura='+idAsignatura+';'
+        if v:
+            print '\n'+query
+        cursor.execute(query)
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            alumno = Alumno()
+            alumno.dni=row[0]
+            lista.append(alumno)
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
