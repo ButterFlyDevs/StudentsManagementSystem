@@ -1,36 +1,45 @@
 # -*- coding: utf-8 -*-
 """
-Created on 29 July 2012
-@author: Lisa Simpson
+Fichero de definición de la API REST del microservicio 1 SBD, que ofrece la interfaz de conexión con el microservicio
+y que en principio solo es una pasarela a la interfaz de conexión con la BD a través de la APIDB.
 """
+#Framework que vamos a usar para implementar la API Rest del microservicio. Apenas se va a utilizar toda la funcionalidad de la librería.
 import webapp2
 import json
-from tools.GestorAlumnosSQL import GestorAlumnos
+from APIDB.GestorAlumnosSQL import GestorAlumnos
+#Para la conversión de objetos python a objetos JSON enviables por http usamos la librería jsonpickle.
 import jsonpickle
 
-
-## CLASE QUE PROCESA EL RECURSO /alumnos usando una forma estandar de uso  de parámetros.
-#Responde a http://localhost:8002/alumnos o  curl -X GET http://localhost:8002/alumnos
-
 class Alumnos(webapp2.RequestHandler):
-    """
-    Manejador de peticiones a Alumnos
-    """
-
-
-    # curl -X GET http://localhost:8002/alumnos
+    '''
+    Manejador de peticiones REST al recurso Alumnos, /alumnos, usando una forma estandar de uso  de parámetros.
+    #Responde a http://localhost:8002/alumnos o  curl -X GET http://localhost:8002/alumnos
+    '''
 
     '''
     Si quisiéramos pasar parámetros
     # curl -d "dni=454545" -X GET -G  http://localhost:8080/alumnos
     que equivale a hacer la peticion a http://localhost:8080/alumnos?dni=9
     '''
-
     def get(self):
         """
         Gestiona las peticiones de tipo get (DAME-QUIERO) al recurso Alumnos
+
+
+        /alumnos Devuelve una lista con todos los alumnos de la base de datos.
+        /alumnos?dni=<dni del alumno> Devuelve todos los datos de un alumno en concreto.
+
+        /alumnos/asignaturas?dni=<dniAlumno> Devuelve todas las asignaturas en la que está matriculado el estudiante.
+
+        /alumnos/profesores?dni=<dniAlumno> Devuelve una lista con todos los profesores que imparten clase a ese alumno
+
+
+
         """
         #Si no se pasa como parámetro nada, se está pidiendo una lista simplificada de todos los alumnos de la base de datos.
+        '''
+        http://localhost:8080/alumnos
+        '''
         if(self.request.get('dni')==''):
 
             print ("GET ALL ALUMNOS #######################")
@@ -93,6 +102,16 @@ class Alumnos(webapp2.RequestHandler):
         '''
         self.response.write(salida)
 
+    def update(self):
+        '''
+        Recursos de tipo update:
+
+        /alumnos?dni=<dniAlumno>
+
+        '''
+        self.response.write('update')
+
+
     def delete(self):
         """
         Función para eliminar un alumno
@@ -104,6 +123,8 @@ class Alumnos(webapp2.RequestHandler):
         #self.response.write("dni: "+self.request.get('dni')+"\n")
         self.response.write(GestorAlumnos.delAlumno(self.request.get('dni')))
 
+
+#Manejador de URLs donde asociamos cada recurso a una clase.
 app = webapp2.WSGIApplication([
     ('/alumnos', Alumnos)
 ], debug=True)
