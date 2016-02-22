@@ -107,7 +107,7 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
   //En realidad debería de llamarse a la api para conseguir todos los datos del usuario.
   $scope.es = Estudiante;
 
-  //Implementación de las acciones que se producen cuando el botón de eliminar se pulsa.
+  //Implementación de las acciones que se producen cuando el BOTÓN ELIMINAR se pulsa.
   $scope.ButtonClick = function(){
     console.log("Pulsado boton de eliminar")
     var ROOT = 'http://localhost:8001/_ah/api';
@@ -135,7 +135,7 @@ routerApp.controller('ControladorEjemplo', function ($scope) {
  //service.greetings().listGreeting().execute()
         // Get the list of previous scores
 
-    gapi.client.helloworld.greetings.listGreeting().execute(function(resp) {
+    gapi.client.helloworld.greetings.getAlumnos().execute(function(resp) {
       //console.log(resp);
       //console.log("after");
       //console.log(resp.alumnos);

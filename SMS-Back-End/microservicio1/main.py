@@ -62,9 +62,14 @@ def getAlumno(id_alumno):
     '''
     #Si no tiene el número correcto de caracteres el identificador.
     if len(id_alumno) != 9:
-        abort(404)
+        abort(400)
 
-    return jsonpickle.encode(GestorAlumnos.getAlumno(id_alumno))
+    salida=GestorAlumnos.getAlumno(id_alumno)
+    if salida=="Elemento no encontrado":
+        #Enviamos el error de NotFound
+        abort(404)
+    else:
+        return jsonpickle.encode(GestorAlumnos.getAlumno(id_alumno))
 
 ''' Hasta ver como proceder con la modificación de alumnos.
 @app.route('/alumnos/<string:id_alumno>',methods=['PUT'])
