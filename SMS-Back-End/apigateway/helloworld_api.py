@@ -66,9 +66,6 @@ class AlumnoCompleto(messages.Message):
     fecha_nac = messages.StringField(6)
     telefono = messages.StringField(7)
 
-
-
-
 class DNI(messages.Message):
     dni = messages.StringField(1)
 
@@ -76,129 +73,31 @@ class ListaAlumnos(messages.Message):
     alumnos = messages.MessageField(Alumno, 1, repeated=True)
 
 
-class Greeting(messages.Message):
-    """Greeting that stores a message."""
-    message = messages.StringField(1)
-
-class GreetingCollection(messages.Message):
-    """Collection of Greetings."""
-    items = messages.MessageField(Greeting, 1, repeated=True)
-
-
-STORED_GREETINGS = GreetingCollection(items=[
-    Greeting(message='hello world!'),
-    Greeting(message='goodbye world!'),
-])
-
-
 @endpoints.api(name='helloworld', version='v1')
 
 class HelloWorldApi(remote.Service):
     """Helloworld API v1."""
 
-    MULTIPLY_METHOD_RESOURCE = endpoints.ResourceContainer(
-            Greeting,
-            times=messages.IntegerField(2, variant=messages.Variant.INT32,
-                                        required=True))
-
-    @endpoints.method(MULTIPLY_METHOD_RESOURCE, Greeting,
-                      path='hellogreeting/{times}', http_method='POST',
-                      name='greetings.multiply')
-
-
-    def greetings_multiply(self, request):
-        return Greeting(message=request.message * request.times)
-
-
-#########  INTENTO DE IMPLEMENTACIÓN DE UN METODO DELETE para eliminar un alumno
-
-
-    '''
-    #Ejemplo de borrado de un recurso pasando el dni de un alumno
-    Ubuntu> curl -d "dni=1" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/eliminaralumno
-    {
-     "message": "OK"
-    }
-
-    #Ejemplo de ejecución en el caso de no encontrar el recurso:
-    Ubuntu> curl -d "dni=1" -X DELETE -G localhost:8001/_ah/api/hellworld/v1/eliminaralumno
-    {
-     "message": "Elemento no encontrado"
-    }
-    '''
-
-    @endpoints.method(DNI,MensajeRespuesta,
-                     path='delAlumno', http_method='DELETE',
-                     name='greetings.delAlumno')
-    def eliminar_alumno(self, request):
-
-        print "POST EN CLOUDPOINTS"
-        print str(request)
-
-        #Una vez que tenemos los datos aquí los enviamos al servicio que gestiona la base de datos.
-        #Podemos imprimir por pantalla los datos recolectados
-        print "MENSAJE RECIBIDO EN ENDPOINTS"+request.dni
-
-        #Nos conectamos al modulo para enviarle los mismos
-        from google.appengine.api import modules
-        #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
-    
-        '''
-        Parece que urlfetch da problemas a al hora de pasar parámetros (payload) cuando se trata del
-        método DELETE.
-        Extracto de la doc:
-        payload: POST, PUT, or PATCH payload (implies method is not GET, HEAD, or DELETE). this is ignored if the method is not POST, PUT, or PATCH.
-        Además no somos los primeros en encontrarse este problema:
-        http://grokbase.com/t/gg/google-appengine/13bvr5qjyq/is-there-any-reason-that-urlfetch-delete-method-does-not-support-a-payload
-
-        Según la última cuestión puede que tengamos que usar POST
-
-        '''
-        url+='alumnos/'+request.dni
-
-        #EL problema queda aquí, a expensas de ver si podemos usar DELETE o tenemos que realizar un apaño con post
-        #usando algún parámetro que indique si se debe eliminar.
-        result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
-
-        print "RESULTADOS DE PETICION AL M1: "
-        print result.content
-
-        #return MensajeRespuesta(message="Todo OK man!")
-        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
-        return MensajeRespuesta(message=result.content)
-
-######### FIN DE INTENTO
-
-
-
-
-
-
-
-
-
-
-    ############################
-    #   COLECCIÓN ALUMNOS      #
-    ############################
+    ##############################################
+    #   COLECCIÓN ALUMNOS      /alumnos          #
+    ##############################################
 
     '''
     getAlumnos()   [GET sin parámetros]
 
-    Devuelve una lista con todos los estudiantes registrados en el sistema.
+    Devuelve una lista con todos los estudiantes registrados en el sistema, de forma simplificada (solo nombre y DNI)
 
     Llamada desde terminal:
-    curl -X GET localhost:8001/_ah/api/helloworld/v1/getAlumnos
+    curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumnos
     Llamada desde JavaScript:
-    response =service.greetings().getAlumnos().execute()
+    response =service.alumnos().getAlumnos().execute()
     '''
     @endpoints.method(message_types.VoidMessage, ListaAlumnos,
                       #path=nombre del recurso a llamar
-                      path='getAlumnos', http_method='GET',
+                      path='alumnos/getAlumnos', http_method='GET',
                       #Puede que sea la forma en la que se llama desde la api:
-                      #response = service.greetings().listGreeting().execute()
-                      name='greetings.getAlumnos')
+                      #response = service.alumnos().listGreeting().execute()
+                      name='alumnos.getAlumnos')
     def getAlumnos(self, unused_request):
         #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
 
@@ -248,12 +147,6 @@ class HelloWorldApi(remote.Service):
         for alumno in listaAlumnos:
             alumnosItems.append(Alumno( nombre=str(alumno.get('nombre')), dni=str(alumno.get('dni'))  ))
 
-        '''
-        greetingItems.append(Greeting(message='hello world2'))
-        greetingItems.append(Greeting(message='goodbye world2'))
-        STORED_GREETINGS2=GreetingCollection(items=greetingItems)
-        '''
-
         #Los adaptamos al tipo de mensaje y enviamos
         #return Greeting(message=str(result.content))
         return ListaAlumnos(alumnos=alumnosItems)
@@ -265,10 +158,10 @@ class HelloWorldApi(remote.Service):
     Devuelve toda la información de un estudiante en caso de estar en el sistema.
 
     Llamada ejemplo desde terminal:
-    curl -X GET localhost:8001/_ah/api/helloworld/v1/getAlumno?dni=11AA22BBZ
+    curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumno?dni=11AA22BBZ
     '''
 
-    @endpoints.method(DNI, AlumnoCompleto, path='getAlumno', http_method='GET', name='greetings.getAlumno')
+    @endpoints.method(DNI, AlumnoCompleto, path='alumnos/getAlumno', http_method='GET', name='alumnos.getAlumno')
     def getAlumno(self,request):
         print "GET CON PARÁMETROS EN ENDPOINT"
 
@@ -319,45 +212,34 @@ class HelloWorldApi(remote.Service):
                                 )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     '''
-    /alumnos POST
+    insertarAlumno()  [POST con todos los atributos de un alumno]
 
-    Introduce un dnuevo alumno en el sistema.
+    Introduce un nuevo alumno en el sistema.
+
+    Ejemplo de llamada en terminal:
+    curl -i -d "nombre=Juan&dni=45301218Z&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nac=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno
+    (-i para ver las cabeceras)
 
     '''
     @endpoints.method(AlumnoCompleto,MensajeRespuesta,
-                     path='alumnos', http_method='POST',
-                     name='greetings.insertaralumno')
+                     path='insertarAlumno', http_method='POST',
+                     name='alumnos.insertarAlumno')
     def insertar_alumno(self, request):
 
         print "POST EN CLOUDPOINTS"
         #La capacidad de recoger datos desde request vendrá dada por tipo de
         #objeto que se espera como petición, en este caso podrán obtenerse
         #todos los atributos que se hayan definido en AlumnoCompleto
-        print str(request)
-        print "fin"
 
-        #Una vez que tenemos los datos aquí los enviamos al servicio que gestiona la base de datos.
-        #Podemos imprimir por pantalla los datos recolectados
+        if v:
+            print "Contenido de petición a insertar"
+            print str(request)
 
-        #Nos conectamos al modulo para enviarle los mismos
-        from google.appengine.api import modules
+        #Si no tenemos todos los atributos entonces enviamos un error de bad request.
+        if request.nombre==None or request.dni==None or request.direccion==None or request.localidad==None or request.provincia==None or request.fecha_nac==None or request.telefono==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
         #Conformamos la dirección:
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
         #Añadimos el servicio al que queremos conectarnos.
@@ -386,58 +268,76 @@ class HelloWorldApi(remote.Service):
         #Realizamos la petición al servicio con los datos pasados al endpoint
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
 
+
+        if v:
+            print "RESULTADOS DE PETICION AL M1: "
+            print result.content
+            print result.status_code
+
+        if str(result.status_code) == '404':
+            raise endpoints.NotFoundException('Alumno con DNI %s ya existe en el sistema.' % (request.dni))
+
+        #return MensajeRespuesta(message="Todo OK man!")
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
+
+    '''
+
+    delAlumno()  [DELETE con dniAlumno]
+
+    #Ejemplo de borrado de un recurso pasando el dni de un alumno
+    Ubuntu> curl -d "dni=1" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/alumnos/eliminaralumno
+    {
+     "message": "OK"
+    }
+
+    #Ejemplo de ejecución en el caso de no encontrar el recurso:
+    Ubuntu> curl -d "dni=1" -X DELETE -G localhost:8001/_ah/api/hellworld/v1/alumnos/eliminaralumno
+    {
+     "message": "Elemento no encontrado"
+    }
+    '''
+
+    @endpoints.method(DNI,MensajeRespuesta,path='delAlumno', http_method='DELETE', name='alumnos.delAlumno')
+    def eliminar_alumno(self, request):
+
+        print "POST EN CLOUDPOINTS"
+        print str(request)
+
+        #Una vez que tenemos los datos aquí los enviamos al servicio que gestiona la base de datos.
+        #Podemos imprimir por pantalla los datos recolectados
+        print "MENSAJE RECIBIDO EN ENDPOINTS"+request.dni
+
+        #Nos conectamos al modulo para enviarle los mismos
+        from google.appengine.api import modules
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        '''
+        Parece que urlfetch da problemas a al hora de pasar parámetros (payload) cuando se trata del
+        método DELETE.
+        Extracto de la doc:
+        payload: POST, PUT, or PATCH payload (implies method is not GET, HEAD, or DELETE). this is ignored if the method is not POST, PUT, or PATCH.
+        Además no somos los primeros en encontrarse este problema:
+        http://grokbase.com/t/gg/google-appengine/13bvr5qjyq/is-there-any-reason-that-urlfetch-delete-method-does-not-support-a-payload
+
+        Según la última cuestión puede que tengamos que usar POST
+
+        '''
+        url+='alumnos/'+request.dni
+
+        #EL problema queda aquí, a expensas de ver si podemos usar DELETE o tenemos que realizar un apaño con post
+        #usando algún parámetro que indique si se debe eliminar.
+        result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
+
         print "RESULTADOS DE PETICION AL M1: "
-        #print result.content
+        print result.content
 
         #return MensajeRespuesta(message="Todo OK man!")
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-##################
-
-
-
-
-    ID_RESOURCE = endpoints.ResourceContainer(
-            message_types.VoidMessage,
-            id=messages.IntegerField(1, variant=messages.Variant.INT32))
-
-
-    @endpoints.method(ID_RESOURCE, Greeting,
-                      path='hellogreeting/{id}', http_method='GET',
-                      name='greetings.getGreeting')
-
-
-    def greeting_get(self, request):
-        try:
-            return STORED_GREETINGS.items[request.id]
-        except (IndexError, TypeError):
-            raise endpoints.NotFoundException('Greeting %s not found.' %
-                                              (request.id,))
-
-    @endpoints.method(message_types.VoidMessage, Greeting,
-                      path='hellogreeting/authed', http_method='POST',
-                      name='greetings.authed')
-    def greeting_authed(self, request):
-        current_user = endpoints.get_current_user()
-        email = (current_user.email() if current_user is not None
-                 else 'Anonymous')
-        return Greeting(message='hello %s' % (email,))
 
 
 APPLICATION = endpoints.api_server([HelloWorldApi])
