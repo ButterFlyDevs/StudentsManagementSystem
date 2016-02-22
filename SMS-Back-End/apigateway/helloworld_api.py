@@ -246,7 +246,7 @@ class HelloWorldApi(remote.Service):
       "message": "Alumno con DNI 5 no encontrado."
      }
     '''
-    @endpoints.method(DNI, AlumnoCompleto, path='alumnos', http_method='GET', name='greetings.getAlumno')
+    @endpoints.method(DNI, AlumnoCompleto, path='alumno', http_method='GET', name='greetings.getAlumno')
     def getAlumno(self,request):
         print "GET CON PARÁMETROS EN ENDPOINT"
 
@@ -349,9 +349,17 @@ class HelloWorldApi(remote.Service):
         return STORED_GREETINGS
     '''
 
+
+
+    '''
+    Llamada desde terminal:
+    curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos
+    Llamada desde JavaScript:
+    response =service.greetings().listGreeting().execute()
+    '''
     @endpoints.method(message_types.VoidMessage, ListaAlumnos,
                       #path=nombre del recurso a llamar
-                      path='hellogreeting', http_method='GET',
+                      path='alumnos', http_method='GET',
                       #Puede que sea la forma en la que se llama desde la api:
                       #response = service.greetings().listGreeting().execute()
                       name='greetings.listGreeting')
@@ -366,7 +374,7 @@ class HelloWorldApi(remote.Service):
         import urllib2
         from google.appengine.api import modules
 
-        #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
         #Añadimos el recurso al que queremos conectarnos.
         url+="alumnos"
@@ -379,6 +387,7 @@ class HelloWorldApi(remote.Service):
         from google.appengine.api import urlfetch
 
         #Llamamos al microservicio y recibimos los resultados con URLFetch
+        #Al no especificar nada se llama al método GET de la URL.
         result = urlfetch.fetch(url)
 
         #Vamos a intentar consumir los datos en JSON y convertirlos a un mensje enviable :)
@@ -396,8 +405,9 @@ class HelloWorldApi(remote.Service):
         miListaAlumnos.alumnos = listaAlumnos
         '''
 
+        #Creamos un vector
         alumnosItems= []
-
+        #Que rellenamos con todo los alumnos de la listaAlumnos
         for alumno in listaAlumnos:
             alumnosItems.append(Alumno( nombre=str(alumno.get('nombre')), dni=str(alumno.get('dni'))  ))
 

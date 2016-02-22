@@ -1,130 +1,125 @@
 # -*- coding: utf-8 -*-
-"""
-Fichero de definición de la API REST del microservicio 1 SBD, que ofrece la interfaz de conexión con el microservicio
-y que en principio solo es una pasarela a la interfaz de conexión con la BD a través de la APIDB.
-"""
-#Framework que vamos a usar para implementar la API Rest del microservicio. Apenas se va a utilizar toda la funcionalidad de la librería.
-import webapp2
-import json
-from APIDB.GestorAlumnosSQL import GestorAlumnos
-#Para la conversión de objetos python a objetos JSON enviables por http usamos la librería jsonpickle.
+from flask import Flask
+from flask import abort
+from flask import request
 import jsonpickle
 
-class Alumnos(webapp2.RequestHandler):
+from APIDB.GestorAlumnosSQL import GestorAlumnos
+
+app = Flask(__name__)
+
+############################
+#   COLECCIÓN ALUMNOS      #
+############################
+
+@app.route('/alumnos',methods=['GET'])
+def getAlumnos():
+    return jsonpickle.encode(GestorAlumnos.getAlumnos())
+
+@app.route('/alumnos',methods=['PUT'])
+def putAlumnos():
+    return "puting algo \n"
+
+@app.route('/alumnos',methods=['DELETE'])
+def delAlumnos():
+    return "deleting algo \n"
+
+@app.route('/alumnos',methods=['POST'])
+def postAlumnos():
     '''
-    Manejador de peticiones REST al recurso Alumnos, /alumnos, usando una forma estandar de uso  de parámetros.
-    #Responde a http://localhost:8002/alumnos o  curl -X GET http://localhost:8002/alumnos
+    Método que inserta un nuevo alumno en el sistema.
+    curl -d "nombre=Juan&dni=45601218Z&direccion=Calle arabl&localidad=Jerez de la frontera&provincia=Granada&fecha_nac=1988-2-6&telefono=677164459" -i -X POST localhost:8080/alumnos
     '''
-
-    '''
-    Si quisiéramos pasar parámetros
-    # curl -d "dni=454545" -X GET -G  http://localhost:8080/alumnos
-    que equivale a hacer la peticion a http://localhost:8080/alumnos?dni=9
-    '''
-    def get(self):
-        """
-        Gestiona las peticiones de tipo get (DAME-QUIERO) al recurso Alumnos
-
-
-        /alumnos Devuelve una lista con todos los alumnos de la base de datos.
-        /alumnos?dni=<dni del alumno> Devuelve todos los datos de un alumno en concreto.
-
-        /alumnos/asignaturas?dni=<dniAlumno> Devuelve todas las asignaturas en la que está matriculado el estudiante.
-
-        /alumnos/profesores?dni=<dniAlumno> Devuelve una lista con todos los profesores que imparten clase a ese alumno
-
-
-
-        """
-        #Si no se pasa como parámetro nada, se está pidiendo una lista simplificada de todos los alumnos de la base de datos.
-        '''
-        http://localhost:8080/alumnos
-        '''
-        if(self.request.get('dni')==''):
-
-            print ("GET ALL ALUMNOS #######################")
-            #Se está pidiendo que se devuelvan todos los alumnos
-            listaAlumnos = GestorAlumnos.getAlumnos()
-
-
-            #Una vez que tenemos la lista de aĺumnos convertimos los datos a JSON para enviarlos
-            salida=""
-            for alumno in listaAlumnos:
-                salida+= str(json.dumps(alumno.__dict__))
-
-            #print "Imprimiendo lista de alumnos"
-            obj = jsonpickle.encode(listaAlumnos)
-            #print str(obj)
-
-            #Los enviamos
-            self.response.write(obj)
-
-        #En otro caso, se está pasando el dni del que se quiere toda su información al completo.
+    if 'dni' in request.form:
+        #Presente el DNI al menos podemos grabar el alumno en el sistema.        r
+        #Se devuelve la salida de control de
+        salida = GestorAlumnos.nuevoAlumno(request.form['nombre'],
+                                  request.form['dni'],
+                                  request.form['direccion'],
+                                  request.form['localidad'],
+                                  request.form['provincia'],
+                                  request.form['fecha_nac'],
+                                  request.form['telefono'])
+        if salida == 'OK':
+            return 'OK'
         else:
-            print ("GET UN ALUMNO #######################")
-            #Recuperamos el alumno pedido.
-            alumno = GestorAlumnos.getAlumno(self.request.get('dni'))
-
-            if(alumno!='Elemento no encontrado'):
-                print "FECHA NACIMIENTO"
-                #Tenemos que hacer esto para que no haya problemas al codificar con JSON el tipo de dato fecha nacimiento
-                alumno.fecha_nac=str(alumno.fecha_nac)
-                print alumno.fecha_nac
-
-            #Si se trata de un error entonces se envía el error que nos devuelve el GestorAlumnos directamente
-
-            #Enviamos el resultado en formato JSON
-            self.response.write(jsonpickle.encode(alumno))
-
-    # curl -d "nombre=JuanAntonio&dni=456320" -X POST http://localhost:8002/alumnos
-    #Gestión de las peticiones post.
-    def post(self):
-        """
-        Función para añadir un nuevo alumno a la base de datos.
-        """
-
-        print ("post in alumnos")
-        print self.request.get('nombre')
-        print self.request.get('dni')
-
-        #Grabamos los datos en la base de datos:
-
-        salida=GestorAlumnos.nuevoAlumno(self.request.get('nombre'), self.request.get('dni'))
+            abort(404)
+    else:
+        abort(404)
 
 
-        #Recogemos los atributos de la petición y los imprimimos
-        #self.response.write("nombre: "+self.request.get('nombre')+"\n")
-        #self.response.write("dni: "+self.request.get('dni')+"\n")
-        '''
-        Salida:
-        nombre: JuanAntonio
-        dni: 456320
-        '''
-        self.response.write(salida)
+#####################
+#   ENTIDAD ALUMNO  #
+#####################
 
-    def update(self):
-        '''
-        Recursos de tipo update:
+@app.route('/alumnos/<string:id_alumno>',methods=['GET'])
+def getAlumno(id_alumno):
+    '''
+    Devuelve todos los datos de un alumno buscado por su id
+    en caso de existir en la base de datos.
+    curl -i -X GET localhost:8080/alumnos/11223344A
 
-        /alumnos?dni=<dniAlumno>
+    '''
+    #Si no tiene el número correcto de caracteres el identificador.
+    if len(id_alumno) != 9:
+        abort(404)
 
-        '''
-        self.response.write('update')
+    return jsonpickle.encode(GestorAlumnos.getAlumno(id_alumno))
 
+''' Hasta ver como proceder con la modificación de alumnos.
+@app.route('/alumnos/<string:id_alumno>',methods=['PUT'])
+def modAlumno(id_alumno):
+    #Si no tiene el número correcto de caracteres el identificador.
+    if len(id_alumno) != 9:
+        abort(404)
+    return id_alumno
+'''
 
-    def delete(self):
-        """
-        Función para eliminar un alumno
-        Puede llamarse, pasándole parámetros desde terminal así:
-        #curl -d "dni=456320" -X DELETE -G http://localhost:8002/alumnos
-        """
-        print "LLAMADA EN MAIN"+self.request.get('dni')+"yeah"
-        #self.response.write("eliminando\n")
-        #self.response.write("dni: "+self.request.get('dni')+"\n")
-        self.response.write(GestorAlumnos.delAlumno(self.request.get('dni')))
+@app.route('/alumnos/<string:id_alumno>',methods=['DELETE'])
+def delAlumno(id_alumno):
+    '''
+    curl -i -X DELETE localhost:8080/alumnos/11223344A
+    Si el alumno no se encuentra se devuelve: "Elemento no encontrado".
 
+    Si la solicitud se realiza con un identificador de alumno que
+    no cumple con ciertos requisitos como la longitud = 9, se devuelve
+    el error 400 - Bad request, que significa que la solicitud contiene
+    sintaxis errónea y no debería repetirse.
 
-#Manejador de URLs donde asociamos cada recurso a una clase.
-app = webapp2.WSGIApplication([
-    ('/alumnos', Alumnos)
-], debug=True)
+    Si la solicitud tiene la sintaxis correcta pero no existe el recurso
+    el error es el 404 - Not found, significa recurso no encontrado,
+    identificia que el servidor no ha encontrado el recurso solicitado.
+
+    '''
+    if len(id_alumno) != 9:
+        abort(400)
+
+    salida = GestorAlumnos.delAlumno(id_alumno)
+    if salida=="Elemento no encontrado":
+        abort(404)
+    else:
+        return 'Elemento eliminado'
+
+@app.route('/alumnos/<string:id_alumno>/profesores',methods=['GET'])
+def getProfesores(id_alumno):
+    '''
+    curl -i -X GET localhost:8080/alumnos/1/profesores
+    '''
+    return jsonpickle.encode(GestorAlumnos.getProfesores(id_alumno))
+
+@app.route('/alumnos/<string:id_alumno>/asignaturas',methods=['GET'])
+def getAsignaturas(id_alumno):
+    '''
+    curl -i -X GET localhost:8080/alumnos/1/asignaturas
+    '''
+    return jsonpickle.encode(GestorAlumnos.getAsignaturas(id_alumno))
+
+@app.route('/alumnos/<string:id_alumno>/cursos',methods=['GET'])
+def getCursos(id_alumno):
+    '''
+    curl -i -X GET localhost:8080/alumnos/1/cursos
+    '''
+    return jsonpickle.encode(GestorAlumnos.getCursos(id_alumno))
+
+if __name__ == '__main__':
+    app.run(debug=True)
