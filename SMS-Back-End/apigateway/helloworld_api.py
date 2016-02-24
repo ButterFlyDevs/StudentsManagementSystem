@@ -20,9 +20,10 @@ import urllib
 #Para el descubrimiento de los módulos
 import urllib2
 from google.appengine.api import modules
-
-
+#Para la decodificaciónd e los datos recibidos en JSON desde las APIs
 import jsonpickle
+
+
 #Variable habilitadora del modo verbose
 v=True
 
@@ -72,7 +73,41 @@ class DNI(messages.Message):
 class ListaAlumnos(messages.Message):
     alumnos = messages.MessageField(Alumno, 1, repeated=True)
 
+class Profesor(message.Message):
+    nombre = messages.StringField(1)
+    dni = messages.StringField(2)
 
+class ProfesorCompleto(messages.Message):
+    nombre = messages.StringField(1)
+    dni = messages.StringField(2)
+    direccion = messages.StringField(3)
+    localidad = messages.StringField(4)
+    provincia = messages.StringField(5)
+    fecha_nac = messages.StringField(6)
+    telefonoA = messages.StringField(7)
+    telefonoB = messages.StringField(8)
+
+class ListaProfesores(messages.Message):
+    profesores = messages.MessageField(Profesor, 1, repeated=True)
+
+class Asignatura(messages.Message):
+    id = messages.StringField(1)
+    nombre = messages.StringField(2)
+
+class ListaAsignaturas(messages.Message):
+    asignaturas = messages.MessageField(Asignatura, 1, repeated=True)
+
+class Curso(messages.Message):
+    id = messages.StringField(1)
+    curso = messages.StringField(2)
+    grupo = messages.StringField(3)
+    nivel = messages.StringField(4)
+
+class ListaCursos(messages.Message):
+    cursos = messages.MessageField(Curso, 1, repeated=True)
+
+
+#Decorador que establace nombre y versión de la api
 @endpoints.api(name='helloworld', version='v1')
 
 class HelloWorldApi(remote.Service):
@@ -105,11 +140,8 @@ class HelloWorldApi(remote.Service):
 
         #Conexión a un microservicio específico:
 
-        from google.appengine.api import modules
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        import urllib2
-        from google.appengine.api import modules
 
         #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
@@ -118,9 +150,6 @@ class HelloWorldApi(remote.Service):
         print str(url)
         #result = urllib2.urlopen(url)
         #print result
-
-        #Envío de su resultado
-        from google.appengine.api import urlfetch
 
         #Llamamos al microservicio y recibimos los resultados con URLFetch
         #Al no especificar nada se llama al método GET de la URL.
@@ -336,6 +365,159 @@ class HelloWorldApi(remote.Service):
         #return MensajeRespuesta(message="Todo OK man!")
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
+
+
+    '''
+    Devuelve una lista con los datos completos de los profesores que dan clase al alumno de dni pasado
+    curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getProfesoresAlumno?dni=1
+    '''
+    @endpoints.method(DNI, ListaProfesores, path='alumnos/getProfesoresAlumno', http_method='GET', name='alumnos.getProfesoresAlumno')
+    def getProfesoreAlumno(self, request):
+        #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
+        if v:
+            print ("Ejecución de getProfesoresAlumno en apigateway")
+
+        #Conexión a un microservicio específico:
+
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Añadimos a la url la coleccion (alumnos), el recurso (alumno dado por su dni) y el recurso anidado de este (profesores)
+        url+='alumnos/'+request.dni+"/profesores"
+
+        #Realizamos la petición
+        result = urlfetch.fetch(url)
+
+        #Vamos a intentar consumir los datos en JSON y convertirlos a un mensje enviable :)
+
+        print "IMPRESION DE LOS DATOS RECIBIDOS"
+        print result.content
+        listaProfesores = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        profesoresItems= []
+        #Que rellenamos con todo los alumnos de la listaAlumnos
+        for profesor in listaProfesores:
+            profesoresItems.append(ProfesorCompleto( nombre=str(profesor.get('nombre')),
+                                           dni=str(profesor.get('dni')),
+                                           direccion=str(profesor.get('direccion')),
+                                           localidad=str(profesor.get('localidad')),
+                                           provincia=str(profesor.get('provincia')),
+                                           fecha_nac=str(profesor.get('fecha_nac')),
+                                           telefonoA=str(profesor.get('telefonoA')),
+                                           telefonoB=str(profesor.get('telefonoB'))
+                                         )
+                                )
+
+        #Los adaptamos al tipo de mensaje y enviamos
+        #return Greeting(message=str(result.content))
+        return ListaProfesores(profesores=profesoresItems)
+
+
+    '''
+    Devuelve una lista con los datos completos de las asignatuas en las que está matriculado el alumno con dni pasado.
+    Ejemplo de llamada:
+    > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getAsignaturasAlumno?dni=1
+    '''
+    @endpoints.method(DNI, ListaAsignaturas, path='alumnos/getAsignaturasAlumno', http_method='GET', name='alumnos.getAsignaturasAlumno')
+    def getAsignaturasAlumno(self, request):
+        if v:
+            print ("Ejecución de getAsignaturasAlumno en apigateway")
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='alumnos/'+request.dni+"/asignaturas"
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaAsignaturas = jsonpickle.decode(result.content)
+        print listaAsignaturas
+        asignaturasItems= []
+        for asignatura in listaAsignaturas:
+            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
+        return ListaAsignaturas(asignaturas=asignaturasItems)
+
+
+    '''
+    Devuelve una lista con los datos completos de las cursos en las que está matriculado el alumno con dni pasado.
+    Ejemplo de llamada:
+    > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getCursosAlumno?dni=1
+    '''
+    @endpoints.method(DNI, ListaCursos, path='alumnos/getCursosAlumno', http_method='GET', name='alumnos.getCursosAlumno')
+    def getCursosAlumno(self, request):
+        if v:
+            print ("Ejecución de getCursosAlumno en apigateway")
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='alumnos/'+request.dni+"/cursos"
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaCursos = jsonpickle.decode(result.content)
+        print listaCursos
+        cursosItems= []
+        for curso in listaCursos:
+            cursosItems.append(Curso(id=str(curso.get('id')),curso=str(curso.get('nombre')),grupo=str(curso.get('grupo')),nivel=str(curso.get('nivel'))))
+        return ListaCursos(cursos=cursosItems)
+
+
+
+    ##############################################
+    #   FUNCIONES PARA ENTIDADES PROFESORES      #
+    ##############################################
+
+
+    @endpoints.method(message_types.VoidMessage, ListaProfesores,
+                      path='profesores/getProfesores', http_method='GET',
+                      name='profesores.getProfesores')
+    def getProfesores(self, unused_request):
+        '''
+        Devuelve una lista con todos los profesores registrados en el sistema, de forma simplificada (solo nombre y DNI)
+
+        Llamada desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getProfesores
+        Llamada desde JavaScript:
+        response =service.profesores.getProfesores().execute()
+        '''
+        #Identificación del módulo en el que estamos.
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+
+        #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el recurso al que queremos conectarnos.
+        url+="profesores"
+        if v:
+            print str(url)
+        #Al no especificar nada se llama al método GET de la URL.
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaProfesores = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        profesoresItems= []
+        #Que rellenamos con todo los profesores de la listaProfesores
+        for profesore in listaProfesores:
+            profesoresItems.append(Profesor( nombre=str(alumno.get('nombre')), dni=str(alumno.get('dni'))  ))
+
+        #Los adaptamos al tipo de mensaje y enviamos
+        #return Greeting(message=str(result.content))
+        return ListaAlumnos(alumnos=alumnosItems)
+
+
+
+
+
+
+
+
+
+
+
 
 
 

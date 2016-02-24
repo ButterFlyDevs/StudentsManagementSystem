@@ -94,8 +94,26 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
   //$scope.id = $stateParams.estudianteID;
   $scope.id=$stateParams.estudianteID;
 
-  //Mockearemos un poco:
 
+  var ROOT = 'http://localhost:8001/_ah/api';
+  gapi.client.load('helloworld', 'v1', null, ROOT);
+  gapi.client.helloworld.alumnos.getAlumno({'dni':$stateParams.estudianteID}).execute(function(resp) {
+
+
+    console.log(resp);
+    $scope.alumno = resp;
+    console.log(resp.nombre);
+    $scope.$apply();
+    /*
+    $scope.es=resp.alumno;
+    //Tenemos que hacer esto para que se aplique scope ya que la llamada a la API está fuera de Angular
+    $scope.$apply();
+    */
+  });
+
+
+  //Mockearemos un poco:
+  /*
   var Estudiante = new Object();
   Estudiante.edad = "15";
   Estudiante.nombre = "Eduardo Manos Tijeras";
@@ -106,6 +124,7 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
 
   //En realidad debería de llamarse a la api para conseguir todos los datos del usuario.
   $scope.es = Estudiante;
+  */
 
   //Implementación de las acciones que se producen cuando el BOTÓN ELIMINAR se pulsa.
   $scope.ButtonClick = function(){
@@ -135,7 +154,7 @@ routerApp.controller('ControladorEjemplo', function ($scope) {
  //service.greetings().listGreeting().execute()
         // Get the list of previous scores
 
-    gapi.client.helloworld.greetings.getAlumnos().execute(function(resp) {
+    gapi.client.helloworld.alumnos.getAlumnos().execute(function(resp) {
       //console.log(resp);
       //console.log("after");
       //console.log(resp.alumnos);
