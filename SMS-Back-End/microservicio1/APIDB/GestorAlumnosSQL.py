@@ -9,7 +9,7 @@ import MySQLdb
 from Alumno import *
 from Profesor import *
 from Asignatura import *
-from Curso import *
+from Clase import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 
@@ -365,9 +365,9 @@ class GestorAlumnos:
             db.close()
 
     @classmethod
-    def getCursos(self, dniAlumno):
+    def getClases(self, dniAlumno):
         """
-        Devuelve una lista con cursos en los que ese alumno está matriculado, aunque en la mayoría de los casos será uno.
+        Devuelve una lista con las clases en las que ese alumno está matriculado, aunque en la mayoría de los casos será una.
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -377,7 +377,7 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Matricula, Curso where Matricula.id_curso=Curso.id and id_alumno="+dniAlumno+";"
+        query="select * from Matricula, Curso from Matriculawhere id_alumno="+dniAlumno+";"
 
         try:
             salida = cursor.execute(query);
@@ -395,13 +395,13 @@ class GestorAlumnos:
             row = cursor.fetchone()
             lista = []
             while row is not None:
-                curso = Curso()
+                clase = Clase()
                 #En esta consulta el identificador de la asignatura se encuentra en la primera posicion.
-                curso.id=row[3]
-                curso.curso=row[4]
-                curso.grupo=row[5]
-                curso.nivel=row[6]
-                lista.append(curso)
+                clase.id=row[3]
+                clase.curso=row[4]
+                clase.grupo=row[5]
+                clase.nivel=row[6]
+                lista.append(clase)
                 #print row[0], row[1]
                 row = cursor.fetchone()
 

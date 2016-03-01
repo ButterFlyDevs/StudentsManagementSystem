@@ -10,7 +10,7 @@ import MySQLdb
 from Profesor import *
 from Alumno import *
 from Asignatura import *
-from Curso import *
+from Clase import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
@@ -261,7 +261,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Matricula, Imparte where Matricula.id_curso = Imparte.id_curso and Matricula.id_asignatura = Imparte.id_asignatura and id_profesor ="+dniProfesor+";"
+        query="select * from Matricula, Imparte where Matricula.curso = Imparte.curso and Matricula.grupo = Imparte.grupo and Matricula.nivel = Imparte.nivel and Matricula.id_asignatura = Imparte.id_asignatura and id_profesor ="+dniProfesor+";"
 
         try:
             salida = cursor.execute(query);
@@ -279,8 +279,8 @@ class GestorProfesores:
             lista = []
             while row is not None:
                 alumno = Alumno()
-
-                alumno.dni=row[2]
+                alumno.nombre=row[0]
+                alumno.dni=row[1]
                 lista.append(alumno)
                 #print row[0], row[1]
                 row = cursor.fetchone()
@@ -303,7 +303,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Imparte, Asignatura where Imparte.id_asignatura=Asignatura.id and id_profesor="+dniProfesor+";"
+        query="select * from Imparte where id_profesor="+dniProfesor+";"
 
         try:
             salida = cursor.execute(query);
@@ -336,9 +336,9 @@ class GestorProfesores:
             db.close()
 
     @classmethod
-    def getCursos(self, dniProfesor):
+    def getClases(self, dniProfesor):
         """
-        Devuelve una lista con cursos en los que ese profesor da clase, normalmente será al menos uno.
+        Devuelve una lista con las clases en los que ese profesor da clase, normalmente será al menos uno.
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -348,7 +348,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Imparte, Curso where Imparte.id_curso=Curso.id and id_profesor="+dniProfesor+";"
+        query="select distinct curso, grupo, nivel from Imparte where id_profesor="+dniProfesor+";"
 
         try:
             salida = cursor.execute(query);
@@ -366,13 +366,13 @@ class GestorProfesores:
             row = cursor.fetchone()
             lista = []
             while row is not None:
-                curso = Curso()
+                clase = Clase()
                 #En esta consulta el identificador de la asignatura se encuentra en la primera posicion.
-                curso.id=row[3]
-                curso.curso=row[4]
-                curso.grupo=row[5]
-                curso.nivel=row[6]
-                lista.append(curso)
+                clase.id=row[3]
+                clase.curso=row[4]
+                clase.grupo=row[5]
+                clase.nivel=row[6]
+                lista.append(clase)
                 #print row[0], row[1]
                 row = cursor.fetchone()
 

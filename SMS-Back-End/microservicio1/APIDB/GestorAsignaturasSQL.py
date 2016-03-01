@@ -8,7 +8,7 @@ Last mod: Feb 2016
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 from Asignatura import *
-from Curso import *
+from Clase import *
 from Profesor import *
 from Alumno import *
 #Uso de variables generales par la conexión a la BD.
@@ -212,9 +212,9 @@ class GestorAsignaturas:
             return 'Elemento no encontrado'
 
     @classmethod
-    def getCursos(self, idAsignatura):
+    def getClases(self, idAsignatura):
         '''
-        Devuelve una lista con todos los cursos donde se imparte la asignatura.
+        Devuelve una lista con todos los clases donde se imparte la asignatura.
         '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -233,12 +233,14 @@ class GestorAsignaturas:
         lista = []
 
         while row is not None:
-            curso = Curso()
+            clase = Clase()
             #print "LISTA SUPER CHACHI"
 
-            curso.id=row[0]
+            clase.curso=row[0]
+            clase.grupo=row[1]
+            clase.nivel=row[2]
 
-            lista.append(curso)
+            lista.append(clase)
             #print row[0], row[1]
             row = cursor.fetchone()
 

@@ -3,4 +3,4 @@
 host='localhost'
 user='root'
 password='root'
-db='smm'
+db='sms'
