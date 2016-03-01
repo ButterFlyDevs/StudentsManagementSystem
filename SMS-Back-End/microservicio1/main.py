@@ -10,6 +10,7 @@ import jsonpickle
 from APIDB.GestorAlumnosSQL import GestorAlumnos
 from APIDB.GestorProfesoresSQL import GestorProfesores
 from APIDB.GestorAsignaturasSQL import GestorAsignaturas
+from APIDB.GestorCursosSQL import GestorCursos
 
 app = Flask(__name__)
 
@@ -134,9 +135,9 @@ def getCursosAlumno(id_alumno):
     return jsonpickle.encode(GestorAlumnos.getCursos(id_alumno))
 
 
-############################
+###############################
 #   COLECCIÓN PROFESORES      #
-############################
+###############################
 
 @app.route('/profesores',methods=['GET'])
 def getProfesores():
@@ -348,9 +349,80 @@ def getCursosAsignaturas(id_asignatura):
 
 
 
+############################
+#   COLECCIÓN CURSOS       #
+############################
 
 
+@app.route('/cursos',methods=['GET'])
+def getCursos():
+    '''
+    Devuelve una lista con todos los cursos registradas en el sistema.
+    > curl -i -X GET localhost:8002/cursos
+    '''
+    return jsonpickle.encode(GestorCursos.getCursos())
 
+
+@app.route('/cursos',methods=['POST'])
+def postCurso():
+    '''
+    Inserta un nuevo curso en el sistema.
+    curl -d "id=" -i -X POST localhost:8002/cursos
+    '''
+    if 'id' in request.form:
+        salida = GestorCursos.nuevoCurso(request.form['id'],request.form['curso'], request.form['grupo'], request.form['nivel'])
+        if salida == 'OK':
+            return 'OK'
+        else:
+            abort(404)
+    else:
+        abort(404)
+
+
+#########################
+#   ENTIDAD CURSO       #
+#########################
+
+@app.route('/cursos/<string:id_curso>',methods=['GET'])
+def getCurso(id_curso):
+    '''
+    Devuelve toda la información sobre el curso que se pasa el id.
+    curl -i -X GET localhost:8002/cursos/ln
+
+    '''
+
+    salida=GestorCursos.getCurso(id_curso)
+    if salida=="Elemento no encontrado":
+        #Enviamos el error de NotFound
+        abort(404)
+    else:
+        return jsonpickle.encode(salida)
+
+
+@app.route('/cursos/<string:id_curso>/alumnos',methods=['GET'])
+def getAlumnosCurso(id_curso):
+    '''
+    Devuelve todos los alumnos que se encuentran matriculados en ese curso.
+    curl -i -X GET localhost:8002/cursos/fr/alumnos
+    '''
+    return jsonpickle.encode(GestorCursos.getAlumnos(id_curso))
+
+
+@app.route('/cursos/<string:id_curso>/profesores', methods=['GET'])
+def getProfesoresCurso(id_curso):
+    '''
+    Devuelve una lista con los profesores que imparten clase a un grupo
+    curl -i -X GET localhost:8002/curso/1ESOA/profesores
+    '''
+    return jsonpickle.encode(GestorCursos.getProfesores(id_curso))
+
+@app.route('/cursos/<string:id_curso>/asignaturas', methods=['GET'])
+def getAsignaturasCurso(id_curso):
+    '''
+    Devuelve una lista con las asignaturas que se imparten a un curso.
+    curl -i -X GET localhost:8002/curso/1ESOA/asignaturas
+    '''
+    return jsonpickle.encode(GestorCursos.getAsignaturas(id_curso))
 
 
 

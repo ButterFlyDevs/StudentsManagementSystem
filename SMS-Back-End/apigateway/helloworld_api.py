@@ -486,7 +486,7 @@ class HelloWorldApi(remote.Service):
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
 
-        #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
         #Añadimos el recurso al que queremos conectarnos.
         url+="profesores"
@@ -507,18 +507,6 @@ class HelloWorldApi(remote.Service):
         #Los adaptamos al tipo de mensaje y enviamos
         #return Greeting(message=str(result.content))
         return ListaAlumnos(alumnos=alumnosItems)
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
