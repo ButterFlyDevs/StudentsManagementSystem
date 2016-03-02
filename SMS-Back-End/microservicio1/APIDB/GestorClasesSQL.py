@@ -38,7 +38,7 @@ class GestorClases:
         curso='\''+curso+'\''
         grupo='\''+grupo+'\''
         nivel='\''+nivel+'\''
-        descripcion='\''+descripcion=+'\''
+        descripcion='\''+descripcion+'\''
 
         query="INSERT INTO Clase VALUES("+curso+","+grupo+","+nivel+","+descripcion+");"
         if v:

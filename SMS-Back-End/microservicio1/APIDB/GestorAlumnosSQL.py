@@ -13,6 +13,9 @@ from Clase import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 
+#Para activar el modo verbose
+v = False
+
 class GestorAlumnos:
     """
     Clase manejadora de la entidad Alumno de la base de datos que ofrece una interfaz de gestión que simplifica y abstrae el uso.
@@ -50,6 +53,9 @@ class GestorAlumnos:
 
 
         query="INSERT INTO Alumno VALUES("+nombre+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nac+","+telefono+");"
+
+        if v:
+            print query
 
         cursor = db.cursor()
         salida =''

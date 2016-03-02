@@ -1,2 +1,3 @@
 *.pyc
-google_appengine
+SMS-Back-End/microservicio1/lib/
+google_appengine/

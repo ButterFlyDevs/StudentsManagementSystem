@@ -10,7 +10,7 @@ import jsonpickle
 from APIDB.GestorAlumnosSQL import GestorAlumnos
 from APIDB.GestorProfesoresSQL import GestorProfesores
 from APIDB.GestorAsignaturasSQL import GestorAsignaturas
-from APIDB.GestorCursosSQL import GestorCursos
+from APIDB.GestorClasesSQL import GestorClases
 
 app = Flask(__name__)
 
@@ -34,10 +34,10 @@ def delAlumnos():
 def postAlumno():
     '''
     Método que inserta un nuevo alumno en el sistema.
-    curl -d "nombre=Juan&dni=45601218Z&direccion=Calle arabl&localidad=Jerez de la frontera&provincia=Granada&fecha_nac=1988-2-6&telefono=677164459" -i -X POST localhost:8080/alumnos
+    curl -d "nombre=Juan&dni=45601218Z&direccion=Calle arabl&localidad=Jerez de la frontera&provincia=Granada&fecha_nac=1988-2-6&telefono=677164459" -i -X POST localhost:8002/alumnos
     '''
     if 'dni' in request.form:
-        #Presente el DNI al menos podemos grabar el alumno en el sistema.        r
+        #Presente el DNI al menos podemos grabar el alumno en el sistema.
         #Se devuelve la salida de control de
         salida = GestorAlumnos.nuevoAlumno(request.form['nombre'],
                                   request.form['dni'],
@@ -63,7 +63,7 @@ def getAlumno(id_alumno):
     '''
     Devuelve todos los datos de un alumno buscado por su id
     en caso de existir en la base de datos.
-    curl -i -X GET localhost:8080/alumnos/11223344A
+    curl -i -X GET localhost:8002/alumnos/11223344A
 
     '''
     #Si no tiene el número correcto de caracteres el identificador.
@@ -127,12 +127,13 @@ def getAsignaturasAlumno(id_alumno):
     '''
     return jsonpickle.encode(GestorAlumnos.getAsignaturas(id_alumno))
 
-@app.route('/alumnos/<string:id_alumno>/cursos',methods=['GET'])
-def getCursosAlumno(id_alumno):
+@app.route('/alumnos/<string:id_alumno>/clases',methods=['GET'])
+def getClasesAlumnos(id_alumno):
     '''
-    curl -i -X GET localhost:8080/alumnos/1/cursos
+    Devuelve las clases a en las que está matriculado el alumno, como 1AESO o 2CBACH.
+    curl -i -X GET localhost:8080/alumnos/1/clases
     '''
-    return jsonpickle.encode(GestorAlumnos.getCursos(id_alumno))
+    return jsonpickle.encode(GestorAlumnos.getClases(id_alumno))
 
 
 ###############################
@@ -249,10 +250,10 @@ def getAsignaturasProfesor(id_profesor):
     '''
     return jsonpickle.encode(GestorProfesores.getAsignaturas(id_profesor))
 
-@app.route('/profesores/<string:id_profesor>/cursos',methods=['GET'])
+@app.route('/profesores/<string:id_profesor>/clases',methods=['GET'])
 def getCursosProfesor(id_profesor):
     '''
-    curl -i -X GET localhost:8080/profesores/1/cursos
+    curl -i -X GET localhost:8080/profesores/1/clases
     '''
     return jsonpickle.encode(GestorProfesores.getCursos(id_profesor))
 
@@ -338,11 +339,11 @@ def getProfesoresAsignatura(id_asignatura):
     '''
     return jsonpickle.encode(GestorAsignaturas.getProfesores(id_asignatura))
 
-@app.route('/asignaturas/<string:id_asignatura>/cursos',methods=['GET'])
+@app.route('/asignaturas/<string:id_asignatura>/clases',methods=['GET'])
 def getCursosAsignaturas(id_asignatura):
     '''
-    Devuelve una lista con los cursos en los que se imparte esa asignatura.
-    curl -i -X GET localhost:8002/asignaturas/fr/cursos
+    Devuelve una lista con los clases en los que se imparte esa asignatura.
+    curl -i -X GET localhost:8002/asignaturas/fr/clases
     '''
     return jsonpickle.encode(GestorAsignaturas.getCursos(id_asignatura))
 
@@ -350,27 +351,27 @@ def getCursosAsignaturas(id_asignatura):
 
 
 ############################
-#   COLECCIÓN CURSOS       #
+#   COLECCIÓN CLASES       #
 ############################
 
 
-@app.route('/cursos',methods=['GET'])
+@app.route('/clases',methods=['GET'])
 def getCursos():
     '''
-    Devuelve una lista con todos los cursos registradas en el sistema.
-    > curl -i -X GET localhost:8002/cursos
+    Devuelve una lista con todos los clases registradas en el sistema.
+    > curl -i -X GET localhost:8002/clases
     '''
-    return jsonpickle.encode(GestorCursos.getCursos())
+    return jsonpickle.encode(GestorClases.getClases())
 
 
-@app.route('/cursos',methods=['POST'])
+@app.route('/clases',methods=['POST'])
 def postCurso():
     '''
-    Inserta un nuevo curso en el sistema.
-    curl -d "id=" -i -X POST localhost:8002/cursos
+    Inserta una nueva clase en el sistema.
+    curl -d "id=" -i -X POST localhost:8002/clases
     '''
     if 'id' in request.form:
-        salida = GestorCursos.nuevoCurso(request.form['id'],request.form['curso'], request.form['grupo'], request.form['nivel'])
+        salida = GestorClases.nuevoCurso(request.form['id'],request.form['curso'], request.form['grupo'], request.form['nivel'])
         if salida == 'OK':
             return 'OK'
         else:
@@ -380,18 +381,18 @@ def postCurso():
 
 
 #########################
-#   ENTIDAD CURSO       #
+#   ENTIDAD CLASE       #
 #########################
 
-@app.route('/cursos/<string:id_curso>',methods=['GET'])
+@app.route('/clases/<string:id_clase>',methods=['GET'])
 def getCurso(id_curso):
     '''
     Devuelve toda la información sobre el curso que se pasa el id.
-    curl -i -X GET localhost:8002/cursos/ln
+    curl -i -X GET localhost:8002/clases/ln
 
     '''
 
-    salida=GestorCursos.getCurso(id_curso)
+    salida=GestorClases.getClase(id_curso)
     if salida=="Elemento no encontrado":
         #Enviamos el error de NotFound
         abort(404)
@@ -399,30 +400,30 @@ def getCurso(id_curso):
         return jsonpickle.encode(salida)
 
 
-@app.route('/cursos/<string:id_curso>/alumnos',methods=['GET'])
+@app.route('/clases/<string:id_clase>/alumnos',methods=['GET'])
 def getAlumnosCurso(id_curso):
     '''
     Devuelve todos los alumnos que se encuentran matriculados en ese curso.
-    curl -i -X GET localhost:8002/cursos/fr/alumnos
+    curl -i -X GET localhost:8002/clases/fr/alumnos
     '''
-    return jsonpickle.encode(GestorCursos.getAlumnos(id_curso))
+    return jsonpickle.encode(GestorClases.getAlumnos(id_curso))
 
 
-@app.route('/cursos/<string:id_curso>/profesores', methods=['GET'])
+@app.route('/clases/<string:id_clase>/profesores', methods=['GET'])
 def getProfesoresCurso(id_curso):
     '''
     Devuelve una lista con los profesores que imparten clase a un grupo
     curl -i -X GET localhost:8002/curso/1ESOA/profesores
     '''
-    return jsonpickle.encode(GestorCursos.getProfesores(id_curso))
+    return jsonpickle.encode(GestorClases.getProfesores(id_curso))
 
-@app.route('/cursos/<string:id_curso>/asignaturas', methods=['GET'])
+@app.route('/clases/<string:id_curso>/asignaturas', methods=['GET'])
 def getAsignaturasCurso(id_curso):
     '''
     Devuelve una lista con las asignaturas que se imparten a un curso.
     curl -i -X GET localhost:8002/curso/1ESOA/asignaturas
     '''
-    return jsonpickle.encode(GestorCursos.getAsignaturas(id_curso))
+    return jsonpickle.encode(GestorClases.getAsignaturas(id_curso))
 
 
 
