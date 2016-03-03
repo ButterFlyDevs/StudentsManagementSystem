@@ -5,10 +5,12 @@ ofrece una interface de gestión que simplifica y abstrae el uso.
 class Alumno:
 
     def __init__(self):
+        self.id = ""
         self.nombre = ""
+        self.apellidos= ""
         self.dni = ""
         self.direccion = ""
         self.localidad = ""
         self.provincia = ""
-        self.fecha_nac = ""
+        self.fecha_nacimiento = ""
         self.telefono = ""

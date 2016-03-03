@@ -13,7 +13,7 @@ from Clase import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 
-#Para activar el modo verbose
+#Para activar/desactivar el modo verbose para muestra de mensajes.
 v = False
 
 class GestorAlumnos:
@@ -23,36 +23,48 @@ class GestorAlumnos:
     """
 
     @classmethod
-    def nuevoAlumno(self, nombre, dni, direccion, localidad, provincia, fecha_nac, telefono):
+    def nuevoAlumno(self, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
         """
         Introduce un nuevo alumno en la base de datos.
-        Argumentos:
-        nombre -- Nombre completo del alumno
-        dni -- DNI del alumno, que será la clave de este.
+        El único argumento que se necesita como mínimo es el nombre.
 
-        Extra de prog:
-
-        Podríamos programarlo para que independientemente del número de parámetros se guardara en la base de datos,
-        así sólo habría que pasarle una lista y funcionaría siempre. Podría sen interesante.
-        O que los paŕametros así como sus nombrs se definieran en algún sitio donde poder conslutaros y así cualquier modificación
-        se hace solo en un lugar.
-
+        El resto de parámetros pueden pasarse o no. En caso de hacerlo no es necesario que se haga en orden, especificando
+        el parámetro que estamos pasando. Esta es una característica de python.
+        Así la llamada: GestorAlumnos.nuevoAlumno('Maria')
+        realizaría la query: INSERT INTO Alumno VALUES(NULL,'Maria',NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+        y la llamada: GestorAlumnos.nuevoAlumno('Maria', apellidos='Fernández García')
+        realizaría la query:
+        INSERT INTO Alumno VALUES(NULL,'Maria','Fernández García',NULL,NULL,NULL,NULL,NULL,NULL);
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Alumno values("+"'"+nombre+"', "+ "'"+dni+"');"
 
-        #Añadimos al principio y al final una comilla simple a todos los elementos.
+        #Añadimos al principio y al final una comilla simple a todos los elementos que no sean NULL(si lo son no queremos ponerle dos '' )
         nombre='\''+nombre+'\''
-        dni='\''+dni+'\''
-        direccion='\''+direccion+'\''
-        localidad='\''+localidad+'\''
-        provincia='\''+provincia+'\''
-        fecha_nac='\''+fecha_nac+'\''
-        telefono='\''+telefono+'\''
+        if(apellidos!='NULL'):
+            apellidos='\''+apellidos+'\''
+        #DNI se pasa como un entero y no es necesario comillarlo.
+        if(direccion!='NULL'):
+            direccion='\''+direccion+'\''
+        if(localidad!='NULL'):
+            localidad='\''+localidad+'\''
+        if(provincia!='NULL'):
+            provincia='\''+provincia+'\''
+        if(fecha_nacimiento!='NULL'):
+            fecha_nacimiento='\''+fecha_nacimiento+'\''
+        if(telefono!='NULL'):
+            telefono='\''+telefono+'\''
 
 
-
-        query="INSERT INTO Alumno VALUES("+nombre+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nac+","+telefono+");"
+        '''
+        Como en la base de datos existe un valor id para el alumno que se autoincrementa no podemos introducir los datos así:
+        query="INSERT INTO Alumno VALUES("+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nac+","+telefono+");"
+        hay que especificar los campos sin este id, así:
+        query='INSERT INTO Alumno (nombre, apellidos, ...) VALUES (...)'
+        o pasar simplemente NULL.
+        '''
+        #NULL por el campo id que es primary key y que se autoincrementa automat por la definición de la tabla Alumno en la BD. (ver DBCreator_v0_1.sql)
+        query="INSERT INTO Alumno VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
 
         if v:
             print query
@@ -86,6 +98,10 @@ class GestorAlumnos:
 
     @classmethod
     def getAlumnos(self):
+        '''
+        Devuelve una lista de todos los alumnos almacenados en la base de datos simplificada, solo con los
+        campos id, nombre y apellidos.
+        '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
@@ -104,8 +120,9 @@ class GestorAlumnos:
             alumno = Alumno()
             #print "LISTA SUPER CHACHI"
 
-            alumno.nombre=row[0]
-            alumno.dni=row[1]
+            alumno.id=row[0]
+            alumno.nombre=row[1]
+            alumno.apellidos=row[2]
             lista.append(alumno)
             #print row[0], row[1]
             row = cursor.fetchone()
@@ -118,17 +135,18 @@ class GestorAlumnos:
         #Una de las opciones es convertirlo en un objeto y devolverlo
 
     @classmethod
-    def getAlumno(self, dniAlumno):
+    def getAlumno(self, idAlumno):
         """
-        Recupera ``TODA`` la información de un alumno en concreto a través de la clave primaria, su DNI.
+        Recupera ``TODA`` la información de un alumno en concreto a través de su id.
 
         Argumentos:
-            dniAlumno: El primer parámetro
+            idAlumno: identificador unívoco del alumno en la tabla
 
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query="select * from Alumno where dni='"+dniAlumno+"';"
+        idAlumno='\''+idAlumno+'\''
+        query='select * from Alumno where id='+idAlumno+';'
 
         try:
             salida = cursor.execute(query);
@@ -149,20 +167,22 @@ class GestorAlumnos:
             #Como se trata de toda la información al completo usaremos todos los campos de la clase alumno.
             #La api del mservicio envia estos datos en JSON sin comprobar nada
             alm = Alumno()
-            alm.nombre=row[0]
-            alm.dni=row[1]
-            alm.direccion=row[2]
-            alm.localidad=row[3]
-            alm.provincia=row[4]
-            alm.fecha_nac=row[5]
-            alm.telefono=row[6]
+            alm.id=row[0]
+            alm.nombre=row[1]
+            alm.apellidos=row[2]
+            alm.dni=row[3]
+            alm.direccion=row[4]
+            alm.localidad=row[5]
+            alm.provincia=row[6]
+            alm.fecha_nacimiento=row[7]
+            alm.telefono=row[8]
 
             return alm
         if salida==0:
             return 'Elemento no encontrado'
 
     @classmethod
-    def modAlumno(self, dniAlumno, campoACambiar, nuevoValor):
+    def modAlumno(self, idAlumno, campoACambiar, nuevoValor):
         """
         Esta función permite cambiar cualquier atributo de un alumno.
         Parámetros:
@@ -171,8 +191,8 @@ class GestorAlumnos:
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
-        dniAlumno='\''+dniAlumno+'\''
-        query="UPDATE Alumno SET "+campoACambiar+"="+nuevoValor+" WHERE dni="+dniAlumno+";"
+        idAlumno='\''+idAlumno+'\''
+        query="UPDATE Alumno SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idAlumno+";"
 
 
 
@@ -206,11 +226,11 @@ class GestorAlumnos:
             return 'Elemento no encontrado'
 
     @classmethod
-    def delAlumno(self, dniAlumno):
+    def delAlumno(self, idAlumno):
         #print "Intentado eliminar alumno con dni "+str(dniAlumno)
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Alumno where dni='"+dniAlumno+"';"
+        query='delete from Alumno where id='+idAlumno+';'
         salida =''
         try:
             salida = cursor.execute(query);
@@ -239,9 +259,7 @@ class GestorAlumnos:
 
     @classmethod
     def getNumAlumnos(self):
-        """
-        Devuelve el número de alumnos de la BD"
-        """
+        '''Devuelve el número de alumnos de la BD'''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
         query="select count(*) from Alumno;"

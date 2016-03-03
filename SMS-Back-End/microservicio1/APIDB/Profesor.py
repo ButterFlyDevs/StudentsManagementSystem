@@ -6,10 +6,10 @@ class Profesor:
 
     def __init__(self):
         self.nombre = ""
+        self.apellidos = ""
         self.dni = ""
         self.direccion = ""
         self.localidad = ""
         self.provincia = ""
-        self.fecha_nac = ""
-        self.telefonoA = ""
-        self.telefonoB = ""
+        self.fecha_nacimiento = ""
+        self.telefono = ""

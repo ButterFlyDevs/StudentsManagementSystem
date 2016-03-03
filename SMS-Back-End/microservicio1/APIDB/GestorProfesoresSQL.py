@@ -25,22 +25,30 @@ class GestorProfesores:
     """
 
     @classmethod
-    def nuevoProfesor(self, nombre, dni, direccion, localidad, provincia, fecha_nac, telefonoA, telefonoB):
+    def nuevoProfesor(self, nombre, dni, apellidos='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
+        '''
+        Introduce un nuevo elemento Profesor en la base de datos.
+        Necesita como mínimo un nombre y un dni
+        '''
 
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
-        #query="INSERT INTO Profesor values("+"'"+nombre+"', "+ "'"+dni+"');"
 
-        #Añadimos al principio y al final una comilla simple a todos los elementos.
         nombre='\''+nombre+'\''
-        dni='\''+dni+'\''
-        direccion='\''+direccion+'\''
-        localidad='\''+localidad+'\''
-        provincia='\''+provincia+'\''
-        fecha_nac='\''+fecha_nac+'\''
-        telefonoA='\''+telefonoA+'\''
-        telefonoB='\''+telefonoB+'\''
+        if(apellidos!='NULL'):
+            apellidos='\''+apellidos+'\''
+        #DNI se pasa como un entero y no es necesario comillarlo.
+        if(direccion!='NULL'):
+            direccion='\''+direccion+'\''
+        if(localidad!='NULL'):
+            localidad='\''+localidad+'\''
+        if(provincia!='NULL'):
+            provincia='\''+provincia+'\''
+        if(fecha_nacimiento!='NULL'):
+            fecha_nacimiento='\''+fecha_nacimiento+'\''
+        if(telefono!='NULL'):
+            telefono='\''+telefono+'\''
 
-        query="INSERT INTO Profesor VALUES("+nombre+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nac+","+telefonoA+","+telefonoB+");"
+        query="INSERT INTO Profesor VALUES("+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
 
         if v:
             print '\n'+query
@@ -74,6 +82,8 @@ class GestorProfesores:
 
     @classmethod
     def getProfesores(self):
+        '''Devuelve una lista simplificada de todos los profesores registrados en el sistema, con los campos nombre,
+        apellidos y dni.'''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
@@ -92,17 +102,10 @@ class GestorProfesores:
 
         while row is not None:
             profesor = Profesor()
-            #print "LISTA SUPER CHACHI"
 
             profesor.nombre=row[0]
-            profesor.dni=row[1]
-            profesor.direccion=row[2];
-            profesor.localidad=row[3];
-            profesor.provincia=row[4];
-            profesor.fecha_nac=row[5];
-            profesor.telefonoA=row[6];
-            profesor.telefonoB=row[7];
-
+            profesor.apellidos=row[1]
+            profesor.dni=row[2]
 
             lista.append(profesor)
             #print row[0], row[1]
@@ -147,13 +150,14 @@ class GestorProfesores:
             #La api del mservicio envia estos datos en JSON sin comprobar nada
             profesor = Profesor()
             profesor.nombre=row[0]
-            profesor.dni=row[1]
-            profesor.direccion=row[2];
-            profesor.localidad=row[3];
-            profesor.provincia=row[4];
-            profesor.fecha_nac=row[5];
-            profesor.telefonoA=row[6];
-            profesor.telefonoB=row[7];
+            profesor.apellidos=row[1]
+            profesor.dni=row[2]
+            profesor.direccion=row[3];
+            profesor.localidad=row[4];
+            profesor.provincia=row[5];
+            profesor.fecha_nacimiento=row[6];
+            profesor.telefono=row[7];
+
 
             return profesor
         if salida==0:
@@ -239,6 +243,38 @@ class GestorProfesores:
         if salida==0:
             return 'Elemento no encontrado'
 
+    @classmethod
+    def getNumProfesores(self):
+        '''Devuelve el número de profesores de la BD'''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        cursor = db.cursor()
+        query="select count(*) from Profesor;"
+        salida =''
+        try:
+            salida = cursor.execute(query);
+            row = cursor.fetchone()
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+
+
+        #print str(cursor)
+        db.commit()
+
+        #print cursor.fetchone()
+        cursor.close()
+        db.close()
+
+        if salida==1:
+            return row[0]
+        if salida==0:
+            return 'Elemento no encontrado'
 
     @classmethod
     def getAlumnos(self, dniProfesor):

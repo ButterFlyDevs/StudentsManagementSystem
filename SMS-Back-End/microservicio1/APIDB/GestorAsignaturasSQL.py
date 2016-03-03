@@ -15,7 +15,7 @@ from Alumno import *
 import dbParams
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
-v=0
+v=1
 
 '''Clase controladora de Asignaturas. Que usando la clase que define el modelo de Asignatura (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
@@ -26,16 +26,15 @@ class GestorAsignaturas:
     """
 
     @classmethod
-    def nuevaAsignatura(self, id, nombre):
+    def nuevaAsignatura(self, nombre):
 
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Asignatura values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
         nombre='\''+nombre+'\''
-        id='\''+id+'\''
 
-        query="INSERT INTO Asignatura VALUES("+id+","+nombre+");"
+        query='INSERT INTO Asignatura VALUES(NULL'+','+nombre+');'
         if v:
             print '\n'+query
         cursor = db.cursor()
@@ -210,6 +209,42 @@ class GestorAsignaturas:
             return 'OK'
         if salida==0:
             return 'Elemento no encontrado'
+
+
+    @classmethod
+    def getNumAsignaturas(self):
+        '''Devuelve el número de asignaturas de la BD'''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        cursor = db.cursor()
+        query="select count(*) from Asignatura;"
+        salida =''
+        try:
+            salida = cursor.execute(query);
+            row = cursor.fetchone()
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+
+
+        #print str(cursor)
+        db.commit()
+
+        #print cursor.fetchone()
+        cursor.close()
+        db.close()
+
+        if salida==1:
+            return row[0]
+        if salida==0:
+            return 'Elemento no encontrado'
+
+
 
     @classmethod
     def getClases(self, idAsignatura):
