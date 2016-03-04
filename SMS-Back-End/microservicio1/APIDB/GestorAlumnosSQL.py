@@ -55,14 +55,14 @@ class GestorAlumnos:
         if(telefono!='NULL'):
             telefono='\''+telefono+'\''
 
-
         '''
         Como en la base de datos existe un valor id para el alumno que se autoincrementa no podemos introducir los datos así:
         query="INSERT INTO Alumno VALUES("+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nac+","+telefono+");"
         hay que especificar los campos sin este id, así:
-        query='INSERT INTO Alumno (nombre, apellidos, ...) VALUES (...)'
+        query='INSERT INTO Alumno (nombre, apellidos, ...) VALUES (...)
         o pasar simplemente NULL.
         '''
+
         #NULL por el campo id que es primary key y que se autoincrementa automat por la definición de la tabla Alumno en la BD. (ver DBCreator_v0_1.sql)
         query="INSERT INTO Alumno VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
 
@@ -311,7 +311,7 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Matricula, Imparte where Matricula.id_curso = Imparte.id_curso and Matricula.id_asignatura = Imparte.id_asignatura and id_alumno ="+dniAlumno+";"
+        query='select dni, nombre, apellidos from Profesor where dni in ( select id_profesor from Imparte where id_asignatura in (select id_asignatura from Matricula where id_alumno='+idAlumno+') and id_clase in  (select id_clase from Matricula where id_alumno='+idAlumno+'))'
 
 
         try:
@@ -354,7 +354,7 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Matricula, Asignatura where Matricula.id_asignatura=Asignatura.id and id_alumno="+dniAlumno+";"
+        query='select * from Asignatura where id in (select id_asignatura from Matricula where id_alumno='+idAlumno+')'
 
         #select * from Matricula, Asignatura where Matricula.id_asignatura=Asignatura.id and id_alumno=4;
 
@@ -401,7 +401,7 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Matricula, Curso from Matriculawhere id_alumno="+dniAlumno+";"
+        query='select * from Clase where id in(select id_clase from Matricula where id_alumno='+idAlumno+')'
 
         try:
             salida = cursor.execute(query);
