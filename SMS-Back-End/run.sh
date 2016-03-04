@@ -1,1 +1,0 @@
-google_appengine/dev_appserver.py --port=8001 --admin_port=8082 SMS-Back-End/apigateway/apigateway.yaml SMS-Back-End/microservicio1/microservicio1.yaml SMS-Back-End/microservicio2/microservicio2.yaml 
