@@ -1,0 +1,10 @@
+Para poder modificar la web sólo hay que escribir en el fuente
+pero para correrla es necesario usar Jekyll, que es lo que
+está basada.
+Para arracar el servidor web local sólo hay que hacer
+sudo jekyll serve
+dentro de la carpeta.
+Para ello hay que instalar jekyll, buscar como y para que 
+se pueda instalar hay que tener instalado ruby en una versión
+superior o igual a la 2.0.0.
+
