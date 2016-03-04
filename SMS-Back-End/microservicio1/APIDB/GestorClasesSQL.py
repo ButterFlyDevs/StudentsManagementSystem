@@ -15,7 +15,7 @@ from Profesor import  *
 import dbParams
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
-v=0
+v=1
 
 '''Clase controladora de Clases. Que usando la clase que define el modelo de Clase (la info en BD que de el se guarda)
 ofrece una interfaz de gestión que simplifica y abstrae el uso.
@@ -26,7 +26,7 @@ class GestorClases:
     """
 
     @classmethod
-    def nuevaClase(self, curso, grupo, nivel, descripcion='NULL'):
+    def nuevaClase(self, curso, grupo, nivel):
         '''
         Introduce una nueva clase en la base de datos. Son necesarios los tres primeros parámetros.
         '''
@@ -38,9 +38,8 @@ class GestorClases:
         curso='\''+curso+'\''
         grupo='\''+grupo+'\''
         nivel='\''+nivel+'\''
-        descripcion='\''+descripcion+'\''
 
-        query="INSERT INTO Clase VALUES("+curso+","+grupo+","+nivel+","+descripcion+");"
+        query="INSERT INTO Clase VALUES(NULL,"+curso+","+grupo+","+nivel+");"
         if v:
             print '\n'+query
         cursor = db.cursor()
@@ -100,8 +99,8 @@ class GestorClases:
             clase = Clase()
             clase.id=row[0]
             clase.curso=row[1]
-            clase.grupo=row[2];
-            clase.nivel=row[3];
+            clase.grupo=row[2]
+            clase.nivel=row[3]
 
 
             lista.append(clase)
@@ -115,18 +114,16 @@ class GestorClases:
         return lista
 
     @classmethod
-    def getClase(self, curso, grupo, nivel):
-        """
-        Recupera TODA la información de un Clase en concreto a través de los tres parámetros que componen su clave primaria.
+    def getClase(self, idClase):
+        '''
+        Recupera TODA la información de un Clase en concreto a través de  su clave primaria.
         Aunque ahora sea poca información, la misión de esta función es traer toda la información de esa asignatura en lugar
         de la versión reducida que trae getClases.
-        """
+        '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        curso='\''+curso+'\''
-        grupo='\''+grupo+'\''
-        nivel='\''+nivel+'\''
-        query="select * from Clase where curso="+curso+" and grupo="+grupo+" and nivel="+nivel+";"
+        idClase='\''+idClase+'\''
+        query="select * from Clase where id="+idClase+";"
         if v:
             print '\n'+query
         try:
@@ -159,23 +156,22 @@ class GestorClases:
             return 'Elemento no encontrado'
 
     @classmethod
-    def modClase(self, curso, grupo, nivel, campoACambiar, nuevoValor):
-        """
+    def modClase(self, idClase, campoACambiar, nuevoValor):
+        '''
         Esta función permite cambiar cualquier atributo de un Clase.
         Parámetros:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
-        """
+        '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
 
-        curso='\''+curso+'\''
-        grupo='\''+grupo+'\''
-        nivel='\''+nivel+'\''
+        idClase='\''+idClase+'\''
+
         #Al parámetro campoACambiar no se le añaden comillas para no generar un error de sintaxis en MySQL.
         nuevoValor='\''+nuevoValor+'\''
 
-        query="UPDATE Clase SET "+campoACambiar+"="+nuevoValor+" WHERE curso="+curso+" and grupo="+grupo+" and nivel="+nivel+";"
+        query="UPDATE Clase SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idClase+";"
         if v:
             print '\n'+query
 
@@ -206,12 +202,12 @@ class GestorClases:
             return 'Elemento no encontrado'
 
     @classmethod
-    def delClase(self, curso, grupo, nivel):
+    def delClase(self, idClase):
         if v:
-            print "Intentado eliminar Clase con id "+str(idCurso)
+            print "Intentado eliminar Clase con id "+str(idClase)
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Clase  WHERE curso="+curso+" and grupo="+grupo+" and nivel="+nivel+";"
+        query="delete from Clase  WHERE id="+idClase+";"
         salida =''
         try:
             salida = cursor.execute(query);
@@ -232,6 +228,41 @@ class GestorClases:
             return 'OK'
         if salida==0:
             return 'Elemento no encontrado'
+
+    @classmethod
+    def getNumClases(self):
+        '''Devuelve el número de clases de la BD'''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        cursor = db.cursor()
+        query="select count(*) from Clase;"
+        salida =''
+        try:
+            salida = cursor.execute(query);
+            row = cursor.fetchone()
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+
+
+        #print str(cursor)
+        db.commit()
+
+        #print cursor.fetchone()
+        cursor.close()
+        db.close()
+
+        if salida==1:
+            return row[0]
+        if salida==0:
+            return 'Elemento no encontrado'
+
+
 
     @classmethod
     def getAsignaturas(self, curso, grupo, nivel):

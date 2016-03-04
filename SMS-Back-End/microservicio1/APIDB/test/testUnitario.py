@@ -20,9 +20,11 @@ from GestorMatriculasSQL import GestorMatriculas
 #import aprovisionadorDBconInterfaz
 #Las clases para la realización de los test debe heredar de unittest.TestCase
 
-#####################
-###  ENTIDADES    ###
-#####################
+########################################################
+###  sobre ENTIDADES(tablas) y RELACIONES(tablas)    ###
+########################################################
+
+### ENTIDADES, como Alumno, Profesor... ###
 
 class TestEntidadAlumno(unittest.TestCase):
     '''
@@ -129,26 +131,6 @@ class TestEntidadAlumno(unittest.TestCase):
             resultado=True
 
         self.assertEqual(resultado,True)
-
-
-
-    ####
-    #   TESTS DE RELACIONES CON OTRAS ENTIDADES, usando aprovisionadorDBconInterfaz.py
-    ####
-    if False:
-        def test_07_ProfesoreQueImparteAAlumno(self):
-            #Ejecutamos el aprovisionamiento de la base de datos usando el aprovisionador. (la BD hasta ahora solo tiene la estructura, sin contenido)
-            aprovisionadorDBconInterfaz.aprovisiona()
-            profesores=GestorAlumnos.getProfesores('1')
-            #Devemos devolver la BD a su estado original (solo estructura)
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            #Comprobamos que al alumno 3 le dan clase tres profesores, según el aprovisionamiento hecho y la función que lo comprueba.
-            self.assertEqual(len(profesores), 2)
-            '''
-            Para probar todas las relaciones, ya que la base de datos debe quedar en su estado original para que
-            el resto de test funcionen, puede que sea mejor juntarlas en un solo test, así se aprovisionará y restaurará
-            pidiéndonos la contraseña sólo una vez y no tantas como pruebas de joins queramos hacer como la de este test.
-            '''
 
 class TestEntidadProfesor(unittest.TestCase):
 
@@ -262,29 +244,6 @@ class TestEntidadProfesor(unittest.TestCase):
 
         self.assertEqual(resultado,True)
 
-    ####
-    #   TESTS DE RELACIONES CON OTRAS ENTIDADES, usando aprovisionadorDBconInterfaz.py
-    ####
-
-    if False:
-        def test_16_AlumnosALosQueDaClaseUnProfesor(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            size=len(GestorProfesores.getAlumnos('1'))
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            self.assertEqual(size,3)
-
-        def test_17_AsignaturasQueImparteUnProfesor(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            size=len(GestorProfesores.getAsignaturas('1'))
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            self.assertEqual(size,1)
-
-        def test_18_CursosEnLosQueImparteUnProfesor(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            size=len(GestorProfesores.getCursos('1'))
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            self.assertEqual(size,1)
-
 class TestEntidadAsignatura(unittest.TestCase):
 
     #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
@@ -380,94 +339,118 @@ class TestEntidadAsignatura(unittest.TestCase):
 
         self.assertEqual(resultado,True)
 
-    ####
-    #   TESTS DE RELACIONES CON OTRAS ENTIDADES, usando aprovisionadorDBconInterfaz.py
-    ####
+class TestEntidadClase(unittest.TestCase):
+
+    # QUEDA HACER LO MISMO CON CLASE !!!!!!!
 
 
-    if False:
+    #seguir aquí!
 
-        def test_25_CursosDondeSeImparteAsignatura(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            size=len(GestorAsignaturas.getCursos('fr'))
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            self.assertEqual(size,1)
+    #HABRÍA QUE PONER LOS TEST DE RELACIONES DESPUÉS DE TODOS LOS TEST DE COLECCIONES, YA QUE LOS TEST DE
+    #RELACIONES COMPRUEBAN COSAS QUE SE TIENEN QUE ESTABLECER CON MÉTODOS DE COLLECCIONES PRIMRO.
 
-        def test_26_ProfesoresQueImparteLaAsignatura(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            size=len(GestorAsignaturas.getProfesores('fr'))
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            self.assertEqual(size,2)
 
-        def test_27_AlumnosQueCursanLaAsignatura(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            size=len(GestorAsignaturas.getAlumnos('mt'))
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            self.assertEqual(size,4)
+    #SERÍA INTERESANTE PONERLO EN OTRAS CUATRO CLASES como TestRelacionesClase que
+    #irían al final después de las de entidad de Matrícula, Asocia e Imparte
+
+
+    #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
+    def test_31_IserccionClase(self):
+        '''
+        Comprueba el método nuevaClase del gestor GestorClasesSQL.py
+        '''
+        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+
+        #1. Insertamos una clase en la base de datos y comprobamos que la salida es 'OK'
+        if GestorClases.nuevaClase('1','A','ESO') == 'OK':
+            testA=True
+        else:
+            testA=False
+
+        #2. Comprobamos que insertar una asignatura con un nombre que ya existe en la base de datos da error por elemento duplicado.
+        if GestorClases.nuevaClase('1','A','ESO') == 'Elemento duplicado':
+            testB=True
+        else:
+            testB=False
+
+        self.assertEqual(testA and testB, True)
+
+
+    def test_32_LecturaClases(self):
+        ''' Comprobación de recuperación correcta de todas las clases de la base de datos'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorClases.nuevaClase('1','B','ESO')
+        GestorClases.nuevaClase('1','C','ESO')
+        self.assertEqual(len(GestorClases.getClases()),3)
+
+
+    def test_33_LecturaClase(self):
+        ''' Comprobación de la lectura correcta de una clase'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+        GestorClases.nuevaClase('1','A','ESO')
+        self.assertNotEqual(GestorClases.getClase('1'),'Elemento no encontrado')
+
+    def test_34_ModificacionClase(self):
+        '''Comprobación de como cualquier atributo de una clase puede modificarse, método modClase de GestorClasesSQL.py'''
+        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+        #Preparamos las variables
+        testA=testB=testC=False;
+
+        #Creamos una asignatura.
+        GestorClases.nuevaClase('1','A','ESO')
+        #1. modificamos el nombre de la asignatura creada, que podremos porque no hay ninguna igual.
+        if GestorClases.modClase('1','nivel','BACH') == 'OK':
+            testA=True
+
+        #Intentamos cambiar un elemento que no existe
+        if GestorClases.modClase('2', 'nivel', 'Primaria') == 'Elemento no encontrado':
+            testB=True
+
+        #Creamos una nueva clase
+        GestorClases.nuevaClase('1','A','ESO') #LA anterior quedó como 1ABACH
+        #Intentamos cambiar un parámetro quedando como tra existente, debe de dar Elemento duplicado como error.
+        if GestorClases.modClase('2', 'nivel', 'BACH') == 'Elemento duplicado':
+            testC=True #El error se da.
+
+        #Comprobamos que el nombre ha sido cambiado.
+        self.assertEqual(testA and testB and testC, True)
+
+    def test_35_EliminacionClase(self):
+        ''' Comprobación del funcionamiento de delClase de GestorClaseSQL.py'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+        GestorClases.nuevaClase('1','A','ESO')
+        if GestorClases.delClase('1') == 'OK' and GestorClases.delClase('1') == 'Elemento no encontrado':
+            testA=True
+        else:
+            testA=False
+        self.assertEqual(testA, True)
+
+
+    def test_36_NumeroClases(self):
+        '''Comprueba que se obtiene de forma correcta el número de clases en la BD con getNumClases de GestorClasesSQL.py'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+        #Comprobamos que no existan.
+        resultado=False
+        cero=GestorClases.getNumClases()
+        print cero
+        for x in range(1, 4):
+            GestorClases.nuevaClase(str(x),'A','ESO')
+        tres=GestorClases.getNumClases()
+        GestorClases.delClase('1')
+        dos=GestorClases.getNumClases()
+
+        if cero==0 and tres==3 and dos==2:
+            resultado=True
+
+        self.assertEqual(resultado,True)
+
+### RELACIONES, (entre entidades u otras relaciones), como Matricula, Asocia... ###
+
 
 if False:
-    class TestEntidadClase(unittest.TestCase):
-
-        # QUEDA HACER LO MISMO CON CLASE !!!!!!!
-
-
-        seguir aquí!
-
-        #HABRÍA QUE PONER LOS TEST DE RELACIONES DESPUÉS DE TODOS LOS TEST DE COLECCIONES, YA QUE LOS TEST DE
-        #RELACIONES COMPRUEBAN COSAS QUE SE TIENEN QUE ESTABLECER CON MÉTODOS DE COLLECCIONES PRIMRO.
-
-
-        #SERÍA INTERESANTE PONERLO EN OTRAS CUATRO CLASES como TestRelacionesClase que
-        irían al final después de las de entidad de Matrícula, Asocia e Imparte
-
-
-        #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
-        def test_31_IserccionCurso(self):
-            self.assertEqual(GestorCursos.nuevoCurso('hhjj','1','A','ESO'), 'OK')
-
-        def test_32_LecturaCurso(self):
-            self.assertNotEqual(GestorCursos.getCurso('hhjj'),'Elemento no encontrado')
-
-        def test_33_ModificacionCurso(self):
-            #modificamos el nombre del alumnos creando en el test anterior.
-            salida=GestorCursos.modCurso('hhjj','nivel','BACH');
-
-            '''
-            Si la clave es el compuesto del resto de campos entonces hay que cambiar la clave si se cambia un
-            campo, entonces si existen relaciones con otras entidades en otras tablas con esa clave habrá
-            que cambiarlas todas. Hay que ver eso y tenerlo en cuenta. Por eso por ahora no se hara así.
-            '''
-
-            #sacamos de la base de datos el alumno.
-            curso=GestorCursos.getCurso('hhjj')
-            #Comprobamos que el nombre ha sido cambiado.
-            self.assertEqual(curso.nivel,'BACH')
-
-        def test_34_EliminacionCurso(self):
-            self.assertEqual(GestorCursos.delCurso('hhjj'),'OK')
-
-        def test_35_AsginaturasAsociadasAlCurso(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            size=len(GestorCursos.getAsignaturas('1AESO'))
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            self.assertEqual(size,1)
-
-        def test_36_AlumnosMatriculadosEnCurso(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            size=len(GestorCursos.getAlumnos('1AESO'))
-            self.assertEqual(size,3)
-
-        def test_37_ProfesoresQueImpartenEnCurso(self):
-            a=len(GestorCursos.getProfesores('1AESO'))
-            b=len(GestorCursos.getProfesores('1BESO'))
-            print a
-            print b
-            salida=False
-            if a==2 and b==1:
-                salida=True
-            #Hemos aprovechado la inicialización anterior y restauramos aquí.
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            self.assertEqual(salida,True)
 
     ### RELACIONES ###
 
@@ -648,7 +631,127 @@ if False:
             self.assertEqual(salida,'OK')
 
 
+#### léeme ####
+'''
+Una vez que se han testeado los métodos que trabajan sobre las entidades (Alumno, Profesor, Asignatura, Clase) y sobre
+las relaciones (Matricula, Asocia e Imparte) se procede a testear los métodos de las anteriores, tanto entidades
+como relaciones que comprueban que entidades concretas se relacionan bien con otras puesto que para comprobar esto
+los métodos de insercción como mínimo de todas las tablas (tanto entidades como Alumno y relaciones como Matricula)
+deben estar implementados para que el aprovisionador pueda funcionar asegurándonos de que los métodos que usa están
+testeados.
+Es por esto anterior por lo que los siguientes métodos se implementan a continuación y no antes.
+'''
+###############
 
+########################################################
+###  sobre la relación de entidades con otras        ###
+########################################################
+
+#Los métodos de las entidades que dan información de como se relacionan con otras.
+
+class Test_RELACIONES_CON_OTROS_EntidadAlumno(unittest.TestCase):
+    '''
+    Testing de los métodos que obtienen relaciones con otras entidades de la base de datos.
+    '''
+
+    ####
+    #   TESTS DE RELACIONES CON OTRAS ENTIDADES, usando aprovisionadorDBconInterfaz.py
+    ####
+    if False:
+        def test_07_ProfesoreQueImparteAAlumno(self):
+            #Ejecutamos el aprovisionamiento de la base de datos usando el aprovisionador. (la BD hasta ahora solo tiene la estructura, sin contenido)
+            aprovisionadorDBconInterfaz.aprovisiona() #PAra usarlo deben de pasarse los test anteriores.
+            profesores=GestorAlumnos.getProfesores('1')
+            #Devemos devolver la BD a su estado original (solo estructura)
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            #Comprobamos que al alumno 3 le dan clase tres profesores, según el aprovisionamiento hecho y la función que lo comprueba.
+            self.assertEqual(len(profesores), 2)
+            '''
+            Para probar todas las relaciones, ya que la base de datos debe quedar en su estado original para que
+            el resto de test funcionen, puede que sea mejor juntarlas en un solo test, así se aprovisionará y restaurará
+            pidiéndonos la contraseña sólo una vez y no tantas como pruebas de joins queramos hacer como la de este test.
+            '''
+
+class Test_RELACIONES_CON_OTROS_EntidadProfesor(unittest.TestCase):
+    '''
+    Testing de los métodos que obtienen relaciones con otras entidades de la base de datos.
+    '''
+    ####
+    #   TESTS DE RELACIONES CON OTRAS ENTIDADES, usando aprovisionadorDBconInterfaz.py
+    ####
+
+    if False:
+        def test_16_AlumnosALosQueDaClaseUnProfesor(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            size=len(GestorProfesores.getAlumnos('1'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            self.assertEqual(size,3)
+
+        def test_17_AsignaturasQueImparteUnProfesor(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            size=len(GestorProfesores.getAsignaturas('1'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            self.assertEqual(size,1)
+
+        def test_18_ClasesEnLosQueImparteUnProfesor(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            size=len(GestorProfesores.getCursos('1'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            self.assertEqual(size,1)
+
+class Test_RELACIONES_CON_OTROS_EntidadAsignatura(unittest.TestCase):
+    ####
+    #   TESTS DE RELACIONES CON OTRAS ENTIDADES, usando aprovisionadorDBconInterfaz.py
+    ####
+
+    if False:
+
+        def test_25_CursosDondeSeImparteAsignatura(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            size=len(GestorAsignaturas.getCursos('fr'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            self.assertEqual(size,1)
+
+        def test_26_ProfesoresQueImparteLaAsignatura(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            size=len(GestorAsignaturas.getProfesores('fr'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            self.assertEqual(size,2)
+
+        def test_27_AlumnosQueCursanLaAsignatura(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            size=len(GestorAsignaturas.getAlumnos('mt'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            self.assertEqual(size,4)
+
+class Test_RELACIONES_CON_OTROS_EntidadClase(unittest.TestCase):
+
+
+    #Consultas sobre las relaciones de datos.
+    if 0:
+
+        def test_35_AsginaturasAsociadasAlCurso(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            size=len(GestorCursos.getAsignaturas('1AESO'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            self.assertEqual(size,1)
+
+        def test_36_AlumnosMatriculadosEnCurso(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            size=len(GestorCursos.getAlumnos('1AESO'))
+            self.assertEqual(size,3)
+
+        def test_37_ProfesoresQueImpartenEnCurso(self):
+            a=len(GestorCursos.getProfesores('1AESO'))
+            b=len(GestorCursos.getProfesores('1BESO'))
+            print a
+            print b
+            salida=False
+            if a==2 and b==1:
+                salida=True
+            #Hemos aprovechado la inicialización anterior y restauramos aquí.
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            self.assertEqual(salida,True)
 
 
 if __name__ == '__main__':

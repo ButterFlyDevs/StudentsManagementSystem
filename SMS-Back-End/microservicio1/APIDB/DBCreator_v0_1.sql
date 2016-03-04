@@ -70,7 +70,9 @@ CREATE TABLE Clase(
   grupo CHAR(1),
   nivel CHAR(20),
   #La clave primaria la forman los tres campos que juntos no pueden ser repetidos. (Sólo puede existir una entidad con ellos)
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  #Hacemos que los tres campos sean UNIQUE para que no pueda exisir una clase con los mismos datos que otra
+  UNIQUE (curso, grupo, nivel)
 );
 
 #Creacion de la tabla para los Grupos
