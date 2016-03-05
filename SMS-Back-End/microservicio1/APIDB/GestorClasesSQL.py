@@ -265,7 +265,7 @@ class GestorClases:
 
 
     @classmethod
-    def getAsignaturas(self, curso, grupo, nivel):
+    def getAsignaturas(self, idClase):
         """
 
         Devuelve una lista con las asignaturas que se dan a esa clase.
@@ -285,8 +285,8 @@ class GestorClases:
         mysql_query="SET NAMES 'utf8'"
         cursor.execute(mysql_query)
         #-----------------------------#
-        idCurso='\''+idCurso+'\''
-        query='select * from Asocia where curso='+curso+' and grupo='+grupo+' and nivel='+nivel+';'
+        idClase='\''+idClase+'\''
+        query='select * from Asignatura where id in (select id_asignatura from Ascoia where id_clase ='+idClase')'
         if v:
             print '\n'+query
 
@@ -310,9 +310,10 @@ class GestorClases:
         return lista
 
     @classmethod
-    def getAlumnos(self, idCurso):
+    def getAlumnos(self, idClase):
         '''
         Devuelve una lista con los alumnos matriculados en esa clase.
+        Campos devueltos: id, nombre, apellidos y dni
         '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -320,13 +321,13 @@ class GestorClases:
         mysql_query="SET NAMES 'utf8'"
         cursor.execute(mysql_query)
         #-----------------------------#
-        idCurso='\''+idCurso+'\''
+        idClase='\''+idClase+'\''
         '''
         Usamos la orden distinct para eliminar los duplicados de una consulta, en este caso id_alumno ya que aparecerá
         que un mismo alumno está matriculado muchas veces en un mismo curso con asignaturas disintas, entonces para evitar
         contabilizar esos repetidos, usamos esta orden.
         '''
-        query='select distinct id_alumno from Matricula where curso='+curso+' and grupo='+grupo+' and nivel='+nivel+';'
+        query='SELECT id, nombre, apellidos, dni FROM Alumno where id in (select distinct id_alumno from Matricula where id_clase='+idClase')'
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -349,9 +350,10 @@ class GestorClases:
         return lista
 
     @classmethod
-    def getProfesores(self, idCurso):
+    def getProfesores(self, idClase):
         '''
-        Devuelve el número de profesores que están impartien a esa clase.
+        Devuelve la lista de profesores que están impartien a esa clase.
+        Devuelve dni, nombre y apellidos
         '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -359,8 +361,8 @@ class GestorClases:
         mysql_query="SET NAMES 'utf8'"
         cursor.execute(mysql_query)
         #-----------------------------#
-        idCurso='\''+idCurso+'\''
-        query='select distinct id_profesor from Imparte where curso='+curso+' and grupo='+grupo+' and nivel='+nivel+';'
+        idClase='\''+idClase+'\''
+        query='SELECT dni, nombre, apellidos from Profesor where dni in (select id_profesor from Imparte where id_clase ='+idClase')'
         if v:
             print '\n'+query
         cursor.execute(query)
