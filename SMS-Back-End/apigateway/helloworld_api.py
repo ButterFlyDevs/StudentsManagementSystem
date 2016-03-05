@@ -73,7 +73,7 @@ class DNI(messages.Message):
 class ListaAlumnos(messages.Message):
     alumnos = messages.MessageField(Alumno, 1, repeated=True)
 
-class Profesor(message.Message):
+class Profesor(messages.Message):
     nombre = messages.StringField(1)
     dni = messages.StringField(2)
 
