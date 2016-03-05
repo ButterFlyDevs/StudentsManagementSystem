@@ -334,7 +334,7 @@ class GestorAsignaturas:
         Con el distinct evitamos que si un alumno por casualidad esta matriculado en lengua de primero
         y lengua de segundo porque así se permite se contabilice como dos alumnos en el recuento, lo que sería un error.
         '''
-        query='select distinct id_alumno from Matricula where id_asignatura='+idAsignatura+';'
+        query='select id, nombre,apellidos, dni from Alumno where id in (select id_alumno from Matricula where id_asignatura ='+idAsignatura+' )'
         if v:
             print '\n'+query
         cursor.execute(query)
