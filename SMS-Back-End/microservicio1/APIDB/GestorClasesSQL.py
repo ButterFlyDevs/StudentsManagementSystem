@@ -285,7 +285,7 @@ class GestorClases:
         mysql_query="SET NAMES 'utf8'"
         cursor.execute(mysql_query)
         #-----------------------------#
-        idCurso='\''+idCurso+'\''
+        idClase='\''+idClase+'\''
         query='select * from Asignatura where id in (select id_asignatura from Ascoia where id_clase ='+idClase')'
         if v:
             print '\n'+query
@@ -321,7 +321,7 @@ class GestorClases:
         mysql_query="SET NAMES 'utf8'"
         cursor.execute(mysql_query)
         #-----------------------------#
-        idCurso='\''+idCurso+'\''
+        idClase='\''+idClase+'\''
         '''
         Usamos la orden distinct para eliminar los duplicados de una consulta, en este caso id_alumno ya que aparecerá
         que un mismo alumno está matriculado muchas veces en un mismo curso con asignaturas disintas, entonces para evitar
