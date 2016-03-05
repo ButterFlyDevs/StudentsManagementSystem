@@ -15,48 +15,46 @@ from GestorMatriculasSQL import GestorMatriculas
 
 def aprovisiona():
     #Insertamos 6 alumnos:
-    GestorAlumnos.nuevoAlumno('A','A1','---','---','---','1900-1-1','---')
-    GestorAlumnos.nuevoAlumno('B','A2','---','---','---','1900-1-1','---')
-    GestorAlumnos.nuevoAlumno('C','A3','---','---','---','1900-1-1','---')
-    GestorAlumnos.nuevoAlumno('D','A4','---','---','---','1900-1-1','---')
-    GestorAlumnos.nuevoAlumno('E','A5','---','---','---','1900-1-1','---')
-    GestorAlumnos.nuevoAlumno('F','A6','---','---','---','1900-1-1','---')
+    GestorAlumnos.nuevoAlumno('A')
+    GestorAlumnos.nuevoAlumno('B')
+    GestorAlumnos.nuevoAlumno('C')
+    GestorAlumnos.nuevoAlumno('D')
+    GestorAlumnos.nuevoAlumno('E')
+    GestorAlumnos.nuevoAlumno('F')
 
     #Insertamos 3 profesores:
-    GestorProfesores.nuevoProfesor('PA','P1','---','---','---','1900-2-1','---','---')
-    GestorProfesores.nuevoProfesor('PB','P2','---','---','---','1900-2-1','---','---')
-    GestorProfesores.nuevoProfesor('PC','P3','---','---','---','1900-2-1','---','---')
+    GestorProfesores.nuevoProfesor('PA','1')
+    GestorProfesores.nuevoProfesor('PB','2')
+    GestorProfesores.nuevoProfesor('PC','3')
 
     #Creamos dos Asignaturas:
-    GestorAsignaturas.nuevaAsignatura('fr','Frances')
-    GestorAsignaturas.nuevaAsignatura('mt','Matematicas')
-    '''
-    #Creamos dos Cursos
-    GestorCursos.nuevoCurso('1AESO','1','A','ES0')
-    GestorCursos.nuevoCurso('1BESO','1','B','ES0')
+    GestorAsignaturas.nuevaAsignatura('Frances')
+    GestorAsignaturas.nuevaAsignatura('Matematicas')
+
+    #Creamos dos Clases
+    GestorClases.nuevaClase('1','A','ES0')
+    GestorClases.nuevaClase('1','B','ES0')
 
     #Asociamos cada asignatura a un curso:
-    GestorAsociaciones.nuevaAsociacion('fr','1AESO') #En 1ºA de ESO solo se imparte la asignatura Francés
-    GestorAsociaciones.nuevaAsociacion('mt','1BESO') #En 1ºB de ESO solo se imparte la asignatura Matemáticas
-
+    GestorAsociaciones.nuevaAsociacion('1','1') #En 1ºA de ESO solo se imparte la asignatura Francés
+    GestorAsociaciones.nuevaAsociacion('2','2') #En 1ºB de ESO solo se imparte la asignatura Matemáticas
+    GestorAsociaciones.nuevaAsociacion('2','1') #En 1ºB de ESO solo se imparte la asignatura Matemáticas
 
     #Especificaremos que profesores imparten las asignaturas:
-    GestorImparte.nuevoImparte('fr','1AESO','1') #La imparte el profesor 1
-    GestorImparte.nuevoImparte('fr','1AESO','2') #La imparte el profesor 2, también.
-    GestorImparte.nuevoImparte('mt','1BESO','3') #La imparte el profesor 3
-
+    GestorImparte.nuevoImparte('1','1','1') #La imparte el profesor 1
+    GestorImparte.nuevoImparte('2','1','2') #La imparte el profesor 2, también.
+    GestorImparte.nuevoImparte('2','2','3') #La imparte el profesor 3
+    GestorImparte.nuevoImparte('2','2','2')
     #Matriculamos alumnos en las asignatura:
-    GestorMatriculas.nuevaMatricula('fr','1AESO','1')
-    GestorMatriculas.nuevaMatricula('mt','1AESO','1') #Matriculamos al mismo en dos asignaturas
-
-    GestorMatriculas.nuevaMatricula('fr','1AESO','2')
-    GestorMatriculas.nuevaMatricula('fr','1AESO','3')
-    GestorMatriculas.nuevaMatricula('mt','1BESO','4')
-    GestorMatriculas.nuevaMatricula('mt','1BESO','5')
-    GestorMatriculas.nuevaMatricula('mt','1BESO','6')
+    GestorMatriculas.nuevaMatricula('1','1','1')
+    GestorMatriculas.nuevaMatricula('2','1','1')
+    GestorMatriculas.nuevaMatricula('3','1','1')
+    GestorMatriculas.nuevaMatricula('4','2','1')
+    GestorMatriculas.nuevaMatricula('5','2','1')
+    GestorMatriculas.nuevaMatricula('6','2','2')
 
 
-    '''
+
 
 if __name__ == '__main__':
     aprovisiona()
