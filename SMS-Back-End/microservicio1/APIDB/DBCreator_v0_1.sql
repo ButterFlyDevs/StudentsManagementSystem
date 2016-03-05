@@ -79,15 +79,15 @@ CREATE TABLE Clase(
 #Un grupo es la asociación de una asignatura y un curso, por ejemplo: 1ºESO-Francés que identifica perfectamente un grupo de alumnos.
 CREATE TABLE Asocia(
 
+ id_clase INT ,
  id_asignatura INT,
- id_clase INT,
 
  #Especificamos que se trata de claves foráneas (claves primarias de otras tablas)
- FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id),
  FOREIGN KEY (id_clase) REFERENCES Clase(id),
+ FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id),
 
  #Especificamos la formación de la clave primaria en esta tabla.
- PRIMARY KEY (id_asignatura, id_clase)
+ PRIMARY KEY (id_clase, id_asignatura)
 
 );
 
