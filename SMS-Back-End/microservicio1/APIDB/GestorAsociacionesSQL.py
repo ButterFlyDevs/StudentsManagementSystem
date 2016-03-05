@@ -91,7 +91,7 @@ class GestorAsociaciones:
         while row is not None:
             asociacion = Asociacion()
             asociacion.id_asignatura=row[0]
-            asociacion.id_curso=row[1]
+            asociacion.id_clase=row[1]
 
             lista.append(asociacion)
             #print row[0], row[1]
@@ -142,7 +142,7 @@ class GestorAsociaciones:
             #La api del mservicio envia estos datos en JSON sin comprobar nada
             asociacion = Asociacion()
             asociacion.id_asignatura=row[0]
-            asociacion.id_curso=row[1]
+            asociacion.id_clase=row[1]
 
             return asociacion
         if salida==0:
@@ -194,12 +194,12 @@ class GestorAsociaciones:
             return 'Elemento no encontrado'
 
     @classmethod
-    def delAsociacion(self, id_asignatura, id_curso):
+    def delAsociacion(self, id_asignatura, id_clase):
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
         cursor = db.cursor()
         id_asignatura='\''+id_asignatura+'\''
-        id_curso='\''+id_curso+'\''
-        query="delete from Asocia where id_asignatura="+id_asignatura+" and id_curso="+id_curso+";"
+        id_clase='\''+id_clase+'\''
+        query="delete from Asocia where id_asignatura="+id_asignatura+" and id_clase="+id_clase+";"
         if v:
             print query
         salida =''
