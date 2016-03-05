@@ -308,7 +308,7 @@ class TestEntidadAsignatura(unittest.TestCase):
         #Comprobamos que el nombre ha sido cambiado.
         self.assertEqual(testA and testB and testC, True)
 
-    def test_15_EliminacionAsignatura(self):
+    def test_25_EliminacionAsignatura(self):
         '''Eliminamos una asignatura de la base de datos y comprobamos el mensaje devuelto'''
         os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         GestorAsignaturas.nuevaAsignatura('fis')
@@ -320,7 +320,7 @@ class TestEntidadAsignatura(unittest.TestCase):
 
         self.assertEqual(testA,True)
 
-    def test_16_NumeroAsignaturas(self):
+    def test_26_NumeroAsignaturas(self):
         '''Comprueba que se obtiene de forma correcta el número de asignaturas en la BD.'''
         os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         #Comprobamos que no existan.
@@ -362,7 +362,6 @@ class TestEntidadClase(unittest.TestCase):
 
         self.assertEqual(testA and testB, True)
 
-
     def test_32_LecturaClases(self):
         ''' Comprobación de recuperación correcta de todas las clases de la base de datos'''
         os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
@@ -370,7 +369,6 @@ class TestEntidadClase(unittest.TestCase):
         GestorClases.nuevaClase('1','B','ESO')
         GestorClases.nuevaClase('1','C','ESO')
         self.assertEqual(len(GestorClases.getClases()),3)
-
 
     def test_33_LecturaClase(self):
         ''' Comprobación de la lectura correcta de una clase'''
@@ -432,7 +430,9 @@ class TestEntidadClase(unittest.TestCase):
 
         self.assertEqual(resultado,True)
 
+###################################################################################
 ### RELACIONES, (entre entidades u otras relaciones), como Matricula, Asocia... ###
+###################################################################################
 
 class TestRelacionAsocia(unittest.TestCase):
     '''
@@ -574,144 +574,261 @@ class TestRelacionAsocia(unittest.TestCase):
 
         self.assertEqual(resultado,True)
 
-    if 0:
 
-        def test_45_AlumnosMAtriculadosEnUnaAsignaturaYCurso(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            sizeA=len(GestorAsociaciones.getAlumnos('mt','1AESO'))
-            sizeB=len(GestorAsociaciones.getAlumnos('fr','1AESO'))
-            sizeC=len(GestorAsociaciones.getAlumnos('mt','1BESO'))
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            salida=False
-            if sizeA==1 and sizeB==3 and sizeC==3:
-                salida=True
-            self.assertEqual(salida,True)
+class TestRelacionImparte(unittest.TestCase):
+    '''
+    Comprobación de las operaciones CRUD sobre la tabla Imparte que relaciona las entidades Curso, Asignatura y profesor de la BD.
+    '''
+    #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
+    def test_51_InserccionRelacionImparte(self):
+        '''Comprueba el método nuevoImparte del gestor GestorImpargeSQL.py'''
+        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
 
-        def test_46_ProfesoresQueImpartenEnUnCursoYAsignatura(self):
-            aprovisionadorDBconInterfaz.aprovisiona()
-            sizeA=len(GestorAsociaciones.getProfesores('mt','1AESO'))
-            sizeB=len(GestorAsociaciones.getProfesores('fr','1AESO'))
-            sizeC=len(GestorAsociaciones.getProfesores('mt','1BESO'))
-            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-            salida=False
-            if sizeA==0 and sizeB==2 and sizeC==1:
-                salida=True
-            self.assertEqual(salida,True)
+        #Preparamos las variables
+        testA=testB=testC=False;
 
+        #Creamos una realación asocia y antes una clas y una asignatura
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        GestorProfesores.nuevoProfesor('Juan', '222')
 
+        #Creamos una entidad en la tabla Imparte. id_clase=1, id_asignatura=1 y dni=222
+        if GestorImparte.nuevoImparte('1','1','222') == 'OK':
+            testA=True
+        else:
+            testA=False
 
-if False:
+        #Creamos una entidad de la tabla Imparte con algún elemento que no existe en Asocia.
+        if GestorImparte.nuevoImparte('1','1','333') == 'Alguno de los elementos no existe':
+            testB=True
+        else:
+            testB=False
 
+        #Testeamos que todas las acciones han sido correctas
+        self.assertEqual(testA and testB, True)
 
+    def test_52_LecturaImpartes(self):
+        '''Recupera la lista de todas las entidades Imparte (Clase-Asignatura-Profesor) almacenadas en la base de datos.'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
 
+        cero = len(GestorAsociaciones.getAsociaciones())
 
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        GestorProfesores.nuevoProfesor('Juan', '222')
 
+        #Creamos la entidad en la tabla Imparte
+        GestorImparte.nuevoImparte('1','1','222')
 
+        uno = len(GestorImparte.getImpartes())
 
-    ### RELACIONES ###
+        print cero
+        print uno
+        if cero == 0 and uno == 1:
+            test = True
+        else:
+            test = False
 
+        self.assertEqual(test, True)
 
+    def test_53_LecturaImparte(self):
+        ''' Comprobación de la lectura correcta de una entidad Imparte concreta'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
 
+        #Creamos una entidad en la tabla Imparte con las tres entidades que necesita para realizarse
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        GestorProfesores.nuevoProfesor('Juan', '222')
+        GestorImparte.nuevoImparte('1','1','222')
 
-    class TestRelacionImparte(unittest.TestCase):
-        '''
-        Comprobación de las operaciones CRUD sobre la tabla Imparte que relaciona las entidades Curso, Asignatura y profesor de la BD.
-        '''
-        #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
-        def test_51_InserccionRelacionImparte(self):
+        #La tupla 1, 1, 222 existe y la 1, 1 ,333 no existe.
+        if GestorImparte.getImparte('1','1','222') != 'Elemento no encontrado' and GestorImparte.getImparte('1','1','333') == 'Elemento no encontrado':
+            test=True
+        else:
+            test=False
 
-            #Creamos una asignatura
-            salidaA=GestorAsignaturas.nuevaAsignatura('fr','Frances')
-            if salidaA=='OK':
-                salidaA=True
-            else:
-                salidaA=False
+        self.assertEqual(test, True)
 
-            #Creamos un curso
-            salidaB=GestorCursos.nuevoCurso('curso','1','A','ESO')
-            if salidaB=='OK':
-                salidaB=True
-            else:
-                salidaB=False
+    def test_54_ModificacionImparte(self):
+        '''Comprobación de como cualquier atributo de una tupla en la tabla Impparte puede modificarse'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
 
-            #Creamos un profesor:
-            salidaC=GestorProfesores.nuevoProfesor('Juan','8888','C/Mesita','Peligros','Granada','1900-2-1','3242123','232332');
+        #Creamos una entidad en la tabla Imparte con las tres entidades que necesita para realizarse
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        GestorProfesores.nuevoProfesor('Juan', '222')
+        GestorProfesores.nuevoProfesor('Antonio', '333')
+        GestorImparte.nuevoImparte('1','1','222')
 
+        testA=testB=testC=False;
 
-            #Testeamos la creación de la asociación
-            salidaD=GestorImparte.nuevoImparte('fr','curso','8888')
-            if salidaD=='OK':
-                salidaD=True
-            else:
-                salidaD=False
+        #Modificamos la tupla imparte para que a esa asociacion (clase-asignatura) le imparta otro profesor.
+        if GestorImparte.modImparte('1','1','222', 'id_profesor', '333') == 'OK':
+            testA=True
 
-            #Testeamos que todas las acciones han sido correctas
-            self.assertEqual(salidaA and salidaB and salidaC and salidaD, True)
+        #Intenamos realizar otra modificación sobre una tupla que no existe
+        if GestorImparte.modImparte('1','1','222', 'id_asignatura', '6') == 'Elemento no encontrado':
+            testB=True
 
+        #Comprobamos que el nombre ha sido cambiado.
+        self.assertEqual(testA and testB, True)
 
-        def test_52_LecturaRelacionImparte(self):
-            self.assertNotEqual(GestorImparte.getImparte('fr','curso','8888'),'Elemento no encontrado')
+    def test_55_EliminacionRelacionImparte(self):
+        ''' Comprobación de la lectura correcta de una entidad Imparte concreta'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
 
+        #Creamos una entidad en la tabla Imparte con las tres entidades que necesita para realizarse
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        GestorProfesores.nuevoProfesor('Juan', '222')
+        GestorImparte.nuevoImparte('1','1','222')
 
-        def test_54_EliminacionRelacionImparte(self):
-            #Vamos a comprobar que se pueden eliminar asociaciones borrando la anterior.
-            salida=GestorImparte.delImparte('fr','curso','8888')
-            #Eliminamos los objetos creados para el test.
-            if salida=='OK':
-                GestorAsignaturas.delAsignatura('fr')
-                GestorCursos.delCurso('curso')
-                GestorProfesores.delProfesor('8888')
-            self.assertEqual(salida,'OK')
+        if GestorImparte.delImparte('1','1','222') == 'OK' and GestorImparte.delImparte('2','2','333') == 'Elemento no encontrado':
+            test = True
+        else:
+            test = False
 
-    class TestRelacionMatricula(unittest.TestCase):
-        '''
-        Comprobación de las operaciones CRUD sobre la tabla Matricula que relaciona las entidades Curso, Asignatura y alumno de la BD.
-        '''
-        #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
-        def test_51_InserccionRelacionMatricula(self):
-
-            #Creamos una asignatura
-            salidaA=GestorAsignaturas.nuevaAsignatura('fr','Frances')
-            if salidaA=='OK':
-                salidaA=True
-            else:
-                salidaA=False
-
-            #Creamos un curso
-            salidaB=GestorCursos.nuevoCurso('curso','1','A','ESO')
-            if salidaB=='OK':
-                salidaB=True
-            else:
-                salidaB=False
-
-            #Creamos un alumno:
-            salidaC=GestorAlumnos.nuevoAlumno('Juan','8888','C/Mesita','Peligros','Granada','1900-2-1','3242123')
-
-
-            #Testeamos la creación de la asociación
-            salidaD=GestorMatriculas.nuevaMatricula('fr','curso','8888')
-            if salidaD=='OK':
-                salidaD=True
-            else:
-                salidaD=False
-
-            #Testeamos que todas las acciones han sido correctas
-            self.assertEqual(salidaA and salidaB and salidaC and salidaD, True)
+        self.assertEqual(test, True)
 
 
-        def test_52_LecturaRelacionMatricula(self):
-            self.assertNotEqual(GestorMatriculas.getMatricula('fr','curso','8888'),'Elemento no encontrado')
+class TestRelacionMatricula(unittest.TestCase):
+    '''
+    Comprobación de las operaciones CRUD sobre la tabla Matricula que relaciona las entidades Clase, Asignatura y Alumno.
+    '''
+    #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
+    def test_61_InserccionRelacionMatricula(self):
+        '''Comprueba el método nuevaMatricula del gestor GestorMatriculasSQL.py'''
+        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+
+        #Preparamos las variables
+        testA=testB=testC=False;
+
+        #Creamos una realación asocia y antes una clas y una asignatura
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+
+        GestorAlumnos.nuevoAlumno('Juan')
+
+        #Creamos una entidad en la tabla Matricula. id_alumno=1, id_clase=1 y id_asignatura=1.
+        if GestorMatriculas.nuevaMatricula('1','1','1') == 'OK':
+            testA=True
+        else:
+            testA=False
+
+        #Creamos una entidad de la tabla Imparte con algún elemento que no existe, en este caso la asignatura con id 333.
+        if GestorImparte.nuevoImparte('1','1','333') == 'Alguno de los elementos no existe':
+            testB=True
+        else:
+            testB=False
+
+        #Testeamos que todas las acciones han sido correctas
+        self.assertEqual(testA and testB, True)
+
+    def test_62_LecturaMatriculas(self):
+        '''Recupera la lista de todas las entidades de la tabla Matricula (Alumno-Clase-Asignatura) almacenadas en la base de datos.'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+
+        #No debe de haber nada.
+        cero = len(GestorMatriculas.getMatriculas())
+
+        #Creamos una realación asocia y antes una clas y una asignatura
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        #Creamos un alumno
+        GestorAlumnos.nuevoAlumno('Juan')
+
+        #Creamos una entidad en la tabla Matricula. id_alumno=1, id_clase=1 y id_asignatura=1.
+        GestorMatriculas.nuevaMatricula('1','1','1')
+        #Ahora hay una
+        uno = len(GestorMatriculas.getMatriculas())
 
 
-        def test_54_EliminacionRelacionMatricula(self):
-            #Vamos a comprobar que se pueden eliminar asociaciones borrando la anterior.
-            salida=GestorMatriculas.delMatricula('fr','curso','8888')
-            #Eliminamos los objetos creados para el test.
-            if salida=='OK':
-                GestorAsignaturas.delAsignatura('fr')
-                GestorCursos.delCurso('curso')
-                GestorAlumnos.delAlumno('8888')
-            self.assertEqual(salida,'OK')
+        if cero == 0 and uno == 1:
+            test = True
+        else:
+            test = False
+
+        self.assertEqual(test, True)
+
+    def test_63_LecturaMatricula(self):
+        ''' Comprobación de la lectura correcta de una entidad de a tabla Matricula concreta'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+
+        #Creamos una realación asocia y antes una clas y una asignatura
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        #Creamos un alumno
+        GestorAlumnos.nuevoAlumno('Juan')
+        #Creamos una entidad en la tabla Matricula. id_alumno=1, id_clase=1 y id_asignatura=1.
+        GestorMatriculas.nuevaMatricula('1','1','1')
+
+        #La tupla 1, 1, 222 existe y la 1, 1 ,333 no existe.
+        if GestorMatriculas.getMatricula('1','1','1') != 'Elemento no encontrado' and GestorMatriculas.getMatricula('1','1','333') == 'Elemento no encontrado':
+            test=True
+        else:
+            test=False
+
+        self.assertEqual(test, True)
+
+    def test_64_ModificacionMatricula(self):
+        '''Comprobación de como cualquier atributo de una tupla en la tabla Impparte puede modificarse'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+
+        #Creamos una realación asocia y antes una clas y una asignatura
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        #Creamos un alumno
+        GestorAlumnos.nuevoAlumno('Juan')
+        GestorAlumnos.nuevoAlumno('Maria')
+        #Creamos una entidad en la tabla Matricula. id_alumno=1, id_clase=1 y id_asignatura=1.
+        GestorMatriculas.nuevaMatricula('1','1','1')
+
+        testA=testB=testC=False;
+
+        #Modificamos la tupla Matricula para que a esa asociacion (clase-asignatura) que está matriculado otro alumno.
+        if GestorMatriculas.modMatricula('1','1','1', 'id_alumno', '2') == 'OK':
+            testA=True
+
+        #Intenamos realizar otra modificación sobre una tupla que no existe, la matricula no existe.
+        if GestorMatriculas.modMatricula('1','1','1', 'id_asignatura', '6') == 'Elemento no encontrado':
+            testB=True
+
+        #Comprobamos que el nombre ha sido cambiado.
+        self.assertEqual(testA and testB, True)
+
+
+    def test_64_EliminacionMatricula(self):
+        '''Comprobación de la eliminación de una tupla de la tabla Matricula'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+
+        #Creamos una realación asocia y antes una clas y una asignatura
+        GestorClases.nuevaClase('1','A','ESO')
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        #Creamos un alumno
+        GestorAlumnos.nuevoAlumno('Juan')
+        GestorAlumnos.nuevoAlumno('Maria')
+        #Creamos una entidad en la tabla Matricula. id_alumno=1, id_clase=1 y id_asignatura=1.
+        GestorMatriculas.nuevaMatricula('1','1','1')
+
+        if GestorMatriculas.delMatricula('1','1','1') == 'OK' and GestorMatriculas.delMatricula('1','1','1') == 'Elemento no encontrado':
+            test = True
+        else:
+            test = False
+
+        self.assertEqual(test, True)
+
 
 
 #### léeme ####
@@ -835,6 +952,34 @@ class Test_RELACIONES_CON_OTROS_EntidadClase(unittest.TestCase):
             #Hemos aprovechado la inicialización anterior y restauramos aquí.
             os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
             self.assertEqual(salida,True)
+
+
+class Test_RELACIONES_CON_OTROS_RelacionAsocia(unittest.TestCase):
+
+    if 0:
+
+        def test_45_AlumnosMAtriculadosEnUnaAsignaturaYCurso(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            sizeA=len(GestorAsociaciones.getAlumnos('mt','1AESO'))
+            sizeB=len(GestorAsociaciones.getAlumnos('fr','1AESO'))
+            sizeC=len(GestorAsociaciones.getAlumnos('mt','1BESO'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            salida=False
+            if sizeA==1 and sizeB==3 and sizeC==3:
+                salida=True
+            self.assertEqual(salida,True)
+
+        def test_46_ProfesoresQueImpartenEnUnCursoYAsignatura(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            sizeA=len(GestorAsociaciones.getProfesores('mt','1AESO'))
+            sizeB=len(GestorAsociaciones.getProfesores('fr','1AESO'))
+            sizeC=len(GestorAsociaciones.getProfesores('mt','1BESO'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            salida=False
+            if sizeA==0 and sizeB==2 and sizeC==1:
+                salida=True
+            self.assertEqual(salida,True)
+
 
 
 if __name__ == '__main__':

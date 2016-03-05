@@ -94,35 +94,36 @@ CREATE TABLE Asocia(
 CREATE TABLE Imparte(
 
   #Añadimos la referencia de la entidad Asignatura
-  id_asignatura INT,
   id_clase INT,
+  id_asignatura INT,
   #Necesitamos una referncia del profesor:
   id_profesor INT,
 
   #Especificamos que se trata de claves foráneas.
-  FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id),
-  FOREIGN KEY (id_clase) REFERENCES Clase(id),
+  FOREIGN KEY (id_clase, id_asignatura) REFERENCES Asocia(id_clase, id_asignatura),
+#  FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id_asignatura),
   FOREIGN KEY (id_profesor) REFERENCES Profesor(dni),
 
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (id_asignatura, id_clase, id_profesor)
+  PRIMARY KEY ( id_clase, id_asignatura, id_profesor)
 
 );
 
 CREATE TABLE Matricula(
 
   #Añadimos la referencia de la entidad Asignatura
-  id_asignatura INT,
-  id_clase INT,
   #Necesitamos una referncia del alumno:
   id_alumno INT,
+  id_clase INT,
+  id_asignatura INT,
+
+
 
   #Especificamos que se trata de claves foráneas.
-  FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id),
-  FOREIGN KEY (id_clase) REFERENCES Clase(id),
+  FOREIGN KEY (id_clase, id_asignatura) REFERENCES Asocia(id_clase, id_asignatura),
   FOREIGN KEY (id_alumno) REFERENCES Alumno(id),
 
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (id_asignatura, id_clase, id_alumno)
+  PRIMARY KEY (id_alumno, id_clase, id_asignatura)
 
 );

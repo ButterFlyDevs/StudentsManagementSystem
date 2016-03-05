@@ -14,7 +14,7 @@ from Clase import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
-v=0
+v=1
 
 '''Clase controladora de profesores. Que usando la clase que define el modelo de Profesor (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.

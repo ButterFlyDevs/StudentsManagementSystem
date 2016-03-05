@@ -8,9 +8,10 @@ Last mod: Feb 2016
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 from Matricula import *
-
+#Uso de variables generales par la conexión a la BD.
+import dbParams
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
-v=0
+v=1
 
 '''Clase controladora de Matriculas. Que usando la clase que define el modelo de Matricula (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
@@ -21,17 +22,18 @@ class GestorMatriculas:
     """
 
     @classmethod
-    def nuevaMatricula(self, id_asignatura, id_curso, id_alumno):
+    def nuevaMatricula(self, id_alumno, id_clase, id_asignatura):
 
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
         #query="INSERT INTO Matricula values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
         id_asignatura='\''+id_asignatura+'\''
-        id_curso='\''+id_curso+'\''
+        id_clase='\''+id_clase+'\''
         id_alumno='\''+id_alumno+'\''
 
-        query="INSERT INTO Matricula VALUES("+id_asignatura+","+id_curso+","+id_alumno+");"
+        query="INSERT INTO Matricula VALUES ("+id_alumno+","+id_clase+","+id_asignatura+");"
+
         if v:
             print '\n'+query
         cursor = db.cursor()
@@ -67,7 +69,7 @@ class GestorMatriculas:
 
     @classmethod
     def getMatriculas(self):
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm")
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -85,11 +87,11 @@ class GestorMatriculas:
 
         while row is not None:
             matricula = Matricula()
-            matricula.id_asignatura=row[0]
-            matricula.id_curso=row[1]
-            matricula.id_alumno=row[2]
+            matricula.id_alumno=row[0]
+            matricula.id_clase=row[1]
+            matricula.id_asignatura=row[2]
 
-            lista.append(curso)
+            lista.append(matricula)
             #print row[0], row[1]
             row = cursor.fetchone()
 
@@ -98,21 +100,18 @@ class GestorMatriculas:
 
         return lista
 
-        #Una de las opciones es convertirlo en un objeto y devolverlo
 
     @classmethod
-    def getMatricula(self, id_asignatura, id_curso, id_alumno):
-        """
-        Recupera TODA la información de un Matricula en concreto a través de la clave primaria, su id.
-        """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+    def getMatricula(self, id_alumno, id_clase, id_asignatura):
+        '''Recupera TODA la información de un Matricula en concreto a través de la clave primaria.'''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
         cursor = db.cursor()
 
         id_asignatura='\''+id_asignatura+'\''
-        id_curso='\''+id_curso+'\''
+        id_clase='\''+id_clase+'\''
         id_alumno='\''+id_alumno+'\''
 
-        query="select * from Matricula where id_asignatura="+id_asignatura+" and id_curso="+id_curso+" and id_alumno="+id_alumno+";"
+        query="select * from Matricula where id_alumno="+id_alumno+" and id_clase="+id_clase+" and id_asignatura="+id_asignatura+";"
         if v:
             print '\n'+query
         try:
@@ -135,17 +134,17 @@ class GestorMatriculas:
             #Como se trata de toda la información al completo usaremos todos los campos de la clase Matricula.
             #La api del mservicio envia estos datos en JSON sin comprobar nada
             matricula = Matricula()
-            matricula.id_asignatura=row[0]
-            matricula.id_curso=row[1]
-            matricula.id_alumno=row[2]
+            matricula.id_alumno=row[0]
+            matricula.id_clase=row[1]
+            matricula.id_asignatura=row[2]
 
             return matricula
         if salida==0:
             return 'Elemento no encontrado'
 
-    '''
+
     @classmethod
-    def modMatricula(self, id_asignatura, id_curso, campoACambiar, nuevoValor):
+    def modMatricula(self, id_alumno, id_clase, id_asignatura, campoACambiar, nuevoValor):
         """
         Esta función permite cambiar cualquier atributo de una Matricula.
         Parámetros:
@@ -156,12 +155,13 @@ class GestorMatriculas:
         se haga, para modificar la relación antes tendremos que destruirla y volverla a crear.
 
         """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
         nuevoValor='\''+nuevoValor+'\''
         id_asignatura='\''+id_asignatura+'\''
-        id_curso='\''+id_curso+'\''
+        id_clase='\''+id_clase+'\''
+        id_alumno='\''+id_alumno+'\''
 
-        query="UPDATE Matricula SET "+campoACambiar+"="+nuevoValor+" WHERE id_asignatura="+id_asignatura+" and id_curso="+id_curso+";"
+        query="UPDATE Matricula SET "+campoACambiar+"="+nuevoValor+" WHERE id_alumno="+id_alumno+" and id_clase="+id_clase+" and id_asignatura="+id_asignatura+";"
         if v:
             print '\n'+query
 
@@ -170,7 +170,7 @@ class GestorMatriculas:
         '''
         #Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Matricula con clave
         #que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
-    '''
+        '''
         try:
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
@@ -193,15 +193,15 @@ class GestorMatriculas:
             return 'Elemento duplicado'
         elif salida==0:
             return 'Elemento no encontrado'
-    '''
+
     @classmethod
-    def delMatricula(self, id_asignatura, id_curso, id_alumno):
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+    def delMatricula(self, id_alumno, id_clase, id_asignatura):
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
         cursor = db.cursor()
         id_asignatura='\''+id_asignatura+'\''
-        id_curso='\''+id_curso+'\''
+        id_clase='\''+id_clase+'\''
         id_alumno='\''+id_alumno+'\''
-        query="delete from Matricula where id_asignatura="+id_asignatura+" and id_curso="+id_curso+" and id_alumno="+id_alumno+";"
+        query="delete from Matricula where id_asignatura="+id_asignatura+" and id_clase="+id_clase+" and id_alumno="+id_alumno+";"
         if v:
             print query
         salida =''
