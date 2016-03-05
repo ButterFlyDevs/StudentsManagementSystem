@@ -337,7 +337,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Imparte where id_profesor="+dniProfesor+";"
+        query='select * from Asignatura where id in (select id_asignatura from Imparte where id_profesor ='+dniProfesor');'
 
         try:
             salida = cursor.execute(query);
@@ -382,7 +382,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select distinct curso, grupo, nivel from Imparte where id_profesor="+dniProfesor+";"
+        query='SELECT * FROM Clase where id in (select id_clase from Imparte where id_profesor='+dniProfesor')'
 
         try:
             salida = cursor.execute(query);
