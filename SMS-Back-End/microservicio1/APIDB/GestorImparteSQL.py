@@ -101,7 +101,7 @@ class GestorImparte:
         #Una de las opciones es convertirlo en un objeto y devolverlo
 
     @classmethod
-    def getImparte(self, id_asignatura, id_curso, id_profesor):
+    def getImparte(self, id_asignatura, id_clase, id_profesor):
         """
         Recupera TODA la información de un Imparte en concreto a través de la clave primaria, su id.
         """
@@ -193,7 +193,7 @@ class GestorImparte:
             return 'Elemento duplicado'
         elif salida==0:
             return 'Elemento no encontrado'
-    '''
+
     @classmethod
     def delImparte(self, id_asignatura, id_curso, id_profesor):
         db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
@@ -223,3 +223,4 @@ class GestorImparte:
             return 'OK'
         if salida==0:
             return 'Elemento no encontrado'
+    '''
