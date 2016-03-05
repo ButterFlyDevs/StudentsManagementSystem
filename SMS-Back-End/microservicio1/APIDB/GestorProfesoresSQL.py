@@ -295,7 +295,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT id, nombre, apellidos, dni from Alumno where id in (select id_alumno from Matricula where id_asignatura in (select id_asignatura from Imparte where id_profesor='+dniProfesor+') AND id_clase in (select id_clase from Imparte where id_profesor='+dniProfesor'))'
+        query='SELECT id, nombre, apellidos, dni from Alumno where id in (select id_alumno from Matricula where id_asignatura in (select id_asignatura from Imparte where id_profesor='+dniProfesor+') AND id_clase in (select id_clase from Imparte where id_profesor='+dniProfesor+'))'
 
         try:
             salida = cursor.execute(query);
@@ -337,7 +337,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='select * from Asignatura where id in (select id_asignatura from Imparte where id_profesor ='+dniProfesor');'
+        query='select * from Asignatura where id in (select id_asignatura from Imparte where id_profesor ='+dniProfesor+');'
 
         try:
             salida = cursor.execute(query);
@@ -382,7 +382,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT * FROM Clase where id in (select id_clase from Imparte where id_profesor='+dniProfesor')'
+        query='SELECT * FROM Clase where id in (select id_clase from Imparte where id_profesor='+dniProfesor+')'
 
         try:
             salida = cursor.execute(query);

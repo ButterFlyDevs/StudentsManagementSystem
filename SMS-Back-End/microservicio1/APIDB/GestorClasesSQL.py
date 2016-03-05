@@ -286,7 +286,7 @@ class GestorClases:
         cursor.execute(mysql_query)
         #-----------------------------#
         idClase='\''+idClase+'\''
-        query='select * from Asignatura where id in (select id_asignatura from Ascoia where id_clase ='+idClase')'
+        query='select * from Asignatura where id in (select id_asignatura from Ascoia where id_clase ='+idClase+')'
         if v:
             print '\n'+query
 
@@ -327,7 +327,7 @@ class GestorClases:
         que un mismo alumno está matriculado muchas veces en un mismo curso con asignaturas disintas, entonces para evitar
         contabilizar esos repetidos, usamos esta orden.
         '''
-        query='SELECT id, nombre, apellidos, dni FROM Alumno where id in (select distinct id_alumno from Matricula where id_clase='+idClase')'
+        query='SELECT id, nombre, apellidos, dni FROM Alumno where id in (select distinct id_alumno from Matricula where id_clase='+idClase+')'
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -362,7 +362,7 @@ class GestorClases:
         cursor.execute(mysql_query)
         #-----------------------------#
         idClase='\''+idClase+'\''
-        query='SELECT dni, nombre, apellidos from Profesor where dni in (select id_profesor from Imparte where id_clase ='+idClase')'
+        query='SELECT dni, nombre, apellidos from Profesor where dni in (select id_profesor from Imparte where id_clase ='+idClase+')'
         if v:
             print '\n'+query
         cursor.execute(query)
