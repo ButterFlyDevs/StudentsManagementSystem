@@ -92,7 +92,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
 
-        query="select * from Profesor"
+        query="select nombre, apellidos, dni from Profesor"
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -279,14 +279,12 @@ class GestorProfesores:
     @classmethod
     def getAlumnos(self, dniProfesor):
         """
-        Devuelve una lista con los alumnos al que imparte clase ese profesor.
+        Devuelve una lista con los alumnos al que imparte clase ese profesor, incluyendo
+        los campos id, nombre, apellidos y dni de los alumnos del profesor
 
         Argumentos:
 
-            dniProfesor: El dni del profsor del que se pide la información.
-
-
-        Extra: ¿Se debería añadir la comprobación de existencia del profesor?
+            dniProfesor: El dni del profsor del que se pide la información.<
 
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
@@ -297,7 +295,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query="select * from Matricula, Imparte where Matricula.curso = Imparte.curso and Matricula.grupo = Imparte.grupo and Matricula.nivel = Imparte.nivel and Matricula.id_asignatura = Imparte.id_asignatura and id_profesor ="+dniProfesor+";"
+        query='SELECT id, nombre, apellidos, dni from Alumno where id in (select id_alumno from Matricula where id_asignatura in (select id_asignatura from Imparte where id_profesor='+dniProfesor+') AND id_clase in (select id_clase from Imparte where id_profesor='+dniProfesor'))'
 
         try:
             salida = cursor.execute(query);
