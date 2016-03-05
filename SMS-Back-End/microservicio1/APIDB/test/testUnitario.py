@@ -341,20 +341,6 @@ class TestEntidadAsignatura(unittest.TestCase):
 
 class TestEntidadClase(unittest.TestCase):
 
-    # QUEDA HACER LO MISMO CON CLASE !!!!!!!
-
-
-    #seguir aquí!
-
-    #HABRÍA QUE PONER LOS TEST DE RELACIONES DESPUÉS DE TODOS LOS TEST DE COLECCIONES, YA QUE LOS TEST DE
-    #RELACIONES COMPRUEBAN COSAS QUE SE TIENEN QUE ESTABLECER CON MÉTODOS DE COLLECCIONES PRIMRO.
-
-
-    #SERÍA INTERESANTE PONERLO EN OTRAS CUATRO CLASES como TestRelacionesClase que
-    #irían al final después de las de entidad de Matrícula, Asocia e Imparte
-
-
-    #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
     def test_31_IserccionClase(self):
         '''
         Comprueba el método nuevaClase del gestor GestorClasesSQL.py
@@ -428,7 +414,6 @@ class TestEntidadClase(unittest.TestCase):
             testA=False
         self.assertEqual(testA, True)
 
-
     def test_36_NumeroClases(self):
         '''Comprueba que se obtiene de forma correcta el número de clases en la BD con getNumClases de GestorClasesSQL.py'''
         os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
@@ -491,8 +476,7 @@ class TestRelacionAsocia(unittest.TestCase):
 
         self.assertEqual(testA and testB and testC, True)
 
-
-    def test_42_LecturaRelacionesAsocia(self):
+    def test_42_LecturaAsociaciones(self):
         '''Recupera la lista de todas las asociaciones (Clase-Asignatura) almacenadas en la base de datos.'''
         os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         #Creamos una clase
@@ -504,7 +488,6 @@ class TestRelacionAsocia(unittest.TestCase):
         GestorAsociaciones.nuevaAsociacion('1','2')
 
         self.assertEqual(len(GestorAsociaciones.getAsociaciones()),2)
-
 
     def test_43_LecturaAsociacion(self):
         ''' Comprobación de la lectura correcta de una asociacion concreta'''
@@ -542,8 +525,8 @@ class TestRelacionAsocia(unittest.TestCase):
 
 
         #Intentamos asociar una clase con una asignatura que no existe (la asignatura con id 3, inexistente):
-        #if GestorAsociaciones.modAsociacion('1','1','id_asignatura', '3') == 'Elemento no encontrado':
-        #    testB=True
+        if GestorAsociaciones.modAsociacion('1','1','id_asignatura', '3') == 'Elemento no encontrado':
+            testB=True
 
 
         #Comprobamos que si realizamos una modificación que da lugar a una asociacioón que ya existe lo detecta.
@@ -556,58 +539,74 @@ class TestRelacionAsocia(unittest.TestCase):
         '''
 
         #Comprobamos que el nombre ha sido cambiado.
-        self.assertEqual(testA, True)
+        self.assertEqual(testA and testB, True)
 
+    def test_45_EliminacionAsocia(self):
+        '''Elimina una tupla de la tabla Asocia usando delAsociaciones de GestorAsociacionesSQL'''
+        #Vamos a comprobar que se pueden eliminar asociaciones borrando la anterior.
+        #Eliminamos los objetos creados para el test.
+        if GestorAsociaciones.delAsociacion('1','2') == 'OK' and GestorAsociaciones.delAsociacion('3','3') == 'Elemento no encontrado':
+            test=True
+        else:
+            test=False
+        self.assertEqual(test, True)
 
+    def test_46_NumeroAsociaciones(self):
+        '''Comprueba que se obtiene de forma correcta el número de asociaciones en la BD con getNumAsociaciones de GestorAsociacionesSQL.py'''
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+        cero=GestorAsociaciones.getNumAsociaciones()
+        #Primero creamos una clase.
+        GestorClases.nuevaClase('1','A','ESO')
+        #Después creamos una asignatura:
+        GestorAsignaturas.nuevaAsignatura('frances')
+        GestorAsignaturas.nuevaAsignatura('len')
+        #Usamos ambos ides (1 y 1 porque se acaban de introducir y son autoincrementables) para relacionarlos.
+        GestorAsociaciones.nuevaAsociacion('1','1')
+        GestorAsociaciones.nuevaAsociacion('1','2')
+        dos=GestorAsociaciones.getNumAsociaciones()
+        GestorAsociaciones.delAsociacion('1','2')
+        una=GestorAsociaciones.getNumAsociaciones()
+
+        if cero==0 and dos==2 and una==1:
+            resultado=True
+        else:
+            resultado=False
+
+        self.assertEqual(resultado,True)
 
     if 0:
-        '''
-        def test_43_ModificacionRelacionAsocia(self):
-            #Intentamos modificar el cambio de la asociación de un curso a una asignatura
-            #cambiando el curso en el que se impartía esa asignatura
-            salida=GestorAsociaciones.modAsociacion('fr','curso','id_curso','curso2')
 
-            #Comprobamos que se puede extraer la asociación modificada.
-            self.assertEqual(GestorAsociaciones.getAsociacion('fr','curso2'),'OK')
-        '''
+        def test_45_AlumnosMAtriculadosEnUnaAsignaturaYCurso(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            sizeA=len(GestorAsociaciones.getAlumnos('mt','1AESO'))
+            sizeB=len(GestorAsociaciones.getAlumnos('fr','1AESO'))
+            sizeC=len(GestorAsociaciones.getAlumnos('mt','1BESO'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            salida=False
+            if sizeA==1 and sizeB==3 and sizeC==3:
+                salida=True
+            self.assertEqual(salida,True)
 
-        def test_44_EliminacionRelacionAsocia(self):
-            #Vamos a comprobar que se pueden eliminar asociaciones borrando la anterior.
-            salida=GestorAsociaciones.delAsociacion('fr','curso')
-            #Eliminamos los objetos creados para el test.
-            if salida=='OK':
-                GestorAsignaturas.delAsignatura('fr')
-                GestorCursos.delCurso('curso')
-            self.assertEqual(salida,'OK')
-
-
-        if 0:
-
-            def test_45_AlumnosMAtriculadosEnUnaAsignaturaYCurso(self):
-                aprovisionadorDBconInterfaz.aprovisiona()
-                sizeA=len(GestorAsociaciones.getAlumnos('mt','1AESO'))
-                sizeB=len(GestorAsociaciones.getAlumnos('fr','1AESO'))
-                sizeC=len(GestorAsociaciones.getAlumnos('mt','1BESO'))
-                os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-                salida=False
-                if sizeA==1 and sizeB==3 and sizeC==3:
-                    salida=True
-                self.assertEqual(salida,True)
-
-            def test_46_ProfesoresQueImpartenEnUnCursoYAsignatura(self):
-                aprovisionadorDBconInterfaz.aprovisiona()
-                sizeA=len(GestorAsociaciones.getProfesores('mt','1AESO'))
-                sizeB=len(GestorAsociaciones.getProfesores('fr','1AESO'))
-                sizeC=len(GestorAsociaciones.getProfesores('mt','1BESO'))
-                os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
-                salida=False
-                if sizeA==0 and sizeB==2 and sizeC==1:
-                    salida=True
-                self.assertEqual(salida,True)
+        def test_46_ProfesoresQueImpartenEnUnCursoYAsignatura(self):
+            aprovisionadorDBconInterfaz.aprovisiona()
+            sizeA=len(GestorAsociaciones.getProfesores('mt','1AESO'))
+            sizeB=len(GestorAsociaciones.getProfesores('fr','1AESO'))
+            sizeC=len(GestorAsociaciones.getProfesores('mt','1BESO'))
+            os.system('mysql -u root -p\'root\' < ../DBCreator_v0.sql')
+            salida=False
+            if sizeA==0 and sizeB==2 and sizeC==1:
+                salida=True
+            self.assertEqual(salida,True)
 
 
 
 if False:
+
+
+
+
+
+
 
     ### RELACIONES ###
 

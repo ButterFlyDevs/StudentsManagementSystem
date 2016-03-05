@@ -66,7 +66,6 @@ class GestorAsociaciones:
         if salida==1452:
             return 'Alguno de los elementos no existe'
 
-
     @classmethod
     def getAsociaciones(self):
         '''
@@ -148,9 +147,8 @@ class GestorAsociaciones:
         if salida==0:
             return 'Elemento no encontrado'
 
-
     @classmethod
-    def modAsociacion(self, id_asignatura, id_clase, campoACambiar, nuevoValor):
+    def modAsociacion(self, id_clase, id_asignatura, campoACambiar, nuevoValor):
         """
         Esta función permite cambiar cualquier atributo de una Asociacion.
         Parámetros:
@@ -159,7 +157,7 @@ class GestorAsociaciones:
         Este caso puede ser delicado al tener sólo dos atributos y ambos ser claves foráneas. Por eso no permitiremos que
         se haga, para modificar la relación antes tendremos que destruirla y volverla a crear.
         """
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="sms"); #La conexión está clara.
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         nuevoValor='\''+nuevoValor+'\''
         id_asignatura='\''+id_asignatura+'\''
         id_clase='\''+id_clase+'\''
@@ -194,12 +192,12 @@ class GestorAsociaciones:
             return 'Elemento no encontrado'
 
     @classmethod
-    def delAsociacion(self, id_asignatura, id_curso):
-        db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="smm"); #La conexión está clara.
+    def delAsociacion(self, id_clase, id_asignatura):
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
         id_asignatura='\''+id_asignatura+'\''
-        id_curso='\''+id_curso+'\''
-        query="delete from Asocia where id_asignatura="+id_asignatura+" and id_curso="+id_curso+";"
+        id_clase='\''+id_clase+'\''
+        query="DELETE FROM Asocia WHERE id_clase="+id_clase+" AND id_asignatura="+id_asignatura+";"
         if v:
             print query
         salida =''
@@ -222,6 +220,42 @@ class GestorAsociaciones:
             return 'OK'
         if salida==0:
             return 'Elemento no encontrado'
+
+    @classmethod
+    def getNumAsociaciones(self):
+        '''Devuelve el número de asociaciones de la BD'''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        cursor = db.cursor()
+        query="select count(*) from Asocia;"
+        salida =''
+        try:
+            salida = cursor.execute(query);
+            row = cursor.fetchone()
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+
+
+        #print str(cursor)
+        db.commit()
+
+        #print cursor.fetchone()
+        cursor.close()
+        db.close()
+
+        if salida==1:
+            return row[0]
+        if salida==0:
+            return 'Elemento no encontrado'
+
+
+    ##DE RELACIONES CON OTRAS##
 
     @classmethod
     def getAlumnos(sef, id_asignatura, id_curso):
