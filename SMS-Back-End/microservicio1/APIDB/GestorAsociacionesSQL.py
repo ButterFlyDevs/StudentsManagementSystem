@@ -224,9 +224,10 @@ class GestorAsociaciones:
             return 'Elemento no encontrado'
 
     @classmethod
-    def getAlumnos(sef, id_asignatura, id_curso):
+    def getAlumnos(sef, id_asignatura, id_clase):
         '''
         Devuelve una lista con los alumnos matriculados en esa asignatura y grupo
+        Devuelve: id del alumno, nombre, apellidos y dni
         '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -236,10 +237,10 @@ class GestorAsociaciones:
         cursor.execute(mysql_query)
         #-----------------------------#
 
-        id_curso='\''+id_curso+'\''
+        id_clase='\''+id_clase+'\''
         id_asignatura='\''+id_asignatura+'\''
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='select * from Matricula where id_asignatura='+id_asignatura+' and id_curso='+id_curso+';'
+        query='select id, nombre, apellidos, dni from Alumno where id in (select id_alumno from Matricula where id_clase ='+id_clase+'and id_asignatura ='+id_asignatura+')'
         try:
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
@@ -267,9 +268,10 @@ class GestorAsociaciones:
             db.close()
 
     @classmethod
-    def getProfesores(self, id_asignatura, id_curso):
+    def getProfesores(self, id_asignatura, id_Clase):
         '''
         Devuelve todos los profesores que imparte esa asignatura a ese grupo
+        Devuelve nombre, apellidos y dni
         '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -279,10 +281,10 @@ class GestorAsociaciones:
         cursor.execute(mysql_query)
         #-----------------------------#
 
-        id_curso='\''+id_curso+'\''
+        id_clase='\''+id_clase+'\''
         id_asignatura='\''+id_asignatura+'\''
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='select * from Imparte where id_asignatura='+id_asignatura+' and id_curso='+id_curso+';'
+        query='SELECT nombre, apellidos, dni from Profesor where dni in (select id_profesor from Imparte where id_clase='+id_clase+'and id_asignatura='+id_asignatura+')'
         try:
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
