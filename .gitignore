@@ -1,3 +1,4 @@
 *.pyc
 SMS-Back-End/microservicio1/lib/
 google_appengine/
+.coverage
