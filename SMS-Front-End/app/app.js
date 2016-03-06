@@ -97,9 +97,9 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
 
   var ROOT = 'http://localhost:8001/_ah/api';
   gapi.client.load('helloworld', 'v1', null, ROOT);
-  gapi.client.helloworld.alumnos.getAlumno({'dni':$stateParams.estudianteID}).execute(function(resp) {
+  gapi.client.helloworld.alumnos.getAlumno({'id':$stateParams.estudianteID}).execute(function(resp) {
 
-
+    console.log("calling getAlumno with id: "+$stateParams.estudianteID);
     console.log(resp);
     $scope.alumno = resp;
     console.log(resp.nombre);
@@ -145,9 +145,7 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
 
 routerApp.controller('ControladorEjemplo', function ($scope) {
 
-
-    console.log("holla");
-
+    
     var ROOT = 'http://localhost:8001/_ah/api';
     gapi.client.load('helloworld', 'v1', null, ROOT);
 
@@ -157,7 +155,7 @@ routerApp.controller('ControladorEjemplo', function ($scope) {
     gapi.client.helloworld.alumnos.getAlumnos().execute(function(resp) {
       //console.log(resp);
       //console.log("after");
-      //console.log(resp.alumnos);
+      console.log(resp.alumnos);
 
       /*Usar los datos que nos proporciona nuestra API es muy sencillo, sólo tenemos que extraer del JSON que se
       encuentra en "resp" los datos que nos interesan. En este caso es un array de alumnos, por tanto

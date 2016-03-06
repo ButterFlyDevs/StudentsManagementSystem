@@ -56,19 +56,21 @@ de una petición de tipo GET.
 
 class Alumno(messages.Message):
     nombre = messages.StringField(1)
-    dni = messages.StringField(2)
+    id = messages.StringField(2)
 
 class AlumnoCompleto(messages.Message):
-    nombre = messages.StringField(1)
-    dni = messages.StringField(2)
-    direccion = messages.StringField(3)
-    localidad = messages.StringField(4)
-    provincia = messages.StringField(5)
-    fecha_nac = messages.StringField(6)
-    telefono = messages.StringField(7)
+    id = messages.StringField(1)
+    nombre = messages.StringField(2)
+    apellidos = messages.StringField(3)
+    dni = messages.StringField(4)
+    direccion = messages.StringField(5)
+    localidad = messages.StringField(6)
+    provincia = messages.StringField(7)
+    fecha_nacimiento = messages.StringField(8)
+    telefono = messages.StringField(9)
 
-class DNI(messages.Message):
-    dni = messages.StringField(1)
+class ID(messages.Message):
+    id = messages.StringField(1)
 
 class ListaAlumnos(messages.Message):
     alumnos = messages.MessageField(Alumno, 1, repeated=True)
@@ -120,7 +122,7 @@ class HelloWorldApi(remote.Service):
     '''
     getAlumnos()   [GET sin parámetros]
 
-    Devuelve una lista con todos los estudiantes registrados en el sistema, de forma simplificada (solo nombre y DNI)
+    Devuelve una lista con todos los estudiantes registrados en el sistema, de forma simplificada (solo nombre y ID)
 
     Llamada desde terminal:
     curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumnos
@@ -157,13 +159,9 @@ class HelloWorldApi(remote.Service):
 
         #Vamos a intentar consumir los datos en JSON y convertirlos a un mensje enviable :)
 
-        print "IMPRESION DE LOS DATOS RECIBIDOS"
+        print "IMPRESION DE LOS DATOS RECIBIDOSsss"
         print result.content
         listaAlumnos = jsonpickle.decode(result.content)
-
-        for alumno in listaAlumnos:
-            print "nombre: "+str(alumno.get('nombre'))
-            print "dni: "+str(alumno.get('dni'))
 
         '''
         miListaAlumnos=ListaAlumnos()
@@ -174,8 +172,15 @@ class HelloWorldApi(remote.Service):
         alumnosItems= []
         #Que rellenamos con todo los alumnos de la listaAlumnos
         for alumno in listaAlumnos:
-            alumnosItems.append(Alumno( nombre=str(alumno.get('nombre')), dni=str(alumno.get('dni'))  ))
+            nombreAlumno = str(alumno.get('nombre'))
+            idAlumno = str(alumno.get('id'))
+            if v:
+                print "Nombre: "+nombreAlumno
+                print "ID: "+idAlumno
+            alumnosItems.append(Alumno( nombre=nombreAlumno, id=idAlumno ) )
 
+
+        #id=str(alumno.get('id')),
         #Los adaptamos al tipo de mensaje y enviamos
         #return Greeting(message=str(result.content))
         return ListaAlumnos(alumnos=alumnosItems)
@@ -190,8 +195,9 @@ class HelloWorldApi(remote.Service):
     curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumno?dni=11AA22BBZ
     '''
 
-    @endpoints.method(DNI, AlumnoCompleto, path='alumnos/getAlumno', http_method='GET', name='alumnos.getAlumno')
+    @endpoints.method(ID, AlumnoCompleto, path='alumnos/getAlumno', http_method='GET', name='alumnos.getAlumno')
     def getAlumno(self,request):
+        print "Calling APIGateway getAlumno"
         print "GET CON PARÁMETROS EN ENDPOINT"
 
         #Cuando se llama a este recurso lo que se quiere es recibir toda la información
@@ -211,7 +217,7 @@ class HelloWorldApi(remote.Service):
         a este procedimiento.
         '''
         #Recursos más entidad
-        url+='alumnos/'+request.dni
+        url+='alumnos/'+request.id
 
         if v:
             print "calling: "+ url
@@ -227,18 +233,31 @@ class HelloWorldApi(remote.Service):
             raise endpoints.BadRequestException('Peticion erronea')
 
         if str(result.status_code) == '404':
-            raise endpoints.NotFoundException('Alumno con DNI %s no encontrado.' % (request.dni))
+            raise endpoints.NotFoundException('Alumno con ID %s no encontrado.' % (request.dni))
 
         alumno = jsonpickle.decode(result.content)
 
-        return AlumnoCompleto(nombre=alumno.get('nombre'),
-                                 dni=alumno.get('dni'),
-                                 direccion=alumno.get('direccion'),
-                                 localidad=alumno.get('localidad'),
-                                 provincia=alumno.get('provincia'),
-                                 fecha_nac=str(alumno.get('fecha_nac')),
-                                 telefono=alumno.get('telefono')
+        print "salida "+url
+        print result.content
+
+        #Componemos un mensaje de tipo AlumnoCompleto
+        alumno = AlumnoCompleto(id=str(alumno.get('id')),
+                                nombre=alumno.get('nombre'),
+                                apellidos=alumno.get('apellidos'),
+                                dni=alumno.get('dni'),
+                                direccion=alumno.get('direccion'),
+                                localidad=alumno.get('localidad'),
+                                provincia=alumno.get('provincia'),
+                                fecha_nacimiento=alumno.get('fecha_nacimiento'),
+                                telefono=alumno.get('telefono')
                                 )
+
+        print "Alumno"
+        print alumno
+
+        return alumno
+
+
 
 
     '''
@@ -304,7 +323,7 @@ class HelloWorldApi(remote.Service):
             print result.status_code
 
         if str(result.status_code) == '404':
-            raise endpoints.NotFoundException('Alumno con DNI %s ya existe en el sistema.' % (request.dni))
+            raise endpoints.NotFoundException('Alumno con ID %s ya existe en el sistema.' % (request.dni))
 
         #return MensajeRespuesta(message="Todo OK man!")
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
@@ -327,7 +346,7 @@ class HelloWorldApi(remote.Service):
     }
     '''
 
-    @endpoints.method(DNI,MensajeRespuesta,path='delAlumno', http_method='DELETE', name='alumnos.delAlumno')
+    @endpoints.method(ID,MensajeRespuesta,path='delAlumno', http_method='DELETE', name='alumnos.delAlumno')
     def eliminar_alumno(self, request):
 
         print "POST EN CLOUDPOINTS"
@@ -371,7 +390,7 @@ class HelloWorldApi(remote.Service):
     Devuelve una lista con los datos completos de los profesores que dan clase al alumno de dni pasado
     curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getProfesoresAlumno?dni=1
     '''
-    @endpoints.method(DNI, ListaProfesores, path='alumnos/getProfesoresAlumno', http_method='GET', name='alumnos.getProfesoresAlumno')
+    @endpoints.method(ID, ListaProfesores, path='alumnos/getProfesoresAlumno', http_method='GET', name='alumnos.getProfesoresAlumno')
     def getProfesoreAlumno(self, request):
         #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
         if v:
@@ -421,7 +440,7 @@ class HelloWorldApi(remote.Service):
     Ejemplo de llamada:
     > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getAsignaturasAlumno?dni=1
     '''
-    @endpoints.method(DNI, ListaAsignaturas, path='alumnos/getAsignaturasAlumno', http_method='GET', name='alumnos.getAsignaturasAlumno')
+    @endpoints.method(ID, ListaAsignaturas, path='alumnos/getAsignaturasAlumno', http_method='GET', name='alumnos.getAsignaturasAlumno')
     def getAsignaturasAlumno(self, request):
         if v:
             print ("Ejecución de getAsignaturasAlumno en apigateway")
@@ -445,7 +464,7 @@ class HelloWorldApi(remote.Service):
     Ejemplo de llamada:
     > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getCursosAlumno?dni=1
     '''
-    @endpoints.method(DNI, ListaCursos, path='alumnos/getCursosAlumno', http_method='GET', name='alumnos.getCursosAlumno')
+    @endpoints.method(ID, ListaCursos, path='alumnos/getCursosAlumno', http_method='GET', name='alumnos.getCursosAlumno')
     def getCursosAlumno(self, request):
         if v:
             print ("Ejecución de getCursosAlumno en apigateway")
@@ -475,7 +494,7 @@ class HelloWorldApi(remote.Service):
                       name='profesores.getProfesores')
     def getProfesores(self, unused_request):
         '''
-        Devuelve una lista con todos los profesores registrados en el sistema, de forma simplificada (solo nombre y DNI)
+        Devuelve una lista con todos los profesores registrados en el sistema, de forma simplificada (solo nombre y ID)
 
         Llamada desde terminal:
         curl -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getProfesores

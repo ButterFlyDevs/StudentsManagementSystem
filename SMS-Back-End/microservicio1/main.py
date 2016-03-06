@@ -14,12 +14,19 @@ from APIDB.GestorClasesSQL import GestorClases
 
 app = Flask(__name__)
 
+#Activar modo verbose
+v=1
+
 ############################
 #   COLECCIÓN ALUMNOS      #
 ############################
 
 @app.route('/alumnos',methods=['GET'])
 def getAlumnos():
+    '''
+    Devuelve una lista de todos los estudiantes.
+    curl -i -X GET localhost:8002/alumnos/
+    '''
     return jsonpickle.encode(GestorAlumnos.getAlumnos())
 
 @app.route('/alumnos',methods=['PUT'])
@@ -55,7 +62,7 @@ def postAlumno():
 
 
 #####################
-#   ENTIDAD ALUMNO  #
+#  ENTIDAD ALUMNO   #
 #####################
 
 @app.route('/alumnos/<string:id_alumno>',methods=['GET'])
@@ -64,19 +71,20 @@ def getAlumno(id_alumno):
     Devuelve todos los datos de un alumno buscado por su id
     en caso de existir en la base de datos.
     curl -i -X GET localhost:8002/alumnos/11223344A
-
     '''
+
+    if v:
+        print 'Calling GestorAlumnos.getAlumno('+id_alumno+')'
+
     #Si no tiene el número correcto de caracteres el identificador.
-    if len(id_alumno) != 9:
-        abort(400)
+    #if len(id_alumno) != 9:
+    #    abort(400)
 
     salida=GestorAlumnos.getAlumno(id_alumno)
     if salida=="Elemento no encontrado":
         #Enviamos el error de NotFound
         abort(404)
     else:
-        print "Aquí: "
-        print str(salida.fecha_nac)
         return jsonpickle.encode(GestorAlumnos.getAlumno(id_alumno))
 
 ''' Hasta ver como proceder con la modificación de alumnos.
@@ -104,8 +112,8 @@ def delAlumno(id_alumno):
     identificia que el servidor no ha encontrado el recurso solicitado.
 
     '''
-    if len(id_alumno) != 9:
-        abort(400)
+    #if len(id_alumno) != 9:
+    #    abort(400)
 
     salida = GestorAlumnos.delAlumno(id_alumno)
     if salida=="Elemento no encontrado":
