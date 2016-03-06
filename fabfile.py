@@ -17,18 +17,26 @@ def pararTodo():
 
 def lanzarTodo():
 
+def lanzarServicioBD():
 
+def lanzarServicioControlEstdiantes():
+
+    pass
 def instalarDependencias():
 
-
+    pass
 def obtenerLineasProyecto():
 
-
+    pass
 def subirGAE():
 
-
+    pass
 def actualizarProyecto():
 
+    pass
 def borrarProyecto():
 
+    pass
 def test_APIBD():
+
+    pass
