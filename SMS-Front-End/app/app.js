@@ -61,7 +61,7 @@ de la vista y se usan).
            controller: 'ControladorDetallesEstudiante'
          })
 
-         /* El anidamiento de una tercera vista que no usarmos 
+         /* El anidamiento de una tercera vista que no usarmos
          //Vista de datos académicos anidada dentro de detalles de estudiantes.
          .state('estudiantes.detalles-estudiante.datos-academicos',{
            url:'/datos-academicos',
@@ -120,6 +120,8 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
   //$scope.id = $stateParams.estudianteID;
   $scope.id=$stateParams.estudianteID;
 
+//  document.write("<script src='/app/js/components/datepicker.js'></script>");
+//  document.write("<script src='/app/js/components/form-select.js'></script>");
 
   var ROOT = 'http://localhost:8001/_ah/api';
   gapi.client.load('helloworld', 'v1', null, ROOT);
