@@ -1,34 +1,52 @@
 // app.js
 var routerApp = angular.module('routerApp', ['ui.router']);
 
+// ############# ENRUTADOR #################################### //
+
 routerApp.config(function($stateProvider, $urlRouterProvider) {
+/*
+
+Configura el enrutamiento de todas las vistas de la web. Implementa a que URLs
+responden que vistas y mediante que controladores. Estos controladores son las FUNCIONES
+que piden los datos donde proceda y los cargan en las vistas donde serán usados y vicesversa (se cargan
+de la vista y se usan).
+*/
 
     $urlRouterProvider.otherwise('/home');
 
     $stateProvider
 
+       //Configura la URL principal
        .state('#',{
          url:'/',
          template:'HomePage'
        })
 
-
-        // HOME STATES AND NESTED VIEWS ========================================
+        /*Definición de VISTAS ANIDADAS, dentro de una vista general que es la de estudiantes se incrustan
+        a su derecha todas las subsecciones distintas. Así estudiantes.html define la plantilla general y dentro de
+        ella está una sección en la que se cargarán las subpartes estudiantes.<subpartes>
+        Ver estudiantes.html.
+        En este caso esta vista no tiene controlador porque no la necesita.
+        */
         .state('estudiantes', {
             url: '/estudiantes',
             templateUrl: 'estudiantes.html'
         })
 
+        /*
+        Vista "main" anidada dentro de la vista estudiantes, con su propio controlador.
+        Asi la vista estudiantes-main.html está anidada dentro de estudiantes.html que se incrusta en la sección <div ui-view></div>
+        */
         .state('estudiantes.main', {
             url: '/main',
             templateUrl: 'estudiantes-main.html',
         })
 
-              // nested list with custom controller
+        // nested list with custom controller
          .state('estudiantes.list', {
              url: '/list',
              templateUrl: 'estudiantes-lista.html',
-             controller: 'ControladorEjemplo'
+             controller: 'ControladorListaEstudiantes'
              /*
              controller: function($scope) {
                  $scope.dogs = ['Bernese', 'Husky', 'Goldendoodle'];
@@ -36,14 +54,20 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
              */
          })
 
-
-
-
+         //Vista detalles estudiantes anidada dentro de estudiantes.
          .state('estudiantes.detalles-estudiante',{
            url: '/detalle/:estudianteID',
            templateUrl: 'estudiantes-detalle.html',
            controller: 'ControladorDetallesEstudiante'
          })
+
+         /* El anidamiento de una tercera vista que no usarmos 
+         //Vista de datos académicos anidada dentro de detalles de estudiantes.
+         .state('estudiantes.detalles-estudiante.datos-academicos',{
+           url:'/datos-academicos',
+           templateUrl: 'estudiantes-detalle-datos-academicos.html',
+           coontroller: 'ControladorDetallesEstudiante-DatosAcademicos'
+         })*/
 
          // nested list with just some random string data
          .state('estudiantes.nuevo', {
@@ -64,10 +88,11 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
 });
 
 
-/*
-Controlador que manejará los datos del formulario enviándolos al servidor.
-*/
+
 routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
+  /*
+  Controlador que manejará los datos del formulario enviándolos al servidor.
+  */
   $scope.addAlumno = function(){
     //console.log("lamando a addAlumno()");
     //console.log($scope.alumno);
@@ -87,6 +112,7 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
 
 
 });
+
 
 routerApp.controller('ControladorDetallesEstudiante', function($scope, $stateParams){
 
@@ -141,11 +167,24 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
   }
 
 
-})
+});
 
-routerApp.controller('ControladorEjemplo', function ($scope) {
+routerApp.controller('ControladorDetallesEstudiante-DatosAcademicos', function($scope, $stateParams){
+  $scope.id=$stateParams.estudianteID;
 
-    
+
+});
+
+
+
+
+
+routerApp.controller('ControladorListaEstudiantes', function ($scope) {
+  /*
+  Controlador que maneja los datos que se muestran en la vista estudiantes-lista.html y que
+  realiza la petición de la lista de Estudiantes y que la carga en el $scope bajo la variable "alumnos".
+  */
+
     var ROOT = 'http://localhost:8001/_ah/api';
     gapi.client.load('helloworld', 'v1', null, ROOT);
 

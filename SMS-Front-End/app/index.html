@@ -1,4 +1,10 @@
-<!-- index.html -->
+<!--
+
+index.html
+
+Es la plantilla principal que define el menú superior y que
+
+-->
 
 <!DOCTYPE html>
 <html>
@@ -6,8 +12,10 @@
 <head>
 
   <!-- Loading UI-KIT CSS Framework -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.24.3/css/uikit.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.24.3/js/uikit.min.js"></script>
+  <link type="text/css" rel="stylesheet" href="/app/css/uikit.gradient.min.css" />
+  <script src="/app/js/uikit.min.js"></script>
+
+  <!--Query-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
 
   <!-- Loading api conector -->
@@ -19,17 +27,30 @@
     <!-- JS (load angular, ui-router, and our custom js file) -->
     <script src="http://code.angularjs.org/1.2.13/angular.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
+
+    <script src="/app/js/components/datepicker.js"></script>
+    <script src="/app/js/components/form-select.js"></script>
+
+    <!--Añadimos la hoja de estilo del componente acordeon-->
+    <link type="text/css" rel="stylesheet" href="/app/css/components/accordion.gradient.css" />
+    <!--Añadimos el java script del componente acordeon-->
+    <script type="text/javascript" src="/app/js/components/accordion.js"></script>
+
     <script src="app.js"></script>
 </head>
 
 <!-- apply our angular app to our site -->
 <body ng-app="routerApp">
 
- <!-- NAVIGATION -->
+ <!--
+ Menú principal , construido con ui-sref, que nos envía al lugar que nos diga el urlProvider dentro de app.js.
+ -->
   <nav class="tm-navbar uk-navbar uk-navbar-attached">
       <div class="uk-container ">
+          <!--Se usa ui-sref a # para que no haga nada -->
           <a class="uk-navbar-brand uk-hidden-small" ui-sref="#">Students Management System</a>
           <ul class="uk-navbar-nav uk-hidden-small">
+
             <li><a ui-sref="estudiantes.main">Estudiantes</a></li>
             <li><a ui-sref="about">Otros</a></li>
           </ul>
@@ -45,6 +66,11 @@
       <div ui-view></div>
     </div>
 
+</div>
+
+<!-- Footer -->
+<div class="uk-contrast">
+  <h1>ouh yeah!</h1>
 </div>
 
 </body>

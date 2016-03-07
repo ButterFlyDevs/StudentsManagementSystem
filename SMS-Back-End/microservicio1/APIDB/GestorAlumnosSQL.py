@@ -14,7 +14,7 @@ from Clase import *
 import dbParams
 
 #Para activar/desactivar el modo verbose para muestra de mensajes.
-v = False
+v = 1
 
 class GestorAlumnos:
     """

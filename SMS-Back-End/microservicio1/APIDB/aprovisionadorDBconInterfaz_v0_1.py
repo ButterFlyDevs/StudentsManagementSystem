@@ -15,7 +15,7 @@ from GestorMatriculasSQL import GestorMatriculas
 
 def aprovisiona():
     #Insertamos 6 alumnos:
-    GestorAlumnos.nuevoAlumno('A')
+    GestorAlumnos.nuevoAlumno('Juan Antonio', 'Fernández Sánchez', '99999999', 'C/ Ramón y Cajal Bloque 9. 2ºA', 'Albolote', 'Granada', '1800-03-23', '677164455')
     GestorAlumnos.nuevoAlumno('B')
     GestorAlumnos.nuevoAlumno('C')
     GestorAlumnos.nuevoAlumno('D')

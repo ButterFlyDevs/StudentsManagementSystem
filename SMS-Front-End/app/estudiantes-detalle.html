@@ -18,11 +18,11 @@ Diseño de la vista de la pestaña de detalles del estudiante.
 
       <ul class="uk-list uk-list-line">
             <li>DNI: {{alumno.dni}} </li>
-            <li>Fecha nacimiento: {{alumno.fecha_nac}}</li>
+            <li>Fecha nacimiento: {{alumno.fecha_nacimiento}}</li>
             <li>Localidad: {{alumno.localidad}}</li>
             <li>Provincia: {{alumno.provincia}}</li>
             <li>Direccion: {{alumno.direccion}}</li>
-            <li>Teléfono: {{alumno.telefono}}</li>            
+            <li>Teléfono: {{alumno.telefono}}</li>
       </ul>
 
     </div>
@@ -31,8 +31,51 @@ Diseño de la vista de la pestaña de detalles del estudiante.
 
 
 <!--Debajo del grid vamos a colocar dos botones, uno de editar y otro de eliminar -->
-<div class="uk-margin-large-top">
+
+<!-- <div class="uk-margin-large-top"> -->
   <!--Usamos la directiva ng-click para especificar la función dentro del controlador de esta vista que
   implementa las acciones asociadas a este botón.-->
-  <button class="uk-button-danger" ng-click="ButtonClick()" type="button">Eliminar</button>
+  <!-- <button class="uk-button-danger" ng-click="ButtonClick()" type="button">Eliminar</button> -->
+<!-- </div> -->
+
+<!--Botón que abre la sección desplegable que muestra los datos académicos -->
+<div class="uk-margin-top">
+
+  <h4><a href="#"><i class="uk-icon-book uk-icon-medium"></i> Datos académicos </a> </h4>
+
+
+
+  <!--Añadimos la hoja de estilo del componente acordeon-->
+  <link type="text/css" rel="stylesheet" href="/app/css/components/accordion.gradient.css" />
+  <!--This accordion will work-->
+       <div data-uk-observe class="uk-accordion" data-uk-accordion="{collapse: true}">
+
+      <h3 class="uk-accordion-title">Title 1</h3>
+      <div class="uk-accordion-content">content one</div>
+
+      <h3 class="uk-accordion-title">Title 2</h3>
+      <div class="uk-accordion-content">content two</div>
+
+      <h3 class="uk-accordion-title">Title 3</h3>
+      <div class="uk-accordion-content">content three</div>
+
+      </div>
+
+
+      <form class="uk-form">
+          <input type="text" data-uk-datepicker="{format:'DD.MM.YYYY'}">
+      </form>
+
 </div>
+
+<!-- Sección donde se inyecta las secciónes que cargan los botones anteriores >
+<div class="container">
+
+    El anidamiento de una tercera vista que no vamos a usar
+
+     <div class="uk-container uk-container-center uk-margin-large-top">
+      <div ui-view></div>
+    </div>
+
+</div>
+-->

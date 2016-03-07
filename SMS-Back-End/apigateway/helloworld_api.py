@@ -240,16 +240,17 @@ class HelloWorldApi(remote.Service):
         print "salida "+url
         print result.content
 
-        #Componemos un mensaje de tipo AlumnoCompleto
+        #Componemos un mensaje de tipo AlumnoCompleto.
+        #Las partes que son enteros las pasamos a string para enviarlos como mensajes de tipo string.
         alumno = AlumnoCompleto(id=str(alumno.get('id')),
                                 nombre=alumno.get('nombre'),
                                 apellidos=alumno.get('apellidos'),
-                                dni=alumno.get('dni'),
+                                dni=str(alumno.get('dni')),
                                 direccion=alumno.get('direccion'),
                                 localidad=alumno.get('localidad'),
                                 provincia=alumno.get('provincia'),
-                                fecha_nacimiento=alumno.get('fecha_nacimiento'),
-                                telefono=alumno.get('telefono')
+                                fecha_nacimiento=str(alumno.get('fecha_nacimiento')),
+                                telefono=str(alumno.get('telefono'))
                                 )
 
         print "Alumno"
