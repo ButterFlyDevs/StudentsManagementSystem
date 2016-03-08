@@ -291,20 +291,17 @@ class GestorAlumnos:
             return 'Elemento no encontrado'
 
     @classmethod
-    def getProfesores(self, dniAlumno):
+    def getProfesores(self, idAlumno):
         """
         Devuelve una lista de los profesores que imparte clase a ese alumno.
 
         Argumentos:
 
-            dniAlumno: El dni del alumno del que se pide la información.
-
-
-        Extra: ¿Se debería añadir la comprobación de existencia del alumno?
-
+            idAlumno: El id del alumno del que se pide la información.
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
+        idAlumno='\''+idAlumno+'\''
 
         #Sacando los acentos...........
         mysql_query="SET NAMES 'utf8'"
@@ -329,9 +326,14 @@ class GestorAlumnos:
             row = cursor.fetchone()
             lista = []
             while row is not None:
+
+                print "Info profesor recibida: "+str(row)
+
                 profesor = Profesor()
 
-                profesor.dni=row[5]
+                profesor.dni=row[0]
+                profesor.nombre=row[1]
+                profesor.apellidos=row[2]
                 lista.append(profesor)
                 #print row[0], row[1]
                 row = cursor.fetchone()

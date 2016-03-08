@@ -77,17 +77,18 @@ class ListaAlumnos(messages.Message):
 
 class Profesor(messages.Message):
     nombre = messages.StringField(1)
-    dni = messages.StringField(2)
+    apellidos = messages.StringField(2)
+    dni = messages.StringField(3)
 
 class ProfesorCompleto(messages.Message):
     nombre = messages.StringField(1)
-    dni = messages.StringField(2)
-    direccion = messages.StringField(3)
-    localidad = messages.StringField(4)
-    provincia = messages.StringField(5)
-    fecha_nac = messages.StringField(6)
-    telefonoA = messages.StringField(7)
-    telefonoB = messages.StringField(8)
+    apellidos = messages.StringField(2)
+    dni = messages.StringField(3)
+    direccion = messages.StringField(4)
+    localidad = messages.StringField(5)
+    provincia = messages.StringField(6)
+    fecha_nac = messages.StringField(7)
+    telefono = messages.StringField(8)
 
 class ListaProfesores(messages.Message):
     profesores = messages.MessageField(Profesor, 1, repeated=True)
@@ -392,7 +393,7 @@ class HelloWorldApi(remote.Service):
     curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getProfesoresAlumno?dni=1
     '''
     @endpoints.method(ID, ListaProfesores, path='alumnos/getProfesoresAlumno', http_method='GET', name='alumnos.getProfesoresAlumno')
-    def getProfesoreAlumno(self, request):
+    def getProfesoresAlumno(self, request):
         #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
         if v:
             print ("Ejecución de getProfesoresAlumno en apigateway")
@@ -405,7 +406,10 @@ class HelloWorldApi(remote.Service):
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
 
         #Añadimos a la url la coleccion (alumnos), el recurso (alumno dado por su dni) y el recurso anidado de este (profesores)
-        url+='alumnos/'+request.dni+"/profesores"
+        url+='alumnos/'+str(request.id)+"/profesores"
+
+
+        print url
 
         #Realizamos la petición
         result = urlfetch.fetch(url)
@@ -420,14 +424,9 @@ class HelloWorldApi(remote.Service):
         profesoresItems= []
         #Que rellenamos con todo los alumnos de la listaAlumnos
         for profesor in listaProfesores:
-            profesoresItems.append(ProfesorCompleto( nombre=str(profesor.get('nombre')),
-                                           dni=str(profesor.get('dni')),
-                                           direccion=str(profesor.get('direccion')),
-                                           localidad=str(profesor.get('localidad')),
-                                           provincia=str(profesor.get('provincia')),
-                                           fecha_nac=str(profesor.get('fecha_nac')),
-                                           telefonoA=str(profesor.get('telefonoA')),
-                                           telefonoB=str(profesor.get('telefonoB'))
+            profesoresItems.append(Profesor( nombre=str(profesor.get('nombre')),
+                                           apellidos=str(profesor.get('apellidos')),
+                                           dni=str(profesor.get('dni'))
                                          )
                                 )
 

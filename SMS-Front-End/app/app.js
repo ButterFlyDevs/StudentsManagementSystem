@@ -78,6 +78,39 @@ de la vista y se usan).
              controller: 'ControladorNuevoEstudiante'
          })
 
+         .state('profesores', {
+             url: '/profesores',
+             templateUrl: 'profesores.html'
+         })
+         .state('profesores.main', {
+             url: '/main',
+             templateUrl: 'profesores-main.html',
+         })
+         .state('profesores.list', {
+              url: '/list',
+              templateUrl: 'profesores-lista.html',
+              controller: 'ControladorListaProfesores'
+          })
+          .state('profesores.detalles-estudiante',{
+            url: '/detalle/:estudianteID',
+            templateUrl: 'profesores-detalle.html',
+            controller: 'ControladorDetallesEstudiante'
+          })
+          .state('profesores.nuevo', {
+              url: '/nuevo',
+              //Podemos meter directamente texto desde aquí
+              //template: 'I could sure use a drink right now.'
+              templateUrl: 'profesores-nuevo.html',
+              controller: 'ControladorNuevoProfesor'
+          })
+
+
+
+
+
+
+
+
         // ABOUT PAGE AND MULTIPLE NAMED VIEWS =================================
         .state('about', {
             // we'll get to this in a bit
@@ -95,13 +128,13 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
   */
   $scope.addAlumno = function(){
     //console.log("lamando a addAlumno()");
-    //console.log($scope.alumno);
+    console.log($scope.alumno);
     //console.log($scope.alumno.nombre)
 
     var ROOT = 'http://localhost:8001/_ah/api';
     gapi.client.load('helloworld', 'v1', null, ROOT);
 
-    gapi.client.helloworld.greetings.insertaralumno({'nombre':$scope.alumno.nombre,'dni':$scope.alumno.dni}).execute(function(resp){
+    gapi.client.helloworld.alumnos.insertaralumno({'nombre':$scope.alumno.nombre,'dni':$scope.alumno.dni}).execute(function(resp){
       //Mostramos por consola la respuesta del servidor
       console.log(resp.message);
       $scope.respuesta=resp.message;
@@ -125,6 +158,17 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
 
   var ROOT = 'http://localhost:8001/_ah/api';
   gapi.client.load('helloworld', 'v1', null, ROOT);
+
+
+  //Pedimos al gateway que nos diga todos los profesores que imparten clase a ese alumno.
+  gapi.client.helloworld.alumnos.getProfesoresAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
+    console.log(resp);
+    //Enviamos al scope no toda la respuesta sino la lista de profesores que se espeara que contenga esta.
+    $scope.profesores = resp.profesores;
+    $scope.$apply();
+  });
+
+  //Pedimos al Gateway toda la informaicón del Alumno.
   gapi.client.helloworld.alumnos.getAlumno({'id':$stateParams.estudianteID}).execute(function(resp) {
 
     console.log("calling getAlumno with id: "+$stateParams.estudianteID);
@@ -139,20 +183,6 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
     */
   });
 
-
-  //Mockearemos un poco:
-  /*
-  var Estudiante = new Object();
-  Estudiante.edad = "15";
-  Estudiante.nombre = "Eduardo Manos Tijeras";
-  Estudiante.localidad = "Granada";
-  Estudiante.curso = "2º ESO";
-  Estudiante.telefono="999-99-99-99"
-  Estudiante.link_foto="http://maitegarcianieto.com/Fotos/Cine/Eduardo%20Manostijeras/Eduardo%20Manostijeras-7.jpg"
-
-  //En realidad debería de llamarse a la api para conseguir todos los datos del usuario.
-  $scope.es = Estudiante;
-  */
 
   //Implementación de las acciones que se producen cuando el BOTÓN ELIMINAR se pulsa.
   $scope.ButtonClick = function(){

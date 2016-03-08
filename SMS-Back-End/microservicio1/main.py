@@ -124,6 +124,7 @@ def delAlumno(id_alumno):
 @app.route('/alumnos/<string:id_alumno>/profesores',methods=['GET'])
 def getProfesoresAlumno(id_alumno):
     '''
+    Devuelve todos los profesores que imparten clase a ese alumno.
     curl -i -X GET localhost:8080/alumnos/1/profesores
     '''
     return jsonpickle.encode(GestorAlumnos.getProfesores(id_alumno))
