@@ -27,6 +27,8 @@ import jsonpickle
 #Variable habilitadora del modo verbose
 v=True
 
+nombreMicroservicio = '\n## API Gateway ##\n'
+
 # TODO: Replace the following lines with client IDs obtained from the APIs
 # Console or Cloud Console.
 WEB_CLIENT_ID = 'replace this with your web client application ID'
@@ -36,6 +38,7 @@ ANDROID_AUDIENCE = WEB_CLIENT_ID
 
 
 package = 'Hello'
+
 
 
 
@@ -120,16 +123,6 @@ class HelloWorldApi(remote.Service):
     #   COLECCIÓN ALUMNOS      /alumnos          #
     ##############################################
 
-    '''
-    getAlumnos()   [GET sin parámetros]
-
-    Devuelve una lista con todos los estudiantes registrados en el sistema, de forma simplificada (solo nombre y ID)
-
-    Llamada desde terminal:
-    curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumnos
-    Llamada desde JavaScript:
-    response =service.alumnos().getAlumnos().execute()
-    '''
     @endpoints.method(message_types.VoidMessage, ListaAlumnos,
                       #path=nombre del recurso a llamar
                       path='alumnos/getAlumnos', http_method='GET',
@@ -137,9 +130,23 @@ class HelloWorldApi(remote.Service):
                       #response = service.alumnos().listGreeting().execute()
                       name='alumnos.getAlumnos')
     def getAlumnos(self, unused_request):
+        '''
+        getAlumnos()   [GET sin parámetros]
+
+        Devuelve una lista con todos los estudiantes registrados en el sistema, de forma simplificada (solo nombre y ID)
+
+        Llamada desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumnos
+        Llamada desde JavaScript:
+        response =service.alumnos().getAlumnos().execute()
+        '''
         #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
 
-        print ("Llamando a una función específica")
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print "Petición GET a alumnos.getAlumnos"
+            print '\n'
 
         #Conexión a un microservicio específico:
 
@@ -150,18 +157,23 @@ class HelloWorldApi(remote.Service):
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
         #Añadimos el recurso al que queremos conectarnos.
         url+="alumnos"
-        print str(url)
         #result = urllib2.urlopen(url)
         #print result
 
+        if v:
+            print "Llamando a: "+str(url)
         #Llamamos al microservicio y recibimos los resultados con URLFetch
         #Al no especificar nada se llama al método GET de la URL.
         result = urlfetch.fetch(url)
 
         #Vamos a intentar consumir los datos en JSON y convertirlos a un mensje enviable :)
 
-        print "IMPRESION DE LOS DATOS RECIBIDOSsss"
-        print result.content
+        if v:
+            print nombreMicroservicio
+            print "Resultados de la petición: "
+            print result.content
+            print "Código de estado: "+str(result.status_code)+'\n'
+
         listaAlumnos = jsonpickle.decode(result.content)
 
         '''
@@ -172,6 +184,10 @@ class HelloWorldApi(remote.Service):
         #Creamos un vector
         alumnosItems= []
         #Que rellenamos con todo los alumnos de la listaAlumnos
+
+        if v:
+            print "Construcción del mensaje de salida: \n"
+
         for alumno in listaAlumnos:
             nombreAlumno = str(alumno.get('nombre'))
             idAlumno = str(alumno.get('id'))
@@ -186,18 +202,17 @@ class HelloWorldApi(remote.Service):
         #return Greeting(message=str(result.content))
         return ListaAlumnos(alumnos=alumnosItems)
 
-
-    '''
-    getAlumno() [GET con dni]
-
-    Devuelve toda la información de un estudiante en caso de estar en el sistema.
-
-    Llamada ejemplo desde terminal:
-    curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumno?dni=11AA22BBZ
-    '''
-
     @endpoints.method(ID, AlumnoCompleto, path='alumnos/getAlumno', http_method='GET', name='alumnos.getAlumno')
     def getAlumno(self,request):
+        '''
+        getAlumno() [GET con dni]
+
+        Devuelve toda la información de un estudiante en caso de estar en el sistema.
+
+        Llamada ejemplo desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumno?dni=11AA22BBZ
+        '''
+
         print "Calling APIGateway getAlumno"
         print "GET CON PARÁMETROS EN ENDPOINT"
 
@@ -259,35 +274,30 @@ class HelloWorldApi(remote.Service):
 
         return alumno
 
-
-
-
-    '''
-    insertarAlumno()  [POST con todos los atributos de un alumno]
-
-    Introduce un nuevo alumno en el sistema.
-
-    Ejemplo de llamada en terminal:
-    curl -i -d "nombre=Juan&dni=45301218Z&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nac=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno
-    (-i para ver las cabeceras)
-
-    '''
     @endpoints.method(AlumnoCompleto,MensajeRespuesta,
                      path='insertarAlumno', http_method='POST',
                      name='alumnos.insertarAlumno')
     def insertar_alumno(self, request):
+        '''
+        insertarAlumno()  [POST con todos los atributos de un alumno]
 
-        print "POST EN CLOUDPOINTS"
-        #La capacidad de recoger datos desde request vendrá dada por tipo de
-        #objeto que se espera como petición, en este caso podrán obtenerse
-        #todos los atributos que se hayan definido en AlumnoCompleto
+        Introduce un nuevo alumno en el sistema.
+
+        Ejemplo de llamada en terminal:
+        curl -i -d "nombre=Juan&dni=45301218Z&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nac=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno
+        (-i para ver las cabeceras)
+
+        '''
 
         if v:
-            print "Contenido de petición a insertar"
+            print nombreMicroservicio
+            print "Petición POST a alumnos.insertarAlumno"
+            print "Contenido de la petición:"
             print str(request)
+            print '\n'
 
         #Si no tenemos todos los atributos entonces enviamos un error de bad request.
-        if request.nombre==None or request.dni==None or request.direccion==None or request.localidad==None or request.provincia==None or request.fecha_nac==None or request.telefono==None:
+        if request.nombre==None or request.apellidos==None or request.dni==None or request.direccion==None or request.localidad==None or request.provincia==None or request.fecha_nacimiento==None or request.telefono==None:
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
@@ -295,23 +305,23 @@ class HelloWorldApi(remote.Service):
         #Añadimos el servicio al que queremos conectarnos.
         url+="alumnos"
 
-        print url
 
-        from google.appengine.api import urlfetch
-        import urllib
-
-        #Si algun dato no es pasado se introduce None
 
         #Extraemos lo datos de la petición al endpoints
         form_fields = {
           "nombre": request.nombre,
+          "apellidos": request.apellidos,
           "dni": request.dni,
           "direccion": request.direccion,
           "localidad": request.localidad,
           "provincia": request.provincia,
-          "fecha_nac": request.fecha_nac,
+          "fecha_nacimiento": request.fecha_nacimiento,
           "telefono": request.telefono
         }
+
+        if v:
+            print "Llamando a: "+url
+
 
         ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
         form_data = urllib.urlencode(form_fields)
@@ -319,9 +329,12 @@ class HelloWorldApi(remote.Service):
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
 
 
+        #Infro después de la petición:
         if v:
-            print "RESULTADOS DE PETICION AL M1: "
+            print nombreMicroservicio
+            print "Resultado de la petición: "
             print result.content
+            print "Código de estado: "
             print result.status_code
 
         if str(result.status_code) == '404':
@@ -331,32 +344,32 @@ class HelloWorldApi(remote.Service):
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
-    '''
-
-    delAlumno()  [DELETE con dniAlumno]
-
-    #Ejemplo de borrado de un recurso pasando el dni de un alumno
-    Ubuntu> curl -d "dni=1" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/alumnos/eliminaralumno
-    {
-     "message": "OK"
-    }
-
-    #Ejemplo de ejecución en el caso de no encontrar el recurso:
-    Ubuntu> curl -d "dni=1" -X DELETE -G localhost:8001/_ah/api/hellworld/v1/alumnos/eliminaralumno
-    {
-     "message": "Elemento no encontrado"
-    }
-    '''
-
     @endpoints.method(ID,MensajeRespuesta,path='delAlumno', http_method='DELETE', name='alumnos.delAlumno')
     def eliminar_alumno(self, request):
+        '''
 
-        print "POST EN CLOUDPOINTS"
-        print str(request)
+        delAlumno()  [DELETE con dniAlumno]
 
-        #Una vez que tenemos los datos aquí los enviamos al servicio que gestiona la base de datos.
-        #Podemos imprimir por pantalla los datos recolectados
-        print "MENSAJE RECIBIDO EN ENDPOINTS"+request.dni
+        #Ejemplo de borrado de un recurso pasando el dni de un alumno
+        Ubuntu> curl -d "dni=1" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/alumnos/eliminaralumno
+        {
+         "message": "OK"
+        }
+
+        #Ejemplo de ejecución en el caso de no encontrar el recurso:
+        Ubuntu> curl -d "dni=1" -X DELETE -G localhost:8001/_ah/api/hellworld/v1/alumnos/eliminaralumno
+        {
+         "message": "Elemento no encontrado"
+        }
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición DELETE a alumnos.delAlumno"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
 
         #Nos conectamos al modulo para enviarle los mismos
         from google.appengine.api import modules
@@ -371,29 +384,36 @@ class HelloWorldApi(remote.Service):
         Además no somos los primeros en encontrarse este problema:
         http://grokbase.com/t/gg/google-appengine/13bvr5qjyq/is-there-any-reason-that-urlfetch-delete-method-does-not-support-a-payload
 
-        Según la última cuestión puede que tengamos que usar POST
+        Por eso en lugar de pasar los datos por payload los añadimos a la url, que es algo equivalente.
 
         '''
-        url+='alumnos/'+request.dni
+        #Extraemos el argumento id de la petición y la añadimos a la URL
+        url+='alumnos/'+request.id
 
-        #EL problema queda aquí, a expensas de ver si podemos usar DELETE o tenemos que realizar un apaño con post
-        #usando algún parámetro que indique si se debe eliminar.
+        if v:
+            print "Llamando a: "+url
+
+        #Realizamos la petición a la url del servicio con el método apropiado.
         result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
 
-        print "RESULTADOS DE PETICION AL M1: "
-        print result.content
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
 
-        #return MensajeRespuesta(message="Todo OK man!")
+
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
-
-    '''
-    Devuelve una lista con los datos completos de los profesores que dan clase al alumno de dni pasado
-    curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getProfesoresAlumno?dni=1
-    '''
     @endpoints.method(ID, ListaProfesores, path='alumnos/getProfesoresAlumno', http_method='GET', name='alumnos.getProfesoresAlumno')
     def getProfesoresAlumno(self, request):
+        '''
+        Devuelve una lista con los datos completos de los profesores que dan clase al alumno de dni pasado
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getProfesoresAlumno?dni=1
+        '''
         #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
         if v:
             print ("Ejecución de getProfesoresAlumno en apigateway")
@@ -434,14 +454,13 @@ class HelloWorldApi(remote.Service):
         #return Greeting(message=str(result.content))
         return ListaProfesores(profesores=profesoresItems)
 
-
-    '''
-    Devuelve una lista con los datos completos de las asignatuas en las que está matriculado el alumno con dni pasado.
-    Ejemplo de llamada:
-    > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getAsignaturasAlumno?dni=1
-    '''
     @endpoints.method(ID, ListaAsignaturas, path='alumnos/getAsignaturasAlumno', http_method='GET', name='alumnos.getAsignaturasAlumno')
     def getAsignaturasAlumno(self, request):
+        '''
+        Devuelve una lista con los datos completos de las asignatuas en las que está matriculado el alumno con dni pasado.
+        Ejemplo de llamada:
+        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getAsignaturasAlumno?dni=1
+        '''
         if v:
             print ("Ejecución de getAsignaturasAlumno en apigateway")
         module = modules.get_current_module_name()
@@ -458,14 +477,13 @@ class HelloWorldApi(remote.Service):
             asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
         return ListaAsignaturas(asignaturas=asignaturasItems)
 
-
-    '''
-    Devuelve una lista con los datos completos de las cursos en las que está matriculado el alumno con dni pasado.
-    Ejemplo de llamada:
-    > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getCursosAlumno?dni=1
-    '''
     @endpoints.method(ID, ListaCursos, path='alumnos/getCursosAlumno', http_method='GET', name='alumnos.getCursosAlumno')
     def getCursosAlumno(self, request):
+        '''
+        Devuelve una lista con los datos completos de las cursos en las que está matriculado el alumno con dni pasado.
+        Ejemplo de llamada:
+        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getCursosAlumno?dni=1
+        '''
         if v:
             print ("Ejecución de getCursosAlumno en apigateway")
         module = modules.get_current_module_name()

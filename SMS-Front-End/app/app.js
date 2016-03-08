@@ -127,16 +127,25 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
   Controlador que manejará los datos del formulario enviándolos al servidor.
   */
   $scope.addAlumno = function(){
-    //console.log("lamando a addAlumno()");
+    console.log("llamada a addAlumno()")
     console.log($scope.alumno);
-    //console.log($scope.alumno.nombre)
 
     var ROOT = 'http://localhost:8001/_ah/api';
     gapi.client.load('helloworld', 'v1', null, ROOT);
 
-    gapi.client.helloworld.alumnos.insertaralumno({'nombre':$scope.alumno.nombre,'dni':$scope.alumno.dni}).execute(function(resp){
+    gapi.client.helloworld.alumnos.insertarAlumno({
+      //Aquí especificamos todos los datods del form que queremos que se envíen:
+      'nombre':$scope.alumno.nombre,
+      'apellidos':$scope.alumno.apellidos,
+      'direccion':$scope.alumno.direccion,
+      'localidad':$scope.alumno.localidad,
+      'provincia':$scope.alumno.provincia,
+      'fecha_nacimiento':$scope.alumno.fecha_nacimiento,
+      'telefono':$scope.alumno.telefono,
+      'dni':$scope.alumno.dni}
+    ).execute(function(resp){
       //Mostramos por consola la respuesta del servidor
-      console.log(resp.message);
+      console.log("Respuesta servidor: "+resp.message);
       $scope.respuesta=resp.message;
       $scope.$apply();
     });
@@ -147,14 +156,30 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
 });
 
 
-routerApp.controller('ControladorDetallesEstudiante', function($scope, $stateParams){
+routerApp.controller('ControladorDetallesEstudiante', function($location, $scope, $stateParams){
+
+  //Implementación de las acciones que se producen cuando el BOTÓN ELIMINAR se pulsa.
+  $scope.delAlumno = function(){
+    console.log("Pulsada confirmación eliminación alumno id: "+$stateParams.estudianteID)
+
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', null, ROOT);
+
+    gapi.client.helloworld.alumnos.delAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
+      //Mostramos por consola la respuesta del servidor
+      console.log(resp.message);
+      $scope.respuesta=resp.message;
+      $scope.$apply();
+    });
+
+    $location.path("/estudiantes/main");
+
+  };
 
   //Rescatamos el id de la url y la enviamos con el scope a la vista
   //$scope.id = $stateParams.estudianteID;
   $scope.id=$stateParams.estudianteID;
 
-//  document.write("<script src='/app/js/components/datepicker.js'></script>");
-//  document.write("<script src='/app/js/components/form-select.js'></script>");
 
   var ROOT = 'http://localhost:8001/_ah/api';
   gapi.client.load('helloworld', 'v1', null, ROOT);
@@ -162,7 +187,8 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
 
   //Pedimos al gateway que nos diga todos los profesores que imparten clase a ese alumno.
   gapi.client.helloworld.alumnos.getProfesoresAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
-    console.log(resp);
+    console.log("Profesores del alumno: ");
+    console.log(resp.profesores);
     //Enviamos al scope no toda la respuesta sino la lista de profesores que se espeara que contenga esta.
     $scope.profesores = resp.profesores;
     $scope.$apply();
@@ -184,19 +210,6 @@ routerApp.controller('ControladorDetallesEstudiante', function($scope, $statePar
   });
 
 
-  //Implementación de las acciones que se producen cuando el BOTÓN ELIMINAR se pulsa.
-  $scope.ButtonClick = function(){
-    console.log("Pulsado boton de eliminar")
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
-
-    gapi.client.helloworld.greetings.eliminaralumno({'dni':'sf'}).execute(function(resp){
-      //Mostramos por consola la respuesta del servidor
-      console.log(resp.message);
-      $scope.respuesta=resp.message;
-      $scope.$apply();
-    });
-  }
 
 
 });

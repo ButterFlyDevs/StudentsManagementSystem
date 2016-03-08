@@ -25,16 +25,29 @@ Diseño de la vista de la pestaña de detalles del estudiante.
                   <li>Teléfono: {{alumno.telefono}}</li>
             </ul>
 
-
-
       </div>
 
     <!-- En la tercera sección los botones de eliminar y modificar alumno -->
     <div class="uk-wdith-1-4 uk-margin-top" >
 
-      <a href="" class="uk-icon-hover uk-icon-medium uk-icon-trash"></a>
+      <a class="uk-icon-edit uk-icon-hover uk-icon-medium "></a>
+      <!--Botón que abre un menú que pide la confirmación de la eliminación del alumno -->
+      <a class="uk-icon-trash uk-icon-hover uk-icon-medium "  id="openModal" ></a>
 
-      <a href="" class="uk-icon-hover uk-icon-medium uk-icon-edit"></a>
+      <!--Definición del mensaje que se muestra -->
+      <div id="Modal" class="uk-modal" aria-hidden="true">
+        <div class="uk-modal-dialog uk-modal-dialog">
+          ¿Está seguro de quere eliminar al estudiante?
+          <hr>
+          <!-- LA implementación de la acción asociada al botón puede estar en el script incluido abajo o
+          en el propio app.js para poder usar el scope.-->
+          <button id="DelButton" ng-click="delAlumno()" class="uk-button uk-button-danger">Eliminar</button>
+          <button id="CancelButton" class="uk-button uk-button-success">Cancel</button>
+
+        </div>
+      </div>
+      <!--Inclusión del fichero donde se implementa la lógica en JavaScript del modal -->
+      <script src="js/especiales/modalEliminacionUsuario.js"></script>
 
     </div>
 

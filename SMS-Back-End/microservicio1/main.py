@@ -16,6 +16,7 @@ app = Flask(__name__)
 
 #Activar modo verbose
 v=1
+nombreMicroservicio = '\n## Microservicio BD ##\n'
 
 ############################
 #   COLECCIÓN ALUMNOS      #
@@ -43,15 +44,22 @@ def postAlumno():
     Método que inserta un nuevo alumno en el sistema.
     curl -d "nombre=Juan&dni=45601218Z&direccion=Calle arabl&localidad=Jerez de la frontera&provincia=Granada&fecha_nac=1988-2-6&telefono=677164459" -i -X POST localhost:8002/alumnos
     '''
+    if v:
+        print nombreMicroservicio
+        print 'Recurso: /alumnos , metodo: POST'
+        print "Petición: "
+        print request.form
+        
     if 'dni' in request.form:
         #Presente el DNI al menos podemos grabar el alumno en el sistema.
         #Se devuelve la salida de control de
         salida = GestorAlumnos.nuevoAlumno(request.form['nombre'],
+                                  request.form['apellidos'],
                                   request.form['dni'],
                                   request.form['direccion'],
                                   request.form['localidad'],
                                   request.form['provincia'],
-                                  request.form['fecha_nac'],
+                                  request.form['fecha_nacimiento'],
                                   request.form['telefono'])
         if salida == 'OK':
             return 'OK'

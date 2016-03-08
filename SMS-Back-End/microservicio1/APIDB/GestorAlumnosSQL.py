@@ -15,6 +15,7 @@ import dbParams
 
 #Para activar/desactivar el modo verbose para muestra de mensajes.
 v = 1
+apiName='\n## API DB ##\n'
 
 class GestorAlumnos:
     """
@@ -36,6 +37,9 @@ class GestorAlumnos:
         realizaría la query:
         INSERT INTO Alumno VALUES(NULL,'Maria','Fernández García',NULL,NULL,NULL,NULL,NULL,NULL);
         """
+
+
+
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Alumno values("+"'"+nombre+"', "+ "'"+dni+"');"
 
@@ -67,6 +71,7 @@ class GestorAlumnos:
         query="INSERT INTO Alumno VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
 
         if v:
+            print apiName
             print query
 
         cursor = db.cursor()
