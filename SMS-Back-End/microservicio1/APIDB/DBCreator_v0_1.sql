@@ -24,7 +24,7 @@ en la tabla. Así aunque no podrán existir dos alumnos que tengan exactamente e
 o el mismo DNI en caso de tenerlo.
 */
 CREATE TABLE Alumno(
-  id INT NOT NULL AUTO_INCREMENT,
+  id_alumno INT NOT NULL AUTO_INCREMENT,
   nombre CHAR(50),
   apellidos CHAR(100),
   dni INT,
@@ -33,8 +33,9 @@ CREATE TABLE Alumno(
   provincia CHAR(50),
   fecha_nacimiento DATE,
   telefono CHAR(50),
-  PRIMARY KEY (id),
-  UNIQUE (nombre, apellidos), #puede que sea mejor quitarlo
+  PRIMARY KEY (id_alumno),
+ 
+  #UNIQUE (nombre, apellidos), #puede que sea mejor quitarlo; González: Es mejor quitarlo. Es posible que dos alumnos se llamen igual.
   UNIQUE (dni)
 );
 
@@ -43,6 +44,7 @@ En este caso si existe el dni para todos y puede usarse como pk, además no
 permitiremos que existan dos personas con el mismo nombre y apellidos.
 */
 CREATE TABLE Profesor(
+  id_profesor INT NOT NULL AUTO_INCREMENT,
   nombre CHAR(50),
   apellidos CHAR(100),
   dni INT,
@@ -51,26 +53,26 @@ CREATE TABLE Profesor(
   provincia CHAR(50),
   fecha_nacimiento DATE,
   telefono CHAR(50),
-  PRIMARY KEY (dni),
+  PRIMARY KEY (id_profesor),
   UNIQUE (nombre, apellidos)  #puede que sea mejor quitarlo.
 );
 
 #Creación de la tabla Asignatura, con todos los atributos de esta entidad.
 CREATE TABLE Asignatura(
-  id INT NOT NULL AUTO_INCREMENT,
+  id_asignatura INT NOT NULL AUTO_INCREMENT,
   nombre CHAR(100),
-  PRIMARY KEY (id),
+  PRIMARY KEY (id_asignatura),
   UNIQUE (nombre) #No se entiende que haya dos asignaturas con el mismo nombre exacto, por eso no se permite.
 );
 
 #Creación de la tabla Clase, ejemplo
 CREATE TABLE Clase(
-  id INT NOT NULL AUTO_INCREMENT,
+  id_clase INT NOT NULL AUTO_INCREMENT,
   curso INT(1),
   grupo CHAR(1),
   nivel CHAR(20),
   #La clave primaria la forman los tres campos que juntos no pueden ser repetidos. (Sólo puede existir una entidad con ellos)
-  PRIMARY KEY (id),
+  PRIMARY KEY (id_clase),
   #Hacemos que los tres campos sean UNIQUE para que no pueda exisir una clase con los mismos datos que otra
   UNIQUE (curso, grupo, nivel)
 );
@@ -83,8 +85,8 @@ CREATE TABLE Asocia(
  id_asignatura INT,
 
  #Especificamos que se trata de claves foráneas (claves primarias de otras tablas)
- FOREIGN KEY (id_clase) REFERENCES Clase(id),
- FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id),
+ FOREIGN KEY (id_clase) REFERENCES Clase(id_clase),
+ FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id_asignatura),
 
  #Especificamos la formación de la clave primaria en esta tabla.
  PRIMARY KEY (id_clase, id_asignatura)
@@ -102,7 +104,7 @@ CREATE TABLE Imparte(
   #Especificamos que se trata de claves foráneas.
   FOREIGN KEY (id_clase, id_asignatura) REFERENCES Asocia(id_clase, id_asignatura),
 #  FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id_asignatura),
-  FOREIGN KEY (id_profesor) REFERENCES Profesor(dni),
+  FOREIGN KEY (id_profesor) REFERENCES Profesor(id_profesor),
 
   #Establecemos la clave primaria compuesta.
   PRIMARY KEY ( id_clase, id_asignatura, id_profesor)
@@ -121,7 +123,7 @@ CREATE TABLE Matricula(
 
   #Especificamos que se trata de claves foráneas.
   FOREIGN KEY (id_clase, id_asignatura) REFERENCES Asocia(id_clase, id_asignatura),
-  FOREIGN KEY (id_alumno) REFERENCES Alumno(id),
+  FOREIGN KEY (id_alumno) REFERENCES Alumno(id_alumno),
 
   #Establecemos la clave primaria compuesta.
   PRIMARY KEY (id_alumno, id_clase, id_asignatura)

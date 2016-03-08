@@ -23,7 +23,7 @@ class GestorAlumnos:
     """
 
     @classmethod
-    def nuevoAlumno(self, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
+    def nuevoAlumno(self,nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
         """
         Introduce un nuevo alumno en la base de datos.
         El único argumento que se necesita como mínimo es el nombre.
@@ -64,6 +64,7 @@ class GestorAlumnos:
         '''
 
         #NULL por el campo id que es primary key y que se autoincrementa automat por la definición de la tabla Alumno en la BD. (ver DBCreator_v0_1.sql)
+
         query="INSERT INTO Alumno VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
 
         if v:

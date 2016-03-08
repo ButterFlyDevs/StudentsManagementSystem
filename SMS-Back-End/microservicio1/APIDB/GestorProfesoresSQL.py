@@ -48,7 +48,7 @@ class GestorProfesores:
         if(telefono!='NULL'):
             telefono='\''+telefono+'\''
 
-        query="INSERT INTO Profesor VALUES("+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
+        query="INSERT INTO Profesor VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
 
         if v:
             print '\n'+query
