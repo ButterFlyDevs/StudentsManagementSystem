@@ -129,40 +129,61 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
   $scope.submitForm = function(formData){
 
 
+    //Lógica del formulario.
 
+    //Cuando el formulario es válido porque cumple con todas las especificaciones:
     if ($scope.formNuevoAlumno.$valid) {
-       alert('Formulario válido');
+       console.log('Formulario válido');
+       console.log('Se progecede a guardar al alumno en la base de datos.')
+
+       var salidaEjecucion;
+
+       console.log("llamada a addAlumno()")
+       console.log($scope.alumno);
+
+       var ROOT = 'http://localhost:8001/_ah/api';
+       gapi.client.load('helloworld', 'v1', null, ROOT);
+
+       gapi.client.helloworld.alumnos.insertarAlumno({
+         //Aquí especificamos todos los datods del form que queremos que se envíen:
+         'nombre':$scope.alumno.nombre,
+         'apellidos':$scope.alumno.apellidos,
+         'direccion':$scope.alumno.direccion,
+         'localidad':$scope.alumno.localidad,
+         'provincia':$scope.alumno.provincia,
+         'fecha_nacimiento':$scope.alumno.fecha_nacimiento,
+         'telefono':$scope.alumno.telefono,
+         'dni':$scope.alumno.dni}
+       ).execute(function(resp){
+         //Mostramos por consola la respuesta del servidor
+         salidaEjecucion=resp.message;
+         console.log("Respuesta servidor: "+salidaEjecucion);
+         console.log(salidaEjecucion);
+
+          if (salidaEjecucion == 'OK'){
+            /*
+            Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+            de este componente, esto lo hcemos en la plantilla (html)
+            */
+            $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
+          }else{
+            $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+          }
+
+         $scope.$apply();
+       });
+
+
+
      }
      else {
          //if form is not valid set $scope.addContact.submitted to true
-         alert('Formulario inválido');
+         console.log('Formulario inválido');
          clase="uk-class-danger"
          $scope.formNuevoAlumno.submitted=true;
      };
 
 
-    console.log("llamada a addAlumno()")
-    console.log($scope.alumno);
-
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
-
-    gapi.client.helloworld.alumnos.insertarAlumno({
-      //Aquí especificamos todos los datods del form que queremos que se envíen:
-      'nombre':$scope.alumno.nombre,
-      'apellidos':$scope.alumno.apellidos,
-      'direccion':$scope.alumno.direccion,
-      'localidad':$scope.alumno.localidad,
-      'provincia':$scope.alumno.provincia,
-      'fecha_nacimiento':$scope.alumno.fecha_nacimiento,
-      'telefono':$scope.alumno.telefono,
-      'dni':$scope.alumno.dni}
-    ).execute(function(resp){
-      //Mostramos por consola la respuesta del servidor
-      console.log("Respuesta servidor: "+resp.message);
-      $scope.respuesta=resp.message;
-      $scope.$apply();
-    });
 
   };
 

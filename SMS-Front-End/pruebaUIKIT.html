@@ -15,6 +15,20 @@
   </head>
 
   <body>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/uikit/2.21.0/js/uikit.js'></script>
+
+    <link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
+    <script type="text/javascript" src="app/js/components/notify.js"></script>
+    <button class="uk-button" data-message="Success message..." data-status="success">Success</button>
+    <script>
+       $(function(){
+           $("body").on("click", ".uk-button[data-message]", function(){
+               $.UIkit.notify($(this).data());
+
+           });
+       })
+       </script>
 
             <button id="openModal" class="uk-button">Open Modal</button>
 
@@ -29,8 +43,7 @@
             </div>
 
 
-            <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-            <script src='https://cdnjs.cloudflare.com/ajax/libs/uikit/2.21.0/js/uikit.js'></script>
+
 
                     <script>
                     var eventHandlerType = (UIkit.support.touch) ? 'tap' : 'click',

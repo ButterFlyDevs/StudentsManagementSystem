@@ -50,12 +50,26 @@
 
 
         <!-- Botón de enviar
-        Esepecificamos la función (en este caso addAlumno()) que se llama al presionar el botón.
-        Esta función está definida en el controlador que carga esta plantilla.
+        Este botón responde a la función definida en el controlador con el nombre puesto en ng-submit, en este caso:submitForm()
         -->
         <br class="uk-margin-bottom">
 
-        <button type="submit" class="uk-button"  ng-class="{ 'uk-button-success' : !formNuevoAlumno.$invalid }" ng-disabled="formNuevoAlumno.$invalid">Submit</button>
+        <!--Añadimos el CSS y el javascript necesarios para poder usar las notificaciones flotantes -->
+        <link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
+        <script type="text/javascript" src="app/js/components/notify.js"></script>
+
+        <button type="submit" class="uk-button"  data-message="Success message..." data-status="success" ng-class="{ 'uk-button-success' : !formNuevoAlumno.$invalid }" ng-disabled="formNuevoAlumno.$invalid">Submit</button>
+        <!--<script>
+           $(function(){
+               $("body").on("click", ".uk-button[data-message]", function(){
+                  // $.UIkit.notify($(this).data());
+                   $.UIkit.notify("Alumno guardado con éxito.");
+
+               });
+           })
+           </script>
+         -->
+
 
         <!-- <input type="submit" class="uk-button" ng-click="submitForm(alumno)" />-->
         <!-- <button class="uk-button" ng-click="addAlumno()">Enviar</button> -->
