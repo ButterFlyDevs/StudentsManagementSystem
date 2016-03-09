@@ -14,12 +14,12 @@ Plantilla de diseños que crea la lista de los estudiantes que el controlador no
   -->
 
 
-  <h2>Estudiantes en el sistema.</h2>
+  <h2>Profesores en el sistema.</h2>
   <ul class="uk-list-line">
       <!-- Mostramos todos los alumnos cargados por el controlador, convirtiendo cada uno además
       en un enlace a la ventana propia del estudiante, además pasamos el identificador  como parámetro en la URL-->
-      <li ng-repeat="alumno in alumnos">
+      <li ng-repeat="profesor in profesores">
         <!--Doc en : https://github.com/angular-ui/ui-router/wiki/Quick-Reference#ui-sref -->
-        <a ui-sref="estudiantes.detalles-estudiante({ estudianteID: alumno.id })">{{ alumno.nombre }}</a>
+        <a ui-sref="profesores.detalles-profesor({ profesorID: profesor.id })">{{ profesor.nombre }}</a>
       </li>
   </ul>

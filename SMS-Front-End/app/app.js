@@ -126,7 +126,21 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
   /*
   Controlador que manejará los datos del formulario enviándolos al servidor.
   */
-  $scope.addAlumno = function(){
+  $scope.submitForm = function(formData){
+
+
+
+    if ($scope.formNuevoAlumno.$valid) {
+       alert('Formulario válido');
+     }
+     else {
+         //if form is not valid set $scope.addContact.submitted to true
+         alert('Formulario inválido');
+         clase="uk-class-danger"
+         $scope.formNuevoAlumno.submitted=true;
+     };
+
+
     console.log("llamada a addAlumno()")
     console.log($scope.alumno);
 
