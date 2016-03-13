@@ -1,3 +1,60 @@
+<!--Importamos las librerías necesarias -->
+<!-- concatenated flow.js + ng-flow libraries -->
+
+
+
+<div flow-init="{target: '/upload'}"
+     flow-files-submitted="$flow.upload()"
+     flow-file-success="$file.msg = $message">
+
+  <input type="file" flow-btn/>
+  Input OR Other element as upload button
+  <span class="btn" flow-btn>Upload File</span>
+
+  <table>
+    <tr ng-repeat="file in $flow.files">
+        <td>{{$index+1}}</td>
+        <td>{{file.name}}</td>
+        <td>{{file.msg}}</td>
+    </tr>
+  </table>
+</div>
+
+
+<div class="container"  flow-init
+      flow-file-added="!!{png:1,gif:1,jpg:1,jpeg:1}[$file.getExtension()]"
+      flow-files-submitted="$flow.upload()">
+  <h1>flow image example</h1>
+  <hr class="soften"/>
+
+  <div>
+    <div class="thumbnail" ng-hide="$flow.files.length">
+      <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&text=no+image" />
+    </div>
+    <div class="thumbnail" ng-show="$flow.files.length">
+      <img flow-img="$flow.files[0]" />
+      <h2>{{$flow.files[0].name}}</h2>
+    </div>
+    <div>
+      <span class="uk-button" ng-hide="$flow.files.length" flow-btn flow-attrs="{accept:'image/*'}">Select image</span>
+
+      <!-- <a href="#" class="btn" ng-show="$flow.files.length" flow-btn flow-attrs="{accept:'image/*'}">Change</a> -->
+      <a href="#" class="btn btn-danger" ng-show="$flow.files.length" ng-click="$flow.cancel()"> Remove </a>
+    </div>
+    <p>
+      Only PNG,GIF,JPG files allowed.
+    </p>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
 <p class="uk-h2">Registro de un nuevo estudiante </p>
 <hr>
 

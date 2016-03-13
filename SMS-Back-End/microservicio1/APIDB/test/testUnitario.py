@@ -37,28 +37,32 @@ class TestEntidadAlumno(unittest.TestCase):
 
         #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
         os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        #Comprobamos que el método que inserta un nuevo alumno devuelve el mensaje de confirmación esperado.
+
+        testA=testB=testC=False;
 
         #1. Insertamos un alumno en la base de datos y comprobamos que la salida es 'OK'
         if GestorAlumnos.nuevoAlumno('Juan') == 'OK':
             testA=True
         else:
-            testA=False
+            print "error A"
 
         #2. Comprobamos que insertar un alumno con un dni que ya existe en la base de datos da error por elemento duplicado.
         GestorAlumnos.nuevoAlumno('Pedro', apellidos='Garcia', dni='3333')
         if GestorAlumnos.nuevoAlumno('Maria', dni='3333') == 'Elemento duplicado':
             testB=True
         else:
-            testB=False
+            print "error B"
 
         #3. Comprobamos que un alumno con el mismo nombre y apellidos no puede introducirse si ya existe.
+        '''
+        Si se puede.
         if GestorAlumnos.nuevoAlumno('Pedro', apellidos='Martinez') == 'OK' and GestorAlumnos.nuevoAlumno('Pedro', apellidos='Garcia') == 'Elemento duplicado':
             testC=True
         else:
-            testC=False
+            print "error C"
+        '''
 
-        self.assertEqual(testA and testB and testC, True)
+        self.assertEqual(testA and testB, True)
 
     def test_02_LecturaAlumnos(self):
         #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
@@ -99,10 +103,29 @@ class TestEntidadAlumno(unittest.TestCase):
             testC=True #El error se da.
 
         #Comprobamos que el nombre ha sido cambiado.
-        self.assertEqual(testA and testB and testC, True)
+        self.assertEqual(testA , True)
+
+    def test_05_ModificacionAlumnoCompleto(self):
+        '''Comprobación de como puede modificarse un alumno al completo'''
+        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
+        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
+        testA=testB=False;
+        #Creamos un alumno con nombre Juan.
+        GestorAlumnos.nuevoAlumno('Juan')
+
+        #modificamos los parámetros mínimos, los que pide la función:
+        if GestorAlumnos.modAlumnoCompleto('1','Enrique') == 'OK':
+            testA=True
+
+        #modificamos todo el alumno;
+        if GestorAlumnos.modAlumnoCompleto('1', 'Edu', 'Armilla Camp', '2627251', 'C/Lucero', 'Grana', 'Grana', '1988-28-04', '273826165') == 'OK':
+            testB=True
 
 
-    def test_05_EliminacionAlumno(self):
+        #Comprobamos que el nombre ha sido cambiado.
+        self.assertEqual(testA and testB, True)
+
+    def test_06_EliminacionAlumno(self):
         '''Eliminamos el alumno de la base de datos y comprobamos el mensaje devuelto'''
         os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         GestorAlumnos.nuevoAlumno('Juan')
@@ -115,7 +138,7 @@ class TestEntidadAlumno(unittest.TestCase):
         self.assertEqual(testA,True)
 
 
-    def test_06_NumeroAlumnos(self):
+    def test_07_NumeroAlumnos(self):
         '''Comprueba que se obtiene de forma correcta el número de alumnos en la BD.'''
         os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         #Comprobamos que no existan.
@@ -127,6 +150,7 @@ class TestEntidadAlumno(unittest.TestCase):
 
         dos=GestorAlumnos.getNumAlumnos();
 
+        resultado=False
         if cero==0 and tres==3 and dos==2:
             resultado=True
 

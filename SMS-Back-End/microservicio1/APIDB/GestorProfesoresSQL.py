@@ -92,7 +92,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
 
-        query="select nombre, apellidos, dni from Profesor"
+        query="select nombre, apellidos, id_profesor from Profesor"
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -119,13 +119,13 @@ class GestorProfesores:
         #Una de las opciones es convertirlo en un objeto y devolverlo
 
     @classmethod
-    def getProfesor(self, dniProfesor):
+    def getProfesor(self, idProfesor):
         """
         Recupera TODA la información de un Profesor en concreto a través de la clave primaria, su DNI.
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query="select * from Profesor where dni='"+dniProfesor+"';"
+        query="select * from Profesor where id='"+idProfesor+"';"
 
         if v:
             print '\n'+query
@@ -164,7 +164,7 @@ class GestorProfesores:
             return 'Elemento no encontrado'
 
     @classmethod
-    def modProfesor(self, dniProfesor, campoACambiar, nuevoValor):
+    def modProfesor(self, idProfesor, campoACambiar, nuevoValor):
         """
         Esta función permite cambiar cualquier atributo de un Profesor.
         Parámetros:
@@ -173,8 +173,8 @@ class GestorProfesores:
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
-        dniProfesor='\''+dniProfesor+'\''
-        query="UPDATE Profesor SET "+campoACambiar+"="+nuevoValor+" WHERE dni="+dniProfesor+";"
+        idProfesor='\''+idProfesor+'\''
+        query="UPDATE Profesor SET "+campoACambiar+"="+nuevoValor+" WHERE id_profesor="+idProfesor+";"
         if v:
             print '\n'+query;
 
@@ -210,11 +210,11 @@ class GestorProfesores:
             return 'Elemento no encontrado'
 
     @classmethod
-    def delProfesor(self, dniProfesor):
+    def delProfesor(self, idProfesor):
         #print "Intentado eliminar profesor con dni "+str(dniProfesor)
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Profesor where dni='"+dniProfesor+"';"
+        query="delete from Profesor where id_profesor='"+idProfesor+"';"
         if v:
             print '\n'+query
         salida =''
@@ -277,7 +277,7 @@ class GestorProfesores:
             return 'Elemento no encontrado'
 
     @classmethod
-    def getAlumnos(self, dniProfesor):
+    def getAlumnos(self, idProfesor):
         """
         Devuelve una lista con los alumnos al que imparte clase ese profesor, incluyendo
         los campos id, nombre, apellidos y dni de los alumnos del profesor
@@ -295,7 +295,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT id, nombre, apellidos, dni from Alumno where id in (select id_alumno from Matricula where id_asignatura in (select id_asignatura from Imparte where id_profesor='+dniProfesor+') AND id_clase in (select id_clase from Imparte where id_profesor='+dniProfesor+'))'
+        query='SELECT id, nombre, apellidos, dni from Alumno where id in (select id_alumno from Matricula where id_asignatura in (select id_asignatura from Imparte where id_profesor='+idProfesor+') AND id_clase in (select id_clase from Imparte where id_profesor='+dniProfesor+'))'
 
         try:
             salida = cursor.execute(query);

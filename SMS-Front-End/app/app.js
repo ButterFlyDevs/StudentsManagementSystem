@@ -1,5 +1,5 @@
 // app.js
-var routerApp = angular.module('routerApp', ['ui.router']);
+var routerApp = angular.module('routerApp', ['ui.router', 'flow']);
 
 // ############# ENRUTADOR #################################### //
 
@@ -61,6 +61,13 @@ de la vista y se usan).
            controller: 'ControladorDetallesEstudiante'
          })
 
+         //Vista detalles estudiantes anidada dentro de estudiantes.
+         .state('estudiantes.modificacion-estudiante',{
+           url: '/modificacion/:estudianteID',
+           templateUrl: 'estudiantes-modificacion.html',
+           controller: 'ControladorModificacionEstudiante'
+         })
+
          /* El anidamiento de una tercera vista que no usarmos
          //Vista de datos académicos anidada dentro de detalles de estudiantes.
          .state('estudiantes.detalles-estudiante.datos-academicos',{
@@ -92,7 +99,7 @@ de la vista y se usan).
               controller: 'ControladorListaProfesores'
           })
           .state('profesores.detalles-estudiante',{
-            url: '/detalle/:estudianteID',
+            url: '/modificacion/:estudianteID',
             templateUrl: 'profesores-detalle.html',
             controller: 'ControladorDetallesEstudiante'
           })
@@ -121,6 +128,19 @@ de la vista y se usan).
 });
 
 
+routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
+  flowFactoryProvider.defaults = {
+    target: 'upload.php',
+    permanentErrors: [404, 500, 501],
+    maxChunkRetries: 1,
+    chunkRetryInterval: 5000,
+    simultaneousUploads: 4,
+    singleFile: true
+  };
+  flowFactoryProvider.on('catchAll', function (event) {
+    console.log('catchAll', arguments);
+  });
+  }]);
 
 routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
   /*
@@ -191,6 +211,38 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
 });
 
 
+routerApp.controller('ControladorModificacionEstudiante', function($location, $scope, $stateParams){
+
+  //Rescatamos el id de la url y la enviamos con el scope a la vista
+  //$scope.id = $stateParams.estudianteID;
+  $scope.id=$stateParams.estudianteID;
+
+
+  var ROOT = 'http://localhost:8001/_ah/api';
+  gapi.client.load('helloworld', 'v1', null, ROOT);
+
+
+  //Pedimos al Gateway toda la informaicón del Alumno.
+  gapi.client.helloworld.alumnos.getAlumno({'id':$stateParams.estudianteID}).execute(function(resp) {
+
+    console.log("calling getAlumno with id: "+$stateParams.estudianteID);
+    console.log(resp);
+    $scope.alumno = resp;
+    console.log(resp.nombre);
+    $scope.$apply();
+    /*
+    $scope.es=resp.alumno;
+    //Tenemos que hacer esto para que se aplique scope ya que la llamada a la API está fuera de Angular
+    $scope.$apply();
+    */
+  });
+
+
+
+
+});
+
+
 routerApp.controller('ControladorDetallesEstudiante', function($location, $scope, $stateParams){
 
   //Implementación de las acciones que se producen cuando el BOTÓN ELIMINAR se pulsa.
@@ -204,10 +256,25 @@ routerApp.controller('ControladorDetallesEstudiante', function($location, $scope
       //Mostramos por consola la respuesta del servidor
       console.log(resp.message);
       $scope.respuesta=resp.message;
+
+
+      //El mensje no sale debido (en principio) a que cambiamos de pantall
+      if (resp.message == 'OK'){
+        /*
+        Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+        de este componente, esto lo hcemos en la plantilla (html)
+        */
+        $.UIkit.notify("Alumno eliminado con éxito.", {status:'success'});
+      }else{
+        $.UIkit.notify("\""+resp.message+"\"", {status:'warning'});
+      }
+
+
       $scope.$apply();
     });
 
-    $location.path("/estudiantes/main");
+    //Después volvemos a la página principal de estudiantes, ahora desbloqueado porque se pierde el mensaje al cambiar.
+    //$location.path("/estudiantes/main");
 
   };
 

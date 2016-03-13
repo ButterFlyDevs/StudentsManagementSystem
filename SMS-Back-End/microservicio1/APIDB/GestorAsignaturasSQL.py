@@ -108,7 +108,7 @@ class GestorAsignaturas:
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query="select * from Asignatura where id='"+idAsignatura+"';"
+        query="select * from Asignatura where id_asignatura='"+idAsignatura+"';"
         if v:
             print '\n'+query
         try:
@@ -149,7 +149,7 @@ class GestorAsignaturas:
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idAsignatura='\''+idAsignatura+'\''
-        query="UPDATE Asignatura SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idAsignatura+";"
+        query="UPDATE Asignatura SET "+campoACambiar+"="+nuevoValor+" WHERE id_asignatura="+idAsignatura+";"
         if v:
             print '\n'+query
 
@@ -188,7 +188,7 @@ class GestorAsignaturas:
             print "Intentado eliminar asignatura con id "+str(idAsignatura)
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Asignatura where id='"+idAsignatura+"';"
+        query="delete from Asignatura where id_asignatura='"+idAsignatura+"';"
         salida =''
         try:
             salida = cursor.execute(query);

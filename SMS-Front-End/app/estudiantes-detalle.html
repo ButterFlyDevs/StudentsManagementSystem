@@ -2,7 +2,9 @@
 <!--
 Diseño de la vista de la pestaña de detalles del estudiante.
 -->
-
+<!--Añadimos el CSS y el javascript necesarios para poder usar las notificaciones flotantes -->
+<link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
+<script type="text/javascript" src="app/js/components/notify.js"></script>
 <div class="uk-grid">
 
     <!--En la primera sección ponemos la imagen del usuario usando la url de este -->
@@ -10,6 +12,7 @@ Diseño de la vista de la pestaña de detalles del estudiante.
       <!--src={{es.link_foto}}-->
       <img class="uk-border-circle"  width="150" height="150" src=http://maitegarcianieto.com/Fotos/Cine/Eduardo%20Manostijeras/Eduardo%20Manostijeras-7.jpg alt="">
     </div>
+
 
     <!-- En la segunda sección TODOS sus datos, junto a su diseño con el kit de CSS-->
     <div class="uk-width-2-4 uk-margin-top ">
@@ -30,7 +33,10 @@ Diseño de la vista de la pestaña de detalles del estudiante.
     <!-- En la tercera sección los botones de eliminar y modificar alumno -->
     <div class="uk-wdith-1-4 uk-margin-top" >
 
-      <a class="uk-icon-edit uk-icon-hover uk-icon-medium "></a>
+      <!--Botón de modificación -->
+      <a ui-sref="estudiantes.modificacion-estudiante({ estudianteID: alumno.id })" class="uk-icon-edit uk-icon-hover uk-icon-medium "></a>
+
+
       <!--Botón que abre un menú que pide la confirmación de la eliminación del alumno -->
       <a class="uk-icon-trash uk-icon-hover uk-icon-medium "  id="openModal" ></a>
 

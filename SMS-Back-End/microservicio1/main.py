@@ -49,7 +49,7 @@ def postAlumno():
         print 'Recurso: /alumnos , metodo: POST'
         print "Petición: "
         print request.form
-        
+
     if 'dni' in request.form:
         #Presente el DNI al menos podemos grabar el alumno en el sistema.
         #Se devuelve la salida de control de
@@ -95,15 +95,35 @@ def getAlumno(id_alumno):
     else:
         return jsonpickle.encode(GestorAlumnos.getAlumno(id_alumno))
 
-''' Hasta ver como proceder con la modificación de alumnos.
-@app.route('/alumnos/<string:id_alumno>',methods=['PUT'])
-def modAlumno(id_alumno):
-    #Si no tiene el número correcto de caracteres el identificador.
-    if len(id_alumno) != 9:
-        abort(404)
-    return id_alumno
-'''
 
+@app.route('/alumnos/<string:id_alumno>',methods=['POST'])
+def modAlumno(id_alumno):
+    '''
+    Función que modifica los atributos de un alumno dado su identificación, usando la función
+    modAlumnoCompleto de la APIDB
+    curl -d "nombre=Juan&dni=45601218Z&direccion=Calle arabl&localidad=Jerez de la frontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=677164459" -i -X POST localhost:8002/alumno/1
+    '''
+    if v:
+        print 'Calling GestorAlumnos.modAlumnoCompleto()'
+
+    #El id del alumno se pasa por la URL
+    salida = GestorAlumnos.modAlumnoCompleto(id_alumno, request.form['nombre'],
+                              request.form['apellidos'],
+                              request.form['dni'],
+                              request.form['direccion'],
+                              request.form['localidad'],
+                              request.form['provincia'],
+                              request.form['fecha_nacimiento'],
+                              request.form['telefono'])
+
+    if v:
+        print "SALIDA: "+salida
+
+    if salida == 'OK':
+        return 'OK'
+    else:
+        abort(404)
+    
 @app.route('/alumnos/<string:id_alumno>',methods=['DELETE'])
 def delAlumno(id_alumno):
     '''

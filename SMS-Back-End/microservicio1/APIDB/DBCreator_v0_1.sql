@@ -34,7 +34,7 @@ CREATE TABLE Alumno(
   fecha_nacimiento DATE,
   telefono CHAR(50),
   PRIMARY KEY (id_alumno),
- 
+
   #UNIQUE (nombre, apellidos), #puede que sea mejor quitarlo; González: Es mejor quitarlo. Es posible que dos alumnos se llamen igual.
   UNIQUE (dni)
 );

@@ -38,8 +38,6 @@ class GestorAlumnos:
         INSERT INTO Alumno VALUES(NULL,'Maria','Fernández García',NULL,NULL,NULL,NULL,NULL,NULL);
         """
 
-
-
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Alumno values("+"'"+nombre+"', "+ "'"+dni+"');"
 
@@ -73,6 +71,7 @@ class GestorAlumnos:
 
         if v:
             print apiName
+            print "nuevoAlumno()"
             print query
 
         cursor = db.cursor()
@@ -96,6 +95,9 @@ class GestorAlumnos:
         db.commit()
         cursor.close()
         db.close()
+
+        if v:
+            print "salida MySQL: "+str(salida)
 
         if salida==1:
             return 'OK'
@@ -152,7 +154,7 @@ class GestorAlumnos:
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
         idAlumno='\''+idAlumno+'\''
-        query='select * from Alumno where id='+idAlumno+';'
+        query='select * from Alumno where id_alumno='+idAlumno+';'
 
         try:
             salida = cursor.execute(query);
@@ -190,7 +192,7 @@ class GestorAlumnos:
     @classmethod
     def modAlumno(self, idAlumno, campoACambiar, nuevoValor):
         """
-        Esta función permite cambiar cualquier atributo de un alumno.
+        Esta función permite cambiar cualquier atributo de un alumno, dado su id.
         Parámetros:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
@@ -198,7 +200,7 @@ class GestorAlumnos:
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idAlumno='\''+idAlumno+'\''
-        query="UPDATE Alumno SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idAlumno+";"
+        query="UPDATE Alumno SET "+campoACambiar+"="+nuevoValor+" WHERE id_alumno="+idAlumno+";"
 
 
 
@@ -232,11 +234,70 @@ class GestorAlumnos:
             return 'Elemento no encontrado'
 
     @classmethod
+    def modAlumnoCompleto(self, idAlumno, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
+        '''
+        Modifica todos los atributos de un alumno dado su id al mismo tiempo.
+        '''
+
+        #Info de seguimiento
+        if v:
+            print apiName
+            print "Llamada a modAlumnoCompleto"
+            print '\n'
+
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        query="UPDATE Alumno SET"
+        query=query+" nombre= "+'\''+nombre+'\''
+        query=query+" , apellidos= "+'\''+apellidos+'\''
+        query=query+" , dni= "+'\''+dni+'\''
+        query=query+" , direccion= "+'\''+direccion+'\''
+        query=query+" , localidad= "+'\''+localidad+'\''
+        query=query+" , provincia= "+'\''+provincia+'\''
+        query=query+" , fecha_nacimiento= "+'\''+fecha_nacimiento+'\''
+        query=query+" , telefono= "+'\''+telefono+'\''
+        query=query+"WHERE id_alumno="+idAlumno+";"
+
+        if v:
+            print apiName
+            print query
+
+        cursor = db.cursor()
+        salida =''
+
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        if v:
+            print "Salida MySQL: "+str(salida)
+
+        #Efectuamos los cambios
+        db.commit()
+        cursor.close()
+        db.close()
+
+        if salida==1:
+            return 'OK'
+        elif salida==1062:
+            return 'Elemento duplicado'
+        elif salida==0:
+            return 'Elemento no encontrado'
+
+
+    @classmethod
     def delAlumno(self, idAlumno):
         #print "Intentado eliminar alumno con dni "+str(dniAlumno)
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query='delete from Alumno where id='+idAlumno+';'
+        idAlumno='\''+idAlumno+'\''
+        query='delete from Alumno WHERE id_alumno='+idAlumno+';'
         salida =''
         try:
             salida = cursor.execute(query);

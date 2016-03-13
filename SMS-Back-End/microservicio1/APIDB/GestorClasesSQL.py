@@ -123,7 +123,7 @@ class GestorClases:
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
         idClase='\''+idClase+'\''
-        query="select * from Clase where id="+idClase+";"
+        query="select * from Clase where id_clase="+idClase+";"
         if v:
             print '\n'+query
         try:
@@ -171,7 +171,7 @@ class GestorClases:
         #Al parámetro campoACambiar no se le añaden comillas para no generar un error de sintaxis en MySQL.
         nuevoValor='\''+nuevoValor+'\''
 
-        query="UPDATE Clase SET "+campoACambiar+"="+nuevoValor+" WHERE id="+idClase+";"
+        query="UPDATE Clase SET "+campoACambiar+"="+nuevoValor+" WHERE id_clase="+idClase+";"
         if v:
             print '\n'+query
 
@@ -204,10 +204,10 @@ class GestorClases:
     @classmethod
     def delClase(self, idClase):
         if v:
-            print "Intentado eliminar Clase con id "+str(idClase)
+            print "Intentado eliminar Clase con id_clase "+str(idClase)
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Clase  WHERE id="+idClase+";"
+        query="delete from Clase  WHERE id_clase="+idClase+";"
         salida =''
         try:
             salida = cursor.execute(query);
