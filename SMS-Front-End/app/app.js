@@ -142,10 +142,12 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
   });
   }]);
 
-routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
+routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) {
   /*
   Controlador que manejará los datos del formulario enviándolos al servidor.
   */
+
+  var insertado = 0;
   $scope.submitForm = function(formData){
 
 
@@ -183,11 +185,16 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
           if (salidaEjecucion == 'OK'){
             /*
             Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
-            de este componente, esto lo hcemos en la plantilla (html)
+            de este componente,   esto lo hcemos en la plantilla (html)
             */
             $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
+            insertado=1;
+            console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+            $location.path("/estudiantes/main");
           }else{
             $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+            insertado=0;
+            console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
           }
 
          $scope.$apply();
@@ -206,7 +213,10 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
 
 
   };
-
+  console.log("Valor insertar: "+insertado);
+  if(insertado == 1 ){
+   $location.path("/estudiantes/main");
+ }
 
 });
 
