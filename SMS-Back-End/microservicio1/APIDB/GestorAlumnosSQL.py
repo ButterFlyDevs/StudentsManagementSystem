@@ -249,13 +249,22 @@ class GestorAlumnos:
         query="UPDATE Alumno SET"
         query=query+" nombre= "+'\''+nombre+'\''
         query=query+" , apellidos= "+'\''+apellidos+'\''
-        query=query+" , dni= "+'\''+dni+'\''
+        if dni=='NULL':
+            query=query+" , dni=NULL "
+        else:
+            query=query+" , dni= "+'\''+dni+'\''
         query=query+" , direccion= "+'\''+direccion+'\''
         query=query+" , localidad= "+'\''+localidad+'\''
         query=query+" , provincia= "+'\''+provincia+'\''
-        query=query+" , fecha_nacimiento= "+'\''+fecha_nacimiento+'\''
+
+        if fecha_nacimiento=='NULL':
+            query=query+" , fecha_nacimiento=NULL "
+        else:
+            query=query+" , fecha_nacimiento= "+'\''+fecha_nacimiento+'\''
+
+
         query=query+" , telefono= "+'\''+telefono+'\''
-        query=query+"WHERE id_alumno="+idAlumno+";"
+        query=query+" WHERE id_alumno="+idAlumno+";"
 
         if v:
             print apiName
@@ -288,7 +297,7 @@ class GestorAlumnos:
         elif salida==1062:
             return 'Elemento duplicado'
         elif salida==0:
-            return 'Elemento no encontrado'
+            return 'Sin cambios realizados'
 
 
     @classmethod

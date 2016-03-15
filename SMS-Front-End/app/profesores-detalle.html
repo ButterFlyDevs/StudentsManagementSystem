@@ -3,6 +3,9 @@
 Diseño de la vista de la pestaña de detalles del estudiante.
 -->
 
+<!--Añadimos el CSS y el javascript necesarios para poder usar las notificaciones flotantes -->
+<link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
+<script type="text/javascript" src="app/js/components/notify.js"></script>
 <div class="uk-grid">
 
     <!--En la primera sección ponemos la imagen del usuario usando la url de este -->
@@ -14,27 +17,45 @@ Diseño de la vista de la pestaña de detalles del estudiante.
     <!-- En la segunda sección TODOS sus datos, junto a su diseño con el kit de CSS-->
     <div class="uk-width-2-4 uk-margin-top ">
 
-            <h2>{{alumno.nombre}}</h2>
+            <h2>{{profesor.nombre}}</h2>
 
             <ul class="uk-list uk-list-line">
-                  <li>DNI: {{alumno.dni}} </li>
-                  <li>Fecha nacimiento: {{alumno.fecha_nacimiento}}</li>
-                  <li>Localidad: {{alumno.localidad}}</li>
-                  <li>Provincia: {{alumno.provincia}}</li>
-                  <li>Direccion: {{alumno.direccion}}</li>
-                  <li>Teléfono: {{alumno.telefono}}</li>
+                  <li>DNI: {{profesor.dni}} </li>
+                  <li>Fecha nacimiento: {{profesor.fecha_nacimiento}}</li>
+                  <li>Localidad: {{profesor.localidad}}</li>
+                  <li>Provincia: {{profesor.provincia}}</li>
+                  <li>Direccion: {{profesor.direccion}}</li>
+                  <li>Teléfono: {{profesor.telefono}}</li>
             </ul>
-
-
 
       </div>
 
     <!-- En la tercera sección los botones de eliminar y modificar alumno -->
     <div class="uk-wdith-1-4 uk-margin-top" >
 
-      <a href="" class="uk-icon-hover uk-icon-medium uk-icon-trash"></a>
+      <!--Botón de modificación, que es un enlace a la vista de modificación del usuario. -->
+      <a ui-sref="estudiantes.modificacion-profesor({ profesorID: profesor.id })" class="uk-icon-edit uk-icon-hover uk-icon-medium "></a>
 
-      <a href="" class="uk-icon-hover uk-icon-medium uk-icon-edit"></a>
+      <!--Botón que abre un menú que pide la confirmación de la eliminación del alumno -->
+      <a class="uk-icon-trash uk-icon-hover uk-icon-medium "  id="openModal" ></a>
+
+      <!--Definición del mensaje flotante que se muestra -->
+      <div id="Modal" class="uk-modal" aria-hidden="true">
+        <div class="uk-modal-dialog uk-modal-dialog">
+          ¿Está seguro de quere eliminar al profesor?
+          <hr>
+          <!-- LA implementación de la acción asociada al botón puede estar en el script incluido abajo o
+          en el propio app.js para poder usar el scope.-->
+          <button id="DelButton" ng-click="delProfesor()" class="uk-button uk-button-danger">Eliminar</button>
+          <button id="CancelButton" class="uk-button uk-button-success">Cancel</button>
+
+        </div>
+      </div>
+      <!-- FIN DEL MENSAJE flotante-->
+
+      <!--Inclusión del fichero donde se implementa la lógica en JavaScript del modal -->
+      <script src="js/especiales/modalEliminacionUsuario.js"></script>
+
 
     </div>
 
@@ -57,19 +78,27 @@ Diseño de la vista de la pestaña de detalles del estudiante.
 
           <div class="uk-grid">
 
-             <div class="uk-width-1-2">
-                <h4>Profesores</h4>
+             <div class="uk-width-1-3">
+                <h4>Alumnos</h4>
                 <hr>
-                <li ng-repeat="profesor in profesores">
-                  <a>{{ profesor.nombre }}</a>
+                <li ng-repeat="alumno in alumnos">
+                  <a>{{ alumno.nombre }}</a>
                 </li>
             </div>
 
-            <div class="uk-width-1-2">
+            <div class="uk-width-1-3">
                 <h4>Clases</h4>
                 <hr>
-                <li ng-repeat="profesor in profesores">
-                  <a>{{ profesor.nombre }}</a>
+                <li ng-repeat="clase in clases">
+                  <a>{{ clase.nombre }}</a>
+                </li>
+            </div>
+
+            <div class="uk-width-1-3">
+                <h4>Asignaturas</h4>
+                <hr>
+                <li ng-repeat="asignatura in asignaturas">
+                  <a>{{ asignatura.nombre }}</a>
                 </li>
             </div>
 

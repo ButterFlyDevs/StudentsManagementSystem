@@ -20,6 +20,6 @@ Plantilla de diseños que crea la lista de los estudiantes que el controlador no
       en un enlace a la ventana propia del estudiante, además pasamos el identificador  como parámetro en la URL-->
       <li ng-repeat="profesor in profesores">
         <!--Doc en : https://github.com/angular-ui/ui-router/wiki/Quick-Reference#ui-sref -->
-        <a ui-sref="profesores.detalles-profesor({ profesorID: profesor.id })">{{ profesor.nombre }}</a>
+        <a ui-sref="profesores.detalles-profesor({ profesorID: profesor.id })">{{ profesor.nombre }} {{profesor.apellidos}} {{profesor.id}}</a>          
       </li>
   </ul>

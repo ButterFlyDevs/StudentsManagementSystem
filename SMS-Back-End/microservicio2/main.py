@@ -1,13 +1,40 @@
 # -*- coding: utf-8 -*-
-import webapp2
+from flask import *
 
-## CLASE QUE PROCESA EL RECURSO /alumnos usando una forma estandar de uso  de parámetros.
-class Alumnos(webapp2.RequestHandler):
+from gcloud import storage
 
-    def get(self):
-        self.response.write("Prueba my-module")
+app = Flask(__name__)
 
 
-app = webapp2.WSGIApplication([
-    ('/alumnos', Alumnos)
-], debug=True)
+def upload_image_file(file):
+    """
+    Upload the user-uploaded file to Google Cloud Storage and retrieve its
+    publicly-accessible URL.
+    """
+    if not file:
+        return None
+
+    public_url = storage.upload_file(
+        file.read(),
+        file.filename,
+        file.content_type
+    )
+
+    current_app.logger.info(
+        "Uploaded file %s as %s.", file.filename, public_url)
+
+    return public_url
+
+
+
+
+@app.route('/',methods=['GET'])
+def saludo():
+    f = open('profile.jpg', 'r')
+    #jpgdata = f.read()
+    return upload_image_file(f)
+    #return 'Hola, soy el microservicio2\n'
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

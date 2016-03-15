@@ -41,37 +41,115 @@ Es la plantilla principal que define el menú superior y que
 
  <!--
  Menú principal , construido con ui-sref, que nos envía al lugar que nos diga el urlProvider dentro de app.js.
+ El estilo CSS es un menú responsive que se enconge cuando la pantalla lo requiere ofreciendo un panel
+ lateral para el menú.
  -->
-  <nav class="tm-navbar uk-navbar uk-navbar-attached">
-      <div class="uk-container ">
-          <!--Se usa ui-sref a # para que no haga nada -->
-          <a class="uk-navbar-brand uk-hidden-small" ui-sref="#">Students Management System</a>
-          <ul class="uk-navbar-nav uk-hidden-small">
 
-            <li><a ui-sref="estudiantes.main">Estudiantes</a></li>
-            <li><a ui-sref="profesores.main">Profesores</a></li>
-            <li><a ui-sref="about">Otros</a></li>
-          </ul>
-      </div>
-  </nav>
+
+
+
+
+ <!--
+   <nav class=" uk-navbar uk-navbar-attached">
+       <div class="uk-container ">
+
+           <a class="uk-navbar-brand uk-hidden-small" ui-sref="#">Students Management System</a>
+           <ul class="uk-navbar-nav uk-hidden-small">
+
+             <li><a ui-sref="estudiantes.main">Estudiantes</a></li>
+             <li><a ui-sref="profesores.main">Profesores</a></li>
+             <li><a ui-sref="about">Otros</a></li>
+           </ul>
+       </div>
+   </nav>
+-->
+
+ <nav class="uk-navbar uk-margin-large-bottom">
+           <a class="uk-navbar-brand uk-hidden-small" ui-sref="#" >SMS</a>
+           <ul class="uk-navbar-nav uk-hidden-small">
+               <!--
+               <li class="uk-active">
+                   <a href="layouts_frontpage.html">Frontpage</a>
+               </li>
+               -->
+               <li><a ui-sref="estudiantes.main">Estudiantes</a></li>
+
+               <li><a ui-sref="profesores.main">Profesores</a></li>
+               <li><a ui-sref="about">Otros</a></li>
+               <!--
+               <li>
+                   <a href="layouts_documentation.html">Documentation</a>
+               </li>
+               <li>
+                   <a href="layouts_contact.html">Contact</a>
+               </li>
+               <li>
+                   <a href="layouts_login.html">Login</a>
+               </li>
+             -->
+           </ul>
+           <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
+           <!--Especificaciones cuando se hace pequeña -->
+           <div class="uk-navbar-brand uk-navbar-center uk-visible-small">SMS</div>
+ </nav>
+
+
+ <div id="offcanvas" class="uk-offcanvas">
+     <div class="uk-offcanvas-bar">
+         <ul class="uk-nav uk-nav-offcanvas">
+
+
+           <li><a ui-sref="estudiantes.main">Estudiantes</a></li>
+
+           <li><a ui-sref="profesores.main">Profesores</a></li>
+           <li><a ui-sref="about">Otros</a></li>
+            <!--
+
+             <li class="uk-active">
+                 <a href="layouts_frontpage.html">Frontpage</a>
+             </li>
+             <li>
+                 <a href="layouts_portfolio.html">Portfolio</a>
+             </li>
+             <li>
+                 <a href="layouts_blog.html">Blog</a>
+             </li>
+             <li>
+                 <a href="layouts_documentation.html">Documentation</a>
+             </li>
+             <li>
+                 <a href="layouts_contact.html">Contact</a>
+             </li>
+             <li>
+                 <a href="layouts_login.html">Login</a>
+             </li>
+           -->
+         </ul>
+     </div>
+ </div>
+
 
 
 
 
 <!-- MAIN CONTENT -->
-<div class="container">
+
 
     <!-- THIS IS WHERE WE WILL INJECT OUR CONTENT ============================== -->
      <div class="uk-container uk-container-center uk-margin-large-top">
       <div ui-view></div>
     </div>
 
-</div>
+
 
 <!-- Footer -->
-<div class="uk-contrast">
+
+<!--
+hola hola soy un pie
+<div class="uk-modal-footer">
+  asfjñaskjfsadlkj
   <h1>ouh yeah!</h1>
 </div>
-
+-->
 </body>
 </html>

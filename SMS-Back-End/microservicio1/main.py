@@ -93,37 +93,38 @@ def getAlumno(id_alumno):
         #Enviamos el error de NotFound
         abort(404)
     else:
-        return jsonpickle.encode(GestorAlumnos.getAlumno(id_alumno))
-
+        return jsonpickle.encode(GestorAlumnos.getAlumno(id_alumno), unpicklable=False)
 
 @app.route('/alumnos/<string:id_alumno>',methods=['POST'])
 def modAlumno(id_alumno):
     '''
     Función que modifica los atributos de un alumno dado su identificación, usando la función
     modAlumnoCompleto de la APIDB
-    curl -d "nombre=Juan&dni=45601218Z&direccion=Calle arabl&localidad=Jerez de la frontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=677164459" -i -X POST localhost:8002/alumno/1
+    curl -d "nombre=Pedro&apellidos=Torrssr&dni=234242&direccion=Calle Duqesa&locia=Granada&fecha_nacimiento=1988-12-4&telefono=23287282" -i -X POST localhost:8002/alumnos/1
     '''
     if v:
         print 'Calling GestorAlumnos.modAlumnoCompleto()'
 
     #El id del alumno se pasa por la URL
-    salida = GestorAlumnos.modAlumnoCompleto(id_alumno, request.form['nombre'],
-                              request.form['apellidos'],
-                              request.form['dni'],
-                              request.form['direccion'],
-                              request.form['localidad'],
-                              request.form['provincia'],
-                              request.form['fecha_nacimiento'],
-                              request.form['telefono'])
+    salida = GestorAlumnos.modAlumnoCompleto(id_alumno,
+                                             request.form['nombre'],
+                                             request.form['apellidos'],
+                                             request.form['dni'],
+                                             request.form['direccion'],
+                                             request.form['localidad'],
+                                             request.form['provincia'],
+                                             request.form['fecha_nacimiento'],
+                                             request.form['telefono']
+                                            );
 
     if v:
-        print "SALIDA: "+salida
+        print "SALIDA: "+str(salida)
 
     if salida == 'OK':
         return 'OK'
     else:
-        abort(404)
-    
+        return salida
+
 @app.route('/alumnos/<string:id_alumno>',methods=['DELETE'])
 def delAlumno(id_alumno):
     '''
@@ -183,6 +184,9 @@ def getProfesores():
     Devuelve una lista con todos los profesores registrados en el sistema.
     > curl -i -X GET localhost:8002/profesores
     '''
+    if v:
+        print "## Microservicio DB ##"
+        print 'Calling GestorPRofesores.getAlumnos()'
     return jsonpickle.encode(GestorProfesores.getProfesores())
 
 @app.route('/profesores',methods=['PUT'])
@@ -225,12 +229,9 @@ def getProfesor(id_profesor):
     '''
     Devuelve todos los datos de un alumno buscado por su id
     en caso de existir en la base de datos.
-    curl -i -X GET localhost:8080/profesores/11223344A
+    curl -i -X GET localhost:8002/profesores/11223344A
 
     '''
-    #Si no tiene el número correcto de caracteres el identificador.
-    if len(id_profesor) != 9:
-        abort(400)
 
     salida=GestorProfesores.getProfesor(id_profesor)
     if salida=="Elemento no encontrado":

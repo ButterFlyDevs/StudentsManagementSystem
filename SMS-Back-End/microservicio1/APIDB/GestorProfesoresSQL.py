@@ -14,7 +14,8 @@ from Clase import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
-v=1
+v = 1
+apiName='\n## API DB ##\n'
 
 '''Clase controladora de profesores. Que usando la clase que define el modelo de Profesor (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
@@ -84,6 +85,7 @@ class GestorProfesores:
     def getProfesores(self):
         '''Devuelve una lista simplificada de todos los profesores registrados en el sistema, con los campos nombre,
         apellidos y dni.'''
+
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
@@ -93,19 +95,24 @@ class GestorProfesores:
         #-----------------------------#
 
         query="select nombre, apellidos, id_profesor from Profesor"
+
         if v:
-            print '\n'+query
+            print apiName
+            print "getProfesores()"
+            print "query: "+query
+
         cursor.execute(query)
         row = cursor.fetchone()
 
         lista = []
 
         while row is not None:
+            print row
             profesor = Profesor()
 
             profesor.nombre=row[0]
             profesor.apellidos=row[1]
-            profesor.dni=row[2]
+            profesor.id=row[2]
 
             lista.append(profesor)
             #print row[0], row[1]
@@ -116,8 +123,6 @@ class GestorProfesores:
 
         return lista
 
-        #Una de las opciones es convertirlo en un objeto y devolverlo
-
     @classmethod
     def getProfesor(self, idProfesor):
         """
@@ -125,7 +130,7 @@ class GestorProfesores:
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         cursor = db.cursor()
-        query="select * from Profesor where id='"+idProfesor+"';"
+        query="select * from Profesor where id_profesor='"+idProfesor+"';"
 
         if v:
             print '\n'+query
@@ -149,14 +154,15 @@ class GestorProfesores:
             #Como se trata de toda la información al completo usaremos todos los campos de la clase Profesor.
             #La api del mservicio envia estos datos en JSON sin comprobar nada
             profesor = Profesor()
-            profesor.nombre=row[0]
-            profesor.apellidos=row[1]
-            profesor.dni=row[2]
-            profesor.direccion=row[3];
-            profesor.localidad=row[4];
-            profesor.provincia=row[5];
-            profesor.fecha_nacimiento=row[6];
-            profesor.telefono=row[7];
+            profesor.id = row[0]
+            profesor.nombre=row[1]
+            profesor.apellidos=row[2]
+            profesor.dni=row[3]
+            profesor.direccion=row[4];
+            profesor.localidad=row[5];
+            profesor.provincia=row[6];
+            profesor.fecha_nacimiento=row[7];
+            profesor.telefono=row[8];
 
 
             return profesor

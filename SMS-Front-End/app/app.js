@@ -19,7 +19,7 @@ de la vista y se usan).
        //Configura la URL principal
        .state('#',{
          url:'/',
-         template:'HomePage'
+         templateUrl:'main.html'
        })
 
         /*Definición de VISTAS ANIDADAS, dentro de una vista general que es la de estudiantes se incrustan
@@ -30,7 +30,7 @@ de la vista y se usan).
         */
         .state('estudiantes', {
             url: '/estudiantes',
-            templateUrl: 'estudiantes.html'
+            templateUrl: 'estudiantes/estudiantes.html'
         })
 
         /*
@@ -39,13 +39,13 @@ de la vista y se usan).
         */
         .state('estudiantes.main', {
             url: '/main',
-            templateUrl: 'estudiantes-main.html',
+            templateUrl: 'estudiantes/estudiantes-main.html',
         })
 
         // nested list with custom controller
          .state('estudiantes.list', {
              url: '/list',
-             templateUrl: 'estudiantes-lista.html',
+             templateUrl: 'estudiantes/estudiantes-lista.html',
              controller: 'ControladorListaEstudiantes'
              /*
              controller: function($scope) {
@@ -57,14 +57,14 @@ de la vista y se usan).
          //Vista detalles estudiantes anidada dentro de estudiantes.
          .state('estudiantes.detalles-estudiante',{
            url: '/detalle/:estudianteID',
-           templateUrl: 'estudiantes-detalle.html',
+           templateUrl: 'estudiantes/estudiantes-detalle.html',
            controller: 'ControladorDetallesEstudiante'
          })
 
          //Vista detalles estudiantes anidada dentro de estudiantes.
          .state('estudiantes.modificacion-estudiante',{
            url: '/modificacion/:estudianteID',
-           templateUrl: 'estudiantes-modificacion.html',
+           templateUrl: 'estudiantes/estudiantes-modificacion.html',
            controller: 'ControladorModificacionEstudiante'
          })
 
@@ -81,7 +81,7 @@ de la vista y se usan).
              url: '/nuevo',
              //Podemos meter directamente texto desde aquí
              //template: 'I could sure use a drink right now.'
-             templateUrl: 'estudiantes-nuevo.html',
+             templateUrl: 'estudiantes/estudiantes-nuevo.html',
              controller: 'ControladorNuevoEstudiante'
          })
 
@@ -98,10 +98,10 @@ de la vista y se usan).
               templateUrl: 'profesores-lista.html',
               controller: 'ControladorListaProfesores'
           })
-          .state('profesores.detalles-estudiante',{
-            url: '/modificacion/:estudianteID',
+          .state('profesores.detalles-profesor',{
+            url: '/detalle/:profesorID',
             templateUrl: 'profesores-detalle.html',
-            controller: 'ControladorDetallesEstudiante'
+            controller: 'ControladorDetallesProfesor'
           })
           .state('profesores.nuevo', {
               url: '/nuevo',
@@ -210,7 +210,6 @@ routerApp.controller('ControladorNuevoEstudiante', function ($scope) {
 
 });
 
-
 routerApp.controller('ControladorModificacionEstudiante', function($location, $scope, $stateParams){
 
   //Rescatamos el id de la url y la enviamos con el scope a la vista
@@ -238,10 +237,72 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
   });
 
 
+  $scope.submitForm = function(formData){
+
+
+    //Lógica del formulario.
+
+    //Cuando el formulario es válido porque cumple con todas las especificaciones:
+    if ($scope.formNuevoAlumno.$valid) {
+       console.log('Formulario válido');
+       console.log('Se progecede a guardar la modificación del alumno en la base de datos.')
+
+       var salidaEjecucion;
+
+       console.log("llamada a modAlumnoCompleto()")
+       console.log($scope.alumno);
+
+       var ROOT = 'http://localhost:8001/_ah/api';
+       gapi.client.load('helloworld', 'v1', null, ROOT);
+
+       gapi.client.helloworld.alumnos.modAlumnoCompleto({
+         //Aquí especificamos todos los datods del form que queremos que se envíen:
+         'id':$stateParams.estudianteID,
+         'nombre':$scope.alumno.nombre,
+         'apellidos':$scope.alumno.apellidos,
+         'direccion':$scope.alumno.direccion,
+         'localidad':$scope.alumno.localidad,
+         'provincia':$scope.alumno.provincia,
+         'fecha_nacimiento':$scope.alumno.fecha_nacimiento,
+         'telefono':$scope.alumno.telefono,
+         'dni':$scope.alumno.dni}
+       ).execute(function(resp){
+         //Mostramos por consola la respuesta del servidor
+         salidaEjecucion=resp.message;
+         console.log("Respuesta servidor: "+salidaEjecucion);
+         console.log(salidaEjecucion);
+
+          if (salidaEjecucion == 'OK'){
+            /*
+            Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+            de este componente, esto lo hcemos en la plantilla (html)
+            */
+            $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
+          }else{
+            $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+          }
+
+         $scope.$apply();
+       });
+
+
+
+     }
+     else {
+         //if form is not valid set $scope.addContact.submitted to true
+         console.log('Formulario inválido');
+         clase="uk-class-danger"
+         $scope.formNuevoAlumno.submitted=true;
+     };
+
+
+
+  };
+
+
 
 
 });
-
 
 routerApp.controller('ControladorDetallesEstudiante', function($location, $scope, $stateParams){
 
@@ -273,7 +334,8 @@ routerApp.controller('ControladorDetallesEstudiante', function($location, $scope
       $scope.$apply();
     });
 
-    //Después volvemos a la página principal de estudiantes, ahora desbloqueado porque se pierde el mensaje al cambiar.
+    //Después volvemos a la página principal de estudiantes, ahora desbloqueado porque se pierde el mensaje al cambiar,
+    // al menos que le pasásemos los datos al controlador de esa página y fuese esa quien cargase el mensaje flotante.
     //$location.path("/estudiantes/main");
 
   };
@@ -282,6 +344,7 @@ routerApp.controller('ControladorDetallesEstudiante', function($location, $scope
   //$scope.id = $stateParams.estudianteID;
   $scope.id=$stateParams.estudianteID;
 
+  console.log("ID estudiante: "+$stateParams.estudianteID);
 
   var ROOT = 'http://localhost:8001/_ah/api';
   gapi.client.load('helloworld', 'v1', null, ROOT);
@@ -322,10 +385,6 @@ routerApp.controller('ControladorDetallesEstudiante-DatosAcademicos', function($
 
 });
 
-
-
-
-
 routerApp.controller('ControladorListaEstudiantes', function ($scope) {
   /*
   Controlador que maneja los datos que se muestran en la vista estudiantes-lista.html y que
@@ -359,3 +418,89 @@ routerApp.controller('ControladorListaEstudiantes', function ($scope) {
     //$scope.salidaAPI="adios";
     }
 );
+
+
+// #################################
+// # Controladores de profesores.  #
+// #################################
+routerApp.controller('ControladorListaProfesores', function ($scope) {
+    /*
+    Controlador que provee a la plantilla profesores-lista.html la lista simplificada de todos los profesores
+    a trabés del API Gateway usando el método getProfesores()
+    */
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', null, ROOT);
+
+    gapi.client.helloworld.profesores.getProfesores().execute(function(resp) {
+      console.log(resp.profesores);
+      $scope.profesores=resp.profesores;
+      $scope.$apply();
+    });
+    }
+);
+
+routerApp.controller('ControladorDetallesProfesor', function($location, $scope, $stateParams){
+
+  //Implementación de las acciones que se producen cuando el BOTÓN ELIMINAR se pulsa.
+  $scope.delProfesor = function(){
+    console.log("Pulsada confirmación eliminación profesor id: "+$stateParams.profesorID)
+
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', null, ROOT);
+
+    gapi.client.helloworld.profesores.delProfesor({'id':$stateParams.profesorID}).execute(function(resp){
+      //Mostramos por consola la respuesta del servidor
+      console.log(resp.message);
+      $scope.respuesta=resp.message;
+
+
+      //El mensje no sale debido (en principio) a que cambiamos de pantall
+      if (resp.message == 'OK'){
+        /*
+        Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+        de este componente, esto lo hcemos en la plantilla (html)
+        */
+        $.UIkit.notify("Profesor eliminado con éxito.", {status:'success'});
+      }else{
+        $.UIkit.notify("\""+resp.message+"\"", {status:'warning'});
+      }
+
+
+      $scope.$apply();
+    });
+
+    //Después volvemos a la página principal de profesores, ahora desbloqueado porque se pierde el mensaje al cambiar,
+    // al menos que le pasásemos los datos al controlador de esa página y fuese esa quien cargase el mensaje flotante.
+    //$location.path("/profesores/main");
+
+  };
+
+  //Rescatamos el id de la url y la enviamos con el scope a la vista
+  //$scope.id = $stateParams.estudianteID;
+  $scope.id=$stateParams.profesorID;
+  console.log("ID profesor: "+$stateParams.profesorID);
+
+  var ROOT = 'http://localhost:8001/_ah/api';
+  gapi.client.load('helloworld', 'v1', null, ROOT);
+
+
+  //Pedimos al gateway que nos diga todos los profesores que imparten clase a ese alumno.
+  gapi.client.helloworld.alumnos.getProfesoresAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
+    console.log("Profesores del alumno: ");
+    console.log(resp.profesores);
+    //Enviamos al scope no toda la respuesta sino la lista de profesores que se espeara que contenga esta.
+    $scope.profesores = resp.profesores;
+    $scope.$apply();
+  });
+
+  //Pedimos al Gateway toda la informaicón del profesor.
+  gapi.client.helloworld.profesores.getProfesor({'id':$stateParams.profesorID}).execute(function(resp) {
+
+    console.log("calling getProfesor with id: "+$stateParams.profesorID);
+    console.log(resp);
+    $scope.profesor = resp;
+    $scope.$apply();
+
+  });
+
+});
