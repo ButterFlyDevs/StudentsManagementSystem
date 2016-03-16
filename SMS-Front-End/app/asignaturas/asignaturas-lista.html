@@ -1,0 +1,25 @@
+<!--
+
+ estudiantes-lista.html
+
+Plantilla de diseños que crea la lista de los estudiantes que el controlador nos proporciona.
+
+ -->
+
+  <!--
+  <h2>Lista de ejemplo</h2>
+  <ul class="uk-list-line">
+      <li ng-repeat="empleado in nuestrosEmpleados">{{ empleado }}</li>
+  </ul>
+  -->
+
+
+  <h2>Asignaturas en el sistema.</h2>
+  <ul class="uk-list-line">
+      <!-- Mostramos todos los alumnos cargados por el controlador, convirtiendo cada uno además
+      en un enlace a la ventana propia del estudiante, además pasamos el identificador  como parámetro en la URL-->
+      <li ng-repeat="asignatura in asignaturas">
+        <!--Doc en : https://github.com/angular-ui/ui-router/wiki/Quick-Reference#ui-sref -->
+        <a ui-sref="asignaturas.detalles-asignatura({ asignaturaID: asignatura.id })">{{ asignatura.nombre }}</a>
+      </li>
+  </ul>

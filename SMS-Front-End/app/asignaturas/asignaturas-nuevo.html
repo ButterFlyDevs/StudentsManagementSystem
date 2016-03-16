@@ -1,0 +1,54 @@
+<p class="uk-h2">Registro de una nueva asignatura</p>
+<hr>
+
+<!-- Definición del formulario de inscripción de un nuevo estudiantes -->
+<!-- Usamos no validate para hacer que sea angular quien haga todo el trabajo -->
+
+<form class="uk-form" name="formNuevaAsignatura" ng-submit="submitForm()" novalidate>
+
+    <fieldset data-uk-margin>
+
+        <!-- Campo nombre -->
+        <input type="text" placeholder="Nombre" name="nombre" ng-class="{ 'uk-form-danger' : formNuevoAlumno.nombre.$invalid && !formNuevoAlumno.$pristine }" ng-minlength="3"  ng-model="alumno.nombre" required>
+
+        <!-- Mensajes de error -->
+        <p ng-show="formNuevoAlumno.nombre.$error.minlength" class="uk-text-danger"><i class="uk-icon-info-circle"></i>   El nombre es demasiado corto.</p>
+
+
+
+        <!-- Botón de enviar
+        Este botón responde a la función definida en el controlador con el nombre puesto en ng-submit, en este caso:submitForm()
+        -->
+        <br class="uk-margin-bottom">
+
+        <!--Añadimos el CSS y el javascript necesarios para poder usar las notificaciones flotantes -->
+        <link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
+        <script type="text/javascript" src="app/js/components/notify.js"></script>
+
+        <button type="submit" class="uk-button"  data-message="Success message..." data-status="success" ng-class="{ 'uk-button-success' : !formNuevoAlumno.$invalid }" ng-disabled="formNuevoAlumno.$invalid">Submit</button>
+        <!--<script>
+           $(function(){
+               $("body").on("click", ".uk-button[data-message]", function(){
+                  // $.UIkit.notify($(this).data());
+                   $.UIkit.notify("Alumno guardado con éxito.");
+
+               });
+           })
+           </script>
+         -->
+
+
+        <!-- <input type="submit" class="uk-button" ng-click="submitForm(alumno)" />-->
+        <!-- <button class="uk-button" ng-click="addAlumno()">Enviar</button> -->
+        <br class="uk-margin-top">
+    </fieldset>
+</form>
+<style>
+input.submitted.ng-invalid
+{
+  border:1px solid #f00;
+}
+</style>
+
+
+{{respuesta}}

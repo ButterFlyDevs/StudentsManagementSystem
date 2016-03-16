@@ -113,6 +113,36 @@ de la vista y se usan).
 
 
 
+          //CONTROLADORES DE ASIGNATURAS
+
+           .state('asignaturas', {
+               url: '/asignaturas',
+               templateUrl: 'asignaturas/asignaturas.html'
+           })
+           .state('asignaturas.main', {
+               url: '/main',
+               templateUrl: 'asignaturas/asignaturas-main.html',
+           })
+           .state('asignaturas.list', {
+                url: '/list',
+                templateUrl: 'asignaturas/asignaturas-lista.html',
+                controller: 'ControladorListaAsignaturas'
+            })
+            .state('asignaturas.detalles-profesor',{
+              url: '/detalle/:profesorID',
+              templateUrl: 'asignaturas/asignaturas-detalle.html',
+              controller: 'ControladorDetallesProfesor'
+            })
+            .state('asignaturas.nuevo', {
+                url: '/nuevo',
+                //Podemos meter directamente texto desde aquí
+                //template: 'I could sure use a drink right now.'
+                templateUrl: 'asignaturas/asignaturas-nuevo.html',
+                controller: 'ControladorNuevoProfesor'
+            })
+
+
+
 
 
 
@@ -141,6 +171,11 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
     console.log('catchAll', arguments);
   });
   }]);
+
+
+// #################################
+// # Controladores de asignaturas  #
+// #################################
 
 routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) {
   /*
@@ -582,3 +617,23 @@ routerApp.controller('ControladorNuevoProfesor', function ($scope) {
 
 
 });
+
+// #################################
+// # Controladores de asignaturas  #
+// #################################
+routerApp.controller('ControladorListaAsignaturas', function ($scope) {
+    /*
+    Controlador que provee a la plantilla profesores-lista.html la lista simplificada de todos los profesores
+    a trabés del API Gateway usando el método getProfesores()
+    */
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', null, ROOT);
+
+    gapi.client.helloworld.asignaturas.getAsignaturas().execute(function(resp) {
+      console.log("recibido desde APIGATEWAY asignaturas.getAsignaturas(): ")
+      console.log(resp.asignaturas);
+      $scope.asignaturas=resp.asignaturas;
+      $scope.$apply();
+    });
+    }
+);

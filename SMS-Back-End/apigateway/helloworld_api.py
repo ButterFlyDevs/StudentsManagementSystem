@@ -706,6 +706,8 @@ class HelloWorldApi(remote.Service):
 
         return profesor
 
+    #Añadir insertarProfesor
+
     @endpoints.method(ID,MensajeRespuesta,path='profesores/delProfesor', http_method='DELETE', name='profesores.delProfesor')
     def delProfesor(self, request):
 
@@ -756,6 +758,9 @@ class HelloWorldApi(remote.Service):
 
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
+
+
+    #Añadir modificarProfesor
 
 
     #Métodos de relación con otras entidades.
