@@ -226,8 +226,12 @@ class GestorClases:
 
         if salida==1:
             return 'OK'
-        if salida==0:
+        elif salida==0:
             return 'Elemento no encontrado'
+        elif salida==1451:
+            return 'El elemento tiene depenencias en otras tablas'
+        else:
+            return 'Other case'
 
     @classmethod
     def getNumClases(self):
@@ -262,7 +266,7 @@ class GestorClases:
         if salida==0:
             return 'Elemento no encontrado'
 
-
+    #Métodos de relación con otras entidades:
 
     @classmethod
     def getAsignaturas(self, idClase):
@@ -313,7 +317,7 @@ class GestorClases:
     def getAlumnos(self, idClase):
         '''
         Devuelve una lista con los alumnos matriculados en esa clase.
-        Campos devueltos: id, nombre, apellidos y dni
+        Campos devueltos: id, nombre y apellidos.
         '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -327,7 +331,7 @@ class GestorClases:
         que un mismo alumno está matriculado muchas veces en un mismo curso con asignaturas disintas, entonces para evitar
         contabilizar esos repetidos, usamos esta orden.
         '''
-        query='SELECT id, nombre, apellidos, dni FROM Alumno where id in (select distinct id_alumno from Matricula where id_clase='+idClase+')'
+        query='SELECT id_alumno, nombre, apellidos FROM Alumno where id_alumno in (select distinct id_alumno from Matricula where id_clase='+idClase+')'
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -337,8 +341,9 @@ class GestorClases:
 
         while row is not None:
             alumno = Alumno()
-            alumno.nombre=row[0]
-            alumno.id=row[1]
+            alumno.id=row[0]
+            alumno.nombre=row[1]
+            alumno.apellidos=row[2]
 
             lista.append(alumno)
             #print row[0], row[1]

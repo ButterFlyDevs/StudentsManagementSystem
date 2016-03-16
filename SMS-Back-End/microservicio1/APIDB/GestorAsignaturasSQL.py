@@ -259,7 +259,8 @@ class GestorAsignaturas:
         cursor.execute(mysql_query)
         #-----------------------------#
         idAsignatura='\''+idAsignatura+'\''
-        query='select * from Asocia where id_asignatura='+idAsignatura+';'
+        query='select id_clase, curso, grupo, nivel from Clase where id_clase in (select id_clase from Asocia where id_asignatura='+idAsignatura+')'
+        #query='select id_profesor, nombre, apellidos from Profesor where id_profesor in (select id_asignatura from Imparte where id_asignatura='+idAsignatura+');'
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -271,9 +272,10 @@ class GestorAsignaturas:
             clase = Clase()
             #print "LISTA SUPER CHACHI"
 
-            clase.curso=row[0]
-            clase.grupo=row[1]
-            clase.nivel=row[2]
+            clase.id=row[0]
+            clase.curso=row[1]
+            clase.grupo=row[2]
+            clase.nivel=row[3]
 
             lista.append(clase)
             #print row[0], row[1]
@@ -297,7 +299,9 @@ class GestorAsignaturas:
         cursor.execute(mysql_query)
         #-----------------------------#
         idAsignatura='\''+idAsignatura+'\''
-        query='select distinct id_profesor from Imparte where id_asignatura='+idAsignatura+';'
+        #query='select distinct id_profesor from Imparte where id_asignatura='+idAsignatura+';'
+        query='select id_profesor, nombre, apellidos from Profesor where id_profesor in (select id_asignatura from Imparte where id_asignatura='+idAsignatura+');'
+
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -307,7 +311,9 @@ class GestorAsignaturas:
 
         while row is not None:
             profesor = Profesor()
-            profesor.dni=row[0]
+            profesor.id=row[0]
+            profesor.nombre=row[1]
+            profesor.apellidos=row[2]
             lista.append(profesor)
             #print row[0], row[1]
             row = cursor.fetchone()
@@ -334,7 +340,7 @@ class GestorAsignaturas:
         Con el distinct evitamos que si un alumno por casualidad esta matriculado en lengua de primero
         y lengua de segundo porque así se permite se contabilice como dos alumnos en el recuento, lo que sería un error.
         '''
-        query='select id, nombre,apellidos, dni from Alumno where id in (select id_alumno from Matricula where id_asignatura ='+idAsignatura+' )'
+        query='select id_alumno, nombre,apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asignatura ='+idAsignatura+' )'
         if v:
             print '\n'+query
         cursor.execute(query)

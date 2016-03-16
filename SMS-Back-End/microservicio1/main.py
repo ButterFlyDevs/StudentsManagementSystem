@@ -277,23 +277,23 @@ def delProfesor(id_profesor):
 @app.route('/profesores/<string:id_profesor>/alumnos',methods=['GET'])
 def getAlumnosProfesor(id_profesor):
     '''
-    curl -i -X GET localhost:8080/profesores/1/alumnos
+    curl -i -X GET localhost:8002/profesores/1/alumnos
     '''
     return jsonpickle.encode(GestorProfesores.getAlumnos(id_profesor))
 
 @app.route('/profesores/<string:id_profesor>/asignaturas',methods=['GET'])
 def getAsignaturasProfesor(id_profesor):
     '''
-    curl -i -X GET localhost:8080/profesores/1/asignaturas
+    curl -i -X GET localhost:8002/profesores/1/asignaturas
     '''
     return jsonpickle.encode(GestorProfesores.getAsignaturas(id_profesor))
 
 @app.route('/profesores/<string:id_profesor>/clases',methods=['GET'])
-def getCursosProfesor(id_profesor):
+def getClasesProfesor(id_profesor):
     '''
-    curl -i -X GET localhost:8080/profesores/1/clases
+    curl -i -X GET localhost:8002/profesores/1/clases
     '''
-    return jsonpickle.encode(GestorProfesores.getCursos(id_profesor))
+    return jsonpickle.encode(GestorProfesores.getClases(id_profesor))
 
 
 
@@ -336,7 +336,7 @@ def getAsignatura(id_asignatura):
     '''
     Devuelve todos los datos de una asignatura buscado por su id
     en caso de existir en la base de datos.
-    curl -i -X GET localhost:8002/asignaturas/ln
+    curl -i -X GET localhost:8002/asignaturas/1
 
     '''
 
@@ -353,14 +353,15 @@ def delAsignatura(id_asignatura):
     Elimina la asignatura que se especifica con el identificador pasado, en caso de exisitir en el sistema.
     curl -i -X DELETE localhost:8002/asignaturas/ln
     '''
-    if len(id_asignatura) != 2:
-        abort(400)
+
 
     salida = GestorAsignaturas.delAsignatura(id_asignatura)
     if salida=="Elemento no encontrado":
         abort(404)
     else:
-        return 'Elemento eliminado\n'
+        return str(salida)
+
+#Métodos que relacionan con otras entidades
 
 @app.route('/asignaturas/<string:id_asignatura>/alumnos',methods=['GET'])
 def getAlumnosAsignatura(id_asignatura):
@@ -378,12 +379,12 @@ def getProfesoresAsignatura(id_asignatura):
     return jsonpickle.encode(GestorAsignaturas.getProfesores(id_asignatura))
 
 @app.route('/asignaturas/<string:id_asignatura>/clases',methods=['GET'])
-def getCursosAsignaturas(id_asignatura):
+def getClasesAsignaturas(id_asignatura):
     '''
     Devuelve una lista con los clases en los que se imparte esa asignatura.
-    curl -i -X GET localhost:8002/asignaturas/fr/clases
+    curl -i -X GET localhost:8002/asignaturas/1/clases
     '''
-    return jsonpickle.encode(GestorAsignaturas.getCursos(id_asignatura))
+    return jsonpickle.encode(GestorAsignaturas.getClases(id_asignatura))
 
 
 
@@ -394,16 +395,15 @@ def getCursosAsignaturas(id_asignatura):
 
 
 @app.route('/clases',methods=['GET'])
-def getCursos():
+def getClases():
     '''
     Devuelve una lista con todos los clases registradas en el sistema.
     > curl -i -X GET localhost:8002/clases
     '''
     return jsonpickle.encode(GestorClases.getClases())
 
-
 @app.route('/clases',methods=['POST'])
-def postCurso():
+def postClase():
     '''
     Inserta una nueva clase en el sistema.
     curl -d "id=" -i -X POST localhost:8002/clases
@@ -423,28 +423,38 @@ def postCurso():
 #########################
 
 @app.route('/clases/<string:id_clase>',methods=['GET'])
-def getCurso(id_curso):
+def getClase(id_clase):
     '''
-    Devuelve toda la información sobre el curso que se pasa el id.
-    curl -i -X GET localhost:8002/clases/ln
-
+    Devuelve toda la información sobre la clase que se pasa el id.
+    curl -i -X GET localhost:8002/clases/1
     '''
-
-    salida=GestorClases.getClase(id_curso)
+    salida=GestorClases.getClase(id_clase)
     if salida=="Elemento no encontrado":
         #Enviamos el error de NotFound
         abort(404)
     else:
         return jsonpickle.encode(salida)
 
+@app.route('/clases/<string:id_clase>',methods=['DELETE'])
+def delClase(id_clase):
+    '''
+    Elimina la clase que se especifica con el identificador pasado, en caso de exisitir en el sistema.
+    curl -i -X DELETE localhost:8002/clases/1
+    '''
+    salida = GestorClases.delClase(id_clase)
+    if salida=="Elemento no encontrado":
+        abort(404)
+    else:
+        return str(salida)
+
 
 @app.route('/clases/<string:id_clase>/alumnos',methods=['GET'])
-def getAlumnosCurso(id_curso):
+def getAlumnosClase(id_clase):
     '''
     Devuelve todos los alumnos que se encuentran matriculados en ese curso.
     curl -i -X GET localhost:8002/clases/fr/alumnos
     '''
-    return jsonpickle.encode(GestorClases.getAlumnos(id_curso))
+    return jsonpickle.encode(GestorClases.getAlumnos(id_clase))
 
 
 @app.route('/clases/<string:id_clase>/profesores', methods=['GET'])

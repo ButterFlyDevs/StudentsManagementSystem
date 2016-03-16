@@ -87,27 +87,27 @@ de la vista y se usan).
 
          .state('profesores', {
              url: '/profesores',
-             templateUrl: 'profesores.html'
+             templateUrl: 'profesores/profesores.html'
          })
          .state('profesores.main', {
              url: '/main',
-             templateUrl: 'profesores-main.html',
+             templateUrl: 'profesores/profesores-main.html',
          })
          .state('profesores.list', {
               url: '/list',
-              templateUrl: 'profesores-lista.html',
+              templateUrl: 'profesores/profesores-lista.html',
               controller: 'ControladorListaProfesores'
           })
           .state('profesores.detalles-profesor',{
             url: '/detalle/:profesorID',
-            templateUrl: 'profesores-detalle.html',
+            templateUrl: 'profesores/profesores-detalle.html',
             controller: 'ControladorDetallesProfesor'
           })
           .state('profesores.nuevo', {
               url: '/nuevo',
               //Podemos meter directamente texto desde aquí
               //template: 'I could sure use a drink right now.'
-              templateUrl: 'profesores-nuevo.html',
+              templateUrl: 'profesores/profesores-nuevo.html',
               controller: 'ControladorNuevoProfesor'
           })
 
@@ -471,7 +471,7 @@ routerApp.controller('ControladorDetallesProfesor', function($location, $scope, 
 
     //Después volvemos a la página principal de profesores, ahora desbloqueado porque se pierde el mensaje al cambiar,
     // al menos que le pasásemos los datos al controlador de esa página y fuese esa quien cargase el mensaje flotante.
-    //$location.path("/profesores/main");
+    $location.path("/profesores/main");
 
   };
 
@@ -502,5 +502,73 @@ routerApp.controller('ControladorDetallesProfesor', function($location, $scope, 
     $scope.$apply();
 
   });
+
+});
+
+routerApp.controller('ControladorNuevoProfesor', function ($scope) {
+  /*
+  Controlador que manejará los datos del formulario enviándolos al servidor.
+  */
+  $scope.submitForm = function(formData){
+
+
+    //Lógica del formulario.
+
+    //Cuando el formulario es válido porque cumple con todas las especificaciones:
+    if ($scope.formNuevoAlumno.$valid) {
+       console.log('Formulario válido');
+       console.log('Se progecede a guardar al alumno en la base de datos.')
+
+       var salidaEjecucion;
+
+       console.log("llamada a addAlumno()")
+       console.log($scope.alumno);
+
+       var ROOT = 'http://localhost:8001/_ah/api';
+       gapi.client.load('helloworld', 'v1', null, ROOT);
+
+       gapi.client.helloworld.alumnos.insertarAlumno({
+         //Aquí especificamos todos los datods del form que queremos que se envíen:
+         'nombre':$scope.alumno.nombre,
+         'apellidos':$scope.alumno.apellidos,
+         'direccion':$scope.alumno.direccion,
+         'localidad':$scope.alumno.localidad,
+         'provincia':$scope.alumno.provincia,
+         'fecha_nacimiento':$scope.alumno.fecha_nacimiento,
+         'telefono':$scope.alumno.telefono,
+         'dni':$scope.alumno.dni}
+       ).execute(function(resp){
+         //Mostramos por consola la respuesta del servidor
+         salidaEjecucion=resp.message;
+         console.log("Respuesta servidor: "+salidaEjecucion);
+         console.log(salidaEjecucion);
+
+          if (salidaEjecucion == 'OK'){
+            /*
+            Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+            de este componente, esto lo hcemos en la plantilla (html)
+            */
+            $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
+          }else{
+            $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+          }
+
+         $scope.$apply();
+       });
+
+
+
+     }
+     else {
+         //if form is not valid set $scope.addContact.submitted to true
+         console.log('Formulario inválido');
+         clase="uk-class-danger"
+         $scope.formNuevoAlumno.submitted=true;
+     };
+
+
+
+  };
+
 
 });

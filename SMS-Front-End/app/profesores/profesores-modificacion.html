@@ -1,0 +1,102 @@
+
+<!--
+Diseño de la vista de la pestaña de detalles del estudiante.
+-->
+<!--Añadimos el CSS y el javascript necesarios para poder usar las notificaciones flotantes -->
+<link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
+<script type="text/javascript" src="app/js/components/notify.js"></script>
+
+<!--Título de la sección -->
+<h3>Modificación del estudiante</h3>
+<hr>
+
+<form class="uk-form" name="formNuevoAlumno" ng-submit="submitForm()" novalidate>
+<!--Grid del formulario de edición de los datos de un alumno -->
+<div class="uk-grid">
+
+
+
+
+    <!--En la primera sección ponemos la imagen del usuario usando la url de este -->
+    <div class="uk-width-1-5 ">
+      <!--src={{es.link_foto}}-->
+      <img class="uk-border-circle"  width="150" height="150" src=http://maitegarcianieto.com/Fotos/Cine/Eduardo%20Manostijeras/Eduardo%20Manostijeras-7.jpg alt="">
+
+      <!-- Botón para eliminar la foto -->
+      <a href="" class="uk-icon-hover uk-icon-medium uk-icon-remove"></a>
+    </div>
+
+    <div class="uk-grid uk-width-4-5">
+
+      <!--Nombre y apelidos en una bloque-->
+      <div class="uk-grid">
+        <!--Subsección 2, los datos que se van a modificar -->
+        <div class="uk-widht-2-5">
+            <!-- Campo nombre -->
+            <p>Nombre</p>
+            <input type="text" placeholder={{alumno.nombre}} name="nombre" ng-class="{ 'uk-form-danger' : formNuevoAlumno.nombre.$invalid && !formNuevoAlumno.$pristine }" ng-minlength="3"  ng-model="alumno.nombre" required>
+            <br>
+            <!-- Campo fecha nacimiento -->
+            <p>Fecha nacimiento</p>
+            <input type="text" placeholder="Fecha Nacimiento" ng-model="alumno.fecha_nacimiento" required>
+
+        </div>
+
+        <!--Subsección 2, los datos que se van a modificar -->
+        <div class="uk-widht-2-5">
+          <!-- Campo apellidos -->
+          <p>Apellidos</p>
+          <input type="text" placeholder={{alumno.apellidos}} name="apellidos" ng-class="{ 'uk-form-danger' : formNuevoAlumno.apellidos.$invalid && formNuevoAlumno.apellidos.$dirty }" ng-model="alumno.apellidos" ng-minlength="3" required>
+
+          <br>
+          <!-- Campo DNI -->
+          <p>DNI</p>
+          <input type="text" placeholder="DNI" ng-model="alumno.dni" required>
+
+        </div>
+      </div>
+
+      <div class="uk-width-1-1">
+        <!-- Campo direccion -->
+        <p>Dirección</p>
+        <input class="uk-form-width-large" type="text" placeholder={{alumno.direccion}} ng-model="alumno.direccion" required>
+      </div>
+
+      <!--Nombre y apelidos en una bloque-->
+      <div class="uk-grid">
+        <!--Subsección 2, los datos que se van a modificar -->
+        <div class="uk-widht-2-5">
+            <!-- Campo nombre -->
+            <p>Localidad</p>
+            <input type="text" placeholder="Localidad" ng-model="alumno.localidad" required>
+        </div>
+
+        <!--Subsección 2, los datos que se van a modificar -->
+        <div class="uk-widht-2-5">
+          <!-- Campo apellidos -->
+          <p>Provincia</p>
+          <input type="text" placeholder="Provincia" ng-model="alumno.provincia" required>
+        </div>
+      </div>
+
+      <div class="uk-width-1-1">
+        <!-- Campo telefono -->
+        <p>Telefono</p>
+        <input type="text" placeholder="Teléfono" ng-model="alumno.telefono" required>
+      </div>
+
+
+      <!--<input type="text" name="username" class="form-control" ng-model="user.username" ng-minlength="3" ng-maxlength="8">-->
+      <p ng-show="formNuevoAlumno.apellidos.$error.minlength" class="uk-margin-top uk-text-danger">El apellido es demasiado corto.</p>
+      <!--<p ng-show="userForm.username.$error.maxlength" class="help-block">Username is too long.</p>-->
+
+
+
+    </div>
+  </div>
+
+  <br>
+  <button type="submit" class="uk-button"  data-message="Success message..." data-status="success" ng-class="{ 'uk-button-success' : !formNuevoAlumno.$invalid }" ng-disabled="formNuevoAlumno.$invalid">Modificar</button>
+  <a ui-sref="estudiantes.list" class="uk-button uk-button-danger">Cancelar</a>
+
+</form>

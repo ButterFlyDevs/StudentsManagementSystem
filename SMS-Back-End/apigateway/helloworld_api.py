@@ -101,17 +101,29 @@ class Asignatura(messages.Message):
     id = messages.StringField(1)
     nombre = messages.StringField(2)
 
+class AsignaturaCompleta(messages.Message):
+    id = messages.StringField(1)
+    nombre = messages.StringField(2)
+
+
 class ListaAsignaturas(messages.Message):
     asignaturas = messages.MessageField(Asignatura, 1, repeated=True)
 
-class Curso(messages.Message):
+class Clase(messages.Message):
     id = messages.StringField(1)
     curso = messages.StringField(2)
     grupo = messages.StringField(3)
     nivel = messages.StringField(4)
 
-class ListaCursos(messages.Message):
-    cursos = messages.MessageField(Curso, 1, repeated=True)
+#Para ampliar en el futuro y no usar el mismo tipo de mensaje:
+class ClaseCompleta(messages.Message):
+    id = messages.StringField(1)
+    curso = messages.StringField(2)
+    grupo = messages.StringField(3)
+    nivel = messages.StringField(4)
+
+class ListaClases(messages.Message):
+    clases = messages.MessageField(Clase, 1, repeated=True)
 
 
 #Decorador que establace nombre y versión de la api
@@ -120,7 +132,7 @@ class HelloWorldApi(remote.Service):
     """Helloworld API v1."""
 
     ##############################################
-    #   COLECCIÓN ALUMNOS      /alumnos          #
+    #   métodos de alumnos                       #
     ##############################################
 
     @endpoints.method(message_types.VoidMessage, ListaAlumnos,
@@ -482,6 +494,7 @@ class HelloWorldApi(remote.Service):
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
+    # Métodos de información sobre relaciones con otras entidades
 
     @endpoints.method(ID, ListaProfesores, path='alumnos/getProfesoresAlumno', http_method='GET', name='alumnos.getProfesoresAlumno')
     def getProfesoresAlumno(self, request):
@@ -552,39 +565,35 @@ class HelloWorldApi(remote.Service):
             asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
         return ListaAsignaturas(asignaturas=asignaturasItems)
 
-    @endpoints.method(ID, ListaCursos, path='alumnos/getCursosAlumno', http_method='GET', name='alumnos.getCursosAlumno')
-    def getCursosAlumno(self, request):
+    @endpoints.method(ID, ListaClases, path='alumnos/getClasesAlumno', http_method='GET', name='alumnos.getClasesAlumno')
+    def getClasesAlumno(self, request):
         '''
-        Devuelve una lista con los datos completos de las cursos en las que está matriculado el alumno con dni pasado.
+        Devuelve una lista con los datos completos de las clases en las que está matriculado el alumno con dni pasado.
         Ejemplo de llamada:
-        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getCursosAlumno?dni=1
+        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getClasesAlumno?dni=1
         '''
         if v:
             print ("Ejecución de getCursosAlumno en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
-        url+='alumnos/'+request.dni+"/cursos"
+        url+='alumnos/'+request.dni+"/clases"
         result = urlfetch.fetch(url)
         if v:
             print result.content
-        listaCursos = jsonpickle.decode(result.content)
-        print listaCursos
-        cursosItems= []
-        for curso in listaCursos:
-            cursosItems.append(Curso(id=str(curso.get('id')),curso=str(curso.get('nombre')),grupo=str(curso.get('grupo')),nivel=str(curso.get('nivel'))))
-        return ListaCursos(cursos=cursosItems)
-
+        listaClases = jsonpickle.decode(result.content)
+        print listaClases
+        clasesItems= []
+        for curso in listaClases:
+            clasesItems.append(Curso(id=str(clase.get('id')),clase=str(clase.get('nombre')),grupo=str(clase.get('grupo')),nivel=str(clase.get('nivel'))))
+        return ListaClases(clases=clasesItems)
 
 
     ##############################################
-    #   Coleccion PROFESORES      #
+    #   métodos de profesores                    #
     ##############################################
 
-
-    @endpoints.method(message_types.VoidMessage, ListaProfesores,
-                      path='profesores/getProfesores', http_method='GET',
-                      name='profesores.getProfesores')
+    @endpoints.method(message_types.VoidMessage, ListaProfesores, path='profesores/getProfesores', http_method='GET', name='profesores.getProfesores')
     def getProfesores(self, unused_request):
         '''
         Devuelve una lista con todos los profesores registrados en el sistema, de forma simplificada (solo nombre y ID)
@@ -747,5 +756,542 @@ class HelloWorldApi(remote.Service):
 
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
+
+
+    #Métodos de relación con otras entidades.
+
+    @endpoints.method(ID, ListaAlumnos, path='profesores/getAlumnosProfesor', http_method='GET', name='profesores.getAlumnosProfesor')
+    def getAlumnosProfesores(self, request):
+        '''
+        Devuelve una lista con los datos resumidos de los alumnos a los que el profesor con id pasado da clase.
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getAlumnosProfesor?id=1
+        '''
+        #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
+        if v:
+            print ("Ejecución de getAlumnosProfesor en apigateway")
+
+        #Conexión a un microservicio específico:
+
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Añadimos a la url la coleccion (alumnos), el recurso (alumno dado por su dni) y el recurso anidado de este (profesores)
+        url+='profesores/'+str(request.id)+"/alumnos"
+
+
+        print url
+
+        #Realizamos la petición
+        result = urlfetch.fetch(url)
+
+        #Vamos a intentar consumir los datos en JSON y convertirlos a un mensje enviable :)
+
+        print "IMPRESION DE LOS DATOS RECIBIDOS"
+        print result.content
+        listaAlumnos = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        vectorAlumnos= []
+        #Que rellenamos con todo los alumnos de la listaAlumnos
+        for alumno in listaAlumnos:
+            vectorAlumnos.append(Alumno( nombre=str(alumno.get('nombre')),
+                                         #apellidos=str(alumno.get('apellidos')),
+                                         id=str(alumno.get('dni'))
+                                         )
+                                )
+
+        #Los adaptamos al tipo de mensaje y enviamos
+        #return Greeting(message=str(result.content))
+        return ListaAlumnos(alumnos=vectorAlumnos)
+
+    @endpoints.method(ID, ListaAsignaturas, path='profesores/getAsignaturasProfesor', http_method='GET', name='profesores.getAsignaturasProfesor')
+    def getAsignaturasProfesor(self, request):
+        '''
+        Devuelve una lista con los datos completos de las asignatuas que el profesor en cuestión imparte.
+        Ejemplo de llamada:
+        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getAsignaturasProfesor?id=1
+        '''
+        if v:
+            print ("Ejecución de getAsignaturasProfesor en apigateway")
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='profesores/'+request.id+"/asignaturas"
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaAsignaturas = jsonpickle.decode(result.content)
+        print listaAsignaturas
+        asignaturasItems= []
+        for asignatura in listaAsignaturas:
+            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
+        return ListaAsignaturas(asignaturas=asignaturasItems)
+
+    @endpoints.method(ID, ListaClases, path='profesores/getClasesProfesor', http_method='GET', name='profesores.getClasesProfesor')
+    def getClasesProfesor(self, request):
+        '''
+        Devuelve una lista con los datos minimos de las clases a las que ese profesor imparte.
+        Ejemplo de llamada:
+        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getClasesProfesor?id=1
+        '''
+        if v:
+            print ("Ejecución de getClasesProfesor en apigateway")
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='profesores/'+request.id+"/clases"
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaClases = jsonpickle.decode(result.content)
+        print listaClases
+        clasesItems= []
+        for clase in listaClases:
+            clasesItems.append(Clase(id=str(clase.get('id')),curso=str(clase.get('nombre')),grupo=str(clase.get('grupo')),nivel=str(clase.get('nivel'))))
+        return ListaClases(clases=clasesItems)
+
+
+    ##############################################
+    #   métodos de asignaturas                   #
+    ##############################################
+
+    @endpoints.method(message_types.VoidMessage, ListaAsignaturas, path='asignaturas/getAsignaturas', http_method='GET', name='asignaturas.getAsignaturas')
+    def getAsignaturas(self, unused_request):
+        '''
+        Devuelve una lista con todos las asignaturas registrados en el sistema, de forma simplificada (solo nombre y ID)
+
+        Llamada desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/asignaturas/getAsignaturas
+        Llamada desde JavaScript:
+        response = service.asignaturas.getAsignaturas().execute()
+        '''
+        #Identificación del módulo en el que estamos.
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+
+        #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el recurso al que queremos conectarnos.
+        url+="asignaturas"
+        if v:
+            print str(url)
+        #Al no especificar nada se llama al método GET de la URL.
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaAsignaturas = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        asignaturasItems= []
+        #Que rellenamos con todo los asignaturas de la listaProfesores
+        for asignatura in listaAsignaturas:
+            asignaturasItems.append(Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ))
+
+        #Los adaptamos al tipo de mensaje y enviamos
+        #return Greeting(message=str(result.content))
+        return ListaAsignaturas(asignaturas=asignaturasItems)
+
+    @endpoints.method(ID, AsignaturaCompleta, path='asignaturas/getAsignatura', http_method='GET', name='asignaturas.getAsignatura')
+    def getAsignatura(self,request):
+        '''
+        Devuelve toda la información de un profesor en caso de estar en el sistema.
+
+        Llamada ejemplo desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/asignaturas/getAsignatura?id=1
+        '''
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print "Petición GET a asignaturas.getAsignatura"
+            print "request: "+str(request)
+            print '\n'
+
+        #Conexión a un microservicio específico:
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+
+        #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Recursos más entidad
+        url+='asignaturas/'+request.id
+
+        if v:
+            print "Llamando a: "+str(url)
+
+        #Petición al microservicio
+        result = urlfetch.fetch(url=url, method=urlfetch.GET)
+
+        print "RESULTADO:"+str(result.status_code)
+        #print result.content
+        if v:
+            print result.status_code
+        if str(result.status_code) == '400':
+            raise endpoints.BadRequestException('Peticion erronea')
+
+        if str(result.status_code) == '404':
+            raise endpoints.NotFoundException('Profesor con ID %s no encontrado.' % (request.id))
+
+        profesor = jsonpickle.decode(result.content)
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "\nCódigo de estado: "+str(result.status_code)+'\n'
+
+
+        #Componemos un mensaje de tipo AlumnoCompleto.
+        #Las partes que son enteros las pasamos a string para enviarlos como mensajes de tipo string.
+        #Los campos que tengan NULL en la bd no se pasan al tipo message y ese campo queda vaćio y no se muestra.
+        asignatura = AsignaturaCompleta(id=str(profesor.get('id')),
+                                nombre=profesor.get('nombre')
+                                )
+
+        return asignatura
+
+    @endpoints.method(ID,MensajeRespuesta,path='asignaturas/delAsignatura', http_method='DELETE', name='asignaturas.delAsignatura')
+    def delAsignatura(self, request):
+
+        '''
+        delProfesor()
+
+        #Ejemplo de borrado de un recurso pasando el id de un profesor
+        Ubuntu> curl -d "id=1" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/asignaturas/delAsignatura
+        {
+         "message": "OK"
+        }
+
+        #Ejemplo de ejecución en el caso de no encontrar el recurso:
+        Ubuntu> curl -d "dni=1" -X DELETE -G localhost:8001/_ah/api/hellworld/v1/asignaturas/delAsignatura
+        {
+         "message": "Elemento no encontrado"
+        }
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición al método asignaturas.delAsignatura de APIGateway"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+
+        #Extraemos el argumento id de la petición y la añadimos a la URL
+        url+='asignaturas/'+request.id
+
+        if v:
+            print "Llamando a: "+url
+
+        #Realizamos la petición a la url del servicio con el método apropiado DELETE
+        result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
+
+    #Métodos de relaciones con otras entidades
+
+    @endpoints.method(ID, ListaAlumnos, path='asignaturas/getAlumnosAsignatura', http_method='GET', name='asignaturas.getAlumnosAsignatura')
+    def getAlumnosAsignatura(self, request):
+        '''
+        Devuelve una lista con los datos resumidos de los alumnos que esta matriculados en esa clase
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/asignaturas/getAlumnosAsignatura?id=1
+        '''
+        #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
+        if v:
+            print ("Ejecución de getAlumnosAsignatura en apigateway")
+
+        #Conexión a un microservicio específico:
+
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Añadimos a la url la coleccion (alumnos), el recurso (alumno dado por su dni) y el recurso anidado de este (profesores)
+        url+='asignaturas/'+str(request.id)+"/alumnos"
+
+
+        print url
+
+        #Realizamos la petición
+        result = urlfetch.fetch(url)
+
+        #Vamos a intentar consumir los datos en JSON y convertirlos a un mensje enviable :)
+
+        print "IMPRESION DE LOS DATOS RECIBIDOS"
+        print result.content
+        listaAlumnos = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        vectorAlumnos= []
+        #Que rellenamos con todo los alumnos de la listaAlumnos
+        for alumno in listaAlumnos:
+            vectorAlumnos.append(Alumno( nombre=str(alumno.get('nombre')),
+                                         #apellidos=str(alumno.get('apellidos')),
+                                         id=str(alumno.get('dni'))
+                                         )
+                                )
+
+        #Los adaptamos al tipo de mensaje y enviamos
+        #return Greeting(message=str(result.content))
+        return ListaAlumnos(alumnos=vectorAlumnos)
+
+    @endpoints.method(ID, ListaProfesores, path='asignaturas/getProfesoresAsignatura', http_method='GET', name='asignaturas.getProfesoresAsignatura')
+    def getProfesoresAsignatura(self, request):
+        '''
+        Devuelve una lista con los datos simplificados de los profesores que imparten clase en una asignatura.
+        Ejemplo de llamada:
+        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/asignaturas/getProfesoresAsignatura?id=1
+        '''
+        if v:
+            print ("Ejecución de getProfesoresAsignatura en apigateway")
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='asignaturas/'+request.id+"/profesores"
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaProfesores = jsonpickle.decode(result.content)
+        print listaProfesores
+        profesoresItems= []
+        for profesor in listaProfesores:
+            profesoresItems.append( Profesor( id=str(profesor.get('id')), nombre=str(profesor.get('nombre')), apellidos=str(profesor.get('apellidos')) ) )
+        return ListaProfesores(profesores=profesoresItems)
+
+    @endpoints.method(ID, ListaClases, path='asignaturas/getClasesAsignatura', http_method='GET', name='asignaturas.getClasesAsignatura')
+    def getClasesAsignatura(self, request):
+        '''
+        Devuelve una lista con los datos minimos de las clases en las que se imparte esa asignatura
+        Ejemplo de llamada:
+        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/asignaturas/getClasesAsignatura?id=1
+        '''
+        if v:
+            print ("Ejecución de getClasesProfesor en apigateway")
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='asignaturas/'+request.id+"/clases"
+        result = urlfetch.fetch(url)
+        if v:
+            print url
+            print "Respuesta del microservicio: \n"
+            print result.content
+            print "\n"
+        listaClases = jsonpickle.decode(result.content)
+        print listaClases
+        clasesItems= []
+        for clase in listaClases:
+            clasesItems.append(Clase(id=str(clase.get('id')),curso=str(clase.get('curso')),grupo=str(clase.get('grupo')),nivel=str(clase.get('nivel'))))
+        return ListaClases(clases=clasesItems)
+
+
+    ##############################################
+    #   métodos de clases                        #
+    ##############################################
+
+    @endpoints.method(message_types.VoidMessage, ListaClases, path='clases/getClases', http_method='GET', name='clases.getClases')
+    def getClases(self, unused_request):
+        '''
+        Devuelve una lista con todos las clases registrados en el sistema, de forma simplificada, id_clase, curso, grupo y nivel
+
+        Llamada desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/clases/getClases
+        Llamada desde JavaScript:
+        response = service.clases.getClases().execute()
+        '''
+        #Identificación del módulo en el que estamos.
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+
+        #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el recurso al que queremos conectarnos.
+        url+="clases"
+        if v:
+            print str(url)
+        #Al no especificar nada se llama al método GET de la URL.
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaClases = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        clasesItems= []
+        #Que rellenamos con todo los asignaturas de la listaProfesores
+        for clase in listaClases:
+            clasesItems.append(Clase( id=str(clase.get('id')), curso=str(clase.get('curso')), grupo=str(clase.get('grupo')), nivel=str(clase.get('nivel')) ))
+
+        return ListaClases(clases=clasesItems)
+
+    @endpoints.method(ID, ClaseCompleta, path='clases/getClase', http_method='GET', name='clases.getClase')
+    def getClase(self,request):
+        '''
+        Devuelve toda la información de una clase en caso de estar en el sistema.
+
+        Llamada ejemplo desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/clases/getClase?id=1
+        '''
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print "Petición GET a clases.getClase"
+            print "request: "+str(request)
+            print '\n'
+
+        #Conexión a un microservicio específico:
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+
+        #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Recursos más entidad
+        url+='clases/'+request.id
+
+        if v:
+            print "Llamando a: "+str(url)
+
+        #Petición al microservicio
+        result = urlfetch.fetch(url=url, method=urlfetch.GET)
+
+        print "RESULTADO:"+str(result.status_code)
+        #print result.content
+        if v:
+            print result.status_code
+        if str(result.status_code) == '400':
+            raise endpoints.BadRequestException('Peticion erronea')
+
+        if str(result.status_code) == '404':
+            raise endpoints.NotFoundException('Profesor con ID %s no encontrado.' % (request.id))
+
+        clase = jsonpickle.decode(result.content)
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "\nCódigo de estado: "+str(result.status_code)+'\n'
+
+
+        #Componemos un mensaje de tipo AlumnoCompleto.
+        #Las partes que son enteros las pasamos a string para enviarlos como mensajes de tipo string.
+        #Los campos que tengan NULL en la bd no se pasan al tipo message y ese campo queda vaćio y no se muestra.
+        clase = ClaseCompleta(id=str(clase.get('id')), curso=str(clase.get('curso')), grupo=str(clase.get('grupo')), nivel=str(clase.get('nivel')) )
+
+
+        return clase
+
+    @endpoints.method(ID,MensajeRespuesta,path='clases/delClase', http_method='DELETE', name='clases.delClase')
+    def delClase(self, request):
+
+        '''
+        Elimina la clase con id pasado en caso de existir en el sistema.
+
+        #Ejemplo de borrado de un recurso pasando el id de la clase.
+        Ubuntu> curl -d "id=1" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/clases/delClase
+        {
+         "message": "OK"
+        }
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición al método clases.delClase de APIGateway"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+
+        #Extraemos el argumento id de la petición y la añadimos a la URL
+        url+='clases/'+request.id
+
+        if v:
+            print "Llamando a: "+url
+
+        #Realizamos la petición a la url del servicio con el método apropiado DELETE
+        result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
+
+    @endpoints.method(ID, ListaAlumnos, path='clases/getAlumnosClase', http_method='GET', name='clases.getAlumnosClase')
+    def getAlumnosClase(self, request):
+        '''
+        Devuelve una lista con los datos resumidos de los alumnos que esta matriculados en esa clase
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/clases/getAlumnosClase?id=1
+        '''
+        #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
+        if v:
+            print ("Ejecución de getAlumnosClase en apigateway")
+
+        #Conexión a un microservicio específico:
+
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Añadimos a la url la coleccion (alumnos), el recurso (alumno dado por su dni) y el recurso anidado de este (profesores)
+        url+='clases/'+str(request.id)+"/alumnos"
+
+
+        print url
+
+        #Realizamos la petición
+        result = urlfetch.fetch(url)
+
+        #Vamos a intentar consumir los datos en JSON y convertirlos a un mensje enviable :)
+
+        print "IMPRESION DE LOS DATOS RECIBIDOS"
+        print result.content
+        listaAlumnos = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        vectorAlumnos= []
+        #Que rellenamos con todo los alumnos de la listaAlumnos
+        for alumno in listaAlumnos:
+            vectorAlumnos.append(Alumno( nombre=str(alumno.get('nombre')),
+                                         #apellidos=str(alumno.get('apellidos')),
+                                         id=str(alumno.get('dni'))
+                                         )
+                                )
+
+        #Los adaptamos al tipo de mensaje y enviamos
+        #return Greeting(message=str(result.content))
+        return ListaAlumnos(alumnos=vectorAlumnos)
+
+    #seguir aquí
 
 APPLICATION = endpoints.api_server([HelloWorldApi])
