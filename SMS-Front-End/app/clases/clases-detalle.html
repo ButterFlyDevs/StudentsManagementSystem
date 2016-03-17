@@ -10,7 +10,7 @@ Diseño de la vista de la pestaña de detalles del estudiante.
     <!-- En la segunda sección TODOS sus datos, junto a su diseño con el kit de CSS-->
     <div class="uk-width-2-4 uk-margin-top ">
 
-            <h2>{{asignatura.nombre}}</h2>
+            <h2>{{clase.curso}}   {{clase.grupo}}   {{clase.nivel}}</h2>
 
     </div>
 
@@ -31,7 +31,7 @@ Diseño de la vista de la pestaña de detalles del estudiante.
           <hr>
           <!-- LA implementación de la acción asociada al botón puede estar en el script incluido abajo o
           en el propio app.js para poder usar el scope.-->
-          <button id="DelButton" ng-click="delAsignatura()" class="uk-button uk-button-danger">Eliminar</button>
+          <button id="DelButton" ng-click="delClase()" class="uk-button uk-button-danger">Eliminar</button>
           <button id="CancelButton" class="uk-button uk-button-success">Cancel</button>
 
         </div>
@@ -81,7 +81,7 @@ Diseño de la vista de la pestaña de detalles del estudiante.
                 <h4>Clases</h4>
                 <hr>
                 <li ng-repeat="clase in clases">
-                  <a ui-sref="clases.detalles-clase({ claseID: clase.id })">{{ clase.curso }}  {{ clase.grupo }}  {{ clase.nivel }}</a>
+                  <a>{{ clase.curso }} {{ clase.grupo }} {{ clase.nivel }}</a>
                 </li>
             </div>
 

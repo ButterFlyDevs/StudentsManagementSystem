@@ -128,19 +128,57 @@ de la vista y se usan).
                 templateUrl: 'asignaturas/asignaturas-lista.html',
                 controller: 'ControladorListaAsignaturas'
             })
-            .state('asignaturas.detalles-profesor',{
-              url: '/detalle/:profesorID',
+            .state('asignaturas.detalles-asignatura',{
+              url: '/detalle/:asignaturaID',
               templateUrl: 'asignaturas/asignaturas-detalle.html',
-              controller: 'ControladorDetallesProfesor'
+              controller: 'ControladorDetallesAsignatura'
+            })
+            .state('asignaturas.modificacion-asignatura',{
+              url: '/modificacion/:asignaturaID',
+              templateUrl: 'asignaturas/asignaturas-modificacion.html',
+              controller: 'ControladorModificacionAsignatura'
             })
             .state('asignaturas.nuevo', {
                 url: '/nuevo',
                 //Podemos meter directamente texto desde aquí
                 //template: 'I could sure use a drink right now.'
                 templateUrl: 'asignaturas/asignaturas-nuevo.html',
-                controller: 'ControladorNuevoProfesor'
+                controller: 'ControladorNuevaAsignatura'
             })
 
+
+            //CONTROLADORES DE CLASES
+
+             .state('clases', {
+                 url: '/clases',
+                 templateUrl: 'clases/clases.html'
+             })
+             .state('clases.main', {
+                 url: '/main',
+                 templateUrl: 'clases/clases-main.html',
+             })
+             .state('clases.list', {
+                  url: '/list',
+                  templateUrl: 'clases/clases-lista.html',
+                  controller: 'ControladorListaClases'
+              })
+              .state('clases.detalles-clase',{
+                url: '/detalle/:claseID',
+                templateUrl: 'clases/clases-detalle.html',
+                controller: 'ControladorDetallesClase'
+              })
+              .state('clases.modificacion-clase',{
+                url: '/modificacion/:asignaturaID',
+                templateUrl: 'clases/clases-modificacion.html',
+                controller: 'ControladorModificacionClase'
+              })
+              .state('clases.nueva', {
+                  url: '/nuevo',
+                  //Podemos meter directamente texto desde aquí
+                  //template: 'I could sure use a drink right now.'
+                  templateUrl: 'clases/clases-nuevo.html',
+                  controller: 'ControladorNuevaClase'
+              })
 
 
 
@@ -419,9 +457,6 @@ routerApp.controller('ControladorDetallesEstudiante', function($location, $scope
     */
   });
 
-
-
-
 });
 
 routerApp.controller('ControladorDetallesEstudiante-DatosAcademicos', function($scope, $stateParams){
@@ -635,5 +670,391 @@ routerApp.controller('ControladorListaAsignaturas', function ($scope) {
       $scope.asignaturas=resp.asignaturas;
       $scope.$apply();
     });
-    }
-);
+
+});
+
+routerApp.controller('ControladorNuevaAsignatura', function ($scope){
+  $scope.submitForm = function(formData){
+    //Cuando el formulario es válido porque cumple con todas las especificaciones:
+    if ($scope.formNuevaAsignatura.$valid) {
+       console.log('Formulario válido');
+       console.log('Se progecede a guardar la asignatura en la base de datos.')
+
+       var salidaEjecucion;
+
+       console.log("llamada a asginaturas.insertarAsignatura()")
+       console.log($scope.alumno);
+
+       var ROOT = 'http://localhost:8001/_ah/api';
+       gapi.client.load('helloworld', 'v1', null, ROOT);
+
+       gapi.client.helloworld.asignaturas.insertarAsignatura({
+         //Aquí especificamos todos los datods del form que queremos que se envíen:
+         'nombre':$scope.alumno.nombre,
+       }
+       ).execute(function(resp){
+         //Mostramos por consola la respuesta del servidor
+         salidaEjecucion=resp.message;
+         console.log("Respuesta servidor: "+salidaEjecucion);
+         console.log(salidaEjecucion);
+
+          if (salidaEjecucion == 'OK'){
+            /*
+            Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+            de este componente, esto lo hcemos en la plantilla (html)
+            */
+            $.UIkit.notify("Asignatura guardado con muchísimo éxito.", {status:'success'});
+          }else{
+            $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+          }
+
+         $scope.$apply();
+       });
+
+
+
+     }
+     else {
+         //if form is not valid set $scope.addContact.submitted to true
+         console.log('Formulario inválido');
+         clase="uk-class-danger"
+         $scope.formNuevoAlumno.submitted=true;
+     };
+
+
+
+  };
+});
+
+routerApp.controller('ControladorDetallesAsignatura', function($location, $scope, $stateParams){
+
+  //Implementación de la acción del botón delAsignatura
+  $scope.delAsignatura = function(){
+    console.log("Pulsada confirmación asignatura alumno id: "+$stateParams.asignaturaID)
+
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', null, ROOT);
+
+    gapi.client.helloworld.asignaturas.delAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
+      //Mostramos por consola la respuesta del servidor
+      console.log("llamando a delAsignatura");
+      console.log(resp.message);
+      $scope.respuesta=resp.message;
+
+
+      //El mensje no sale debido (en principio) a que cambiamos de pantall
+      if (resp.message == 'OK'){
+        /*
+        Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+        de este componente, esto lo hcemos en la plantilla (html)
+        */
+        $.UIkit.notify("Asignatura eliminado con éxito.", {status:'success'});
+      }else{
+        $.UIkit.notify("\""+resp.message+"\"", {status:'warning'});
+      }
+
+      $scope.$apply();
+    });
+
+    //Después volvemos a la página principal de estudiantes, ahora desbloqueado porque se pierde el mensaje al cambiar,
+    // al menos que le pasásemos los datos al controlador de esa página y fuese esa quien cargase el mensaje flotante.
+    //$location.path("/estudiantes/main");
+
+  };
+
+  //Rescatamos el id de la url y la enviamos con el scope a la vista
+  //$scope.id = $stateParams.estudianteID;
+  $scope.id=$stateParams.estudianteID;
+
+  console.log("ID asignatura: "+$stateParams.asignaturaID);
+
+  var ROOT = 'http://localhost:8001/_ah/api';
+  gapi.client.load('helloworld', 'v1', null, ROOT);
+
+
+  //Pedimos al Gateway toda la informaicón de la asignatura.
+  gapi.client.helloworld.asignaturas.getAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp) {
+    console.log("calling getAsignatura with id: "+$stateParams.asignaturaID);
+    console.log(resp);
+    $scope.asignatura = resp;
+    console.log(resp.nombre);
+    $scope.$apply();
+  });
+
+  /*
+  ### Información extra de la asginatura ###
+  */
+
+  //Pedimos al gateway todos los alumnos matriculados en esa asignatura.
+  gapi.client.helloworld.asignaturas.getAlumnosAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
+    console.log("Petición al APIG de alumnos matriculados en la asignatura "+$stateParams.asignaturaID);
+    console.log(resp.alumnos);
+    $scope.estudiantes = resp.alumnos;
+    $scope.$apply();
+  });
+
+  //Pedimos al gateway todos los profesores que imparten esa asisnatura.
+  gapi.client.helloworld.asignaturas.getProfesoresAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
+    console.log("Petición al APIG de los profesores que imparten la asignatura "+$stateParams.asignaturaID);
+    console.log(resp.profesores);
+    $scope.profesores = resp.profesores;
+    $scope.$apply();
+  });
+
+  //Pedimos al gateway todos los clases en las que se imparte esa asisnatura.
+  gapi.client.helloworld.asignaturas.getClasesAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
+    console.log("Petición al APIG de las clases en las que se imparten la asignatura "+$stateParams.asignaturaID);
+    console.log(resp.clases);
+    $scope.clases = resp.clases;
+    $scope.$apply();
+  });
+
+
+}); //Fin controlador detalles asignatura
+
+routerApp.controller('ControladorModificacionAsignatura', function($location, $scope, $stateParams){
+
+  //Rescatamos el id de la url y la enviamos con el scope a la vista
+  //$scope.id = $stateParams.estudianteID;
+  $scope.id=$stateParams.asignaturaID;
+
+
+  var ROOT = 'http://localhost:8001/_ah/api';
+  gapi.client.load('helloworld', 'v1', null, ROOT);
+
+
+  //Pedimos al Gateway toda la informaicón del Alumno.
+  gapi.client.helloworld.asignaturas.getAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp) {
+
+    console.log("calling getAsignatura with id: "+$stateParams.asignaturaID);
+    console.log(resp);
+    $scope.asignatura = resp;
+    console.log(resp.nombre);
+    $scope.$apply();
+    /*
+    $scope.es=resp.alumno;
+    //Tenemos que hacer esto para que se aplique scope ya que la llamada a la API está fuera de Angular
+    $scope.$apply();
+    */
+  });
+
+
+  $scope.submitForm = function(formData){
+
+    console.log("Solicitud de formulario")
+
+    //Cuando el formulario es válido porque cumple con todas las especificaciones:
+    if ($scope.formModificacionAsignatura.$valid) {
+       console.log('Formulario válido');
+       console.log('Se progecede a guardar la modificación del alumno en la base de datos.')
+
+       var salidaEjecucion;
+
+       console.log("llamada a modAlumnoCompleto()")
+       console.log($scope.alumno);
+
+       var ROOT = 'http://localhost:8001/_ah/api';
+       gapi.client.load('helloworld', 'v1', null, ROOT);
+
+       gapi.client.helloworld.asignaturas.modAsignaturaCompleta({
+         'id':$stateParams.asignaturaID,
+         //asignatura.nombre se coge de la plantilla con la directiva ng-model así: ng-model="asignatura.nombre"
+         'nombre':$scope.asignatura.nombre
+       }).execute(function(resp){
+         //Mostramos por consola la respuesta del servidor
+         salidaEjecucion=resp.message;
+         console.log("Respuesta servidor: "+salidaEjecucion);
+         console.log(salidaEjecucion);
+
+          if (salidaEjecucion == 'OK'){
+            /*
+            Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+            de este componente, esto lo hcemos en la plantilla (html)
+            */
+            $.UIkit.notify("Asignatura guardada con muchísimo éxito.", {status:'success'});
+          }else{
+            $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+          }
+
+         $scope.$apply();
+       });
+
+
+
+     }
+     else {
+         //if form is not valid set $scope.addContact.submitted to true
+         console.log('Formulario inválido');
+         clase="uk-class-danger"
+         $scope.formNuevoAlumno.submitted=true;
+     };
+
+
+
+  };
+
+
+
+
+});
+
+// #################################
+// # Controladores de clases       #
+// #################################
+routerApp.controller('ControladorListaClases', function ($scope) {
+    /*
+    Controlador que provee a la plantilla clases-lista.html la lista simplificada de todos las clases
+    a trabés del API Gateway usando el método getClases()
+    */
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', null, ROOT);
+
+    gapi.client.helloworld.clases.getClases().execute(function(resp) {
+      console.log("recibido desde APIGATEWAY clases.getClases(): ")
+      console.log(resp.clases);
+      $scope.clases=resp.clases;
+      $scope.$apply();
+    });
+
+});
+
+routerApp.controller('ControladorNuevaClase', function ($scope){
+  $scope.submitForm = function(formData){
+    //Cuando el formulario es válido porque cumple con todas las especificaciones:
+    if ($scope.formNuevaClase.$valid) {
+       console.log('Formulario válido');
+       console.log('Se progecede a guardar la clase en la base de datos.')
+
+       var salidaEjecucion;
+
+       console.log("llamada a asginaturas.insertarAsignatura()")
+       console.log($scope.alumno);
+
+       var ROOT = 'http://localhost:8001/_ah/api';
+       gapi.client.load('helloworld', 'v1', null, ROOT);
+
+       gapi.client.helloworld.clases.insertarClase({
+         'curso':$scope.clase.curso,
+         'grupo':$scope.clase.grupo,
+         'nivel':$scope.clase.nivel,
+       }
+       ).execute(function(resp){
+         //Mostramos por consola la respuesta del servidor
+         salidaEjecucion=resp.message;
+         console.log("Respuesta servidor: "+salidaEjecucion);
+         console.log(salidaEjecucion);
+
+          if (salidaEjecucion == 'OK'){
+            /*
+            Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+            de este componente, esto lo hcemos en la plantilla (html)
+            */
+            $.UIkit.notify("Asignatura guardado con muchísimo éxito.", {status:'success'});
+          }else{
+            $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+          }
+
+         $scope.$apply();
+       });
+
+
+
+     }
+     else {
+         //if form is not valid set $scope.addContact.submitted to true
+         console.log('Formulario inválido');
+         clase="uk-class-danger"
+         $scope.formNuevoAlumno.submitted=true;
+     };
+
+
+
+  };
+});
+
+routerApp.controller('ControladorDetallesClase', function($location, $scope, $stateParams){
+
+  //Implementación de la acción del botón delAsignatura
+  $scope.delClase = function(){
+    console.log("Pulsada confirmación eliminación clase con id: "+$stateParams.asignaturaID)
+
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', null, ROOT);
+
+    gapi.client.helloworld.clases.delClase({'id':$stateParams.claseID}).execute(function(resp){
+      //Mostramos por consola la respuesta del servidor
+      console.log("llamando a delAsignatura");
+      console.log(resp.message);
+      $scope.respuesta=resp.message;
+
+
+      //El mensje no sale debido (en principio) a que cambiamos de pantall
+      if (resp.message == 'OK'){
+        /*
+        Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+        de este componente, esto lo hcemos en la plantilla (html)
+        */
+        $.UIkit.notify("Asignatura eliminado con éxito.", {status:'success'});
+      }else{
+        $.UIkit.notify("\""+resp.message+"\"", {status:'warning'});
+      }
+
+      $scope.$apply();
+    });
+
+    //Después volvemos a la página principal de estudiantes, ahora desbloqueado porque se pierde el mensaje al cambiar,
+    // al menos que le pasásemos los datos al controlador de esa página y fuese esa quien cargase el mensaje flotante.
+    //$location.path("/estudiantes/main");
+
+  };
+
+  //Rescatamos el id de la url y la enviamos con el scope a la vista
+  //$scope.id = $stateParams.estudianteID;
+  $scope.id=$stateParams.claseID;
+
+  console.log("ID clase: "+$stateParams.claseID);
+
+  var ROOT = 'http://localhost:8001/_ah/api';
+  gapi.client.load('helloworld', 'v1', null, ROOT);
+
+
+  //Pedimos al Gateway toda la informaicón de la asignatura.
+  gapi.client.helloworld.clases.getClase({'id':$stateParams.claseID}).execute(function(resp) {
+    console.log("calling getClase with id: "+$stateParams.claseID);
+    console.log(resp);
+    $scope.clase = resp;
+    console.log(resp.clase);
+    $scope.$apply();
+  });
+
+  /*
+  ### Información extra de la asginatura ###
+  */
+
+  /*
+  //Pedimos al gateway todos los alumnos matriculados en esa asignatura.
+  gapi.client.helloworld.asignaturas.getAlumnosAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
+    console.log("Petición al APIG de alumnos matriculados en la asignatura "+$stateParams.asignaturaID);
+    console.log(resp.alumnos);
+    $scope.estudiantes = resp.alumnos;
+    $scope.$apply();
+  });
+
+  //Pedimos al gateway todos los profesores que imparten esa asisnatura.
+  gapi.client.helloworld.asignaturas.getProfesoresAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
+    console.log("Petición al APIG de los profesores que imparten la asignatura "+$stateParams.asignaturaID);
+    console.log(resp.profesores);
+    $scope.profesores = resp.profesores;
+    $scope.$apply();
+  });
+
+  //Pedimos al gateway todos los clases en las que se imparte esa asisnatura.
+  gapi.client.helloworld.asignaturas.getClasesAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
+    console.log("Petición al APIG de las clases en las que se imparten la asignatura "+$stateParams.asignaturaID);
+    console.log(resp.clases);
+    $scope.clases = resp.clases;
+    $scope.$apply();
+  });
+  */
+
+}); //Fin controlador detalles asignatura

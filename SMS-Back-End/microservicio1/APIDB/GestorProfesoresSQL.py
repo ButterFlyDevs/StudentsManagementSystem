@@ -26,7 +26,7 @@ class GestorProfesores:
     """
 
     @classmethod
-    def nuevoProfesor(self, nombre, dni, apellidos='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
+    def nuevoProfesor(self, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
         '''
         Introduce un nuevo elemento Profesor en la base de datos.
         Necesita como mínimo un nombre y un dni
@@ -214,6 +214,73 @@ class GestorProfesores:
             return 'Elemento duplicado'
         elif salida==0:
             return 'Elemento no encontrado'
+
+    @classmethod
+    def modProfesorCompleto(self, idProfesor, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
+        '''
+        Modifica todos los atributos de un profesor dado su id al mismo tiempo.
+        '''
+
+        #Info de seguimiento
+        if v:
+            print apiName
+            print "Llamada a modProfesorCompleto"
+            print '\n'
+
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        query="UPDATE Profesor SET"
+        query=query+" nombre= "+'\''+nombre+'\''
+        query=query+" , apellidos= "+'\''+apellidos+'\''
+        if dni=='NULL':
+            query=query+" , dni=NULL "
+        else:
+            query=query+" , dni= "+'\''+dni+'\''
+        query=query+" , direccion= "+'\''+direccion+'\''
+        query=query+" , localidad= "+'\''+localidad+'\''
+        query=query+" , provincia= "+'\''+provincia+'\''
+
+        if fecha_nacimiento=='NULL':
+            query=query+" , fecha_nacimiento=NULL "
+        else:
+            query=query+" , fecha_nacimiento= "+'\''+fecha_nacimiento+'\''
+
+
+        query=query+" , telefono= "+'\''+telefono+'\''
+        query=query+" WHERE id_profesor="+idProfesor+";"
+
+        if v:
+            print apiName
+            print query
+
+        cursor = db.cursor()
+        salida =''
+
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        if v:
+            print "Salida MySQL: "+str(salida)
+
+        #Efectuamos los cambios
+        db.commit()
+        cursor.close()
+        db.close()
+
+        if salida==1:
+            return 'OK'
+        elif salida==1062:
+            return 'Elemento duplicado'
+        elif salida==0:
+            return 'Sin cambios realizados'
+
 
     @classmethod
     def delProfesor(self, idProfesor):

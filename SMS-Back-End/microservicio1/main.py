@@ -200,24 +200,29 @@ def delProfesores():
 @app.route('/profesores',methods=['POST'])
 def postProfesor():
     '''
-    Método que inserta un nuevo alumno en el sistema.
-    curl -d "nombre=Juan&dni=45601218Z&direccion=Calle arabl&localidad=Jerez de la frontera&provincia=Granada&fecha_nac=1988-2-6&telefonoA=277164459&telefonoB=177164459" -i -X POST localhost:8080/profesores
+    Método que inserta un nuevo profesor en el sistema.
+    curl -d "nombre=Juan&apellidos=Bartlo&dni=46666&direccion=Calle arabl&localidad=Jerez de la fronta&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=137631" -i -X POST localhost:8002/profesores
+
+
     '''
-    if 'dni' in request.form:
-        salida = GestorProfesores.nuevoProfesor(request.form['nombre'],
-                                  request.form['dni'],
-                                  request.form['direccion'],
-                                  request.form['localidad'],
-                                  request.form['provincia'],
-                                  request.form['fecha_nac'],
-                                  request.form['telefonoA'],
-                                  request.form['telefonoB'])
-        if salida == 'OK':
-            return 'OK'
-        else:
-            abort(404)
+    if v:
+        print "Calling postProfesor()"
+        print str(request.form)
+
+    salida = GestorProfesores.nuevoProfesor(request.form['nombre'],
+                              request.form['apellidos'],
+                              request.form['dni'],
+                              request.form['direccion'],
+                              request.form['localidad'],
+                              request.form['provincia'],
+                              request.form['fecha_nacimiento'],
+                              request.form['telefono'],
+                              )
+    if salida == 'OK':
+        return 'OK'
     else:
-        abort(404)
+        #abort(404)
+        return salida
 
 
 #######################
@@ -240,14 +245,36 @@ def getProfesor(id_profesor):
     else:
         return jsonpickle.encode(GestorProfesores.getProfesor(id_profesor))
 
-''' Hasta ver como proceder con la modificación de profesores.
-@app.route('/profesores/<string:id_profesor>',methods=['PUT'])
-def modProfesor(id_profesor):
-    #Si no tiene el número correcto de caracteres el identificador.
-    if len(id_profesor) != 9:
-        abort(404)
-    return id_profesor
-'''
+@app.route('/profesores/<string:id_profesor>',methods=['POST'])
+def modProfesorCompleto(id_profesor):
+    '''
+    Función que modifica los atributos de un profesor dado su identificación, usando la función
+    modProfesorCompleto de la APIDB
+    curl -d "nombre=Pedro&apellidos=Torrssr&dni=234242&direccion=Calle Duqesa&localidad=Granada&proviia=Burgos&fecha_nacimiento=1988-12-4&telefono=23287282" -i -X POST localhost:8002/profesores/1
+
+    '''
+    if v:
+        print 'Calling GestorProfesores.modProfesorCompleto()'
+
+    #El id del alumno se pasa por la URL
+    salida = GestorProfesores.modProfesorCompleto(id_profesor,
+                                             request.form['nombre'],
+                                             request.form['apellidos'],
+                                             request.form['dni'],
+                                             request.form['direccion'],
+                                             request.form['localidad'],
+                                             request.form['provincia'],
+                                             request.form['fecha_nacimiento'],
+                                             request.form['telefono']
+                                            );
+
+    if v:
+        print "SALIDA: "+str(salida)
+
+    if salida == 'OK':
+        return 'OK'
+    else:
+        return salida
 
 @app.route('/profesores/<string:id_profesor>',methods=['DELETE'])
 def delProfesor(id_profesor):
@@ -273,6 +300,8 @@ def delProfesor(id_profesor):
         abort(404)
     else:
         return 'Elemento eliminado'
+
+#Métodos que relacionan con otras entidades.
 
 @app.route('/profesores/<string:id_profesor>/alumnos',methods=['GET'])
 def getAlumnosProfesor(id_profesor):
@@ -315,17 +344,13 @@ def getAsignaturas():
 def postAsignatura():
     '''
     Inserta una nueva asignatura en el sistema.
-    curl -d "id=" -i -X POST localhost:8080/asignaturas
+    curl -d "nombre=ComputacionZZ" -i -X POST localhost:8002/asignaturas
     '''
-    if 'id' in request.form:
-        salida = GestorAsignaturas.nuevaAsignatura(request.form['id'],request.form['nombre'])
-        if salida == 'OK':
-            return 'OK'
-        else:
-            abort(404)
+    salida = GestorAsignaturas.nuevaAsignatura(request.form['nombre'])
+    if salida == 'OK':
+        return 'OK'
     else:
         abort(404)
-
 
 #########################
 #   ENTIDAD ASIGNATURA  #
@@ -347,6 +372,28 @@ def getAsignatura(id_asignatura):
     else:
         return jsonpickle.encode(salida)
 
+@app.route('/asignaturas/<string:id_asignatura>',methods=['POST'])
+def modAsignaturaCompleta(id_asignatura):
+    '''
+    Función que modifica los atributos de una asignatura completa dado su identificación
+    curl -d "nombre=Ciudadania" -i -X POST localhost:8002/asignaturas/1
+
+    '''
+    if v:
+        print 'Calling GestorProfesores.modProfesorCompleto()'
+
+    #El id del alumno se pasa por la URL
+    salida = GestorAsignaturas.modAsignaturaCompleta(id_asignatura, request.form['nombre']);
+
+    if v:
+        print "SALIDA: "+str(salida)
+
+    if salida == 'OK':
+        return 'OK'
+    else:
+        return salida
+
+
 @app.route('/asignaturas/<string:id_asignatura>',methods=['DELETE'])
 def delAsignatura(id_asignatura):
     '''
@@ -366,7 +413,7 @@ def delAsignatura(id_asignatura):
 @app.route('/asignaturas/<string:id_asignatura>/alumnos',methods=['GET'])
 def getAlumnosAsignatura(id_asignatura):
     '''
-    curl -i -X GET localhost:8002/asignaturas/fr/alumnos
+    curl -i -X GET localhost:8002/asignaturas/1/alumnos
     '''
     return jsonpickle.encode(GestorAsignaturas.getAlumnos(id_asignatura))
 
@@ -406,17 +453,13 @@ def getClases():
 def postClase():
     '''
     Inserta una nueva clase en el sistema.
-    curl -d "id=" -i -X POST localhost:8002/clases
+    curl -d "curso=3&grupo=C&nivel=ESO" -i -X POST localhost:8002/clases
     '''
-    if 'id' in request.form:
-        salida = GestorClases.nuevoCurso(request.form['id'],request.form['curso'], request.form['grupo'], request.form['nivel'])
-        if salida == 'OK':
-            return 'OK'
-        else:
-            abort(404)
+    salida = GestorClases.nuevaClase(request.form['curso'], request.form['grupo'], request.form['nivel'])
+    if salida == 'OK':
+        return 'OK'
     else:
         abort(404)
-
 
 #########################
 #   ENTIDAD CLASE       #
@@ -447,6 +490,7 @@ def delClase(id_clase):
     else:
         return str(salida)
 
+#Métodos que relacionan con otras entidades
 
 @app.route('/clases/<string:id_clase>/alumnos',methods=['GET'])
 def getAlumnosClase(id_clase):
@@ -455,7 +499,6 @@ def getAlumnosClase(id_clase):
     curl -i -X GET localhost:8002/clases/fr/alumnos
     '''
     return jsonpickle.encode(GestorClases.getAlumnos(id_clase))
-
 
 @app.route('/clases/<string:id_clase>/profesores', methods=['GET'])
 def getProfesoresCurso(id_curso):

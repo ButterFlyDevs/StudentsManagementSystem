@@ -132,7 +132,7 @@ class HelloWorldApi(remote.Service):
     """Helloworld API v1."""
 
     ##############################################
-    #   métodos de alumnos                       #
+    #   métodos de ALUMNOS                       #
     ##############################################
 
     @endpoints.method(message_types.VoidMessage, ListaAlumnos,
@@ -292,9 +292,7 @@ class HelloWorldApi(remote.Service):
 
         return alumno
 
-    @endpoints.method(AlumnoCompleto,MensajeRespuesta,
-                     path='insertarAlumno', http_method='POST',
-                     name='alumnos.insertarAlumno')
+    @endpoints.method(AlumnoCompleto,MensajeRespuesta, path='alumnos/insertarAlumno', http_method='POST', name='alumnos.insertarAlumno')
     def insertar_alumno(self, request):
         '''
         insertarAlumno()  [POST con todos los atributos de un alumno]
@@ -302,7 +300,7 @@ class HelloWorldApi(remote.Service):
         Introduce un nuevo alumno en el sistema.
 
         Ejemplo de llamada en terminal:
-        curl -i -d "nombre=Juan&dni=45301218Z&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nac=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno
+        curl -i -d "nombre=Juan&dni=45301218Z&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno
         (-i para ver las cabeceras)
 
         '''
@@ -590,7 +588,7 @@ class HelloWorldApi(remote.Service):
 
 
     ##############################################
-    #   métodos de profesores                    #
+    #   métodos de PROFESORES                    #
     ##############################################
 
     @endpoints.method(message_types.VoidMessage, ListaProfesores, path='profesores/getProfesores', http_method='GET', name='profesores.getProfesores')
@@ -706,7 +704,70 @@ class HelloWorldApi(remote.Service):
 
         return profesor
 
-    #Añadir insertarProfesor
+    @endpoints.method(ProfesorCompleto,MensajeRespuesta, path='profesores/insertarProfesor', http_method='POST', name='profesores.insertarProfesor')
+    def insertarProfesor(self, request):
+        '''
+        Introduce un nuevo profesor en el sistema.
+
+        Ejemplo de llamada en terminal:
+        curl -i -d "nombre=Juan&apellidos=Azustregui&dni=99&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/profesores/insertarProfesor
+        (-i para ver las cabeceras)
+
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a profesores.insertarProfesor"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Si no tenemos todos los atributos entonces enviamos un error de bad request.
+        if request.nombre==None or request.apellidos==None or request.dni==None or request.direccion==None or request.localidad==None or request.provincia==None or request.fecha_nacimiento==None or request.telefono==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="profesores"
+
+
+        #Extraemos lo datos de la petición al endpoints
+        form_fields = {
+          "nombre": request.nombre,
+          "apellidos": request.apellidos,
+          "dni": request.dni,
+          "direccion": request.direccion,
+          "localidad": request.localidad,
+          "provincia": request.provincia,
+          "fecha_nacimiento": request.fecha_nacimiento,
+          "telefono": request.telefono
+        }
+
+        if v:
+            print "Llamando a: "+url
+
+
+        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        form_data = urllib.urlencode(form_fields)
+        #Realizamos la petición al servicio con los datos pasados al endpoint
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+        if str(result.status_code) == '404':
+            raise endpoints.NotFoundException('Alumno con ID %s ya existe en el sistema.' % (request.dni))
+
+        #return MensajeRespuesta(message="Todo OK man!")
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
 
     @endpoints.method(ID,MensajeRespuesta,path='profesores/delProfesor', http_method='DELETE', name='profesores.delProfesor')
     def delProfesor(self, request):
@@ -759,9 +820,58 @@ class HelloWorldApi(remote.Service):
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
+    @endpoints.method(ProfesorCompleto,MensajeRespuesta,path='profesores/modProfesorCompleto', http_method='POST', name='profesores.modProfesorCompleto')
+    def modificarProfesorCompleto(self, request):
+        '''
+        Modifica todos los atributos de un profesor, aunque algunos queden igual.
+        curl -d "id=1&nombre=Pedro&apellidos=Torrssr&dni=23&direccion=CREalCartuja&localidad=Granada&provincia=Granada&fecha_nacimiento=1988-12-4&telefono=23287282" -i -X POST -G localhost:8001/_ah/api/helloworld/v1/profesores/modProfesorCompleto
+        '''
 
-    #Añadir modificarProfesor
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a alumnos.modAlumnoCompleto"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
 
+        if request.nombre==None or request.apellidos==None or request.dni==None or request.direccion==None or request.localidad==None or request.provincia==None or request.fecha_nacimiento==None or request.telefono==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Añadimos el recurso al que queremos conectarnos, colección alumnos / alumno con id concreto.
+        url+="profesores/"+request.id
+
+        #Extraemos lo datos de la petición que se reciben aquí en el endpoints
+        form_fields = {
+          "nombre": request.nombre,
+          "apellidos": request.apellidos,
+          "dni": request.dni,
+          "direccion": request.direccion,
+          "localidad": request.localidad,
+          "provincia": request.provincia,
+          "fecha_nacimiento": request.fecha_nacimiento,
+          "telefono": request.telefono
+        }
+
+        if v:
+            print "Llamando a: "+url
+
+        form_data = urllib.urlencode(form_fields)
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+        #return MensajeRespuesta(message="Todo OK man!")
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
 
     #Métodos de relación con otras entidades.
 
@@ -859,7 +969,7 @@ class HelloWorldApi(remote.Service):
 
 
     ##############################################
-    #   métodos de asignaturas                   #
+    #   métodos de ASIGNATURAS                   #
     ##############################################
 
     @endpoints.method(message_types.VoidMessage, ListaAsignaturas, path='asignaturas/getAsignaturas', http_method='GET', name='asignaturas.getAsignaturas')
@@ -959,6 +1069,57 @@ class HelloWorldApi(remote.Service):
 
         return asignatura
 
+    @endpoints.method(AsignaturaCompleta, MensajeRespuesta, path='asignaturas/insertarAsignatura', http_method='POST', name='asignaturas.insertarAsignatura')
+    def insertarAsignatura(self, request):
+        '''
+        Introduce un nuevo profesor en el sistema.
+
+        Ejemplo de llamada en terminal:
+        curl -i -d "nombre=CienciasExperimentales" -X POST -G localhost:8001/_ah/api/helloworld/v1/asignaturas/insertarAsignatura
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a asignaturas.insertarAsignatura"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Si no tenemos todos los atributos entonces enviamos un error de bad request.
+        if request.nombre==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="asignaturas"
+
+
+        #Extraemos lo datos de la petición al endpoints
+        form_fields = {
+          "nombre": request.nombre,
+        }
+
+        if v:
+            print "Llamando a: "+url
+
+
+        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        form_data = urllib.urlencode(form_fields)
+        #Realizamos la petición al servicio con los datos pasados al endpoint
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+        return MensajeRespuesta(message=result.content)
+
     @endpoints.method(ID,MensajeRespuesta,path='asignaturas/delAsignatura', http_method='DELETE', name='asignaturas.delAsignatura')
     def delAsignatura(self, request):
 
@@ -1010,6 +1171,50 @@ class HelloWorldApi(remote.Service):
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
+    @endpoints.method(AsignaturaCompleta,MensajeRespuesta,path='asignaturas/modAsignaturaCompleta', http_method='POST', name='asignaturas.modAsignaturaCompleta')
+    def modificarAsignaturaCompleta(self, request):
+        '''
+        Modifica todos los atributos de una asignatura, aunque algunos queden igual.
+        curl -d "id=1&nombre=Chinorri" -i -X POST -G localhost:8001/_ah/api/helloworld/v1/asignaturas/modAsignaturaCompleta
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a asignaturas.modAsignaturaCompleta"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        if request.nombre==None or request.id==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Añadimos el recurso al que queremos conectarnos, colección alumnos / alumno con id concreto.
+        url+="asignaturas/"+request.id
+
+        #Extraemos lo datos de la petición que se reciben aquí en el endpoints
+        form_fields = {
+          "nombre": request.nombre
+        }
+
+        if v:
+            print "Llamando a: "+url
+
+        form_data = urllib.urlencode(form_fields)
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+        return MensajeRespuesta(message=result.content)
+
     #Métodos de relaciones con otras entidades
 
     @endpoints.method(ID, ListaAlumnos, path='asignaturas/getAlumnosAsignatura', http_method='GET', name='asignaturas.getAlumnosAsignatura')
@@ -1050,7 +1255,7 @@ class HelloWorldApi(remote.Service):
         for alumno in listaAlumnos:
             vectorAlumnos.append(Alumno( nombre=str(alumno.get('nombre')),
                                          #apellidos=str(alumno.get('apellidos')),
-                                         id=str(alumno.get('dni'))
+                                         id=str(alumno.get('id'))
                                          )
                                 )
 
@@ -1109,7 +1314,7 @@ class HelloWorldApi(remote.Service):
 
 
     ##############################################
-    #   métodos de clases                        #
+    #   métodos de CLASES                        #
     ##############################################
 
     @endpoints.method(message_types.VoidMessage, ListaClases, path='clases/getClases', http_method='GET', name='clases.getClases')
@@ -1206,6 +1411,60 @@ class HelloWorldApi(remote.Service):
 
         return clase
 
+    @endpoints.method(ClaseCompleta, MensajeRespuesta, path='clases/insertarClase', http_method='POST', name='clases.insertarClase')
+    def insertarClase(self, request):
+        '''
+        Introduce una nueva clase en el sistema.
+
+        Ejemplo de llamada en terminal:
+        curl -i -d "curso=4&grupo=B&nivel=Primaria" -X POST -G localhost:8001/_ah/api/helloworld/v1/clases/insertarClase
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a clases.insertarClase"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Si no tenemos todos los atributos entonces enviamos un error de bad request.
+        if request.curso==None or request.grupo==None or request.nivel==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="clases"
+
+
+        #Extraemos lo datos de la petición al endpoints
+        form_fields = {
+          "curso": request.curso,
+          "grupo": request.grupo,
+          "nivel": request.nivel,
+        }
+
+        if v:
+            print "Llamando a: "+url
+
+
+        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        form_data = urllib.urlencode(form_fields)
+        #Realizamos la petición al servicio con los datos pasados al endpoint
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+        return MensajeRespuesta(message=result.content)
+
+
     @endpoints.method(ID,MensajeRespuesta,path='clases/delClase', http_method='DELETE', name='clases.delClase')
     def delClase(self, request):
 
@@ -1250,6 +1509,54 @@ class HelloWorldApi(remote.Service):
 
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
+
+    @endpoints.method(ClaseCompleta,MensajeRespuesta,path='clases/modClaseCompleta', http_method='POST', name='clases.modClaseCompleta')
+    def modificarClaseCompleta(self, request):
+        '''
+        Modifica todos los atributos de una clase, aunque algunos queden igual.
+        curl -d "id=1&curso=1&grupo=B&nivel=BACH" -i -X POST -G localhost:8001/_ah/api/helloworld/v1/clases/modClaseCompleta
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a asignaturas.modAsignaturaCompleta"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        if  request.id==None or request.curso==None or request.grupo==None or request.nivel==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Añadimos el recurso al que queremos conectarnos, colección alumnos / alumno con id concreto.
+        url+="clases/"+request.id
+
+        #Extraemos lo datos de la petición que se reciben aquí en el endpoints
+        form_fields = {
+          "curso": request.curso,
+          "grupo": request.grupo,
+          "nivel": request.nivel
+        }
+
+        if v:
+            print "Llamando a: "+url
+
+        form_data = urllib.urlencode(form_fields)
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+        return MensajeRespuesta(message=result.content)
+
+    #Métodos de relaciones con otras entidades
 
     @endpoints.method(ID, ListaAlumnos, path='clases/getAlumnosClase', http_method='GET', name='clases.getAlumnosClase')
     def getAlumnosClase(self, request):

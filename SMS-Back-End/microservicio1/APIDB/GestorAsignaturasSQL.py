@@ -16,6 +16,7 @@ import dbParams
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=1
+apiName='\n## API DB ##\n'
 
 '''Clase controladora de Asignaturas. Que usando la clase que define el modelo de Asignatura (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
@@ -183,6 +184,56 @@ class GestorAsignaturas:
             return 'Elemento no encontrado'
 
     @classmethod
+    def modAsignaturaCompleta(self, idAsignatura, nombre):
+        '''
+        Modifica todos los atributos de una asignatura dado su id al mismo tiempo.
+        '''
+
+        #Info de seguimiento
+        if v:
+            print apiName
+            print "Llamada a modAsignaturaCompleta"
+            print '\n'
+
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        query="UPDATE Asignatura SET"
+        query=query+" nombre= "+'\''+nombre+'\''
+        query=query+" WHERE id_asignatura="+idAsignatura+";"
+
+        if v:
+            print apiName
+            print query
+
+        cursor = db.cursor()
+        salida =''
+
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        if v:
+            print "Salida MySQL: "+str(salida)
+
+        #Efectuamos los cambios
+        db.commit()
+        cursor.close()
+        db.close()
+
+        if salida==1:
+            return 'OK'
+        elif salida==1062:
+            return 'Elemento duplicado'
+        elif salida==0:
+            return 'Sin cambios realizados'
+
+    @classmethod
     def delAsignatura(self, idAsignatura):
         if v:
             print "Intentado eliminar asignatura con id "+str(idAsignatura)
@@ -209,7 +260,6 @@ class GestorAsignaturas:
             return 'OK'
         if salida==0:
             return 'Elemento no encontrado'
-
 
     @classmethod
     def getNumAsignaturas(self):
@@ -244,7 +294,7 @@ class GestorAsignaturas:
         if salida==0:
             return 'Elemento no encontrado'
 
-
+    #Métodos que extraen información de relación con otras entidades:
 
     @classmethod
     def getClases(self, idAsignatura):
@@ -340,7 +390,7 @@ class GestorAsignaturas:
         Con el distinct evitamos que si un alumno por casualidad esta matriculado en lengua de primero
         y lengua de segundo porque así se permite se contabilice como dos alumnos en el recuento, lo que sería un error.
         '''
-        query='select id_alumno, nombre,apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asignatura ='+idAsignatura+' )'
+        query='select id_alumno, nombre, apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asignatura ='+idAsignatura+' )'
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -350,7 +400,9 @@ class GestorAsignaturas:
 
         while row is not None:
             alumno = Alumno()
-            alumno.dni=row[0]
+            alumno.id=row[0]
+            alumno.nombre=row[1]
+            alumno.apellidos=row[2]
             lista.append(alumno)
             row = cursor.fetchone()
 

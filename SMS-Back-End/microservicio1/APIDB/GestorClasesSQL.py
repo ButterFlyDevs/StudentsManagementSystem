@@ -16,6 +16,7 @@ import dbParams
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=1
+apiName='\n## API DB ##\n'
 
 '''Clase controladora de Clases. Que usando la clase que define el modelo de Clase (la info en BD que de el se guarda)
 ofrece una interfaz de gestión que simplifica y abstrae el uso.
@@ -200,6 +201,60 @@ class GestorClases:
             return 'Elemento duplicado'
         elif salida==0:
             return 'Elemento no encontrado'
+
+    @classmethod
+    def modClaseCompleta(self, idClase, curso, grupo, nivel):
+        '''
+        Modifica todos los atributos de una clase dado su id al mismo tiempo.
+        '''
+
+        #Info de seguimiento
+        if v:
+            print apiName
+            print "Llamada a modClaseCompleta"
+            print '\n'
+
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        query="UPDATE Clase SET"
+        query=query+" curso= "+'\''+curso+'\''
+        query=query+" , grupo= "+'\''+grupo+'\''
+        query=query+" , nivel= "+'\''+nivel+'\''
+        query=query+" WHERE id_clase="+idClase+";"
+
+        if v:
+            print apiName
+            print query
+
+        cursor = db.cursor()
+        salida =''
+
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            # Get data from database
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        if v:
+            print "Salida MySQL: "+str(salida)
+
+        #Efectuamos los cambios
+        db.commit()
+        cursor.close()
+        db.close()
+
+        if salida==1:
+            return 'OK'
+        elif salida==1062:
+            return 'Elemento duplicado'
+        elif salida==0:
+            return 'Sin cambios realizados'
+
+
 
     @classmethod
     def delClase(self, idClase):

@@ -1,0 +1,45 @@
+
+<!--
+Diseño de la vista de la pestaña de detalles del estudiante.
+-->
+<!--Añadimos el CSS y el javascript necesarios para poder usar las notificaciones flotantes -->
+<link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
+<script type="text/javascript" src="app/js/components/notify.js"></script>
+
+<!--Título de la sección -->
+<h3>Modificación de la asignatura</h3>
+<hr>
+<!-- Con ng-submit especificamos la función que dentro del controlador que gestiona esta plantilla. -->
+<form class="uk-form" name="formModificacionAsignatura" ng-submit="submitForm()" novalidate>
+
+     <fieldset data-uk-margin>
+
+        <!-- Campo nombre -->
+        <input type="text" placeholder={{asignatura.nombre}} name="nombre" ng-class="{ 'uk-form-danger' : formModificacionAsignatura.nombre.$invalid && !formModificacionAsignatura.$pristine }" ng-minlength="3"  ng-model="asignatura.nombre" required>
+
+        <!-- Mensajes de error -->
+        <p ng-show="formModificacionAsignatura.nombre.$error.minlength" class="uk-text-danger"><i class="uk-icon-info-circle"></i>   El nombre es demasiado corto.</p>
+
+
+        <br class="uk-margin-top">
+    </fieldset>
+
+<style>
+input.submitted.ng-invalid
+{
+  border:1px solid #f00;
+}
+</style>
+
+
+
+
+
+    </div>
+  </div>
+
+  <br>
+  <button type="submit" class="uk-button"  data-message="Success message..." data-status="success" ng-class="{ 'uk-button-success' : !formModificacionAsignatura.$invalid }" ng-disabled="formModificacionAsignatura.$invalid">Modificar</button>
+  <a ui-sref="asignaturas.list" class="uk-button uk-button-danger">Cancelar</a>
+
+</form>

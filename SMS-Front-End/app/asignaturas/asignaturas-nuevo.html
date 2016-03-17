@@ -6,13 +6,13 @@
 
 <form class="uk-form" name="formNuevaAsignatura" ng-submit="submitForm()" novalidate>
 
-    <fieldset data-uk-margin>
+     <fieldset data-uk-margin>
 
         <!-- Campo nombre -->
-        <input type="text" placeholder="Nombre" name="nombre" ng-class="{ 'uk-form-danger' : formNuevoAlumno.nombre.$invalid && !formNuevoAlumno.$pristine }" ng-minlength="3"  ng-model="alumno.nombre" required>
+        <input type="text" placeholder="Nombre" name="nombre" ng-class="{ 'uk-form-danger' : formNuevaAsignatura.nombre.$invalid && !formNuevaAsignatura.$pristine }" ng-minlength="3"  ng-model="alumno.nombre" required>
 
         <!-- Mensajes de error -->
-        <p ng-show="formNuevoAlumno.nombre.$error.minlength" class="uk-text-danger"><i class="uk-icon-info-circle"></i>   El nombre es demasiado corto.</p>
+        <p ng-show="formNuevaAsignatura.nombre.$error.minlength" class="uk-text-danger"><i class="uk-icon-info-circle"></i>   El nombre es demasiado corto.</p>
 
 
 
@@ -25,7 +25,7 @@
         <link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
         <script type="text/javascript" src="app/js/components/notify.js"></script>
 
-        <button type="submit" class="uk-button"  data-message="Success message..." data-status="success" ng-class="{ 'uk-button-success' : !formNuevoAlumno.$invalid }" ng-disabled="formNuevoAlumno.$invalid">Submit</button>
+        <button type="submit" class="uk-button"  data-message="Success message..." data-status="success" ng-class="{ 'uk-button-success' : !formNuevaAsignatura.$invalid }" ng-disabled="formNuevaAsignatura.$invalid">Submit</button>
         <!--<script>
            $(function(){
                $("body").on("click", ".uk-button[data-message]", function(){
