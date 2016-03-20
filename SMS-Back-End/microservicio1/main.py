@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+
 #####################################################
 ## DEFINICIÓN DE LA API REST del MICROSERVICIO SBD ##
 #####################################################
+
+
 from flask import Flask
 from flask import abort
 from flask import request
@@ -11,6 +14,9 @@ from APIDB.GestorAlumnosSQL import GestorAlumnos
 from APIDB.GestorProfesoresSQL import GestorProfesores
 from APIDB.GestorAsignaturasSQL import GestorAsignaturas
 from APIDB.GestorClasesSQL import GestorClases
+from APIDB.GestorMatriculasSQL import GestorMatriculas
+from APIDB.GestorImpartesSQL import GestorImpartes
+from APIDB.GestorAsociacionesSQL import GestorAsociaciones
 
 app = Flask(__name__)
 
@@ -501,21 +507,141 @@ def getAlumnosClase(id_clase):
     return jsonpickle.encode(GestorClases.getAlumnos(id_clase))
 
 @app.route('/clases/<string:id_clase>/profesores', methods=['GET'])
-def getProfesoresCurso(id_curso):
+def getProfesoresClase(id_clase):
     '''
     Devuelve una lista con los profesores que imparten clase a un grupo
-    curl -i -X GET localhost:8002/curso/1ESOA/profesores
+    curl -i -X GET localhost:8002/clases/1/profesores
     '''
-    return jsonpickle.encode(GestorClases.getProfesores(id_curso))
+    return jsonpickle.encode(GestorClases.getProfesores(id_clase))
 
-@app.route('/clases/<string:id_curso>/asignaturas', methods=['GET'])
-def getAsignaturasCurso(id_curso):
+@app.route('/clases/<string:id_clase>/asignaturas', methods=['GET'])
+def getAsignaturasClase(id_clase):
     '''
-    Devuelve una lista con las asignaturas que se imparten a un curso.
-    curl -i -X GET localhost:8002/curso/1ESOA/asignaturas
+    Devuelve una lista con las asignaturas que se imparten a una clase concreta.
+    curl -i -X GET localhost:8002/clases/1/asignaturas
     '''
-    return jsonpickle.encode(GestorClases.getAsignaturas(id_curso))
+    return jsonpickle.encode(GestorClases.getAsignaturas(id_clase))
 
+
+
+
+
+############################
+#   COLECCIÓN MATRICULAS       #
+############################
+
+
+@app.route('/matriculas',methods=['GET'])
+def getMatriculas():
+    '''
+    Devuelve una lista con todos las matriculas registradas en el sistema.
+    > curl -i -X GET localhost:8002/matriculas
+    '''
+    return jsonpickle.encode(GestorMatriculas.getMatriculas())
+
+@app.route('/matriculas',methods=['POST'])
+def postMatricula():
+    '''
+    Inserta una nueva matricula en el sistema.
+    curl -d "id_alumno=1&id_asignatura=2&id_clase=2" -i -X POST localhost:8002/matriculas
+    '''
+    salida = GestorMatriculas.nuevaMatricula(request.form['id_alumno'], request.form['id_asignatura'], request.form['id_clase'])
+    if salida == 'OK':
+        return 'OK'
+    else:
+        print salida
+        abort(404)
+
+@app.route('/matriculas/<string:id_matricula>',methods=['DELETE'])
+def delMatricula(id_matricula):
+    '''
+    Elimina la matricula que se especifica con el identificador pasado, en caso de exisitir en el sistema.
+    curl -i -X DELETE localhost:8002/matriculas/1
+    '''
+    salida = GestorMatriculas.delMatricula(id_matricula)
+    if salida=="Elemento no encontrado":
+        abort(404)
+    else:
+        return str(salida)
+
+
+
+############################
+#   COLECCIÓN IMPARTES     #
+############################
+
+
+@app.route('/impartes',methods=['GET'])
+def getImpartes():
+    '''
+    Devuelve una lista con todos las tuplas de la tabla Imparte de la BD.
+    curl -i -X GET localhost:8002/impartes
+    '''
+    return jsonpickle.encode(GestorImpartes.getImpartes())
+
+@app.route('/impartes',methods=['POST'])
+def postImparte():
+    '''
+    Inserta una nueva relación imparte en el sistema.
+    curl -d "id_profesor=1&id_asignatura=2&id_clase=2" -i -X POST localhost:8002/impartes
+    '''
+    salida = GestorImpartes.nuevoImparte(request.form['id_clase'], request.form['id_asignatura'], request.form['id_profesor'])
+    if salida == 'OK':
+        return 'OK'
+    else:
+        print salida
+        abort(404)
+
+@app.route('/impartes/<string:id_imparte>',methods=['DELETE'])
+def delImparte(id_imparte):
+    '''
+    Elimina la matricula que se especifica con el identificador pasado, en caso de exisitir en el sistema.
+    curl -i -X DELETE localhost:8002/impartes/1
+    '''
+    salida = GestorImpartes.delImparte(id_imparte)
+    if salida=="Elemento no encontrado":
+        abort(404)
+    else:
+        return str(salida)
+
+
+#############################
+#   COLECCIÓN ASOCIACIONES  #
+#############################
+
+
+@app.route('/asociaciones',methods=['GET'])
+def getAsociaciones():
+    '''
+    Devuelve una lista con todos las tuplas de la tabla Asocia de la BD.
+    curl -i -X GET localhost:8002/asociaciones
+    '''
+    return jsonpickle.encode(GestorAsociaciones.getAsociaciones())
+
+@app.route('/impartes',methods=['POST'])
+def postAsociacion():
+    '''
+    Inserta una nueva relación imparte en el sistema.
+    curl -d "id_profesor=1&id_asignatura=2&id_clase=2" -i -X POST localhost:8002/impartes
+    '''
+    salida = GestorImpartes.nuevoImparte(request.form['id_clase'], request.form['id_asignatura'], request.form['id_profesor'])
+    if salida == 'OK':
+        return 'OK'
+    else:
+        print salida
+        abort(404)
+
+@app.route('/impartes/<string:id_imparte>',methods=['DELETE'])
+def delAsociacion(id_imparte):
+    '''
+    Elimina la matricula que se especifica con el identificador pasado, en caso de exisitir en el sistema.
+    curl -i -X DELETE localhost:8002/impartes/1
+    '''
+    salida = GestorImpartes.delImparte(id_imparte)
+    if salida=="Elemento no encontrado":
+        abort(404)
+    else:
+        return str(salida)
 
 
 if __name__ == '__main__':

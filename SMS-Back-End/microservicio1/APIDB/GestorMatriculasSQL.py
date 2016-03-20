@@ -22,17 +22,19 @@ class GestorMatriculas:
     """
 
     @classmethod
-    def nuevaMatricula(self, id_alumno, id_clase, id_asignatura):
+    def nuevaMatricula(self, id_alumno, id_asociacion):
+        '''
+        Da de alta una matrícula en el sistema.
+        '''
 
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
         #query="INSERT INTO Matricula values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
-        id_asignatura='\''+id_asignatura+'\''
-        id_clase='\''+id_clase+'\''
+        id_asociacion='\''+id_asociacion+'\''
         id_alumno='\''+id_alumno+'\''
 
-        query="INSERT INTO Matricula VALUES ("+id_alumno+","+id_clase+","+id_asignatura+");"
+        query="INSERT INTO Matricula VALUES (NULL, "+id_alumno+","+id_asociacion+");"
 
         if v:
             print '\n'+query
@@ -65,7 +67,6 @@ class GestorMatriculas:
             return 'Elemento duplicado'
         if salida=='1452':
             return 'Alguno de los elementos no existe'
-
 
     @classmethod
     def getMatriculas(self):
@@ -142,7 +143,6 @@ class GestorMatriculas:
         if salida==0:
             return 'Elemento no encontrado'
 
-
     @classmethod
     def modMatricula(self, id_alumno, id_clase, id_asignatura, campoACambiar, nuevoValor):
         """
@@ -195,13 +195,11 @@ class GestorMatriculas:
             return 'Elemento no encontrado'
 
     @classmethod
-    def delMatricula(self, id_alumno, id_clase, id_asignatura):
+    def delMatricula(self, id_matricula):
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
         cursor = db.cursor()
-        id_asignatura='\''+id_asignatura+'\''
-        id_clase='\''+id_clase+'\''
-        id_alumno='\''+id_alumno+'\''
-        query="delete from Matricula where id_asignatura="+id_asignatura+" and id_clase="+id_clase+" and id_alumno="+id_alumno+";"
+        id_matricula='\''+id_matricula+'\''
+        query="delete from Matricula where id_matricula="+id_matricula+";"
         if v:
             print query
         salida =''

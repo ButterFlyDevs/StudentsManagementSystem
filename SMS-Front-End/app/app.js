@@ -18,7 +18,7 @@ de la vista y se usan).
 
        //Configura la URL principal
        .state('#',{
-         url:'/',
+         url:'/home',
          templateUrl:'main.html'
        })
 

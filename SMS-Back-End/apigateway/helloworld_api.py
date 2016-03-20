@@ -105,7 +105,6 @@ class AsignaturaCompleta(messages.Message):
     id = messages.StringField(1)
     nombre = messages.StringField(2)
 
-
 class ListaAsignaturas(messages.Message):
     asignaturas = messages.MessageField(Asignatura, 1, repeated=True)
 
@@ -124,6 +123,31 @@ class ClaseCompleta(messages.Message):
 
 class ListaClases(messages.Message):
     clases = messages.MessageField(Clase, 1, repeated=True)
+
+class Matricula(messages.Message):
+    id_matricula = messages.StringField(1)
+    id_alumno = messages.StringField(2)
+    id_asociacion = messages.StringField(3)
+
+class ListaMatriculas(messages.Message):
+    matriculas = messages.MessageField(Matricula, 1, repeated=True)
+
+class Imparte(messages.Message):
+    id_imparte = messages.StringField(1)
+    id_profesor = messages.StringField(2)
+    id_asociacion = messages.StringField(3)
+
+class ListaImpartes(messages.Message):
+    impartes = messages.MessageField(Imparte, 1, repeated=True)
+
+class Asocia(messages.Message):
+    id_asocia = messages.StringField(1)
+    id_clase = messages.StringField(2)
+    id_asignatura = messages.StringField(3)
+
+class ListaAsocias(messages.Message):
+    asociaciones = messages.MessageField(Asocia, 1, repeated=True)
+
 
 
 #Decorador que establace nombre y versión de la api
@@ -1464,7 +1488,6 @@ class HelloWorldApi(remote.Service):
 
         return MensajeRespuesta(message=result.content)
 
-
     @endpoints.method(ID,MensajeRespuesta,path='clases/delClase', http_method='DELETE', name='clases.delClase')
     def delClase(self, request):
 
@@ -1603,6 +1626,463 @@ class HelloWorldApi(remote.Service):
         #Los adaptamos al tipo de mensaje y enviamos
         #return Greeting(message=str(result.content))
         return ListaAlumnos(alumnos=vectorAlumnos)
+
+    @endpoints.method(ID, ListaProfesores, path='clases/getProfesoresClase', http_method='GET', name='clases.getProfesoresClase')
+    def getProfesoresClase(self, request):
+        '''
+        Devuelve una lista con los datos simplificados de los profesores que imparten alguna asignatura a esa clase.
+        Ejemplo de llamada:
+        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/clases/getProfesoresClase?id=1
+        '''
+        if v:
+            print ("Ejecución de getProfesoresAsignatura en apigateway")
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='clases/'+request.id+"/profesores"
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaProfesores = jsonpickle.decode(result.content)
+        print listaProfesores
+        profesoresItems= []
+        for profesor in listaProfesores:
+            profesoresItems.append( Profesor( id=str(profesor.get('id')), nombre=str(profesor.get('nombre')), apellidos=str(profesor.get('apellidos')) ) )
+        return ListaProfesores(profesores=profesoresItems)
+
+    @endpoints.method(ID, ListaAsignaturas, path='clases/getAsignaturasClase', http_method='GET', name='clases.getAsignaturasClase')
+    def getAsignaturasClase(self, request):
+        '''
+        Devuelve una lista con los datos mínimos de las asignaturas que se imparten en una clase.
+        Ejemplo de llamada:
+        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/clases/getAsignaturasClase?id=1
+        '''
+        if v:
+            print ("Ejecución de getAsignaturasProfesor en apigateway")
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='clases/'+request.id+"/asignaturas"
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaAsignaturas = jsonpickle.decode(result.content)
+        print listaAsignaturas
+        asignaturasItems= []
+        for asignatura in listaAsignaturas:
+            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
+        return ListaAsignaturas(asignaturas=asignaturasItems)
+
+
+    ##############################################
+    #   métodos de MATRICULAS                    #
+    ##############################################
+
+    @endpoints.method(message_types.VoidMessage, ListaMatriculas, path='matriculas/getMatriculas', http_method='GET', name='matriculas.getMatriculas')
+    def getMatriculas(self, unused_request):
+        '''
+        Devuelve una lista con todos las matriculas registrados en el sistema.
+
+        Llamada desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/matriculas/getMatriculas
+        Llamada desde JavaScript:
+        response = service.matriculas.getMatriculas().execute()
+        '''
+        #Identificación del módulo en el que estamos.
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+
+        #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el recurso al que queremos conectarnos.
+        url+="matriculas"
+        if v:
+            print str(url)
+        #Al no especificar nada se llama al método GET de la URL.
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaMatriculas = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        matriculasItems= []
+
+        for matricula in listaMatriculas:
+            matriculasItems.append(Matricula( id_alumno=str(matricula.get('id_alumno')),
+                                              id_clase=str(matricula.get('id_clase')),
+                                              id_asignatura=str(matricula.get('id_asignatura'))
+                                            ))
+
+        return ListaMatriculas(matriculas=matriculasItems)
+
+    @endpoints.method(Matricula, MensajeRespuesta, path='matriculas/insertarMatricula', http_method='POST', name='matriculas.insertarMatricula')
+    def insertarMatricula(self, request):
+        '''
+        Introduce una nueva clase en el sistema.
+
+        Ejemplo de llamada en terminal:
+        curl -i -d "id_alumno=2&id_asignatura=1&id_clase=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/matriculas/insertarMatricula
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a clases.insertarClase"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Si no tenemos todos los atributos entonces enviamos un error de bad request.
+        if request.id_alumno==None or request.id_asignatura==None or request.id_clase==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="matriculas"
+
+
+        #Extraemos lo datos de la petición al endpoints
+        form_fields = {
+          "id_alumno": request.id_alumno,
+          "id_asignatura": request.id_asignatura,
+          "id_clase": request.id_clase,
+        }
+
+        if v:
+            print "Llamando a: "+url
+
+
+        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        form_data = urllib.urlencode(form_fields)
+        #Realizamos la petición al servicio con los datos pasados al endpoint
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+        return MensajeRespuesta(message=result.content)
+
+    @endpoints.method(ID,MensajeRespuesta,path='matriculas/delMatricula', http_method='DELETE', name='matriculas.delMatricula')
+    def delMatricula(self, request):
+
+        '''
+        Elimina una matriculación en el sistema, identificándola con su id.
+
+        #Ejemplo de borrado de una matrícula:
+        curl -d "id=2" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/matriculas/delMatricula
+        {
+         "message": "OK"
+        }
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición al método clases.delClase de APIGateway"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+
+        #Extraemos el argumento id de la petición y la añadimos a la URL
+        url+='matriculas/'+request.id
+
+        if v:
+            print "Llamando a: "+url
+
+        #Realizamos la petición a la url del servicio con el método apropiado DELETE
+        result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
+
+    ##############################################
+    #   métodos de IMPARTE                       #
+    ##############################################
+
+    @endpoints.method(message_types.VoidMessage, ListaImpartes, path='impartes/getImpartes', http_method='GET', name='impartes.getImpartes')
+    def getImpartes(self, unused_request):
+        '''
+        Devuelve una lista con todos las entidades de la relación Imparte del sistema.
+        Llamada desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/impartes/getImpartes
+        '''
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el recurso al que queremos conectarnos.
+        url+="impartes"
+        if v:
+            print str(url)
+        #Al no especificar nada se llama al método GET de la URL.
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaImpartes = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        impartesItems= []
+
+        for imparte in listaImpartes:
+            impartesItems.append(Imparte( id_profesor=str(imparte.get('id_profesor')),
+                                              id_clase=str(imparte.get('id_clase')),
+                                              id_asignatura=str(imparte.get('id_asignatura'))
+                                            ))
+
+        return ListaImpartes(impartes=impartesItems)
+
+    @endpoints.method(Imparte, MensajeRespuesta, path='impartes/insertarImparte', http_method='POST', name='impartes.insertarImparte')
+    def insertarImparte(self, request):
+        '''
+        Introduce una relación Imparte (un procesor que imaparte una asignatura en una clase).
+        Ejemplo de llamada en terminal:
+        curl -i -d "id_profesor=2&id_asignatura=1&id_clase=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/impartes/insertarImparte
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a impartes.insertarImparte"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Si no tenemos todos los atributos entonces enviamos un error de bad request.
+        if request.id_profesor==None or request.id_asignatura==None or request.id_clase==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="impartes"
+
+
+        #Extraemos lo datos de la petición al endpoints
+        form_fields = {
+          "id_profesor": request.id_profesor,
+          "id_asignatura": request.id_asignatura,
+          "id_clase": request.id_clase,
+        }
+
+        if v:
+            print "Llamando a: "+url
+
+
+        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        form_data = urllib.urlencode(form_fields)
+        #Realizamos la petición al servicio con los datos pasados al endpoint
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+        return MensajeRespuesta(message=result.content)
+
+    @endpoints.method(ID,MensajeRespuesta,path='impartes/delImparte', http_method='DELETE', name='impartes.delImparte')
+    def delImparte(self, request):
+
+        '''
+        Elimina una tupla de la relación Imparte del sistema.
+
+        #Ejemplo de borrado de una matrícula:
+        curl -d "id=2" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/impartes/delImparte
+        {
+         "message": "OK"
+        }
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición al método clases.delClase de APIGateway"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+
+        #Extraemos el argumento id de la petición y la añadimos a la URL
+        url+='impartes/'+request.id
+
+        if v:
+            print "Llamando a: "+url
+
+        #Realizamos la petición a la url del servicio con el método apropiado DELETE
+        result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
+
+    ##############################################
+    #   métodos de ASOCIA                       #
+    ##############################################
+
+    @endpoints.method(message_types.VoidMessage, ListaImpartes, path='asociaciones/getAsociaciones', http_method='GET', name='asociaciones.getAsociaciones')
+    def getAsociaciones(self, unused_request):
+        '''
+        Devuelve una lista con todos las entidades de la relación Asocia del sistema.
+        Llamada desde terminal:
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/asociaciones/getAsociaciones
+        '''
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el recurso al que queremos conectarnos.
+        url+="impartes"
+        if v:
+            print str(url)
+        #Al no especificar nada se llama al método GET de la URL.
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaImpartes = jsonpickle.decode(result.content)
+
+        #Creamos un vector
+        impartesItems= []
+
+        for imparte in listaImpartes:
+            impartesItems.append(Imparte( id_profesor=str(imparte.get('id_profesor')),
+                                              id_clase=str(imparte.get('id_clase')),
+                                              id_asignatura=str(imparte.get('id_asignatura'))
+                                            ))
+
+        return ListaImpartes(impartes=impartesItems)
+
+    @endpoints.method(Imparte, MensajeRespuesta, path='asociaciones/insertarImparte', http_method='POST', name='asociaciones.insertarImparte')
+    def insertarAsociacion(self, request):
+        '''
+        Introduce una relación Imparte (un procesor que imaparte una asignatura en una clase).
+        Ejemplo de llamada en terminal:
+        curl -i -d "id_profesor=2&id_asignatura=1&id_clase=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/asociaciones/insertarImparte
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a asociaciones.insertarImparte"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Si no tenemos todos los atributos entonces enviamos un error de bad request.
+        if request.id_profesor==None or request.id_asignatura==None or request.id_clase==None:
+            raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="asociaciones"
+
+
+        #Extraemos lo datos de la petición al endpoints
+        form_fields = {
+          "id_profesor": request.id_profesor,
+          "id_asignatura": request.id_asignatura,
+          "id_clase": request.id_clase,
+        }
+
+        if v:
+            print "Llamando a: "+url
+
+
+        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        form_data = urllib.urlencode(form_fields)
+        #Realizamos la petición al servicio con los datos pasados al endpoint
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+        return MensajeRespuesta(message=result.content)
+
+    @endpoints.method(ID,MensajeRespuesta,path='asociaciones/delImparte', http_method='DELETE', name='asociaciones.delImparte')
+    def delAsociacion(self, request):
+
+        '''
+        Elimina una tupla de la relación Imparte del sistema.
+
+        #Ejemplo de borrado de una matrícula:
+        curl -d "id=2" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/impartes/delImparte
+        {
+         "message": "OK"
+        }
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición al método clases.delClase de APIGateway"
+            print "Contenido de la petición:"
+            print str(request)
+            print '\n'
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+
+        #Extraemos el argumento id de la petición y la añadimos a la URL
+        url+='impartes/'+request.id
+
+        if v:
+            print "Llamando a: "+url
+
+        #Realizamos la petición a la url del servicio con el método apropiado DELETE
+        result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
+
+        #Infro después de la petición:
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+
+
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return MensajeRespuesta(message=result.content)
+
+
+
+
+
 
     #seguir aquí
 

@@ -254,8 +254,6 @@ class GestorClases:
         elif salida==0:
             return 'Sin cambios realizados'
 
-
-
     @classmethod
     def delClase(self, idClase):
         if v:
@@ -345,7 +343,7 @@ class GestorClases:
         cursor.execute(mysql_query)
         #-----------------------------#
         idClase='\''+idClase+'\''
-        query='select * from Asignatura where id in (select id_asignatura from Ascoia where id_clase ='+idClase+')'
+        query='select * from Asignatura where id_asignatura in (select id_asignatura from Asocia where id_clase ='+idClase+')'
         if v:
             print '\n'+query
 
@@ -422,7 +420,7 @@ class GestorClases:
         cursor.execute(mysql_query)
         #-----------------------------#
         idClase='\''+idClase+'\''
-        query='SELECT dni, nombre, apellidos from Profesor where dni in (select id_profesor from Imparte where id_clase ='+idClase+')'
+        query='SELECT id_profesor, nombre, apellidos from Profesor where id_profesor in (select id_profesor from Imparte where id_clase ='+idClase+')'
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -432,12 +430,15 @@ class GestorClases:
 
         while row is not None:
             profesor = Profesor()
-            profesor.nombre=row[0]
-            profesor.id=row[1]
+            profesor.id=row[0]
+            profesor.nombre=row[1]
+            profesor.apellidos=row[2]
 
             lista.append(profesor)
             #print row[0], row[1]
             row = cursor.fetchone()
 
         cursor.close()
-        db.cl
+        db.close()
+
+        return lista

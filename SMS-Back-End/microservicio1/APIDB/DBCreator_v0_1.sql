@@ -81,6 +81,7 @@ CREATE TABLE Clase(
 #Un grupo es la asociación de una asignatura y un curso, por ejemplo: 1ºESO-Francés que identifica perfectamente un grupo de alumnos.
 CREATE TABLE Asocia(
 
+ id_asociacion INT NOT NULL AUTO_INCREMENT,
  id_clase INT ,
  id_asignatura INT,
 
@@ -89,43 +90,40 @@ CREATE TABLE Asocia(
  FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id_asignatura),
 
  #Especificamos la formación de la clave primaria en esta tabla.
- PRIMARY KEY (id_clase, id_asignatura)
-
+ PRIMARY KEY (id_asociacion)
 );
 
 CREATE TABLE Imparte(
 
+  id_imparte INT NOT NULL AUTO_INCREMENT,
   #Añadimos la referencia de la entidad Asignatura
-  id_clase INT,
-  id_asignatura INT,
+  id_asociacion INT,
   #Necesitamos una referncia del profesor:
   id_profesor INT,
 
   #Especificamos que se trata de claves foráneas.
-  FOREIGN KEY (id_clase, id_asignatura) REFERENCES Asocia(id_clase, id_asignatura),
+  FOREIGN KEY (id_asociacion) REFERENCES Asocia(id_asociacion),
 #  FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id_asignatura),
   FOREIGN KEY (id_profesor) REFERENCES Profesor(id_profesor),
 
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY ( id_clase, id_asignatura, id_profesor)
+  PRIMARY KEY (id_imparte)
 
 );
 
 CREATE TABLE Matricula(
 
-  #Añadimos la referencia de la entidad Asignatura
-  #Necesitamos una referncia del alumno:
+  id_matricula INT NOT NULL AUTO_INCREMENT,
   id_alumno INT,
-  id_clase INT,
-  id_asignatura INT,
+  id_asociacion INT,
 
 
 
   #Especificamos que se trata de claves foráneas.
-  FOREIGN KEY (id_clase, id_asignatura) REFERENCES Asocia(id_clase, id_asignatura),
+  FOREIGN KEY (id_asociacion) REFERENCES Asocia(id_asociacion),
   FOREIGN KEY (id_alumno) REFERENCES Alumno(id_alumno),
 
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (id_alumno, id_clase, id_asignatura)
+  PRIMARY KEY (id_matricula)
 
 );

@@ -33,7 +33,7 @@ class GestorAsociaciones:
         id_asignatura='\''+id_asignatura+'\''
         id_clase='\''+id_clase+'\''
 
-        query="INSERT INTO Asocia VALUES("+id_clase+","+id_asignatura+");"
+        query="INSERT INTO Asocia VALUES(NULL, "+id_clase+","+id_asignatura+");"
         if v:
             print '\n'+query
         cursor = db.cursor()
@@ -89,8 +89,9 @@ class GestorAsociaciones:
 
         while row is not None:
             asociacion = Asociacion()
-            asociacion.id_asignatura=row[0]
+            asociacion.id=row[0]
             asociacion.id_clase=row[1]
+            asociacion.id_asignatura=row[2]            
 
             lista.append(asociacion)
             #print row[0], row[1]
