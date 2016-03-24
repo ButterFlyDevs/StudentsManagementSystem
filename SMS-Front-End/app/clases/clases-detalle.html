@@ -62,27 +62,38 @@ Diseño de la vista de la pestaña de detalles del estudiante.
 
             <div class="uk-width-1-3">
                 <h4>Estudiantes</h4>
-                <hr>
+
+                <!--Linea divisoria gris --> <hr>
+
+                <!--Mostramos el mensaje "Aún no hay estudiantes" cuando el vector esté vacío. -->
+                <li ng-show="!estudiantes.length"><p class="uk-text-muted">Aún no hay estudiantes inscritos en esa clase.</p></li>
+
                 <li ng-repeat="alumno in estudiantes">
-                  <a ui-sref="estudiantes.detalles-estudiante({ estudianteID: alumno.id })">{{ alumno.nombre }}</a>
+                  <a ui-sref="estudiantes.detalles-estudiante({ estudianteID: alumno.id })">{{ alumno.nombre }} {{alumno.apellidos}}</a>
                 </li>
+
             </div>
 
              <div class="uk-width-1-3">
                 <h4>Profesores</h4>
                 <hr>
+
+                <li ng-show="!profesores.length"><p class="uk-text-muted">Aún no hay profesores inscritos en esa clase.</p></li>
                 <li ng-repeat="profesor in profesores">
-                  <!--<a>{{ profesor.nombre }}</a>-->
                   <a ui-sref="profesores.detalles-profesor({ profesorID: profesor.id })">{{ profesor.nombre }} {{profesor.apellidos}} </a>
                 </li>
+
             </div>
 
             <div class="uk-width-1-3">
-                <h4>Clases</h4>
+                <h4>Asignaturas</h4>
                 <hr>
-                <li ng-repeat="clase in clases">
-                  <a>{{ clase.curso }} {{ clase.grupo }} {{ clase.nivel }}</a>
+                <li ng-show="!asignaturas.length"><p class="uk-text-muted">Aún no hay asignaturas inscritas en esa clase.</p></li>
+                <li ng-repeat="asignatura in asignaturas">
+                  <a ui-sref="asignaturas.detalles-asignatura({ asignaturaID: asignatura.id })">{{ asignatura.nombre }}</a>
+                  <a>{{ asignatura.nombre}}</a>
                 </li>
+
             </div>
 
 

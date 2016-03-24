@@ -88,9 +88,9 @@ class GestorMatriculas:
 
         while row is not None:
             matricula = Matricula()
-            matricula.id_alumno=row[0]
-            matricula.id_clase=row[1]
-            matricula.id_asignatura=row[2]
+            matricula.id=row[0]
+            matricula.id_alumno=row[1]
+            matricula.id_asociacion=row[2]
 
             lista.append(matricula)
             #print row[0], row[1]

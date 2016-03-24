@@ -91,7 +91,7 @@ class GestorAsociaciones:
             asociacion = Asociacion()
             asociacion.id=row[0]
             asociacion.id_clase=row[1]
-            asociacion.id_asignatura=row[2]            
+            asociacion.id_asignatura=row[2]
 
             lista.append(asociacion)
             #print row[0], row[1]
@@ -193,13 +193,12 @@ class GestorAsociaciones:
             return 'Elemento no encontrado'
 
     @classmethod
-
-    def delAsociacion(self, id_clase, id_asignatura):
+    def delAsociacion(self, id_asociacion):
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
-        id_asignatura='\''+id_asignatura+'\''
-        id_clase='\''+id_clase+'\''
-        query="DELETE FROM Asocia WHERE id_clase="+id_clase+" AND id_asignatura="+id_asignatura+";"
+        id_asociacion='\''+id_asociacion+'\''
+
+        query="DELETE FROM Asocia WHERE  id_asociacion="+id_asociacion+";"
 
         if v:
             print query

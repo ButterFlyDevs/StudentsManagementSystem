@@ -90,7 +90,8 @@ CREATE TABLE Asocia(
  FOREIGN KEY (id_asignatura) REFERENCES Asignatura(id_asignatura),
 
  #Especificamos la formación de la clave primaria en esta tabla.
- PRIMARY KEY (id_asociacion)
+ PRIMARY KEY (id_asociacion),
+ UNIQUE (id_clase, id_asignatura) #Para que no puedan repetirse
 );
 
 CREATE TABLE Imparte(

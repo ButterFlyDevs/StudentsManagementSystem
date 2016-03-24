@@ -1031,30 +1031,29 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
   ### Información extra de la asginatura ###
   */
 
-  /*
-  //Pedimos al gateway todos los alumnos matriculados en esa asignatura.
-  gapi.client.helloworld.asignaturas.getAlumnosAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
-    console.log("Petición al APIG de alumnos matriculados en la asignatura "+$stateParams.asignaturaID);
+
+  //Pedimos al gateway todos los alumnos matriculados en esa clase (de cualquier asignatura)
+  gapi.client.helloworld.clases.getAlumnosClase({'id':$stateParams.claseID}).execute(function(resp){
+    console.log("Petición al APIG de alumnos matriculados en la clase "+$stateParams.claseID);
     console.log(resp.alumnos);
     $scope.estudiantes = resp.alumnos;
     $scope.$apply();
   });
 
-  //Pedimos al gateway todos los profesores que imparten esa asisnatura.
-  gapi.client.helloworld.asignaturas.getProfesoresAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
-    console.log("Petición al APIG de los profesores que imparten la asignatura "+$stateParams.asignaturaID);
+  gapi.client.helloworld.clases.getProfesoresClase({'id':$stateParams.claseID}).execute(function(resp){
+    console.log("Petición al APIG de profesores que imparten a esa clase. "+$stateParams.claseID);
     console.log(resp.profesores);
     $scope.profesores = resp.profesores;
     $scope.$apply();
   });
 
-  //Pedimos al gateway todos los clases en las que se imparte esa asisnatura.
-  gapi.client.helloworld.asignaturas.getClasesAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
-    console.log("Petición al APIG de las clases en las que se imparten la asignatura "+$stateParams.asignaturaID);
-    console.log(resp.clases);
-    $scope.clases = resp.clases;
+
+  gapi.client.helloworld.clases.getAsignaturasClase({'id':$stateParams.claseID}).execute(function(resp){
+    console.log("Petición al APIG de los asignaturas que se imparten en la clase "+$stateParams.claseID);
+    console.log(resp.asignaturas);
+    $scope.asignaturas = resp.asignaturas;
     $scope.$apply();
   });
-  */
+
 
 }); //Fin controlador detalles asignatura

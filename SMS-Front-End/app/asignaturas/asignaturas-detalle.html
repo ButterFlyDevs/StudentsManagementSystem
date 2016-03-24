@@ -63,6 +63,8 @@ Diseño de la vista de la pestaña de detalles del estudiante.
             <div class="uk-width-1-3">
                 <h4>Estudiantes</h4>
                 <hr>
+                <!--Si el vector está vacío se muestra un mensaje.-->
+                <li ng-show="!estudiantes.length"><p class="uk-text-muted">Aún no hay alumnos matriculados en esta asignatura.</p></li>
                 <li ng-repeat="alumno in estudiantes">
                   <a ui-sref="estudiantes.detalles-estudiante({ estudianteID: alumno.id })">{{ alumno.nombre }}</a>
                 </li>
@@ -71,6 +73,7 @@ Diseño de la vista de la pestaña de detalles del estudiante.
              <div class="uk-width-1-3">
                 <h4>Profesores</h4>
                 <hr>
+                <li ng-show="!profesores.length"><p class="uk-text-muted">Aún no hay profesores que imparten en esta clase.</p></li>
                 <li ng-repeat="profesor in profesores">
                   <!--<a>{{ profesor.nombre }}</a>-->
                   <a ui-sref="profesores.detalles-profesor({ profesorID: profesor.id })">{{ profesor.nombre }} {{profesor.apellidos}} </a>
@@ -80,6 +83,7 @@ Diseño de la vista de la pestaña de detalles del estudiante.
             <div class="uk-width-1-3">
                 <h4>Clases</h4>
                 <hr>
+                <li ng-show="!clases.length"><p class="uk-text-muted">Aún no hay clases en las que se imparta esta asignatura.</p></li>
                 <li ng-repeat="clase in clases">
                   <a ui-sref="clases.detalles-clase({ claseID: clase.id })">{{ clase.curso }}  {{ clase.grupo }}  {{ clase.nivel }}</a>
                 </li>

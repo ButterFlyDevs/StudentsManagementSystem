@@ -59,7 +59,8 @@ de una petición de tipo GET.
 
 class Alumno(messages.Message):
     nombre = messages.StringField(1)
-    id = messages.StringField(2)
+    apellidos = messages.StringField(2)
+    id = messages.StringField(3)
 
 class AlumnoCompleto(messages.Message):
     id = messages.StringField(1)
@@ -140,13 +141,13 @@ class Imparte(messages.Message):
 class ListaImpartes(messages.Message):
     impartes = messages.MessageField(Imparte, 1, repeated=True)
 
-class Asocia(messages.Message):
-    id_asocia = messages.StringField(1)
+class Asociacion(messages.Message):
+    id_asociacion = messages.StringField(1)
     id_clase = messages.StringField(2)
     id_asignatura = messages.StringField(3)
 
-class ListaAsocias(messages.Message):
-    asociaciones = messages.MessageField(Asocia, 1, repeated=True)
+class ListaAsociaciones(messages.Message):
+    asociaciones = messages.MessageField(Asociacion, 1, repeated=True)
 
 
 
@@ -225,12 +226,13 @@ class HelloWorldApi(remote.Service):
             print "Construcción del mensaje de salida: \n"
 
         for alumno in listaAlumnos:
-            nombreAlumno = str(alumno.get('nombre'))
             idAlumno = str(alumno.get('id'))
+            nombreAlumno = alumno.get('nombre').encode('utf-8')
+            apellidosAlumno = alumno.get('apellidos').encode('utf-8')
             if v:
                 print "Nombre: "+nombreAlumno
                 print "ID: "+idAlumno
-            alumnosItems.append(Alumno( nombre=nombreAlumno, id=idAlumno ) )
+            alumnosItems.append(Alumno( id=idAlumno, nombre=nombreAlumno.decode('utf-8'), apellidos=apellidosAlumno.decode('utf-8') ) )
 
 
         #id=str(alumno.get('id')),
@@ -1591,40 +1593,24 @@ class HelloWorldApi(remote.Service):
         if v:
             print ("Ejecución de getAlumnosClase en apigateway")
 
-        #Conexión a un microservicio específico:
-
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
-
-        #Añadimos a la url la coleccion (alumnos), el recurso (alumno dado por su dni) y el recurso anidado de este (profesores)
         url+='clases/'+str(request.id)+"/alumnos"
 
-
-        print url
+        if v:
+            print url
 
         #Realizamos la petición
         result = urlfetch.fetch(url)
 
-        #Vamos a intentar consumir los datos en JSON y convertirlos a un mensje enviable :)
-
-        print "IMPRESION DE LOS DATOS RECIBIDOS"
-        print result.content
+        if v:
+            print "IMPRESION DE LOS DATOS RECIBIDOS"
+            print result.content
         listaAlumnos = jsonpickle.decode(result.content)
-
-        #Creamos un vector
         vectorAlumnos= []
-        #Que rellenamos con todo los alumnos de la listaAlumnos
         for alumno in listaAlumnos:
-            vectorAlumnos.append(Alumno( nombre=str(alumno.get('nombre')),
-                                         #apellidos=str(alumno.get('apellidos')),
-                                         id=str(alumno.get('dni'))
-                                         )
-                                )
-
-        #Los adaptamos al tipo de mensaje y enviamos
-        #return Greeting(message=str(result.content))
+            vectorAlumnos.append(Alumno( id=str(alumno.get('id')), nombre=alumno.get('nombre').encode('utf-8').decode('utf-8'), apellidos=alumno.get('apellidos').encode('utf-8').decode('utf-8')))
         return ListaAlumnos(alumnos=vectorAlumnos)
 
     @endpoints.method(ID, ListaProfesores, path='clases/getProfesoresClase', http_method='GET', name='clases.getProfesoresClase')
@@ -1632,7 +1618,7 @@ class HelloWorldApi(remote.Service):
         '''
         Devuelve una lista con los datos simplificados de los profesores que imparten alguna asignatura a esa clase.
         Ejemplo de llamada:
-        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/clases/getProfesoresClase?id=1
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/clases/getProfesoresClase?id=1
         '''
         if v:
             print ("Ejecución de getProfesoresAsignatura en apigateway")
@@ -1647,7 +1633,7 @@ class HelloWorldApi(remote.Service):
         print listaProfesores
         profesoresItems= []
         for profesor in listaProfesores:
-            profesoresItems.append( Profesor( id=str(profesor.get('id')), nombre=str(profesor.get('nombre')), apellidos=str(profesor.get('apellidos')) ) )
+            profesoresItems.append( Profesor( id=str(profesor.get('id')), nombre=profesor.get('nombre').encode('utf-8').decode('utf-8'), apellidos=profesor.get('apellidos').encode('utf-8').decode('utf-8') ) )
         return ListaProfesores(profesores=profesoresItems)
 
     @endpoints.method(ID, ListaAsignaturas, path='clases/getAsignaturasClase', http_method='GET', name='clases.getAsignaturasClase')
@@ -1708,9 +1694,9 @@ class HelloWorldApi(remote.Service):
         matriculasItems= []
 
         for matricula in listaMatriculas:
-            matriculasItems.append(Matricula( id_alumno=str(matricula.get('id_alumno')),
-                                              id_clase=str(matricula.get('id_clase')),
-                                              id_asignatura=str(matricula.get('id_asignatura'))
+            matriculasItems.append(Matricula( id_matricula=str(matricula.get('id')),
+                                              id_alumno=str(matricula.get('id_alumno')),
+                                              id_asociacion=str(matricula.get('id_asociacion'))
                                             ))
 
         return ListaMatriculas(matriculas=matriculasItems)
@@ -1950,7 +1936,7 @@ class HelloWorldApi(remote.Service):
     #   métodos de ASOCIA                       #
     ##############################################
 
-    @endpoints.method(message_types.VoidMessage, ListaImpartes, path='asociaciones/getAsociaciones', http_method='GET', name='asociaciones.getAsociaciones')
+    @endpoints.method(message_types.VoidMessage, ListaAsociaciones, path='asociaciones/getAsociaciones', http_method='GET', name='asociaciones.getAsociaciones')
     def getAsociaciones(self, unused_request):
         '''
         Devuelve una lista con todos las entidades de la relación Asocia del sistema.
@@ -1962,32 +1948,32 @@ class HelloWorldApi(remote.Service):
         #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
         #Añadimos el recurso al que queremos conectarnos.
-        url+="impartes"
+        url+="asociaciones"
         if v:
             print str(url)
         #Al no especificar nada se llama al método GET de la URL.
         result = urlfetch.fetch(url)
         if v:
             print result.content
-        listaImpartes = jsonpickle.decode(result.content)
+        listaAsociaciones = jsonpickle.decode(result.content)
 
         #Creamos un vector
-        impartesItems= []
+        asociacionesItems= []
 
-        for imparte in listaImpartes:
-            impartesItems.append(Imparte( id_profesor=str(imparte.get('id_profesor')),
-                                              id_clase=str(imparte.get('id_clase')),
-                                              id_asignatura=str(imparte.get('id_asignatura'))
-                                            ))
+        for asociacion in listaAsociaciones:
+            asociacionesItems.append(Asociacion( id_asociacion=str(asociacion.get('id')),
+                                                 id_clase=str(asociacion.get('id_clase')),
+                                                 id_asignatura=str(asociacion.get('id_asignatura'))
+                                               ))
 
-        return ListaImpartes(impartes=impartesItems)
+        return ListaAsociaciones(asociaciones=asociacionesItems)
 
     @endpoints.method(Imparte, MensajeRespuesta, path='asociaciones/insertarImparte', http_method='POST', name='asociaciones.insertarImparte')
     def insertarAsociacion(self, request):
         '''
         Introduce una relación Imparte (un procesor que imaparte una asignatura en una clase).
         Ejemplo de llamada en terminal:
-        curl -i -d "id_profesor=2&id_asignatura=1&id_clase=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/asociaciones/insertarImparte
+        curl -i -d "id_asignatura=1&id_clase=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/asociaciones/insertarImparte
         '''
 
         if v:
@@ -2009,7 +1995,6 @@ class HelloWorldApi(remote.Service):
 
         #Extraemos lo datos de la petición al endpoints
         form_fields = {
-          "id_profesor": request.id_profesor,
           "id_asignatura": request.id_asignatura,
           "id_clase": request.id_clase,
         }

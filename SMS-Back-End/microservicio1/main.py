@@ -32,8 +32,8 @@ nombreMicroservicio = '\n## Microservicio BD ##\n'
 def getAlumnos():
     '''
     Devuelve una lista de todos los estudiantes.
-    curl -i -X GET localhost:8002/alumnos/
-    '''
+    curl -i -X GET localhost:8002/alumnos
+    '''    
     return jsonpickle.encode(GestorAlumnos.getAlumnos())
 
 @app.route('/alumnos',methods=['PUT'])
@@ -502,7 +502,7 @@ def delClase(id_clase):
 def getAlumnosClase(id_clase):
     '''
     Devuelve todos los alumnos que se encuentran matriculados en ese curso.
-    curl -i -X GET localhost:8002/clases/fr/alumnos
+    curl -i -X GET localhost:8002/clases/1/alumnos
     '''
     return jsonpickle.encode(GestorClases.getAlumnos(id_clase))
 
@@ -535,7 +535,7 @@ def getAsignaturasClase(id_clase):
 def getMatriculas():
     '''
     Devuelve una lista con todos las matriculas registradas en el sistema.
-    > curl -i -X GET localhost:8002/matriculas
+    curl -i -X GET localhost:8002/matriculas
     '''
     return jsonpickle.encode(GestorMatriculas.getMatriculas())
 
@@ -618,26 +618,28 @@ def getAsociaciones():
     '''
     return jsonpickle.encode(GestorAsociaciones.getAsociaciones())
 
-@app.route('/impartes',methods=['POST'])
+@app.route('/asociaciones',methods=['POST'])
 def postAsociacion():
     '''
     Inserta una nueva relación imparte en el sistema.
-    curl -d "id_profesor=1&id_asignatura=2&id_clase=2" -i -X POST localhost:8002/impartes
+    curl -d "id_asignatura=2&id_clase=3" -i -X POST localhost:8002/impartes
     '''
-    salida = GestorImpartes.nuevoImparte(request.form['id_clase'], request.form['id_asignatura'], request.form['id_profesor'])
+    salida = GestorAsociaciones.nuevaAsociacion(request.form['id_clase'], request.form['id_asignatura'])
+    print salida
     if salida == 'OK':
         return 'OK'
     else:
         print salida
         abort(404)
 
-@app.route('/impartes/<string:id_imparte>',methods=['DELETE'])
-def delAsociacion(id_imparte):
+@app.route('/asociaciones/<string:id_asociacion>',methods=['DELETE'])
+def delAsociacion(id_asociacion):
     '''
-    Elimina la matricula que se especifica con el identificador pasado, en caso de exisitir en el sistema.
-    curl -i -X DELETE localhost:8002/impartes/1
+    Elimina la asociacion entre clase y aseignatua que se especifica con el identificador pasado, en caso de exisitir en el sistema.
+    curl -i -X DELETE localhost:8002/asociaciones/1
     '''
-    salida = GestorImpartes.delImparte(id_imparte)
+    salida = GestorAsociaciones.delAsociacion(id_asociacion)
+    print salida
     if salida=="Elemento no encontrado":
         abort(404)
     else:
