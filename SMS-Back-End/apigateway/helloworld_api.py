@@ -7,6 +7,7 @@ as well as those methods defined in an API.
 
 
 import endpoints
+#https://cloud.google.com/appengine/docs/python/tools/protorpc/messages/messageclass
 from protorpc import messages
 from protorpc import message_types
 from protorpc import remote
@@ -2066,9 +2067,25 @@ class HelloWorldApi(remote.Service):
 
 
 
+    class Imagen(messages.Message):
+        image = messages.BytesField(1, required=True)
 
 
+    @endpoints.method(Imagen,MensajeRespuesta,path='imagenes/subirImagen', http_method='POST', name='imagenes.subirImagen')
+    def subirImagen(self, request):
+        '''
+        (echo -n '{"image": "'; base64 profile.jpg; echo '"}') | curl -H "Content-Type: application/json" -d @-  localhost:8001/_ah/ap/helloworld/v1/imagenes/subirImagen
+        '''
 
-    #seguir aquí
+        print "IMAGEN EN API ENDPOINTS"
+        print request.image
+
+        from manejadorImagenes import ManejadorImagenes
+        print 'URL \n'
+        print ManejadorImagenes.CreateFile('prueba', request.image)
+
+        return MensajeRespuesta( message='calling subirImagen()' )
+
+    #seguir aqu
 
 APPLICATION = endpoints.api_server([HelloWorldApi])
