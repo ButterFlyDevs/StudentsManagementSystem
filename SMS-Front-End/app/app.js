@@ -1,5 +1,5 @@
 // app.js
-var routerApp = angular.module('routerApp', ['ui.router' /*, 'flow'*/]);
+var routerApp = angular.module('routerApp', ['ui.router' ,'flow']);
 
 // ############# ENRUTADOR #################################### //
 
@@ -213,137 +213,104 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
 */
 
 
-  function getBase64Image(img, nombre) {
-      // Create an empty canvas element
+  function subirImagen(img, nombre) {
 
-      //img es un objeto de tipo File()
-
-      console.log('Datos en getBase64Image');
+      console.log('Llamando a subirImagen() ')
+      console.log('Params: ')
+      //La imagen que recibimos (img) es un objeto de tipo file.
       console.log(img)
-      console.log(img.nombre)
+      console.log('nombre del fichero: ' + img.name)
+      console.log(nombre)
+
 
       //Creamos un objeto de tipo FileReader()
       var reader = new FileReader();
 
-      var base64;
-
+      //Implementamos la funcion onload del reader.
       reader.onload = function(e) {
         var dataURL = reader.result;
-        //console.log('Yeah');
-        //console.log(dataURL);
         base64 = dataURL;
-        console.log('Sending: ' + dataURL);
-
+        //console.log('Sending: ' + dataURL);
+        //Quitamos parte de la información de formato que no necesita el Cloud Endpoint
         var res = dataURL.slice(23);
-        console.log('Sending2 : ' + res);
-        
+        //console.log('Sending2 : ' + res);
+
         gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
-
-          console.log("calling subirImagen with image: "+res);
-
+          //console.log("calling subirImagen with image: "+res);
           console.log(resp);
-          /*$scope.alumno = resp;
-          console.log(resp.nombre);
-          $scope.$apply();
-          */
-          /*
-          $scope.es=resp.alumno;
-          //Tenemos que hacer esto para que se aplique scope ya que la llamada a la API está fuera de Angular
-          $scope.$apply();
-          */
         });
-
-
-
       }
 
-      console.log('cosa');
-      var cosa = reader.readAsDataURL(img);
-
-      console.log(cosa);
-
-      console.log(base64);
-
-      console.log('ancho imagen: ' + img.width);
-
-     var canvas = document.createElement("canvas");
-      //canvas.width = img.width;
-      //canvas.height = img.height;
-
-      canvas.width = 300;
-      canvas.height = 400;
-
-      console.log(canvas)
-
-
-
-
-      // Copy the image contents to the canvas
-    //  var ctx = canvas.getContext("2d");
-//      ctx.drawImage(img, 0, 0);
-
-/*
-      // Get the data-URL formatted image
-      // Firefox supports PNG and JPEG. You could check img.src to
-      // guess the original format, but be aware the using "image/jpg"
-      // will re-encode the image.
-      var dataURL = canvas.toDataURL("image/png");
-
-      return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-
-    */
-
-
-
+      //Llamamos a readAsDataURL
+      reader.readAsDataURL(img);
   }
 
+  routerApp.controller('UploadCtrl', function ($scope) {
+    $scope.imageStrings = [];
+    $scope.processFiles = function(files){
+      console.log('files:'+files);
+      angular.forEach(files, function(flowFile, i){
+         var fileReader = new FileReader();
+            fileReader.onload = function (event) {
+              var uri = event.target.result;
+                $scope.imageStrings[i] = uri;
+            };
+            fileReader.readAsDataURL(flowFile.file);
+      });
+    };
 
-  routerApp.controller('HomeCtrl', ['$scope', function ($scope)
+  });
+
+  routerApp.controller('UploadCtrl2', function ($scope) {
+
+
+    /*
+    $scope.processFiles = function(files){
+      console.log('processFiles:');
+      console.log(files);
+
+    };
+    */
+
+    $scope.uploadFiles = function(e)
+  	{
+      console.log('HOla uploadFile')
+      console.log(e)
+      console.log(e.files)
+      //Llamamos a la función que sube la imagen:
+      //subirImagen($scope.file, 'caca');
+      angular.forEach(e.files, function(flowFile, i){
+         var fileReader = new FileReader();
+            var nombre = flowFile.file.name;
+
+            fileReader.onload = function (event) {
+              var uri = event.target.result;
+                //$scope.imageStrings[i] = uri;
+
+                var res = uri.slice(23);
+                //console.log('Sending2 : ' + res);
+
+                //Estamos usando como nombre de la imagen el nombrel del fichero.
+                gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
+                  //console.log("calling subirImagen with image: "+res);
+                  console.log(resp);
+                });
+
+
+            };
+            fileReader.readAsDataURL(flowFile.file);
+      });
+
+  	}
+  });
+
+  routerApp.controller('controladorSubidaImagenes', ['$scope', function ($scope)
   {
+    $scope.imageStrings = [];
   	$scope.uploadFile = function()
   	{
-  		var nombrefichero = $scope.name;
-      //Aquí tenemos la imagen cargarda, ahora tenemos que enviarla.
-  		var file = $scope.file;
-      console.log('Nombre: ' + nombrefichero);
-      console.log('Fichero: ' + file);
-
-      console.log(getBase64Image(file, nombrefichero));
-
-      //var reader = new FileReader();
-      //console.log(reader.readAsDataURL(file));
-      /*
-  		upload.uploadFile(file, name).then(function(res)
-  		{
-  			console.log(res);
-  		})
-      */
-  	}
-  }])
-
-  routerApp.service('upload', ["$http", "$q", function ($http, $q)
-  {
-  	this.uploadFile = function(file, name)
-  	{
-  		var deferred = $q.defer();
-  		var formData = new FormData();
-  		formData.append("name", name);
-  		formData.append("file", file);
-  		return $http.post("server.php", formData, {
-  			headers: {
-  				"Content-type": undefined
-  			},
-  			transformRequest: angular.identity
-  		})
-  		.success(function(res)
-  		{
-  			deferred.resolve(res);
-  		})
-  		.error(function(msg, code)
-  		{
-  			deferred.reject(msg);
-  		})
-  		return deferred.promise;
+      //Llamamos a la función que sube la imagen:
+      subirImagen($scope.file, $scope.name);
   	}
   }])
 
