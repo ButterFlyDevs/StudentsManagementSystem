@@ -212,7 +212,7 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
 
 */
 
-
+/*
   function subirImagen(img, nombre) {
 
       console.log('Llamando a subirImagen() ')
@@ -260,7 +260,7 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
     };
 
   });
-
+*/
   routerApp.controller('UploadCtrl2', function ($scope) {
 
 
@@ -304,6 +304,7 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
   	}
   });
 
+/*
   routerApp.controller('controladorSubidaImagenes', ['$scope', function ($scope)
   {
     $scope.imageStrings = [];
@@ -326,7 +327,7 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
   		}
   	};
   }])
-
+*/
 
 
 
@@ -561,16 +562,8 @@ routerApp.controller('ControladorDetallesEstudiante', function($location, $scope
   gapi.client.load('helloworld', 'v1', null, ROOT);
 
 
-  //Pedimos al gateway que nos diga todos los profesores que imparten clase a ese alumno.
-  gapi.client.helloworld.alumnos.getProfesoresAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
-    console.log("Profesores del alumno: ");
-    console.log(resp.profesores);
-    //Enviamos al scope no toda la respuesta sino la lista de profesores que se espeara que contenga esta.
-    $scope.profesores = resp.profesores;
-    $scope.$apply();
-  });
 
-  //Pedimos al Gateway toda la informaicón del Alumno.
+  //Pedimos al Gateway toda la información del Alumno.
   gapi.client.helloworld.alumnos.getAlumno({'id':$stateParams.estudianteID}).execute(function(resp) {
 
     console.log("calling getAlumno with id: "+$stateParams.estudianteID);
@@ -583,6 +576,35 @@ routerApp.controller('ControladorDetallesEstudiante', function($location, $scope
     //Tenemos que hacer esto para que se aplique scope ya que la llamada a la API está fuera de Angular
     $scope.$apply();
     */
+  });
+
+  /*
+  ### Información extra del estudiante para el apartado de DATOS ACADÉMICOS ###
+  */
+
+  //Pedimos al gateway que nos diga todos los profesores que imparten clase a ese alumno.
+  gapi.client.helloworld.alumnos.getProfesoresAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
+    console.log("Profesores del alumno: ");
+    console.log(resp.profesores);
+    //Enviamos al scope no toda la respuesta sino la lista de profesores que se espeara que contenga esta.
+    $scope.profesores = resp.profesores;
+    $scope.$apply();
+  });
+
+  //Pedimos al gateway que nos diga todos las asignaturas a las que está matriculado ese alumno.
+  gapi.client.helloworld.alumnos.getAsignaturasAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
+    console.log("Asignaturas del alumno: ");
+    console.log(resp.asignaturas);
+    $scope.asignaturas = resp.asignaturas;
+    $scope.$apply();
+  });
+
+  //Pedimos al gateway que nos diga todos las clases en las que está matriculado ese alumno.
+  gapi.client.helloworld.alumnos.getClasesAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
+    console.log("Clases del alumno: ");
+    console.log(resp.clases);
+    $scope.clases = resp.clases;
+    $scope.$apply();
   });
 
 });
@@ -692,23 +714,41 @@ routerApp.controller('ControladorDetallesProfesor', function($location, $scope, 
   gapi.client.load('helloworld', 'v1', null, ROOT);
 
 
-  //Pedimos al gateway que nos diga todos los profesores que imparten clase a ese alumno.
-  gapi.client.helloworld.alumnos.getProfesoresAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
-    console.log("Profesores del alumno: ");
-    console.log(resp.profesores);
-    //Enviamos al scope no toda la respuesta sino la lista de profesores que se espeara que contenga esta.
-    $scope.profesores = resp.profesores;
-    $scope.$apply();
-  });
-
-  //Pedimos al Gateway toda la informaicón del profesor.
+  //Pedimos al Gateway toda la información del profesor.
   gapi.client.helloworld.profesores.getProfesor({'id':$stateParams.profesorID}).execute(function(resp) {
-
     console.log("calling getProfesor with id: "+$stateParams.profesorID);
     console.log(resp);
     $scope.profesor = resp;
     $scope.$apply();
+  });
 
+  /*
+  ### Información extra del profesor para el apartado de DATOS ACADÉMICOS ###
+  */
+
+  //Pedimos al gateway que nos diga todos los alumnos a los que imparte clase es profesor.
+  gapi.client.helloworld.profesores.getAlumnosProfesor({'id':$stateParams.profesorID}).execute(function(resp){
+    console.log("Aumnos del profesor: ");
+    console.log(resp.alumnos);
+    //Enviamos al scope no toda la respuesta sino la lista de profesores que se espeara que contenga esta.
+    $scope.estudiantes = resp.alumnos;
+    $scope.$apply();
+  });
+
+  //Pedimos al gateway que nos diga todos las asignaturas que imparte el profesor.
+  gapi.client.helloworld.profesores.getAsignaturasProfesor({'id':$stateParams.profesorID}).execute(function(resp){
+    console.log("Asignaturas del profesor: ");
+    console.log(resp.asignaturas);
+    $scope.asignaturas = resp.asignaturas;
+    $scope.$apply();
+  });
+
+  //Pedimos al gateway que nos diga todos las clases en las que imparte el profesor.
+  gapi.client.helloworld.profesores.getClasesProfesor({'id':$stateParams.profesorID}).execute(function(resp){
+    console.log("Clases del profesor: ");
+    console.log(resp.clases);
+    $scope.clases = resp.clases;
+    $scope.$apply();
   });
 
 });
@@ -915,7 +955,7 @@ routerApp.controller('ControladorDetallesAsignatura', function($location, $scope
 
   //Pedimos al gateway todos los alumnos matriculados en esa asignatura.
   gapi.client.helloworld.asignaturas.getAlumnosAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
-    console.log("Petición al APIG de alumnos matriculados en la asignatura "+$stateParams.asignaturaID);
+    console.log("Petición al API Gateway de alumnos matriculados en la asignatura "+$stateParams.asignaturaID);
     console.log(resp.alumnos);
     $scope.estudiantes = resp.alumnos;
     $scope.$apply();
@@ -1146,9 +1186,9 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
   gapi.client.load('helloworld', 'v1', null, ROOT);
 
 
-  //Pedimos al Gateway toda la informaicón de la asignatura.
+  //Pedimos al Gateway toda la informaicón de la clase.
   gapi.client.helloworld.clases.getClase({'id':$stateParams.claseID}).execute(function(resp) {
-    console.log("calling getClase with id: "+$stateParams.claseID);
+    console.log("Petición al API Gateway de alumnos matriculados en la clase con ID:  "+$stateParams.claseID);
     console.log(resp);
     $scope.clase = resp;
     console.log(resp.clase);
@@ -1162,14 +1202,14 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
 
   //Pedimos al gateway todos los alumnos matriculados en esa clase (de cualquier asignatura)
   gapi.client.helloworld.clases.getAlumnosClase({'id':$stateParams.claseID}).execute(function(resp){
-    console.log("Petición al APIG de alumnos matriculados en la clase "+$stateParams.claseID);
+    console.log("Petición al API Gateway de alumnos matriculados en la clase con ID:  "+$stateParams.claseID);
     console.log(resp.alumnos);
     $scope.estudiantes = resp.alumnos;
     $scope.$apply();
   });
 
   gapi.client.helloworld.clases.getProfesoresClase({'id':$stateParams.claseID}).execute(function(resp){
-    console.log("Petición al APIG de profesores que imparten a esa clase. "+$stateParams.claseID);
+    console.log("Petición al API Gateway de profesores que imparten en la clase con ID:  "+$stateParams.claseID);
     console.log(resp.profesores);
     $scope.profesores = resp.profesores;
     $scope.$apply();
@@ -1177,7 +1217,7 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
 
 
   gapi.client.helloworld.clases.getAsignaturasClase({'id':$stateParams.claseID}).execute(function(resp){
-    console.log("Petición al APIG de los asignaturas que se imparten en la clase "+$stateParams.claseID);
+    console.log("Petición al API Gateway de los asignaturas que se imparten en la clase con ID:  "+$stateParams.claseID);
     console.log(resp.asignaturas);
     $scope.asignaturas = resp.asignaturas;
     $scope.$apply();

@@ -33,7 +33,7 @@ def getAlumnos():
     '''
     Devuelve una lista de todos los estudiantes.
     curl -i -X GET localhost:8002/alumnos
-    '''    
+    '''
     return jsonpickle.encode(GestorAlumnos.getAlumnos())
 
 @app.route('/alumnos',methods=['PUT'])
@@ -160,14 +160,14 @@ def delAlumno(id_alumno):
 def getProfesoresAlumno(id_alumno):
     '''
     Devuelve todos los profesores que imparten clase a ese alumno.
-    curl -i -X GET localhost:8080/alumnos/1/profesores
+    curl -i -X GET localhost:8002/alumnos/1/profesores
     '''
     return jsonpickle.encode(GestorAlumnos.getProfesores(id_alumno))
 
 @app.route('/alumnos/<string:id_alumno>/asignaturas',methods=['GET'])
 def getAsignaturasAlumno(id_alumno):
     '''
-    curl -i -X GET localhost:8080/alumnos/1/asignaturas
+    curl -i -X GET localhost:8002/alumnos/1/asignaturas
     '''
     return jsonpickle.encode(GestorAlumnos.getAsignaturas(id_alumno))
 
@@ -175,7 +175,7 @@ def getAsignaturasAlumno(id_alumno):
 def getClasesAlumnos(id_alumno):
     '''
     Devuelve las clases a en las que está matriculado el alumno, como 1AESO o 2CBACH.
-    curl -i -X GET localhost:8080/alumnos/1/clases
+    curl -i -X GET localhost:8002/alumnos/1/clases
     '''
     return jsonpickle.encode(GestorAlumnos.getClases(id_alumno))
 

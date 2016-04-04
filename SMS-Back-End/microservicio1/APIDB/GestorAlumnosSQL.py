@@ -384,8 +384,12 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='select dni, nombre, apellidos from Profesor where dni in ( select id_profesor from Imparte where id_asignatura in (select id_asignatura from Matricula where id_alumno='+idAlumno+') and id_clase in  (select id_clase from Matricula where id_alumno='+idAlumno+'))'
+        #query='SELECT id_profesor, nombre, apellidos from Profesor where id_profesor in ( select id_profesor from Imparte where id_asignatura in (select id_asignatura from Matricula where id_alumno='+idAlumno+') and id_clase in  (select id_clase from Matricula where id_alumno='+idAlumno+'))'
 
+        query='SELECT nombre, apellidos, id_profesor FROM Profesor WHERE id_profesor IN (SELECT id_profesor FROM Imparte, Matricula WHERE Imparte.id_asociacion=Matricula.id_asociacion and Matricula.id_alumno='+idAlumno+');'
+
+        if v:
+            print query
 
         try:
             salida = cursor.execute(query);
@@ -407,9 +411,9 @@ class GestorAlumnos:
 
                 profesor = Profesor()
 
-                profesor.dni=row[0]
-                profesor.nombre=row[1]
-                profesor.apellidos=row[2]
+                profesor.id=row[2]
+                profesor.nombre=row[0]
+                profesor.apellidos=row[1]
                 lista.append(profesor)
                 #print row[0], row[1]
                 row = cursor.fetchone()
@@ -421,7 +425,7 @@ class GestorAlumnos:
             db.close()
 
     @classmethod
-    def getAsignaturas(self, dniAlumno):
+    def getAsignaturas(self, idAlumno):
         """Devuelve una lista con las asignaturas en las que ese alumno está matriculado
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
@@ -433,6 +437,8 @@ class GestorAlumnos:
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
         query='select * from Asignatura where id in (select id_asignatura from Matricula where id_alumno='+idAlumno+')'
+
+        query='SELECT * FROM Asignatura WHERE id_asignatura IN (SELECT id_asignatura FROM Asocia WHERE id_asociacion IN (SELECT id_asociacion FROM Matricula WHERE id_alumno='+idAlumno+'));'
 
         #select * from Matricula, Asignatura where Matricula.id_asignatura=Asignatura.id and id_alumno=4;
 
@@ -454,8 +460,8 @@ class GestorAlumnos:
             while row is not None:
                 asignatura = Asignatura()
                 #En esta consulta el identificador de la asignatura se encuentra en la primera posicion.
-                asignatura.id=row[3]
-                asignatura.nombre=row[4]
+                asignatura.id=row[0]
+                asignatura.nombre=row[1]
                 lista.append(asignatura)
                 #print row[0], row[1]
                 row = cursor.fetchone()
@@ -467,7 +473,7 @@ class GestorAlumnos:
             db.close()
 
     @classmethod
-    def getClases(self, dniAlumno):
+    def getClases(self, idAlumno):
         """
         Devuelve una lista con las clases en las que ese alumno está matriculado, aunque en la mayoría de los casos será una.
         """
@@ -479,7 +485,7 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='select * from Clase where id in(select id_clase from Matricula where id_alumno='+idAlumno+')'
+        query='SELECT * FROM Clase WHERE id_clase IN (SELECT id_clase FROM Asocia WHERE id_asociacion IN (SELECT id_asociacion FROM Matricula WHERE id_alumno='+idAlumno+'));'
 
         try:
             salida = cursor.execute(query);
@@ -499,10 +505,10 @@ class GestorAlumnos:
             while row is not None:
                 clase = Clase()
                 #En esta consulta el identificador de la asignatura se encuentra en la primera posicion.
-                clase.id=row[3]
-                clase.curso=row[4]
-                clase.grupo=row[5]
-                clase.nivel=row[6]
+                clase.id=row[0]
+                clase.curso=row[1]
+                clase.grupo=row[2]
+                clase.nivel=row[3]
                 lista.append(clase)
                 #print row[0], row[1]
                 row = cursor.fetchone()

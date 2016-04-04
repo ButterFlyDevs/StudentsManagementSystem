@@ -525,7 +525,7 @@ class HelloWorldApi(remote.Service):
     def getProfesoresAlumno(self, request):
         '''
         Devuelve una lista con los datos completos de los profesores que dan clase al alumno de dni pasado
-        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getProfesoresAlumno?dni=1
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getProfesoresAlumno?id=1
         '''
         #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
         if v:
@@ -557,11 +557,7 @@ class HelloWorldApi(remote.Service):
         profesoresItems= []
         #Que rellenamos con todo los alumnos de la listaAlumnos
         for profesor in listaProfesores:
-            profesoresItems.append(Profesor( nombre=str(profesor.get('nombre')),
-                                           apellidos=str(profesor.get('apellidos')),
-                                           dni=str(profesor.get('dni'))
-                                         )
-                                )
+            profesoresItems.append(Profesor( nombre=str(profesor.get('nombre')), apellidos=str(profesor.get('apellidos')), id=str(profesor.get('id'))))
 
         #Los adaptamos al tipo de mensaje y enviamos
         #return Greeting(message=str(result.content))
@@ -572,14 +568,14 @@ class HelloWorldApi(remote.Service):
         '''
         Devuelve una lista con los datos completos de las asignatuas en las que está matriculado el alumno con dni pasado.
         Ejemplo de llamada:
-        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getAsignaturasAlumno?dni=1
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAsignaturasAlumno?id=1
         '''
         if v:
             print ("Ejecución de getAsignaturasAlumno en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
-        url+='alumnos/'+request.dni+"/asignaturas"
+        url+='alumnos/'+request.id+"/asignaturas"
         result = urlfetch.fetch(url)
         if v:
             print result.content
@@ -595,22 +591,22 @@ class HelloWorldApi(remote.Service):
         '''
         Devuelve una lista con los datos completos de las clases en las que está matriculado el alumno con dni pasado.
         Ejemplo de llamada:
-        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumos/getClasesAlumno?dni=1
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getClasesAlumno?id=1
         '''
         if v:
             print ("Ejecución de getCursosAlumno en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
-        url+='alumnos/'+request.dni+"/clases"
+        url+='alumnos/'+request.id+"/clases"
         result = urlfetch.fetch(url)
         if v:
             print result.content
         listaClases = jsonpickle.decode(result.content)
         print listaClases
         clasesItems= []
-        for curso in listaClases:
-            clasesItems.append(Curso(id=str(clase.get('id')),clase=str(clase.get('nombre')),grupo=str(clase.get('grupo')),nivel=str(clase.get('nivel'))))
+        for clase in listaClases:
+            clasesItems.append(Clase(id=str(clase.get('id')),curso=str(clase.get('curso')),grupo=str(clase.get('grupo')),nivel=str(clase.get('nivel'))))
         return ListaClases(clases=clasesItems)
 
 
@@ -938,9 +934,9 @@ class HelloWorldApi(remote.Service):
         vectorAlumnos= []
         #Que rellenamos con todo los alumnos de la listaAlumnos
         for alumno in listaAlumnos:
-            vectorAlumnos.append(Alumno( nombre=str(alumno.get('nombre')),
-                                         #apellidos=str(alumno.get('apellidos')),
-                                         id=str(alumno.get('dni'))
+            vectorAlumnos.append(Alumno( nombre=alumno.get('nombre').encode('utf-8').decode('utf-8'),
+                                         apellidos=alumno.get('apellidos').encode('utf-8').decode('utf-8'),
+                                         id=str(alumno.get('id'))
                                          )
                                 )
 
@@ -953,7 +949,7 @@ class HelloWorldApi(remote.Service):
         '''
         Devuelve una lista con los datos completos de las asignatuas que el profesor en cuestión imparte.
         Ejemplo de llamada:
-        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getAsignaturasProfesor?id=1
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getAsignaturasProfesor?id=1
         '''
         if v:
             print ("Ejecución de getAsignaturasProfesor en apigateway")
@@ -976,7 +972,7 @@ class HelloWorldApi(remote.Service):
         '''
         Devuelve una lista con los datos minimos de las clases a las que ese profesor imparte.
         Ejemplo de llamada:
-        > curl -i -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getClasesProfesor?id=1
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getClasesProfesor?id=1
         '''
         if v:
             print ("Ejecución de getClasesProfesor en apigateway")
@@ -991,7 +987,7 @@ class HelloWorldApi(remote.Service):
         print listaClases
         clasesItems= []
         for clase in listaClases:
-            clasesItems.append(Clase(id=str(clase.get('id')),curso=str(clase.get('nombre')),grupo=str(clase.get('grupo')),nivel=str(clase.get('nivel'))))
+            clasesItems.append(Clase(id=str(clase.get('id')),curso=str(clase.get('curso')),grupo=str(clase.get('grupo')),nivel=str(clase.get('nivel'))))
         return ListaClases(clases=clasesItems)
 
 
@@ -1280,8 +1276,8 @@ class HelloWorldApi(remote.Service):
         vectorAlumnos= []
         #Que rellenamos con todo los alumnos de la listaAlumnos
         for alumno in listaAlumnos:
-            vectorAlumnos.append(Alumno( nombre=str(alumno.get('nombre')),
-                                         #apellidos=str(alumno.get('apellidos')),
+            vectorAlumnos.append(Alumno( nombre=alumno.get('nombre').encode('utf-8').decode('utf-8'),
+                                         apellidos=alumno.get('apellidos').encode('utf-8').decode('utf-8'),
                                          id=str(alumno.get('id'))
                                          )
                                 )

@@ -84,7 +84,7 @@ Diseño de la vista de la pestaña de detalles del estudiante.
                 <!--Si el vector está vacío se muestra un mensaje.-->
                 <li ng-show="!estudiantes.length"><p class="uk-text-muted">Aún no hay alumnos matriculados en esta asignatura.</p></li>
                 <li ng-repeat="alumno in estudiantes">
-                  <a ui-sref="estudiantes.detalles-estudiante({ estudianteID: alumno.id })">{{ alumno.nombre }}</a>
+                  <a ui-sref="estudiantes.detalles-estudiante({ estudianteID: alumno.id })">{{ alumno.nombre }} {{alumno.apellidos}}</a>
                 </li>
             </div>
 

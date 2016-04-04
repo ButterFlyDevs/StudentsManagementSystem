@@ -368,7 +368,8 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT id_alumno, nombre, apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asignatura in (select id_asignatura from Imparte where id_profesor='+idProfesor+') AND id_clase in (select id_clase from Imparte where id_profesor='+idProfesor+'))'
+        query='SELECT nombre, apellidos, id_alumno FROM Alumno WHERE id_alumno IN (SELECT id_alumno FROM Imparte, Matricula WHERE Imparte.id_asociacion=Matricula.id_asociacion AND Imparte.id_profesor='+idProfesor+');'
+
 
         try:
             salida = cursor.execute(query);
@@ -387,7 +388,9 @@ class GestorProfesores:
             while row is not None:
                 alumno = Alumno()
                 alumno.nombre=row[0]
-                alumno.dni=row[1]
+                alumno.apellidos=row[1]
+                alumno.id=row[2]
+                print alumno
                 lista.append(alumno)
                 #print row[0], row[1]
                 row = cursor.fetchone()
@@ -410,7 +413,10 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='select * from Asignatura where id_asignatura in (select id_asignatura from Imparte where id_profesor ='+idProfesor+');'
+        query='SELECT * FROM Asignatura WHERE id_asignatura IN (SELECT id_asignatura FROM Asocia WHERE id_asociacion IN (SELECT id_asociacion FROM Imparte WHERE id_profesor='+idProfesor+'));'
+
+        if v:
+            print query
 
         try:
             salida = cursor.execute(query);
@@ -455,7 +461,8 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT * FROM Clase where id_clase in (select id_clase from Imparte where id_profesor='+idProfesor+')'
+        query='SELECT * FROM Clase WHERE id_clase IN (SELECT id_clase FROM Asocia where id_asociacion IN(SELECT id_asociacion FROM Imparte WHERE id_profesor='+idProfesor+'));'
+
 
         try:
             salida = cursor.execute(query);

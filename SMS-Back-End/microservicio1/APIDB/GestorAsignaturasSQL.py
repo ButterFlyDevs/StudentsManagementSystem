@@ -350,8 +350,9 @@ class GestorAsignaturas:
         #-----------------------------#
         idAsignatura='\''+idAsignatura+'\''
         #query='select distinct id_profesor from Imparte where id_asignatura='+idAsignatura+';'
-        query='select id_profesor, nombre, apellidos from Profesor where id_profesor in (select id_asignatura from Imparte where id_asignatura='+idAsignatura+');'
+        query='SELECT id_profesor, nombre, apellidos from Profesor where id_profesor in (select id_profesor from Imparte where id_asociacion IN ( select id_asociacion from Asocia where id_asignatura='+idAsignatura+'));'
 
+        #query='SELECT id_profesor, nombre, apellidos from Profesor where id_profesor IN (select id_profesor from Imparte where id_asociacion = (select id_asociacion from Asocia where id_clase='+idClase+'))';
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -390,7 +391,10 @@ class GestorAsignaturas:
         Con el distinct evitamos que si un alumno por casualidad esta matriculado en lengua de primero
         y lengua de segundo porque así se permite se contabilice como dos alumnos en el recuento, lo que sería un error.
         '''
-        query='select id_alumno, nombre, apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asignatura ='+idAsignatura+' )'
+        #query='select id_alumno, nombre, apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asignatura ='+idAsignatura+' )'
+
+        query='SELECT id_alumno, nombre, apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asociacion IN ( select id_asociacion from Asocia where id_asignatura='+idAsignatura+'));'
+
         if v:
             print '\n'+query
         cursor.execute(query)
