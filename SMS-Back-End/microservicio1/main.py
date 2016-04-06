@@ -523,6 +523,20 @@ def getAsignaturasClase(id_clase):
     return jsonpickle.encode(GestorClases.getAsignaturas(id_clase))
 
 
+@app.route('/clases/<string:id_clase>/asociaciones', methods=['GET'])
+def getAsociacionesClase(id_clase):
+    '''
+    Devuelve una lista con las asociaciones de clase-asignatura que se imparten a una clase concreta.
+    Estas entindades son distintas de las asignaturas que se imparten en las clases ya que estas nos llevan a las
+    asignaturas en general y las asociaciones son una especificación de la asignatura para una clase concreta.
+
+    curl -i -X GET localhost:8002/clases/1/asociaciones
+
+    '''
+    return jsonpickle.encode(GestorClases.getAsociaciones(id_clase))
+
+
+
 
 
 
@@ -618,11 +632,41 @@ def getAsociaciones():
     '''
     return jsonpickle.encode(GestorAsociaciones.getAsociaciones())
 
+@app.route('/asociaciones/<string:id_asociacion>', methods=['GET'])
+def getTodoSobreAsociacion(id_asociacion):
+    '''
+    Devuelve todos los datos importates de una asociacione (una asignatura que se da a una clase en concreto) tal como
+    su nombre completo, nombre del profesor y nombre de los alumnos.
+
+    curl -i -X GET localhost:8002/asociaciones/1
+
+    En lugar de hacer tres llamadas a métodos sueltos de la colección asociación para que nos de su nombre legible,
+    el profesor que la imparte y los alumnos matriculados creamos un método que nos devuelve la información al completo.
+    '''
+
+    #Creamos un pequeño objeto que represente la asociacion con su máxima información
+    class AsociacionCompleta:
+        nombreAsignatura = ""
+        profesoresAsociacion = []
+        alumnosAsociacion = []
+
+    asociacion = AsociacionCompleta()
+
+    #Nombre de la asignatura de la asociacion
+    asociacion.nombreAsignatura = GestorAsociaciones.getAsociacionCompleta(id_asociacion).nombreAsignatura;
+    #Profesor que imparte la asociación:
+    asociacion.profesoresAsociacion = GestorAsociaciones.getProfesores(id_asociacion);
+    #Alumnos que están matriculados a esa asociacion de asignatura y clase concreta (BASE DEL SISTEMA).
+    asociacion.alumnosAsociacion = GestorAsociaciones.getAlumnos(id_asociacion);
+
+    return jsonpickle.encode(asociacion)
+
+
 @app.route('/asociaciones',methods=['POST'])
 def postAsociacion():
     '''
     Inserta una nueva relación imparte en el sistema.
-    curl -d "id_asignatura=2&id_clase=3" -i -X POST localhost:8002/impartes
+    curl -d "id_asignatura=2&id_clase=3" -i -X POST localhost:8002/asociaciones
     '''
     salida = GestorAsociaciones.nuevaAsociacion(request.form['id_clase'], request.form['id_asignatura'])
     print salida
@@ -630,7 +674,8 @@ def postAsociacion():
         return 'OK'
     else:
         print salida
-        abort(404)
+        #abort(404)
+        return salida
 
 @app.route('/asociaciones/<string:id_asociacion>',methods=['DELETE'])
 def delAsociacion(id_asociacion):
@@ -644,6 +689,7 @@ def delAsociacion(id_asociacion):
         abort(404)
     else:
         return str(salida)
+
 
 
 if __name__ == '__main__':

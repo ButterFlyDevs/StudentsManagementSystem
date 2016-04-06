@@ -11,6 +11,7 @@ from Clase import *
 from Asignatura import *
 from Alumno import *
 from Profesor import  *
+from Asociacion import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 
@@ -438,6 +439,41 @@ class GestorClases:
 
             lista.append(profesor)
             #print row[0], row[1]
+            row = cursor.fetchone()
+
+        cursor.close()
+        db.close()
+
+        return lista
+
+
+    @classmethod
+    def getAsociaciones(self, idClase):
+
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+        idClase='\''+idClase+'\''
+
+        #query='SELECT * FROM Asocia WHERE id_clase='+idClase+';'
+        query='select * from (select * from Asocia where id_clase='+idClase+') AS tablaAsocia, Asignatura where tablaAsocia.id_asignatura = Asignatura.id_asignatura;'
+        if v:
+            print '\n'+query
+        cursor.execute(query);
+        row = cursor.fetchone()
+
+        lista = []
+
+        while row is not None:
+            asociacion = Asociacion()
+            asociacion.id = row[0]
+            asociacion.idClase = row[1]
+            asociacion.idAsignatura = row[2]
+            asociacion.nombreAsignatura = row[4]
+            lista.append(asociacion)
             row = cursor.fetchone()
 
         cursor.close()

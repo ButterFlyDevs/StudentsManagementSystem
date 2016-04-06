@@ -146,10 +146,16 @@ class Asociacion(messages.Message):
     id_asociacion = messages.StringField(1)
     id_clase = messages.StringField(2)
     id_asignatura = messages.StringField(3)
+    nombreAsignatura = messages.StringField(4)
 
 class ListaAsociaciones(messages.Message):
     asociaciones = messages.MessageField(Asociacion, 1, repeated=True)
 
+#Definimos un tipo especial de mensaje
+class AsociacionCompleta(messages.Message):
+    nombreAsignatura = messages.StringField(1)
+    listaProfesores = messages.MessageField(Profesor, 2, repeated=True)
+    listaAlumnos = messages.MessageField(Alumno, 3, repeated=True)
 
 
 #Decorador que establace nombre y versión de la api
@@ -1656,6 +1662,27 @@ class HelloWorldApi(remote.Service):
             asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
         return ListaAsignaturas(asignaturas=asignaturasItems)
 
+    @endpoints.method(ID, ListaAsociaciones, path='clases/getAsociacionesClase', http_method='GET', name='clases.getAsociacionesClase')
+    def getAsociacionesClase(self, request):
+        '''
+            curl -i -X GET localhost:8001/_ah/api/helloworld/v1/clases/getAsociacionesClase?id=1
+        '''
+        if v:
+            print ("Ejecución de getAsociacionesClase en apigateway")
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='clases/'+request.id+"/asociaciones"
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+        listaAsociaciones = jsonpickle.decode(result.content)
+        print listaAsociaciones
+        listaAS= []
+
+        for a in listaAsociaciones:
+            listaAS.append( Asociacion( id_asociacion=str(a.get('id')), id_clase=str(a.get('idClase')), id_asignatura=str(a.get('idAsignatura')), nombreAsignatura=str(a.get('nombreAsignatura')) ) )
+        return ListaAsociaciones(asociaciones=listaAS)
 
     ##############################################
     #   métodos de MATRICULAS                    #
@@ -1965,23 +1992,23 @@ class HelloWorldApi(remote.Service):
 
         return ListaAsociaciones(asociaciones=asociacionesItems)
 
-    @endpoints.method(Imparte, MensajeRespuesta, path='asociaciones/insertarImparte', http_method='POST', name='asociaciones.insertarImparte')
+    @endpoints.method(Asociacion, MensajeRespuesta, path='asociaciones/insertaAsociacion', http_method='POST', name='asociaciones.insertaAsociacion')
     def insertarAsociacion(self, request):
         '''
-        Introduce una relación Imparte (un procesor que imaparte una asignatura en una clase).
+        Introduce una relación Asocia (una especificación de una asignatura en una clase concreta).
         Ejemplo de llamada en terminal:
-        curl -i -d "id_asignatura=1&id_clase=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/asociaciones/insertarImparte
+        curl -i -d "id_asignatura=2&id_clase=3" -X POST -G localhost:8001/_ah/api/helloworld/v1/asociaciones/insertaAsociacion
         '''
 
         if v:
             print nombreMicroservicio
-            print "Petición POST a asociaciones.insertarImparte"
+            print "Petición POST a asociaciones.insertaAsociacion"
             print "Contenido de la petición:"
             print str(request)
             print '\n'
 
         #Si no tenemos todos los atributos entonces enviamos un error de bad request.
-        if request.id_profesor==None or request.id_asignatura==None or request.id_clase==None:
+        if request.id_asignatura==None or request.id_clase==None:
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
@@ -2061,11 +2088,54 @@ class HelloWorldApi(remote.Service):
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
+    @endpoints.method(ID, AsociacionCompleta,path='asociaciones/getAsociacionCompleta', http_method='GET', name='asociaciones.getAsociacionCompleta')
+    def getAsociacionCompleta(self, request):
+
+        '''
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/asociaciones/getAsociacionCompleta?id=1
+        '''
+
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el recurso al que queremos conectarnos.
+        url+="asociaciones/"+request.id
+        if v:
+            print str(url)
+        #Al no especificar nada se llama al método GET de la URL.
+        result = urlfetch.fetch(url)
+        if v:
+            print result.content
+
+        #Información Asociación Completa
+        iac = jsonpickle.decode(result.content)
+
+        print 'IAC recibido: \n'
+        print iac
+
+        #Formateamos la información recibida para enviarla.
+
+        #Creamos un par de vectores
+        profesores= []
+        alumnos = []
+
+
+        for profesor in iac['profesoresAsociacion']:
+            profesores.append(Profesor( nombre=profesor.get('nombre').encode('utf-8').decode('utf-8'), apellidos=profesor.get('apellidos').encode('utf-8').decode('utf-8'), id=str(profesor.get('id'))))
+
+        for alumno in iac['alumnosAsociacion']:
+            alumnos.append(Alumno( nombre=alumno.get('nombre').encode('utf-8').decode('utf-8'), apellidos=alumno.get('apellidos').encode('utf-8').decode('utf-8'), id=str(alumno.get('id'))))
+
+        return AsociacionCompleta( nombreAsignatura=str(iac['nombreAsignatura']), listaProfesores=profesores, listaAlumnos=alumnos)
+
+
+
+
 
     class Imagen(messages.Message):
         name = messages.StringField(1, required=True)
         image  = messages.BytesField(2, required=True)
-
 
     @endpoints.method(Imagen, MensajeRespuesta, path='imagenes/subirImagen', http_method='POST', name='imagenes.subirImagen')
     def subirImagen(self, request):

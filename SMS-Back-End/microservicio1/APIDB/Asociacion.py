@@ -6,5 +6,7 @@ class Asociacion:
 
     def __init__(self):
         self.id = ""
-        self.id_asignatura = ""
-        self.id_clase = ""
+        self.idAsignatura = ""
+        self.nombreAsignatura = ""
+        self.idClase = ""
+        

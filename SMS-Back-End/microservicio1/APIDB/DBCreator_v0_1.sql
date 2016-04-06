@@ -1,7 +1,7 @@
 /**
   Fichero de creación de la base de datos de SMM--
   Uso:
-    > mysql -u root -p < DBCreator.sql
+    > mysql -u root -p'root' < DBCreator.sql
   Ejecutado en el mismo directorio que este fichero.
 
   Versión 0.1

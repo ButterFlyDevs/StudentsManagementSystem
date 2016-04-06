@@ -105,17 +105,18 @@ class GestorAsociaciones:
         #Una de las opciones es convertirlo en un objeto y devolverlo
 
     @classmethod
-    def getAsociacion(self, id_clase, id_asignatura):
+    def getAsociacionCompleta(self, idAsociacion):
         """
         Recupera TODA la información de un Asociacion en concreto a través de la clave primaria, su id.
         """
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
-        id_clase='\''+id_clase+'\''
-        id_asignatura='\''+id_asignatura+'\''
+        idAsociacion='\''+idAsociacion+'\''
 
-        query="select * from Asocia where id_clase="+id_clase+" and id_asignatura="+id_asignatura+";"
+        #Montamos un alias para poder sacar el nombre de la asignatura sin ninguna subconsulta fea.
+        query='select * from (select * from Asocia where id_asociacion='+idAsociacion+') AS tablaAsocia, Asignatura where tablaAsocia.id_asignatura = Asignatura.id_asignatura;'
+
         if v:
             print '\n'+query
         try:
@@ -141,8 +142,11 @@ class GestorAsociaciones:
             #Como se trata de toda la información al completo usaremos todos los campos de la clase Asociacion.
             #La api del mservicio envia estos datos en JSON sin comprobar nada
             asociacion = Asociacion()
-            asociacion.id_asignatura=row[0]
+            asociacion.id=row[0]
             asociacion.id_clase=row[1]
+            asociacion.id_asignatura=row[2]
+            #La tercera vuelve a ser el id_asignatura
+            asociacion.nombreAsignatura=row[4]
 
             return asociacion
         if salida==0:
@@ -260,10 +264,10 @@ class GestorAsociaciones:
     ##DE RELACIONES CON OTRAS##
 
     @classmethod
-    def getAlumnos(sef, id_asignatura, id_clase):
+    def getAlumnos(sef, idAsociacion):
         '''
         Devuelve una lista con los alumnos matriculados en esa asignatura y grupo
-        Devuelve: id del alumno, nombre, apellidos y dni
+        Devuelve: id del alumno, nombre, apellidos e id
         '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -273,10 +277,14 @@ class GestorAsociaciones:
         cursor.execute(mysql_query)
         #-----------------------------#
 
-        id_clase='\''+id_clase+'\''
-        id_asignatura='\''+id_asignatura+'\''
+        isAsociacion='\''+idAsociacion+'\''
+
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='select id, nombre, apellidos, dni from Alumno where id in (select id_alumno from Matricula where id_clase ='+id_clase+'and id_asignatura ='+id_asignatura+')'
+        query='SELECT nombre, apellidos, id_alumno from Alumno where id_alumno IN (select id_alumno from Matricula where id_asociacion='+idAsociacion+');'
+
+        if v:
+            print query
+
         try:
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
@@ -293,7 +301,9 @@ class GestorAsociaciones:
             lista = []
             while row is not None:
                 alumno = Alumno()
-                alumno.dni=row[2]
+                alumno.nombre=row[0]
+                alumno.apellidos=row[1]
+                alumno.id=row[2]
                 lista.append(alumno)
                 row = cursor.fetchone()
 
@@ -304,10 +314,10 @@ class GestorAsociaciones:
             db.close()
 
     @classmethod
-    def getProfesores(self, id_asignatura, id_Clase):
+    def getProfesores(self, idAsociacion):
         '''
-        Devuelve todos los profesores que imparte esa asignatura a ese grupo
-        Devuelve nombre, apellidos y dni
+        Devuelve todos los profesores que imparte esa asignatura a esa asociacion Asignatura-Clase (Frances-1AESO)
+        Devuelve nombre, apellidos e id.
         '''
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
@@ -317,10 +327,11 @@ class GestorAsociaciones:
         cursor.execute(mysql_query)
         #-----------------------------#
 
-        id_clase='\''+id_clase+'\''
-        id_asignatura='\''+id_asignatura+'\''
+        idAsociacion='\''+idAsociacion+'\''
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT nombre, apellidos, dni from Profesor where dni in (select id_profesor from Imparte where id_clase='+id_clase+'and id_asignatura='+id_asignatura+')'
+
+        query=' select nombre, apellidos, id_profesor from Profesor where id_profesor IN (select id_profesor from Imparte where id_asociacion='+idAsociacion+');'
+
         try:
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
@@ -337,7 +348,9 @@ class GestorAsociaciones:
             lista = []
             while row is not None:
                 profesor = Profesor()
-                profesor.dni=row[2]
+                profesor.nombre=row[0];
+                profesor.apellidos=row[1];
+                profesor.id=row[2];
                 lista.append(profesor)
                 row = cursor.fetchone()
 

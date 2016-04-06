@@ -24,18 +24,23 @@ Diseño de la vista de la pestaña de detalles del estudiante.
       <!--Botón que abre un menú que pide la confirmación de la eliminación del alumno -->
       <a class="uk-icon-trash uk-icon-hover uk-icon-medium "  id="openModal" ></a>
 
-      <!--Definición del mensaje que se muestra -->
-      <div id="Modal" class="uk-modal" aria-hidden="true">
-        <div class="uk-modal-dialog uk-modal-dialog">
-          ¿Está seguro de quere eliminar la asignatura?
-          <hr>
-          <!-- LA implementación de la acción asociada al botón puede estar en el script incluido abajo o
-          en el propio app.js para poder usar el scope.-->
-          <button id="DelButton" ng-click="delClase()" class="uk-button uk-button-danger">Eliminar</button>
-          <button id="CancelButton" class="uk-button uk-button-success">Cancel</button>
+      <!--DISEÑO DEL MODAL -->
 
-        </div>
-      </div>
+          <!--Definición del mensaje que se muestra -->
+          <div id="Modal" class="uk-modal" aria-hidden="true">
+            <div class="uk-modal-dialog uk-modal-dialog">
+              ¿Está seguro de quere eliminar la clase?
+              <hr>
+              <!-- LA implementación de la acción asociada al botón puede estar en el script incluido abajo o
+              en el propio app.js para poder usar el scope.-->
+              <button id="DelButton" ng-click="delClase()" class="uk-button uk-button-danger">Eliminar</button>
+              <button id="CancelButton" class="uk-button uk-button-success">Cancel</button>
+
+            </div>
+          </div>
+
+      <!--Fin DISEÑO MODAL -->
+
       <!--Inclusión del fichero donde se implementa la lógica en JavaScript del modal -->
       <script src="js/especiales/modalEliminacionUsuario.js"></script>
 
@@ -52,10 +57,10 @@ Diseño de la vista de la pestaña de detalles del estudiante.
     <!--Añadimos la interactividad con JavaScript -->
     <script type="text/javascript" src="app/js/components/accordion.min.js"></script>
 
-    <!--Definimos el acordeon de las secicones menores -->
+    <!-- Definimos el acordeon de las secicones menores -->
     <div class="uk-accordion" data-uk-accordion="{collapse:false, showfirst:false}">
 
-        <h3 class="uk-accordion-title"><i class="uk-icon-book uk-icon-medium"></i> Datos académicos </a></h3>
+        <h3 class="uk-accordion-title"><i class="uk-icon-book uk-icon-medium"></i>General</a></h3>
         <div class="uk-accordion-content">
 
           <div class="uk-grid">
@@ -91,7 +96,6 @@ Diseño de la vista de la pestaña de detalles del estudiante.
                 <li ng-show="!asignaturas.length"><p class="uk-text-muted">Aún no hay asignaturas inscritas en esa clase.</p></li>
                 <li ng-repeat="asignatura in asignaturas">
                   <a ui-sref="asignaturas.detalles-asignatura({ asignaturaID: asignatura.id })">{{ asignatura.nombre }}</a>
-                  <a>{{ asignatura.nombre}}</a>
                 </li>
 
             </div>
@@ -108,6 +112,73 @@ Diseño de la vista de la pestaña de detalles del estudiante.
         <h3 class="uk-accordion-title">Title 3</h3>
         <div class="uk-accordion-content">content three</div>
         -->
+    </div>
+
+    <!-- Definición de la sección de gestión -->
+    <div class="uk-accordion" data-uk-accordion="{collapse:false, showfirst:false}">
+
+        <h3 class="uk-accordion-title"><i class="uk-icon-cog uk-icon-medium"></i>Específico</a></h3>
+        <div class="uk-accordion-content">
+
+
+          <ul ng-repeat="asociacion in asociaciones">
+
+              <h4><strong>{{ asociacion.nombreAsignatura}}</strong> (1AESO)</h4>
+              <hr>
+
+              <p>Profesores</p>
+              <hr>
+              <ul ng-repeat="profesor in asociacion.listaProfesores" style="list-style: none;">
+                 <li>{{profesor.nombre}} {{profesor.apellidos}}</li>
+              </ul>
+
+              <p>Estudiantes</p>
+              <hr>
+              <ul ng-repeat="alumno in asociacion.listaAlumnos" style="list-style: none;">
+                 <li>{{alumno.nombre}} {{alumno.apellidos}}</li>
+              </ul>
+
+          </ul>
+
+
+
+          <!--Botón que abre un menú para añadir una especificación de una asignatura a esta clase -->
+          <a style="none;"  data-uk-modal="{target:'#modal'}" ng-click="cargarAsignaturas()"><i style="color: green;" class="uk-icon-plus uk-icon-medium"></i>  Añadir asignatura</a>
+
+           <!--Creamos el modal y lo asociamos a un controlador para que sea quien carge las asignaturas -->
+           <div id="modal" class="uk-modal">
+             <div class="uk-modal-dialog">
+
+                      <button type="button" class="uk-modal-close uk-close"></button>
+
+                      <!--CABECERA-->
+                      <div class="uk-modal-header">
+                          <h2>Asignaturas disponibles</h2>
+                      </div>
+
+                      <!--CUERPO-->
+                      <p>Seleccione una asignatura que desee que se imparta en {{clase.curso}}   {{clase.grupo}}   {{clase.nivel}}</p>
+                      <!--Creamos un formulario desde donde extraeremos la información y especificamos la función que responderá a el. -->
+                      <form class="uk-form" name="formSeleccionAsignatura" ng-submit="asociar()" >
+                        <li ng-repeat="asignatura in asignaturas">
+                          <label><input type="checkbox" ng-model="asignatura.selected" value="{{asignatura.id}}"> {{ asignatura.nombre }}</label>
+                        </li>
+
+                      <!--PIE-->
+                      <div class="uk-modal-footer uk-text-right">
+                          <button type="button" class="uk-button uk-modal-close">Cancelar</button>
+                          <button type="submit"  type="button" class="uk-button uk-button-primary">Asociar</button>
+                          <!--ng-click="asociar(clase.id)"-->
+                      </div>
+
+                      </form>
+             </div>
+           </div>
+
+
+
+        </div>
+
     </div>
 
 </div>
