@@ -123,14 +123,50 @@ Diseño de la vista de la pestaña de detalles del estudiante.
 
           <ul ng-repeat="asociacion in asociaciones">
 
-              <h4><strong>{{ asociacion.nombreAsignatura}}</strong> (1AESO)</h4>
+              <h4><strong>{{ asociacion.nombreAsignatura}}</strong> (1AESO)</h4>              
               <hr>
 
               <p>Profesores</p>
+
               <hr>
               <ul ng-repeat="profesor in asociacion.listaProfesores" style="list-style: none;">
                  <li>{{profesor.nombre}} {{profesor.apellidos}}</li>
               </ul>
+
+              <!--Botón de apertura del modal para añadir un nuevo profesor a esta asociación.-->
+              <a style="none;"  data-uk-modal="{target:'#modalProfesores'}" ng-click="cargarProfesores(asociacion.idAsociacion)" class="uk-margin-large-left"><i style="color: purple;" class="uk-icon-plus uk-icon"></i></a>
+              <!--Definición del modal que añade profesor a esta especificación de una asignatura a una clase -->
+                 <div id="modalProfesores" class="uk-modal">
+                   <div class="uk-modal-dialog">
+
+                            <button type="button" class="uk-modal-close uk-close"></button>
+
+                            <!--CABECERA-->
+                            <div class="uk-modal-header">
+                                <h2>Profesores disponibles</h2>
+                            </div>
+
+                            <!--CUERPO-->
+                            <p>Seleccione una profesore que desee que imparta {{asociacion.nombreAsignatura}} en {{clase.curso}}   {{clase.grupo}}   {{clase.nivel}}</p>
+                            <!--Creamos un formulario desde donde extraeremos la información y especificamos la función que responderá a el. -->
+                            <form class="uk-form" name="formSeleccionProfesor" ng-submit="asignar()" >
+                              <li ng-repeat="profesor in profesores">
+                                <label><input type="checkbox" ng-model="profesor.selected" value="{{profesor.id}}"> {{ profesor.nombre }} {{profesor.apellidos}}</label>
+                              </li>
+
+
+                            <!--PIE-->
+                            <div class="uk-modal-footer uk-text-right">
+                                <button type="button" class="uk-button uk-modal-close">Cancelar</button>
+                                <button type="submit"  type="button" class="uk-button uk-button-primary">Asignar</button>
+                                <!--ng-click="asociar(clase.id)"-->
+                            </div>
+
+                            </form>
+                   </div>
+                 </div>
+              <!-- Fin de la definición -->
+
 
               <p>Estudiantes</p>
               <hr>

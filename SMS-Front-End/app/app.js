@@ -1177,9 +1177,7 @@ routerApp.controller('ControladorNuevaClase', function ($scope){
 
 routerApp.controller('ControladorDetallesClase', function($location, $scope, $stateParams){
 
-
-  //Implementación de la acción del botón delAsignatura
-
+  //Función que pide al gateway la lista de todas la asignaturas del sistema.
   $scope.cargarAsignaturas = function(){
     console.log("llamada a cargarAsignaturas");
     gapi.client.helloworld.asignaturas.getAsignaturas().execute(function(resp){
@@ -1190,8 +1188,9 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
     });
   };
 
-  $scope.asociar = function(claseID){
-    console.log('Llamada a submitForm()');
+  //Función que asocia una o varias asignaturas a una clase concreta ( como Francés e Inglés a 1AESO)
+  $scope.asociar = function(){
+    console.log('Llamada a asociar()');
     asignaturasSeleccionadas = [];
     //Recogemos las selecciones y las introducimos en un vector.
     angular.forEach($scope.asignaturas, function(asignatura){
@@ -1200,10 +1199,56 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
     //Mostramos las asignaturas que han sido seleccionadas
     console.log('Asignaturas seleccionadas');
     console.log(asignaturasSeleccionadas);
-    console.log('Para la clase');
-    console.log($scope.clase.id);
-  }
+    console.log('Para la clase con id: '+$scope.clase.id);
 
+    //Recorremos todas las asignaturas seleccionadas y las asociamos a esta clase como una especificación de cada asignatura.
+    for(var i=0; i<asignaturasSeleccionadas.length; i++){
+      gapi.client.helloworld.asociaciones.insertaAsociacion({'id_clase':$scope.clase.id, 'id_asignatura':asignaturasSeleccionadas[i]}).execute(function(resp){
+        console.log('llamando a insertarAsociacion');
+        console.log(resp.message);
+      });
+    }
+  };
+
+  //Función que pide al gateway la lista de todos los profesores del sistema.
+  $scope.cargarProfesores = function(param){
+    console.log('llamada a cargarProfesores y seteo del param idAsociacion: '+param);
+    $scope.idAsociacion=param;
+    gapi.client.helloworld.profesores.getProfesores().execute(function(resp){
+      console.log('Petición al API Gateway de la lista de todos los profesores');
+      console.log(resp.profesores);
+      $scope.profesores = resp.profesores;
+      $scope.$apply();
+    });
+  };
+
+  /*Función que asigna un profesor a una asociación (asignatura-clase). para que imparta una especificación de una asignatura en concreto en una clase concreta
+  como Literatura a 3ºB-ESO */
+  $scope.asignar = function(){
+    console.log('Llamada a asignar()');
+
+    console.log('Obtención valor idAsociacion: '+$scope.idAsociacion);
+
+    profesoresSeleccionados = [];
+    //Recogemos las selecciones y las introducimos en un vector.
+    angular.forEach($scope.profesores, function(profesor){
+      if (!!profesor.selected) profesoresSeleccionados.push(profesor.id);
+    })
+    //Mostramos las profesor que han sido seleccionadas
+    console.log('Profesores seleccionados');
+    console.log(profesoresSeleccionados);
+    console.log('Para la asociacion con id: '+$scope.idAsociacion);
+
+
+    //Recorremos todas las profesor seleccionadas y las asociamos a esta clase como una especificación de cada asignatura.
+    for(var i=0; i<profesoresSeleccionados.length; i++){
+      gapi.client.helloworld.impartes.insertarImparte({'id_asociacion':$scope.idAsociacion, 'id_profesor':profesoresSeleccionados[i]}).execute(function(resp){
+        console.log('llamando a insertarImparte');
+        console.log(resp.message);
+      });
+    }
+
+  };
 
   //Implementación de la acción del botón delAsignatura
   $scope.delClase = function(){
@@ -1251,7 +1296,7 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
 
   //Pedimos al Gateway toda la informaicón de la clase.
   gapi.client.helloworld.clases.getClase({'id':$stateParams.claseID}).execute(function(resp) {
-    console.log("Petición al API Gateway de alumnos matriculados en la clase con ID:  "+$stateParams.claseID);
+    console.log("Petición al API Gateway de información de la clase con ID:  "+$stateParams.claseID);
     console.log(resp);
     $scope.clase = resp;
     console.log(resp.clase);
@@ -1303,13 +1348,14 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
   //Creamos un array donde guardamos todos los bloques de información que nos vengan
   var listaAsociacionesCompleta = new Array();
 
-  //Pedimos todas las asociaciones (especificaciones) de la clase y toda la información de cada una.
+  //Pedimos todas las asociaciones (especificaciones de asignaturas) que se dan para  la clase y toda la información de cada una.
   gapi.client.helloworld.clases.getAsociacionesClase({'id':$stateParams.claseID}).execute(function(resp){
     console.log("Petición al API Gateway de las asociaciones (especificaciones) de la asignaturas que se imparten en esta clase");
 
-    //Guardamos la respuesta
+    //Guardamos la respuesta.
     listaAsociaciones = resp.asociaciones;
 
+    //Una asociación es asignatura en clase. (inglés en 1ºABach)
 
     //Ahora por cada asociación que tenga esta clase vamos a pedir todos sus datos:
     for(var i=0; i<listaAsociaciones.length; i++){

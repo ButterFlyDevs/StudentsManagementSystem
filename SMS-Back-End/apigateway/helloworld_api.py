@@ -156,6 +156,7 @@ class AsociacionCompleta(messages.Message):
     nombreAsignatura = messages.StringField(1)
     listaProfesores = messages.MessageField(Profesor, 2, repeated=True)
     listaAlumnos = messages.MessageField(Alumno, 3, repeated=True)
+    idAsociacion = messages.StringField(4)
 
 
 #Decorador que establace nombre y versión de la api
@@ -1031,7 +1032,7 @@ class HelloWorldApi(remote.Service):
         asignaturasItems= []
         #Que rellenamos con todo los asignaturas de la listaProfesores
         for asignatura in listaAsignaturas:
-            asignaturasItems.append(Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ))
+            asignaturasItems.append(Asignatura( id=str(asignatura.get('id')), nombre=asignatura.get('nombre').encode('utf-8').decode('utf-8') ))
 
         #Los adaptamos al tipo de mensaje y enviamos
         #return Greeting(message=str(result.content))
@@ -1659,7 +1660,7 @@ class HelloWorldApi(remote.Service):
         print listaAsignaturas
         asignaturasItems= []
         for asignatura in listaAsignaturas:
-            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
+            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=asignatura.get('nombre').encode('utf-8').decode('utf-8') ) )
         return ListaAsignaturas(asignaturas=asignaturasItems)
 
     @endpoints.method(ID, ListaAsociaciones, path='clases/getAsociacionesClase', http_method='GET', name='clases.getAsociacionesClase')
@@ -1681,7 +1682,7 @@ class HelloWorldApi(remote.Service):
         listaAS= []
 
         for a in listaAsociaciones:
-            listaAS.append( Asociacion( id_asociacion=str(a.get('id')), id_clase=str(a.get('idClase')), id_asignatura=str(a.get('idAsignatura')), nombreAsignatura=str(a.get('nombreAsignatura')) ) )
+            listaAS.append( Asociacion( id_asociacion=str(a.get('id')), id_clase=str(a.get('idClase')), id_asignatura=str(a.get('idAsignatura')), nombreAsignatura=a.get('nombreAsignatura').encode('utf-8').decode('utf-8') ) )
         return ListaAsociaciones(asociaciones=listaAS)
 
     ##############################################
@@ -1864,7 +1865,7 @@ class HelloWorldApi(remote.Service):
         '''
         Introduce una relación Imparte (un procesor que imaparte una asignatura en una clase).
         Ejemplo de llamada en terminal:
-        curl -i -d "id_profesor=2&id_asignatura=1&id_clase=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/impartes/insertarImparte
+        curl -i -d "id_asociacion=1&id_profesor=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/impartes/insertarImparte
         '''
 
         if v:
@@ -1875,7 +1876,7 @@ class HelloWorldApi(remote.Service):
             print '\n'
 
         #Si no tenemos todos los atributos entonces enviamos un error de bad request.
-        if request.id_profesor==None or request.id_asignatura==None or request.id_clase==None:
+        if request.id_profesor==None or request.id_asociacion==None:
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
@@ -1887,8 +1888,7 @@ class HelloWorldApi(remote.Service):
         #Extraemos lo datos de la petición al endpoints
         form_fields = {
           "id_profesor": request.id_profesor,
-          "id_asignatura": request.id_asignatura,
-          "id_clase": request.id_clase,
+          "id_asociacion": request.id_asociacion,
         }
 
         if v:
@@ -2127,7 +2127,7 @@ class HelloWorldApi(remote.Service):
         for alumno in iac['alumnosAsociacion']:
             alumnos.append(Alumno( nombre=alumno.get('nombre').encode('utf-8').decode('utf-8'), apellidos=alumno.get('apellidos').encode('utf-8').decode('utf-8'), id=str(alumno.get('id'))))
 
-        return AsociacionCompleta( nombreAsignatura=str(iac['nombreAsignatura']), listaProfesores=profesores, listaAlumnos=alumnos)
+        return AsociacionCompleta( nombreAsignatura=str(iac['nombreAsignatura']), listaProfesores=profesores, listaAlumnos=alumnos, idAsociacion=request.id)
 
 
 

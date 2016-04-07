@@ -594,12 +594,12 @@ def getImpartes():
     return jsonpickle.encode(GestorImpartes.getImpartes())
 
 @app.route('/impartes',methods=['POST'])
-def postImparte():
+def insertarImparte():
     '''
-    Inserta una nueva relación imparte en el sistema.
-    curl -d "id_profesor=1&id_asignatura=2&id_clase=2" -i -X POST localhost:8002/impartes
+    Inserta una nueva relación imparte en el sistema, un profesor que imparte clase en una asocaición asignatura-clase, ejempo; Juan -> Lengua-4ºC-ESO
+    curl -d "id_asociacion=2&id_profesor=1" -i -X POST localhost:8002/impartes
     '''
-    salida = GestorImpartes.nuevoImparte(request.form['id_clase'], request.form['id_asignatura'], request.form['id_profesor'])
+    salida = GestorImpartes.nuevoImparte(request.form['id_asociacion'], request.form['id_profesor'])
     if salida == 'OK':
         return 'OK'
     else:

@@ -108,7 +108,10 @@ CREATE TABLE Imparte(
   FOREIGN KEY (id_profesor) REFERENCES Profesor(id_profesor),
 
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (id_imparte)
+  PRIMARY KEY (id_imparte),
+
+  #Especificamos que la formación id_asociacion, id_profesor) com par no pueda repetirse:
+  UNIQUE (id_asociacion, id_profesor)
 
 );
 

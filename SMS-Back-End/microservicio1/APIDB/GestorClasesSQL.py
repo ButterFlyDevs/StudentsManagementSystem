@@ -386,7 +386,7 @@ class GestorClases:
         contabilizar esos repetidos, usamos esta orden.
         '''
         #query='SELECT id_alumno, nombre, apellidos FROM Alumno where id_alumno in (select distinct id_alumno from Matricula where id_clase='+idClase+')'
-        query= 'select id_alumno, nombre, apellidos from Alumno where id_alumno IN (select id_alumno from Matricula where id_asociacion = (select id_asociacion from Asocia where id_clase='+idClase+'));'
+        query= 'select id_alumno, nombre, apellidos from Alumno where id_alumno IN (select id_alumno from Matricula where id_asociacion IN (select id_asociacion from Asocia where id_clase='+idClase+'));'
         if v:
             print '\n'+query
         cursor.execute(query)
