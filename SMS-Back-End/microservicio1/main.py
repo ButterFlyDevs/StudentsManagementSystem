@@ -557,9 +557,9 @@ def getMatriculas():
 def postMatricula():
     '''
     Inserta una nueva matricula en el sistema.
-    curl -d "id_alumno=1&id_asignatura=2&id_clase=2" -i -X POST localhost:8002/matriculas
+    curl -d "id_alumno=1&id_asociacion=2" -i -X POST localhost:8002/matriculas
     '''
-    salida = GestorMatriculas.nuevaMatricula(request.form['id_alumno'], request.form['id_asignatura'], request.form['id_clase'])
+    salida = GestorMatriculas.nuevaMatricula(request.form['id_alumno'], request.form['id_asociacion'])
     if salida == 'OK':
         return 'OK'
     else:

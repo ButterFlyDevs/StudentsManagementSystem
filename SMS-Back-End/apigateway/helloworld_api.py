@@ -1732,7 +1732,7 @@ class HelloWorldApi(remote.Service):
         Introduce una nueva clase en el sistema.
 
         Ejemplo de llamada en terminal:
-        curl -i -d "id_alumno=2&id_asignatura=1&id_clase=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/matriculas/insertarMatricula
+        curl -i -d "id_alumno=2&id_asociacion=2" -X POST -G localhost:8001/_ah/api/helloworld/v1/matriculas/insertarMatricula
         '''
 
         if v:
@@ -1743,7 +1743,7 @@ class HelloWorldApi(remote.Service):
             print '\n'
 
         #Si no tenemos todos los atributos entonces enviamos un error de bad request.
-        if request.id_alumno==None or request.id_asignatura==None or request.id_clase==None:
+        if request.id_alumno==None or request.id_asociacion==None:
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
@@ -1755,8 +1755,7 @@ class HelloWorldApi(remote.Service):
         #Extraemos lo datos de la petición al endpoints
         form_fields = {
           "id_alumno": request.id_alumno,
-          "id_asignatura": request.id_asignatura,
-          "id_clase": request.id_clase,
+          "id_asociacion": request.id_asociacion
         }
 
         if v:

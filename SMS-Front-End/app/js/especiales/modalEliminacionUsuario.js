@@ -12,7 +12,7 @@ $('#openModal').on(eventHandlerType, function(e) {
 });
 
 $('#DelButton').on(eventHandlerType, function(e) {
-  console.log("Eliminación en modalEliminacionUsuario.")
+  console.log("Eliminación en modalEliminacionClase.")
   e.preventDefault();
   //Oculta el modal
   modal.hide();

@@ -1175,7 +1175,7 @@ routerApp.controller('ControladorNuevaClase', function ($scope){
   };
 });
 
-routerApp.controller('ControladorDetallesClase', function($location, $scope, $stateParams){
+routerApp.controller('ControladorDetallesClase', function($location, $scope, $stateParams, $window){
 
   //Función que pide al gateway la lista de todas la asignaturas del sistema.
   $scope.cargarAsignaturas = function(){
@@ -1201,12 +1201,28 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
     console.log(asignaturasSeleccionadas);
     console.log('Para la clase con id: '+$scope.clase.id);
 
+    var salidaEjecucionCorrecta = true;
+
     //Recorremos todas las asignaturas seleccionadas y las asociamos a esta clase como una especificación de cada asignatura.
     for(var i=0; i<asignaturasSeleccionadas.length; i++){
       gapi.client.helloworld.asociaciones.insertaAsociacion({'id_clase':$scope.clase.id, 'id_asignatura':asignaturasSeleccionadas[i]}).execute(function(resp){
         console.log('llamando a insertarAsociacion');
         console.log(resp.message);
+        if (resp.message!= 'OK'){
+          salidaEjecucionCorrecta = false;
+        }
+        console.log('Var de control salidaEjecucionCorrecta: '+salidaEjecucionCorrecta);
       });
+    }
+
+    if (salidaEjecucionCorrecta){
+      /*
+      Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+      de este componente, esto lo hcemos en la plantilla (html)
+      */
+      $.UIkit.notify("Asignatura añadida con éxito.", {status:'success'});
+    }else{
+      $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
     }
   };
 
@@ -1221,6 +1237,19 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
       $scope.$apply();
     });
   };
+
+  $scope.cargarAlumnos = function(param){
+    console.log('llamada a cargarAlumnos');
+    //Hacemos lo mismo que con los profesores
+    $scope.idAsociacion=param;
+    gapi.client.helloworld.alumnos.getAlumnos().execute(function(resp){
+        console.log('Petición al API Gateway de la lista de todos los alumnos');
+        console.log(resp.alumnos);
+        $scope.alumnos = resp.alumnos;
+        $scope.$apply();
+    });
+  };
+
 
   /*Función que asigna un profesor a una asociación (asignatura-clase). para que imparta una especificación de una asignatura en concreto en una clase concreta
   como Literatura a 3ºB-ESO */
@@ -1239,27 +1268,87 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
     console.log(profesoresSeleccionados);
     console.log('Para la asociacion con id: '+$scope.idAsociacion);
 
+    var salidaEjecucionCorrecta = true;
 
     //Recorremos todas las profesor seleccionadas y las asociamos a esta clase como una especificación de cada asignatura.
     for(var i=0; i<profesoresSeleccionados.length; i++){
       gapi.client.helloworld.impartes.insertarImparte({'id_asociacion':$scope.idAsociacion, 'id_profesor':profesoresSeleccionados[i]}).execute(function(resp){
         console.log('llamando a insertarImparte');
         console.log(resp.message);
+        if (resp.message!= 'OK'){
+          salidaEjecucionCorrecta = false;
+        }
+        console.log('Var de control salidaEjecucionCorrecta: '+salidaEjecucionCorrecta);
+
       });
     }
 
+
+
+    if (salidaEjecucionCorrecta){
+      /*
+      Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+      de este componente, esto lo hcemos en la plantilla (html)
+      */
+      $.UIkit.notify("Asignación realizada con éxito.", {status:'success'});
+    }else{
+      $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+    }
+
+
+    //Antes de terminar recargamos la página:
+    /*
+    Ahora mismo lo que hace es recargar toda la aplicación, pero lo que queremos es que recarge solo la página en la que estamos con este
+    controlador.
+    */
+    $window.location.reload();
+
+
+
   };
 
+
+  $scope.matricular = function(){
+    console.log('Llamada a matricular()');
+
+    console.log('Asociacion: '+$scope.idAsociacion);
+
+    /*El procedimiento es el mismo que se hace con los profesores en asignar, recorrer la lista de los seleccionados y
+    llamar a la api tantas veces como profesores tengamos.
+    */
+
+    alumnosSeleccionados = [];
+    //Recogemos las selecciones y las introducimos en un vector.
+    angular.forEach($scope.alumnos, function(alumno){
+      if (!!alumno.selected) alumnosSeleccionados.push(alumno.id);
+    })
+    //Mostramos las profesor que han sido seleccionadas
+    console.log('Alumnos seleccionados');
+    console.log(alumnosSeleccionados);
+    console.log('Para la asociacion con id: '+$scope.idAsociacion);
+
+
+    //Recorremos todas las profesor seleccionadas y las asociamos a esta clase como una especificación de cada asignatura.
+    for(var i=0; i<alumnosSeleccionados.length; i++){
+      gapi.client.helloworld.matriculas.insertarMatricula({'id_asociacion':$scope.idAsociacion, 'id_alumno':alumnosSeleccionados[i]}).execute(function(resp){
+        console.log('llamando a insertarMatricula');
+        console.log(resp.message);
+      });
+    }
+
+  }
+
+
   //Implementación de la acción del botón delAsignatura
-  $scope.delClase = function(){
-    console.log("Pulsada confirmación eliminación clase con id: "+$stateParams.asignaturaID)
+  $scope.delClase = function(clase){
+    console.log("Pulsada confirmación eliminación clase con id: "+clase.id)
 
     var ROOT = 'http://localhost:8001/_ah/api';
     gapi.client.load('helloworld', 'v1', null, ROOT);
 
     gapi.client.helloworld.clases.delClase({'id':$stateParams.claseID}).execute(function(resp){
       //Mostramos por consola la respuesta del servidor
-      console.log("llamando a delAsignatura");
+      console.log("llamando a delClase");
       console.log(resp.message);
       $scope.respuesta=resp.message;
 
@@ -1270,7 +1359,7 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
         Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
         de este componente, esto lo hcemos en la plantilla (html)
         */
-        $.UIkit.notify("Asignatura eliminado con éxito.", {status:'success'});
+        $.UIkit.notify("Clase eliminado con éxito.", {status:'success'});
       }else{
         $.UIkit.notify("\""+resp.message+"\"", {status:'warning'});
       }
