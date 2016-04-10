@@ -18,7 +18,7 @@ def aprovisiona():
     #Insertamos 6 alumnos, cada insercción genera un id (unívco) para cada alumno.
     #Cabecera: nuevoAlumno(self,nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL')
     #id 1
-    GestorAlumnos.nuevoAlumno('Rocio', 'Prida Ruíz', '99999999', 'C/ Ramón y Cajal Bloque 9. 2ºA', 'Albolote', 'Granada', '1800-03-23', '677112233')
+    GestorAlumnos.nuevoAlumno('Rocío', 'Prida Ruíz', '99999999', 'C/ Ramon y Cajal Bloque 9. 2ºA', 'Albolote', 'Granada', '1800-03-23', '677112233')
     #id 2
     GestorAlumnos.nuevoAlumno('Eduardo', 'Martín Fernández', '12345678', 'C/ Ramón y Cajal Bloque 9. 2ºA', 'Albolote', 'Granada', '1800-03-23', '677262625')
     #id 3

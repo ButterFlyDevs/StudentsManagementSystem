@@ -37,7 +37,7 @@ class GestorAsignaturas:
 
         query='INSERT INTO Asignatura VALUES(NULL'+','+nombre+');'
         if v:
-            print '\n'+query
+            print '\n'+query.encode('utf-8')
         cursor = db.cursor()
         salida =''
         '''
@@ -113,6 +113,10 @@ class GestorAsignaturas:
         if v:
             print '\n'+query
         try:
+            #Sacando los acentos...........
+            mysql_query="SET NAMES 'utf8'"
+            cursor.execute(mysql_query)
+            #-----------------------------#
             salida = cursor.execute(query);
             row = cursor.fetchone()
         except MySQLdb.Error, e:

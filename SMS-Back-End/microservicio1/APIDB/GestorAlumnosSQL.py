@@ -41,6 +41,7 @@ class GestorAlumnos:
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Alumno values("+"'"+nombre+"', "+ "'"+dni+"');"
 
+
         #Añadimos al principio y al final una comilla simple a todos los elementos que no sean NULL(si lo son no queremos ponerle dos '' )
         nombre='\''+nombre+'\''
         if(apellidos!='NULL'):
@@ -69,6 +70,8 @@ class GestorAlumnos:
 
         query="INSERT INTO Alumno VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
 
+        print query;
+
         if v:
             print apiName
             print "nuevoAlumno()"
@@ -81,6 +84,10 @@ class GestorAlumnos:
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
         try:
+            #Seteando los acentos.........#
+            mysql_query="SET NAMES 'utf8'"
+            cursor.execute(mysql_query)
+            #-----------------------------#
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
             # Get data from database
@@ -134,13 +141,13 @@ class GestorAlumnos:
             lista.append(alumno)
             #print row[0], row[1]
             row = cursor.fetchone()
+            print 'Nombre alumno: '+alumno.nombre
 
         cursor.close()
         db.close()
 
         return lista
 
-        #Una de las opciones es convertirlo en un objeto y devolverlo
 
     @classmethod
     def getAlumno(self, idAlumno):
@@ -155,8 +162,15 @@ class GestorAlumnos:
         cursor = db.cursor()
         idAlumno='\''+idAlumno+'\''
         query='select * from Alumno where id_alumno='+idAlumno+';'
+        if v:
+            print 'Query in GestorAlumnosSQL.getAlumno()'
+            print query
 
         try:
+            #Sacando los acentos...........
+            mysql_query="SET NAMES 'utf8'"
+            cursor.execute(mysql_query)
+            #-----------------------------#
             salida = cursor.execute(query);
             row = cursor.fetchone()
         except MySQLdb.Error, e:
@@ -184,6 +198,8 @@ class GestorAlumnos:
             alm.provincia=row[6]
             alm.fecha_nacimiento=row[7]
             alm.telefono=row[8]
+
+            print 'Nombre alumno: '+alm.nombre
 
             return alm
         if salida==0:

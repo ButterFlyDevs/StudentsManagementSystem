@@ -99,7 +99,8 @@ def getAlumno(id_alumno):
         #Enviamos el error de NotFound
         abort(404)
     else:
-        return jsonpickle.encode(GestorAlumnos.getAlumno(id_alumno), unpicklable=False)
+        #return jsonpickle.encode(GestorAlumnos.getAlumno(id_alumno), unpicklable=False)
+        return jsonpickle.encode(salida, unpicklable=False)
 
 @app.route('/alumnos/<string:id_alumno>',methods=['POST'])
 def modAlumno(id_alumno):
@@ -249,7 +250,7 @@ def getProfesor(id_profesor):
         #Enviamos el error de NotFound
         abort(404)
     else:
-        return jsonpickle.encode(GestorProfesores.getProfesor(id_profesor))
+        return jsonpickle.encode(GestorProfesores.getProfesor(id_profesor), unpicklable=False)
 
 @app.route('/profesores/<string:id_profesor>',methods=['POST'])
 def modProfesorCompleto(id_profesor):

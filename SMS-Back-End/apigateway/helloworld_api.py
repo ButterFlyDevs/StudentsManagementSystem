@@ -40,8 +40,14 @@ ANDROID_AUDIENCE = WEB_CLIENT_ID
 
 package = 'Hello'
 
+def formatText(cadena):
+    '''
+    Función que recibe una cadena como parámetro y la formatea para resolver el problema de los acentos.
+    '''
+    return cadena.encode('utf-8').decode('utf-8')
 
-
+def formatTextInput(cadena):
+    return cadena.encode('utf-8')
 
 class MensajeRespuesta(messages.Message):
     message = messages.StringField(1)
@@ -235,12 +241,10 @@ class HelloWorldApi(remote.Service):
 
         for alumno in listaAlumnos:
             idAlumno = str(alumno.get('id'))
-            nombreAlumno = alumno.get('nombre').encode('utf-8')
-            apellidosAlumno = alumno.get('apellidos').encode('utf-8')
-            if v:
-                print "Nombre: "+nombreAlumno
-                print "ID: "+idAlumno
-            alumnosItems.append(Alumno( id=idAlumno, nombre=nombreAlumno.decode('utf-8'), apellidos=apellidosAlumno.decode('utf-8') ) )
+            nombreAlumno = alumno.get('nombre')
+            apellidosAlumno = alumno.get('apellidos')
+
+            alumnosItems.append(Alumno( id=idAlumno, nombre=formatText(nombreAlumno), apellidos=formatText(apellidosAlumno) ) )
 
 
         #id=str(alumno.get('id')),
@@ -311,17 +315,19 @@ class HelloWorldApi(remote.Service):
             print "\nCódigo de estado: "+str(result.status_code)+'\n'
 
 
+        
+
         #Componemos un mensaje de tipo AlumnoCompleto.
         #Las partes que son enteros las pasamos a string para enviarlos como mensajes de tipo string.
         alumno = AlumnoCompleto(id=str(alumno.get('id')),
-                                nombre=alumno.get('nombre'),
+                                nombre=formatText(alumno.get('nombre')),
                                 apellidos=alumno.get('apellidos'),
                                 dni=str(alumno.get('dni')),
                                 direccion=alumno.get('direccion'),
                                 localidad=alumno.get('localidad'),
                                 provincia=alumno.get('provincia'),
                                 fecha_nacimiento=str(alumno.get('fecha_nacimiento')),
-                                telefono=str(alumno.get('telefono'))
+                                telefono=alumno.get('telefono')
                                 )
 
         return alumno
@@ -359,12 +365,12 @@ class HelloWorldApi(remote.Service):
 
         #Extraemos lo datos de la petición al endpoints
         form_fields = {
-          "nombre": request.nombre,
-          "apellidos": request.apellidos,
+          "nombre": formatTextInput(request.nombre),
+          "apellidos": formatTextInput(request.apellidos),
           "dni": request.dni,
-          "direccion": request.direccion,
-          "localidad": request.localidad,
-          "provincia": request.provincia,
+          "direccion": formatTextInput(request.direccion),
+          "localidad": formatTextInput(request.localidad),
+          "provincia": formatTextInput(request.provincia),
           "fecha_nacimiento": request.fecha_nacimiento,
           "telefono": request.telefono
         }
@@ -941,11 +947,7 @@ class HelloWorldApi(remote.Service):
         vectorAlumnos= []
         #Que rellenamos con todo los alumnos de la listaAlumnos
         for alumno in listaAlumnos:
-            vectorAlumnos.append(Alumno( nombre=alumno.get('nombre').encode('utf-8').decode('utf-8'),
-                                         apellidos=alumno.get('apellidos').encode('utf-8').decode('utf-8'),
-                                         id=str(alumno.get('id'))
-                                         )
-                                )
+            vectorAlumnos.append(Alumno( nombre=formatText(alumno.get('nombre')), apellidos=formatText(alumno.get('apellidos')), id=str(alumno.get('id'))))
 
         #Los adaptamos al tipo de mensaje y enviamos
         #return Greeting(message=str(result.content))
@@ -970,9 +972,9 @@ class HelloWorldApi(remote.Service):
         listaAsignaturas = jsonpickle.decode(result.content)
         print listaAsignaturas
         asignaturasItems= []
-        for asignatura in listaAsignaturas:            
 
-            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
+        for asignatura in listaAsignaturas:
+            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=formatText(asignatura.get('nombre')) ) )
         return ListaAsignaturas(asignaturas=asignaturasItems)
 
     @endpoints.method(ID, ListaClases, path='profesores/getClasesProfesor', http_method='GET', name='profesores.getClasesProfesor')
@@ -1033,7 +1035,7 @@ class HelloWorldApi(remote.Service):
         asignaturasItems= []
         #Que rellenamos con todo los asignaturas de la listaProfesores
         for asignatura in listaAsignaturas:
-            asignaturasItems.append(Asignatura( id=str(asignatura.get('id')), nombre=asignatura.get('nombre').encode('utf-8').decode('utf-8') ))
+            asignaturasItems.append(Asignatura( id=str(asignatura.get('id')), nombre=formatText(asignatura.get('nombre')) ))
 
         #Los adaptamos al tipo de mensaje y enviamos
         #return Greeting(message=str(result.content))
@@ -1128,10 +1130,11 @@ class HelloWorldApi(remote.Service):
 
         #Extraemos lo datos de la petición al endpoints
         form_fields = {
-          "nombre": request.nombre,
+          "nombre": request.nombre.encode('utf-8')
         }
-
         if v:
+            print 'form_fields:'
+            print form_fields
             print "Llamando a: "+url
 
 
@@ -1284,8 +1287,8 @@ class HelloWorldApi(remote.Service):
         vectorAlumnos= []
         #Que rellenamos con todo los alumnos de la listaAlumnos
         for alumno in listaAlumnos:
-            vectorAlumnos.append(Alumno( nombre=alumno.get('nombre').encode('utf-8').decode('utf-8'),
-                                         apellidos=alumno.get('apellidos').encode('utf-8').decode('utf-8'),
+            vectorAlumnos.append(Alumno( nombre=formatText(alumno.get('nombre')),
+                                         apellidos=formatText(alumno.get('apellidos')),
                                          id=str(alumno.get('id'))
                                          )
                                 )
@@ -1615,7 +1618,7 @@ class HelloWorldApi(remote.Service):
         listaAlumnos = jsonpickle.decode(result.content)
         vectorAlumnos= []
         for alumno in listaAlumnos:
-            vectorAlumnos.append(Alumno( id=str(alumno.get('id')), nombre=alumno.get('nombre').encode('utf-8').decode('utf-8'), apellidos=alumno.get('apellidos').encode('utf-8').decode('utf-8')))
+            vectorAlumnos.append(Alumno( id=str(alumno.get('id')), nombre=formatText(alumno.get('nombre')), apellidos=formatText(alumno.get('apellidos'))))
         return ListaAlumnos(alumnos=vectorAlumnos)
 
     @endpoints.method(ID, ListaProfesores, path='clases/getProfesoresClase', http_method='GET', name='clases.getProfesoresClase')
@@ -1638,7 +1641,7 @@ class HelloWorldApi(remote.Service):
         print listaProfesores
         profesoresItems= []
         for profesor in listaProfesores:
-            profesoresItems.append( Profesor( id=str(profesor.get('id')), nombre=profesor.get('nombre').encode('utf-8').decode('utf-8'), apellidos=profesor.get('apellidos').encode('utf-8').decode('utf-8') ) )
+            profesoresItems.append( Profesor( id=str(profesor.get('id')), nombre=formatText(profesor.get('nombre')), apellidos=formatText(profesor.get('apellidos')) ) )
         return ListaProfesores(profesores=profesoresItems)
 
     @endpoints.method(ID, ListaAsignaturas, path='clases/getAsignaturasClase', http_method='GET', name='clases.getAsignaturasClase')
@@ -1661,7 +1664,7 @@ class HelloWorldApi(remote.Service):
         print listaAsignaturas
         asignaturasItems= []
         for asignatura in listaAsignaturas:
-            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=asignatura.get('nombre').encode('utf-8').decode('utf-8') ) )
+            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=formatText(asignatura.get('nombre')) ) )
         return ListaAsignaturas(asignaturas=asignaturasItems)
 
     @endpoints.method(ID, ListaAsociaciones, path='clases/getAsociacionesClase', http_method='GET', name='clases.getAsociacionesClase')
@@ -1683,7 +1686,7 @@ class HelloWorldApi(remote.Service):
         listaAS= []
 
         for a in listaAsociaciones:
-            listaAS.append( Asociacion( id_asociacion=str(a.get('id')), id_clase=str(a.get('idClase')), id_asignatura=str(a.get('idAsignatura')), nombreAsignatura=a.get('nombreAsignatura').encode('utf-8').decode('utf-8') ) )
+            listaAS.append( Asociacion( id_asociacion=str(a.get('id')), id_clase=str(a.get('idClase')), id_asignatura=str(a.get('idAsignatura')), nombreAsignatura=formatText(a.get('nombreAsignatura')) ) )
         return ListaAsociaciones(asociaciones=listaAS)
 
     ##############################################
@@ -2122,10 +2125,10 @@ class HelloWorldApi(remote.Service):
 
 
         for profesor in iac['profesoresAsociacion']:
-            profesores.append(Profesor( nombre=profesor.get('nombre').encode('utf-8').decode('utf-8'), apellidos=profesor.get('apellidos').encode('utf-8').decode('utf-8'), id=str(profesor.get('id'))))
+            profesores.append(Profesor( nombre=formatText(profesor.get('nombre')), apellidos=formatText(profesor.get('apellidos')), id=str(profesor.get('id'))))
 
         for alumno in iac['alumnosAsociacion']:
-            alumnos.append(Alumno( nombre=alumno.get('nombre').encode('utf-8').decode('utf-8'), apellidos=alumno.get('apellidos').encode('utf-8').decode('utf-8'), id=str(alumno.get('id'))))
+            alumnos.append(Alumno( nombre=formatText(alumno.get('nombre')), apellidos=formatText(alumno.get('apellidos')), id=str(alumno.get('id'))))
 
         return AsociacionCompleta( nombreAsignatura=str(iac['nombreAsignatura']), listaProfesores=profesores, listaAlumnos=alumnos, idAsociacion=request.id)
 
