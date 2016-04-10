@@ -970,7 +970,8 @@ class HelloWorldApi(remote.Service):
         listaAsignaturas = jsonpickle.decode(result.content)
         print listaAsignaturas
         asignaturasItems= []
-        for asignatura in listaAsignaturas:
+        for asignatura in listaAsignaturas:            
+
             asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
         return ListaAsignaturas(asignaturas=asignaturasItems)
 
