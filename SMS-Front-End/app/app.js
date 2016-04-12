@@ -1226,6 +1226,27 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
     }
   };
 
+
+  $scope.delImparte = function(idImparte){
+    console.log('Calling delImparte with params: idImparte '+idImparte);
+
+    
+    gapi.client.helloworld.impartes.delImparte({'id':idImparte} ).execute(function(resp){
+      console.log('Peticion al API Gateway de la eliminacion de una tupla en la tabla Imparte');
+      console.log(resp.message);
+      var respuesta=resp.message;
+      if (respuesta == 'OK'){
+        $.UIkit.notify("Relacion eliminada con muchísimo éxito.", {status:'success'});
+      }else{
+        $.UIkit.notify("\""+respuesta+"\"", {status:'warning'});
+      }
+    });
+
+
+
+
+  }
+
   //Función que pide al gateway la lista de todos los profesores del sistema.
   $scope.cargarProfesores = function(param){
     console.log('llamada a cargarProfesores y seteo del param idAsociacion: '+param);

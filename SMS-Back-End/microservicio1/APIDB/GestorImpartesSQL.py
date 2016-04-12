@@ -68,7 +68,6 @@ class GestorImpartes:
             print 'Alguno de los elemento'
             return 'Alguno de los elementos no existe'
 
-
     @classmethod
     def getImpartes(self):
         '''Devuelve una lista simlifacada de todos los elementos Imparte de la tabla imparte de la bd'''
@@ -153,6 +152,37 @@ class GestorImpartes:
         cursor = db.cursor()
         id_imparte='\''+id_imparte+'\''
         query="delete from Imparte where id_imparte="+id_imparte+";"
+        if v:
+            print query
+        salida =''
+        try:
+            salida = cursor.execute(query);
+        except MySQLdb.Error, e:
+            try:
+                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                print "Error number: "+str(e.args[0])
+                salida=e.args[0]
+            except IndexError:
+                print "MySQL Error: %s" % str(e)
+
+        db.commit()
+        cursor.close()
+        db.close()
+
+        if salida==1:
+            return 'OK'
+        if salida==0:
+            return 'Elemento no encontrado'
+
+    @classmethod
+    def delImparteSinClave(self, id_asociacion, id_profesor):
+        '''Elimina una tupla imparte de la tabla Imparte usando los ides de la asociacion y del profesor,
+        se usa cuando no se tiene el id de la tupla imparte en concreto.'''
+        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        cursor = db.cursor()
+        id_asociacion='\''+id_asociacion+'\''
+        id_profesor='\''+id_profesor+'\''
+        query="DELETE FROM Imparte WHERE id_asociacion="+id_asociacion+" AND id_profesor"+id_profesor+";"
         if v:
             print query
         salida =''

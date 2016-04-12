@@ -112,6 +112,11 @@ class GestorAsociaciones:
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
         cursor = db.cursor()
 
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
+
         idAsociacion='\''+idAsociacion+'\''
 
         #Montamos un alias para poder sacar el nombre de la asignatura sin ninguna subconsulta fea.
@@ -330,7 +335,18 @@ class GestorAsociaciones:
         idAsociacion='\''+idAsociacion+'\''
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
 
-        query=' select nombre, apellidos, id_profesor from Profesor where id_profesor IN (select id_profesor from Imparte where id_asociacion='+idAsociacion+');'
+        #query=' select nombre, apellidos, id_profesor from Profesor where id_profesor IN (select id_profesor from Imparte where id_asociacion='+idAsociacion+');'
+
+        '''
+        Creamos una nueva query para que aparte de darnos los profesores que imparten clase en esa asociación nos de los identificadores de la tabla imparte
+        que relaciona estos profesores con las asociaciones, así es más fácil a la hora de eliminar por ejmplo a un profesor de una asociación hacerlo por el id
+        de la tabla imparte que es la que define esta relación.
+        '''
+        query = 'select nombre, apellidos, Profesor.id_profesor, id_imparte from (select id_profesor, id_imparte from Imparte where id_asociacion='+idAsociacion+') AS tablaImparte, Profesor where tablaImparte.id_profesor = Profesor.id_profesor;'
+
+
+        if v:
+            print 'QUERY in getProfesores: '+query
 
         try:
             salida = cursor.execute(query);
@@ -347,10 +363,11 @@ class GestorAsociaciones:
             row = cursor.fetchone()
             lista = []
             while row is not None:
-                profesor = Profesor()
-                profesor.nombre=row[0];
-                profesor.apellidos=row[1];
-                profesor.id=row[2];
+                profesor = ProfesorExtendido()
+                profesor.nombre=row[0]
+                profesor.apellidos=row[1]
+                profesor.id=row[2]
+                profesor.idImparte = row[3]
                 lista.append(profesor)
                 row = cursor.fetchone()
 

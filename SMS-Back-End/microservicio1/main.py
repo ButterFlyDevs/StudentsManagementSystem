@@ -620,6 +620,7 @@ def delImparte(id_imparte):
         return str(salida)
 
 
+
 #############################
 #   COLECCIÓN ASOCIACIONES  #
 #############################

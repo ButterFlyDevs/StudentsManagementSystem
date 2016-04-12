@@ -91,6 +91,8 @@ class Profesor(messages.Message):
     apellidos = messages.StringField(2)
     id = messages.StringField(3)
 
+
+
 class ProfesorCompleto(messages.Message):
     id = messages.StringField(1)
     nombre = messages.StringField(2)
@@ -157,10 +159,18 @@ class Asociacion(messages.Message):
 class ListaAsociaciones(messages.Message):
     asociaciones = messages.MessageField(Asociacion, 1, repeated=True)
 
+#Un nuevo tipo de mensaje para el profesor simple que añade un poco de información necesaria
+class ProfesorSimpleExtendido(messages.Message):
+    nombre = messages.StringField(1)
+    apellidos = messages.StringField(2)
+    id = messages.StringField(3)
+    idImparte = messages.StringField(4)
+
+
 #Definimos un tipo especial de mensaje
 class AsociacionCompleta(messages.Message):
     nombreAsignatura = messages.StringField(1)
-    listaProfesores = messages.MessageField(Profesor, 2, repeated=True)
+    listaProfesores = messages.MessageField(ProfesorSimpleExtendido, 2, repeated=True)
     listaAlumnos = messages.MessageField(Alumno, 3, repeated=True)
     idAsociacion = messages.StringField(4)
 
@@ -315,7 +325,7 @@ class HelloWorldApi(remote.Service):
             print "\nCódigo de estado: "+str(result.status_code)+'\n'
 
 
-        
+
 
         #Componemos un mensaje de tipo AlumnoCompleto.
         #Las partes que son enteros las pasamos a string para enviarlos como mensajes de tipo string.
@@ -2125,12 +2135,12 @@ class HelloWorldApi(remote.Service):
 
 
         for profesor in iac['profesoresAsociacion']:
-            profesores.append(Profesor( nombre=formatText(profesor.get('nombre')), apellidos=formatText(profesor.get('apellidos')), id=str(profesor.get('id'))))
+            profesores.append(ProfesorSimpleExtendido( nombre=formatText(profesor.get('nombre')), apellidos=formatText(profesor.get('apellidos')), id=str(profesor.get('id')), idImparte=str(profesor.get('idImparte')) ))
 
         for alumno in iac['alumnosAsociacion']:
             alumnos.append(Alumno( nombre=formatText(alumno.get('nombre')), apellidos=formatText(alumno.get('apellidos')), id=str(alumno.get('id'))))
 
-        return AsociacionCompleta( nombreAsignatura=str(iac['nombreAsignatura']), listaProfesores=profesores, listaAlumnos=alumnos, idAsociacion=request.id)
+        return AsociacionCompleta( nombreAsignatura=formatText(iac['nombreAsignatura']), listaProfesores=profesores, listaAlumnos=alumnos, idAsociacion=request.id)
 
 
 

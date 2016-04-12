@@ -14,3 +14,13 @@ class Profesor:
         self.provincia = ""
         self.fecha_nacimiento = ""
         self.telefono = ""
+
+
+'''
+Modelo de la entidad profesor que añade la información del id_imparte para
+cuando esa información es necesaria junto a los datos del profesor.
+'''
+class ProfesorExtendido(Profesor):
+
+    def __init__(self):
+        self.idImparte = ""
