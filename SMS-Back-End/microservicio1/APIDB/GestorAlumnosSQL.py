@@ -24,7 +24,7 @@ class GestorAlumnos:
     """
 
     @classmethod
-    def nuevoAlumno(self,nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
+    def nuevoAlumno(self,nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL', imagen='NULL'):
         """
         Introduce un nuevo alumno en la base de datos.
         El único argumento que se necesita como mínimo es el nombre.
@@ -57,6 +57,8 @@ class GestorAlumnos:
             fecha_nacimiento='\''+fecha_nacimiento+'\''
         if(telefono!='NULL'):
             telefono='\''+telefono+'\''
+        if(imagen!='NULL'):
+            imagen='\''+imagen+'\''
 
         '''
         Como en la base de datos existe un valor id para el alumno que se autoincrementa no podemos introducir los datos así:
@@ -68,7 +70,7 @@ class GestorAlumnos:
 
         #NULL por el campo id que es primary key y que se autoincrementa automat por la definición de la tabla Alumno en la BD. (ver DBCreator_v0_1.sql)
 
-        query="INSERT INTO Alumno VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
+        query="INSERT INTO Alumno VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+','+imagen+");"
 
         print query;
 
@@ -198,6 +200,7 @@ class GestorAlumnos:
             alm.provincia=row[6]
             alm.fecha_nacimiento=row[7]
             alm.telefono=row[8]
+            alm.urlImagen = row[9]
 
             print 'Nombre alumno: '+alm.nombre
 

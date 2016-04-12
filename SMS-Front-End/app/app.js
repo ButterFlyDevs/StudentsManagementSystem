@@ -195,72 +195,6 @@ de la vista y se usan).
 
 });
 
-/*
-routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
-  flowFactoryProvider.defaults = {
-    target: 'upload.php',
-    permanentErrors: [404, 500, 501],
-    maxChunkRetries: 1,
-    chunkRetryInterval: 5000,
-    simultaneousUploads: 4,
-    singleFile: true
-  };
-  flowFactoryProvider.on('catchAll', function (event) {
-    console.log('catchAll', arguments);
-  });
-  }]);
-
-*/
-
-/*
-  function subirImagen(img, nombre) {
-
-      console.log('Llamando a subirImagen() ')
-      console.log('Params: ')
-      //La imagen que recibimos (img) es un objeto de tipo file.
-      console.log(img)
-      console.log('nombre del fichero: ' + img.name)
-      console.log(nombre)
-
-
-      //Creamos un objeto de tipo FileReader()
-      var reader = new FileReader();
-
-      //Implementamos la funcion onload del reader.
-      reader.onload = function(e) {
-        var dataURL = reader.result;
-        base64 = dataURL;
-        //console.log('Sending: ' + dataURL);
-        //Quitamos parte de la información de formato que no necesita el Cloud Endpoint
-        var res = dataURL.slice(23);
-        //console.log('Sending2 : ' + res);
-
-        gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
-          //console.log("calling subirImagen with image: "+res);
-          console.log(resp);
-        });
-      }
-
-      //Llamamos a readAsDataURL
-      reader.readAsDataURL(img);
-  }
-
-  routerApp.controller('UploadCtrl', function ($scope) {
-    $scope.imageStrings = [];
-    $scope.processFiles = function(files){
-      console.log('files:'+files);
-      angular.forEach(files, function(flowFile, i){
-         var fileReader = new FileReader();
-            fileReader.onload = function (event) {
-              var uri = event.target.result;
-                $scope.imageStrings[i] = uri;
-            };
-            fileReader.readAsDataURL(flowFile.file);
-      });
-    };
-
-  });
-*/
   routerApp.controller('UploadCtrl2', function ($scope) {
 
 
@@ -279,6 +213,9 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
       console.log(e.files)
       //Llamamos a la función que sube la imagen:
       //subirImagen($scope.file, 'caca');
+
+      var urlImagenSubida="";
+
       angular.forEach(e.files, function(flowFile, i){
          var fileReader = new FileReader();
             var nombre = flowFile.file.name;
@@ -294,6 +231,7 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
                 gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
                   //console.log("calling subirImagen with image: "+res);
                   console.log(resp);
+                  urlImagenSubida=resp;
                 });
 
 
@@ -301,39 +239,11 @@ routerApp.config(['flowFactoryProvider', function (flowFactoryProvider) {
             fileReader.readAsDataURL(flowFile.file);
       });
 
+
+
+      return urlImagenSubida;
   	}
   });
-
-/*
-  routerApp.controller('controladorSubidaImagenes', ['$scope', function ($scope)
-  {
-    $scope.imageStrings = [];
-  	$scope.uploadFile = function()
-  	{
-      //Llamamos a la función que sube la imagen:
-      subirImagen($scope.file, $scope.name);
-  	}
-  }])
-
-  routerApp.directive('uploaderModel', ["$parse", function ($parse) {
-  	return {
-  		restrict: 'A',
-  		link: function (scope, iElement, iAttrs)
-  		{
-  			iElement.on("change", function(e)
-  			{
-  				$parse(iAttrs.uploaderModel).assign(scope, iElement[0].files[0]);
-  			});
-  		}
-  	};
-  }])
-*/
-
-
-
-
-
-
 
 
 
@@ -345,9 +255,61 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
   /*
   Controlador que manejará los datos del formulario enviándolos al servidor.
   */
+  function uploadFiles2(e)
+  {
+    console.log('HOla uploadFile')
+    console.log(e)
+    console.log(e.files)
+    //Llamamos a la función que sube la imagen:
+    //subirImagen($scope.file, 'caca');
 
+    var urlImagenSubida="";
+
+    angular.forEach(e.files, function(flowFile, i){
+       var fileReader = new FileReader();
+          var nombre = flowFile.file.name;
+
+          fileReader.onload = function (event) {
+            var uri = event.target.result;
+              //$scope.imageStrings[i] = uri;
+
+              var res = uri.slice(23);
+              //console.log('Sending2 : ' + res);
+
+              var urlImagenSubida;
+              //Estamos usando como nombre de la imagen el nombrel del fichero.
+
+              gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
+                //console.log("calling subirImagen with image: "+res);
+                //console.log(resp);
+                urlImagenSubida=resp.message;
+                console.log('Respuesta del servidor imagen: ');
+                console.log(urlImagenSubida);
+
+                //Una vez que se sube la imagen la subimos al usuario
+
+
+              });
+
+
+              console.log('salida¡')
+              console.log(urlImagenSubida)
+
+          };
+
+
+
+          fileReader.readAsDataURL(flowFile.file);
+    });
+
+    //setTimeout(this, 5000);
+    console.log('return urlImagenSubida: '+urlImagenSubida)
+    return urlImagenSubida;
+  }
   var insertado = 0;
-  $scope.submitForm = function(formData){
+  $scope.submitForm = function(imagen){
+
+
 
 
     //Lógica del formulario.
@@ -357,25 +319,72 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
        console.log('Formulario válido');
        console.log('Se progecede a guardar al alumno en la base de datos.')
 
+
+       //Creamos un array con los elementos a enviar:
+       var datos={
+         //Aquí especificamos todos los datods del form que queremos que se envíen:
+         'nombre':$scope.formNuevoAlumno.nombre.$modelValue,
+         'apellidos':$scope.formNuevoAlumno.apellidos.$modelValue,
+         'direccion':$scope.formNuevoAlumno.direccion.$modelValue,
+         'localidad':$scope.formNuevoAlumno.localidad.$modelValue,
+         'provincia':$scope.formNuevoAlumno.provincia.$modelValue,
+         'fecha_nacimiento':$scope.formNuevoAlumno.fecha_nacimiento.$modelValue,
+         'telefono':$scope.formNuevoAlumno.telefono.$modelValue,
+         'dni':$scope.formNuevoAlumno.dni.$modelValue
+       };
+       console.log('Imprimiendo datos');
+       console.log(datos);
+
+
+       //Primero cargamos la imagen del usuario:
+       console.log('Procesamiento de la imagen:');
+
+       if (imagen.files.length!=0){ //Si existe una imagen cargada
+         console.log('Añadiendo imagen!!!!: ');
+         //Subimos la imagen al sistema.
+         //console.log('salida: '+urlImagen);
+
+         //Añadimos la url de la imagen a los datos a enviar:
+         window.setTimeout(function(){
+           datos.imagen=uploadFiles2(imagen);
+         },5000);
+
+
+         console.log(datos.imagen);
+         console.log('Fin añadiendo imagen!!!');
+
+         //Vamos a esperar un poco a que se suba la imagen :)
+
+
+       }
+
+
+
+       console.log('Imprimiendo datos 2');
+       console.log(datos);
+
+       console.log('IMAGEEEEENENNNN');
+       console.log(imagen);
+       console.log('Num Images');
+       console.log(imagen.files.length);
+
+
+
+
        var salidaEjecucion;
 
-       console.log("llamada a addAlumno()")
-       console.log($scope.alumno);
+
+
+    //   console.log('Formulario: ');
+    //   console.log($scope.formNuevoAlumno);
+
 
        var ROOT = 'http://localhost:8001/_ah/api';
        gapi.client.load('helloworld', 'v1', null, ROOT);
 
-       gapi.client.helloworld.alumnos.insertarAlumno({
-         //Aquí especificamos todos los datods del form que queremos que se envíen:
-         'nombre':$scope.alumno.nombre,
-         'apellidos':$scope.alumno.apellidos,
-         'direccion':$scope.alumno.direccion,
-         'localidad':$scope.alumno.localidad,
-         'provincia':$scope.alumno.provincia,
-         'fecha_nacimiento':$scope.alumno.fecha_nacimiento,
-         'telefono':$scope.alumno.telefono,
-         'dni':$scope.alumno.dni}
-       ).execute(function(resp){
+       //llamamos al APIG con los datos creados antes.
+       console.log("llamada a insertarAlumno()")
+       gapi.client.helloworld.alumnos.insertarAlumno(datos).execute(function(resp){
          //Mostramos por consola la respuesta del servidor
          salidaEjecucion=resp.message;
          console.log("Respuesta servidor: "+salidaEjecucion);

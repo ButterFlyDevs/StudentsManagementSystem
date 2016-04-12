@@ -79,6 +79,7 @@ class AlumnoCompleto(messages.Message):
     provincia = messages.StringField(7)
     fecha_nacimiento = messages.StringField(8)
     telefono = messages.StringField(9)
+    imagen = messages.StringField(10)
 
 class ID(messages.Message):
     id = messages.StringField(1)
@@ -275,7 +276,7 @@ class HelloWorldApi(remote.Service):
         Devuelve toda la información de un estudiante en caso de estar en el sistema.
 
         Llamada ejemplo desde terminal:
-        curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumno?dni=11AA22BBZ
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumno?id=2
         '''
 
         #Info de seguimiento
@@ -334,15 +335,20 @@ class HelloWorldApi(remote.Service):
 
         #Componemos un mensaje de tipo AlumnoCompleto.
         #Las partes que son enteros las pasamos a string para enviarlos como mensajes de tipo string.
+
+        #Ojo, solo los elementos que no sean null se enviarán. Cuando un alumno no tenga imagen y pr tanto su valor
+        #en la base de datos sea null no se recibirá el campo imagen en el JSON que la API G devuelve.
+
         alumno = AlumnoCompleto(id=str(alumno.get('id')),
                                 nombre=formatText(alumno.get('nombre')),
-                                apellidos=alumno.get('apellidos'),
+                                apellidos=formatText(alumno.get('apellidos')),
                                 dni=str(alumno.get('dni')),
-                                direccion=alumno.get('direccion'),
-                                localidad=alumno.get('localidad'),
-                                provincia=alumno.get('provincia'),
+                                direccion=formatText(alumno.get('direccion')),
+                                localidad=formatText(alumno.get('localidad')),
+                                provincia=formatText(alumno.get('provincia')),
                                 fecha_nacimiento=str(alumno.get('fecha_nacimiento')),
-                                telefono=alumno.get('telefono')
+                                telefono=alumno.get('telefono'),
+                                imagen=alumno.get('urlImagen')
                                 )
 
         return alumno
@@ -414,6 +420,9 @@ class HelloWorldApi(remote.Service):
         #return MensajeRespuesta(message="Todo OK man!")
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
+
+
+
 
     @endpoints.method(ID,MensajeRespuesta,path='delAlumno', http_method='DELETE', name='alumnos.delAlumno')
     def eliminar_alumno(self, request):
@@ -585,7 +594,7 @@ class HelloWorldApi(remote.Service):
         profesoresItems= []
         #Que rellenamos con todo los alumnos de la listaAlumnos
         for profesor in listaProfesores:
-            profesoresItems.append(Profesor( nombre=str(profesor.get('nombre')), apellidos=str(profesor.get('apellidos')), id=str(profesor.get('id'))))
+            profesoresItems.append(Profesor( nombre=formatText(profesor.get('nombre')), apellidos=formatText(profesor.get('apellidos')), id=str(profesor.get('id'))))
 
         #Los adaptamos al tipo de mensaje y enviamos
         #return Greeting(message=str(result.content))
@@ -611,7 +620,7 @@ class HelloWorldApi(remote.Service):
         print listaAsignaturas
         asignaturasItems= []
         for asignatura in listaAsignaturas:
-            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=str(asignatura.get('nombre')) ) )
+            asignaturasItems.append( Asignatura( id=str(asignatura.get('id')), nombre=formatText(asignatura.get('nombre')) ) )
         return ListaAsignaturas(asignaturas=asignaturasItems)
 
     @endpoints.method(ID, ListaClases, path='alumnos/getClasesAlumno', http_method='GET', name='alumnos.getClasesAlumno')
@@ -2184,9 +2193,10 @@ class HelloWorldApi(remote.Service):
 
         from manejadorImagenes import ManejadorImagenes
         print 'URL \n'
-        print ManejadorImagenes.CreateFile(request.name, request.image)
+        url = ManejadorImagenes.CreateFile(request.name, request.image)
+        print url
 
-        return MensajeRespuesta( message='calling subirImagen()' )
+        return MensajeRespuesta( message=str(url) )
 
     #seguir aqu
 

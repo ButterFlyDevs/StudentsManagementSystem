@@ -121,15 +121,17 @@
 <p class="uk-h2">Registro de un nuevo estudiante </p>
 <hr>
 
-<form class="uk-form" name="formNuevoAlumno" ng-submit="submitForm()" novalidate>
+<form class="uk-form" name="formNuevoAlumno" novalidate>
+  <div flow-init flow-name="uploader.flow">
+
 
   <div class="uk-grid">
 
       <div class="uk-width-1-4 uk-margin-top">
-        <div ng-controller="UploadCtrl2" >
+      <!--   <div ng-controller="UploadCtrl2" >-->
 
           <!-- flow-files-added="processFiles($files)" -->
-          <div flow-init flow-name="uploader.flow"   flow-files-submitted="$flow.upload()">
+
 
 
             <div class="uk-thumbnail uk-overlay-hover uk-border-circle">
@@ -156,29 +158,14 @@
 
             </div>
 
-            <!--<img class="preview" flow-img="uploader.flow.files[0]"/><br>-->
 
-
-
-
-              <!--Botón para la subida de ficheros -->
-              <!--<button flow-btn type="file">Upload Image</button>-->
-
-              <!-- Botón antiguo -->
               <input value="Enviar2" type="submit" ng-click="uploadFiles($flow)" />
 
 
-
-              <!--
-              <div ng-repeat="image in uploader.flow.files track by $index">
-                <span class="text">Blob image displayed with "flow-img"</span><img class="preview" flow-img="image"/><br>
-              </div>
-            -->
-
-          </div>
+           <!-- Fin de la sección de flow-init -->
 
 
-        </div>
+      <!--   </div> <div ng-controller="UploadCtrl2" > -->
       </div>
 
       <div class="uk-width-3-4 uk-margin-top">
@@ -187,7 +174,7 @@
             <!-- Campo nombre -->
             <!--<input type="text" name="nombre" placeholder="Nombre" ng-model="alumno.nombre"  equired >-->
 
-            <input type="text" placeholder="Nombre" name="nombre" ng-class="{ 'uk-form-danger' : formNuevoAlumno.nombre.$invalid && !formNuevoAlumno.$pristine }" ng-minlength="3"  ng-model="alumno.nombre" required>
+            <input  type="text" ng-model="nombreAlumno" placeholder="Nombre" name="nombre" ng-class="{ 'uk-form-danger' : formNuevoAlumno.nombre.$invalid && !formNuevoAlumno.$pristine }" ng-minlength="3"   required>
 
 
             <!-- Campo apellidos -->
@@ -199,24 +186,24 @@
 
             <br class="uk-margin-bottom">
             <!-- Campo direccion -->
-            <input type="text" placeholder="Dirección" ng-model="alumno.direccion" required>
+            <input type="text" placeholder="Dirección" name="direccion" ng-model="alumno.direccion" required>
 
             <!-- Campo localidad -->
-            <input type="text" placeholder="Localidad" ng-model="alumno.localidad" required>
+            <input type="text" placeholder="Localidad" name="localidad" ng-model="alumno.localidad" required>
 
             <br class="uk-margin-bottom">
             <!-- Campo provincia -->
-            <input type="text" placeholder="Provincia" ng-model="alumno.provincia" required>
+            <input type="text" placeholder="Provincia" name="provincia" ng-model="alumno.provincia" required>
 
             <!-- Campo fecha nacimiento -->
-            <input type="text" placeholder="Fecha Nacimiento" ng-model="alumno.fecha_nacimiento" required>
+            <input type="text" placeholder="Fecha Nacimiento" name="fecha_nacimiento" ng-model="alumno.fecha_nacimiento" required>
 
             <br class="uk-margin-bottom">
             <!-- Campo telefono -->
-            <input type="text" placeholder="Teléfono" ng-model="alumno.telefono" required>
+            <input type="text" placeholder="Teléfono" name="telefono" ng-model="alumno.telefono" required>
 
             <!-- Campo DNI -->
-            <input type="text" placeholder="DNI" ng-model="alumno.dni" required>
+            <input type="text" placeholder="DNI" name="dni" ng-model="alumno.dni" required>
 
 
             <!-- Mensajes de error -->
@@ -233,7 +220,7 @@
             <link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
             <script type="text/javascript" src="app/js/components/notify.js"></script>
 
-            <button type="submit" class="uk-button"  data-message="Success message..." data-status="success" ng-class="{ 'uk-button-success' : !formNuevoAlumno.$invalid }" ng-disabled="formNuevoAlumno.$invalid">Submit</button>
+            <button  ng-click="submitForm($flow)" class="uk-button"  data-message="Success message..." data-status="success" ng-class="{ 'uk-button-success' : !formNuevoAlumno.$invalid }" ng-disabled="formNuevoAlumno.$invalid">Submit</button>
             <!--<script>
                $(function(){
                    $("body").on("click", ".uk-button[data-message]", function(){
@@ -252,9 +239,11 @@
         </fieldset>
       </div>
 
-  </div>
+  </div> <!--fin div del grid-->
 
+</div> <!-- div flow -->
 </form>
+
 
 
 <style>

@@ -33,11 +33,14 @@ CREATE TABLE Alumno(
   provincia CHAR(50),
   fecha_nacimiento DATE,
   telefono CHAR(50),
+  url_imagen CHAR (200),
+
   PRIMARY KEY (id_alumno),
 
   #UNIQUE (nombre, apellidos), #puede que sea mejor quitarlo; González: Es mejor quitarlo. Es posible que dos alumnos se llamen igual.
   UNIQUE (dni)
 );
+
 
 /*Creación de la tabla Profesor, con todos los atributos de esta entidad.
 En este caso si existe el dni para todos y puede usarse como pk, además no

@@ -14,6 +14,7 @@ class Alumno:
         self.provincia = ""
         self.fecha_nacimiento = ""
         self.telefono = ""
+        self.urlImagen = ""
 
 '''
 Modelo de la entidad alumno que añade la información del id_matricula para
