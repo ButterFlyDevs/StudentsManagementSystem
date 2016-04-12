@@ -285,7 +285,10 @@ class GestorAsociaciones:
         isAsociacion='\''+idAsociacion+'\''
 
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT nombre, apellidos, id_alumno from Alumno where id_alumno IN (select id_alumno from Matricula where id_asociacion='+idAsociacion+');'
+        #query='SELECT nombre, apellidos, id_alumno from Alumno where id_alumno IN (select id_alumno from Matricula where id_asociacion='+idAsociacion+');'
+
+        #Ver justificació de modificación en getProfesores:
+        query = 'SELECT nombre, apellidos, Alumno.id_alumno, id_matricula FROM (SELECT id_alumno, id_matricula FROM Matricula WHERE id_asociacion='+idAsociacion+') AS tablaMatricula, Alumno WHERE tablaMatricula.id_alumno = Alumno.id_alumno';
 
         if v:
             print query
@@ -305,10 +308,11 @@ class GestorAsociaciones:
             row = cursor.fetchone()
             lista = []
             while row is not None:
-                alumno = Alumno()
+                alumno = AlumnoExtendido()
                 alumno.nombre=row[0]
                 alumno.apellidos=row[1]
                 alumno.id=row[2]
+                alumno.idMatricula=row[3]
                 lista.append(alumno)
                 row = cursor.fetchone()
 

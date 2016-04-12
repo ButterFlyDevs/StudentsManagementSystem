@@ -166,12 +166,17 @@ class ProfesorSimpleExtendido(messages.Message):
     id = messages.StringField(3)
     idImparte = messages.StringField(4)
 
+class AlumnoSimpleExtendido(messages.Message):
+    nombre = messages.StringField(1)
+    apellidos = messages.StringField(2)
+    id = messages.StringField(3)
+    idMatricula = messages.StringField(4)
 
 #Definimos un tipo especial de mensaje
 class AsociacionCompleta(messages.Message):
     nombreAsignatura = messages.StringField(1)
     listaProfesores = messages.MessageField(ProfesorSimpleExtendido, 2, repeated=True)
-    listaAlumnos = messages.MessageField(Alumno, 3, repeated=True)
+    listaAlumnos = messages.MessageField(AlumnoSimpleExtendido, 3, repeated=True)
     idAsociacion = messages.StringField(4)
 
 
@@ -2138,7 +2143,7 @@ class HelloWorldApi(remote.Service):
             profesores.append(ProfesorSimpleExtendido( nombre=formatText(profesor.get('nombre')), apellidos=formatText(profesor.get('apellidos')), id=str(profesor.get('id')), idImparte=str(profesor.get('idImparte')) ))
 
         for alumno in iac['alumnosAsociacion']:
-            alumnos.append(Alumno( nombre=formatText(alumno.get('nombre')), apellidos=formatText(alumno.get('apellidos')), id=str(alumno.get('id'))))
+            alumnos.append(AlumnoSimpleExtendido( nombre=formatText(alumno.get('nombre')), apellidos=formatText(alumno.get('apellidos')), id=str(alumno.get('id')), idMatricula=str(alumno.get('idMatricula'))))
 
         return AsociacionCompleta( nombreAsignatura=formatText(iac['nombreAsignatura']), listaProfesores=profesores, listaAlumnos=alumnos, idAsociacion=request.id)
 

@@ -14,3 +14,12 @@ class Alumno:
         self.provincia = ""
         self.fecha_nacimiento = ""
         self.telefono = ""
+
+'''
+Modelo de la entidad alumno que añade la información del id_matricula para
+cuando esa información es necesaria junto a los datos del alumno.
+'''
+class AlumnoExtendido(Alumno):
+
+    def __init__(self):
+        self.idMatricula = ""

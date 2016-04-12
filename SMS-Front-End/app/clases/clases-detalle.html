@@ -269,7 +269,43 @@ Diseño de la vista de la pestaña de detalles del estudiante.
                   <hr>
                   <p ng-show="!asociacion.listaAlumnos.length" class="uk-text-muted uk-margin-left">Aún no hay estudiantes matriculados.</p>
                   <ul ng-repeat="alumno in asociacion.listaAlumnos" style="list-style: none;">
-                     <li>{{alumno.nombre}} {{alumno.apellidos}}</li>
+                     <li>{{alumno.nombre}} {{alumno.apellidos}}
+                     <a style="none;" data-uk-modal="{target:'#modalEliminacionAlumnoAsociacion'}">
+                        <i style="color: gray;" class="uk-icon-trash uk-icon"></i>
+                     </a>
+
+                     <!--Definición del modal que añade profesor a esta especificación de una asignatura a una clase.
+                        Como se trata de algo específico del profesor debemos definir el modal aquí para que pueda
+                        coger el nombre del profesor del que estamos hablando.
+                     -->
+                     <div id="modalEliminacionAlumnoAsociacion" class="uk-modal" aria-hidden="true">
+                       <div class="uk-modal-dialog uk-modal-dialog">
+                         ¿Está seguro de quiere desmatricular a {{alumno.nombre}} {{alumno.apellidos}} de {{asociacion.nombreAsignatura}} en {{clase.curso}} {{clase.grupo}} {{clase.nivel}} ?
+                         <hr>
+                         <!-- LA implementación de la acción asociada al botón puede estar en el script incluido abajo o
+                         en el propio app.js para poder usar el scope.-->
+                         <button id="delMatricula" ng-click="delMatricula(alumno.idMatricula)" class="uk-button uk-button-danger">Eliminar</button>
+                         <button id="CancelButton" class="uk-button uk-button-success uk-modal-close " >Cancel</button>
+
+                       </div>
+                     </div>
+                     <!--Añadimos el script necesario para que se cierre el modal al pulsar el botón de Eliminar -->
+                     <script>
+                       var eventHandlerType = (UIkit.support.touch) ? 'tap' : 'click',
+                         modalDelMatricula = UIkit.modal('#modalEliminacionAlumnoAsociacion', {
+                           bgclose: false
+                         });
+                       console.log('manejadorEventosModal: ' + eventHandlerType);
+
+                       $('#delMatricula').on(eventHandlerType, function(e) {
+                         console.log("push delMatricula.")
+                         e.preventDefault();
+                         //Oculta el modal
+                         modalDelMatricula.hide();
+                       });
+
+                     </script>
+                     </li>
                   </ul>
 
                   <!--Definición del modal que añade alumnos a esta especificación de una asignatura a una clase -->

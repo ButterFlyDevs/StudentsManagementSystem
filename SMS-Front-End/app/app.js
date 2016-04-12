@@ -1229,8 +1229,6 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
 
   $scope.delImparte = function(idImparte){
     console.log('Calling delImparte with params: idImparte '+idImparte);
-
-    
     gapi.client.helloworld.impartes.delImparte({'id':idImparte} ).execute(function(resp){
       console.log('Peticion al API Gateway de la eliminacion de una tupla en la tabla Imparte');
       console.log(resp.message);
@@ -1241,10 +1239,20 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
         $.UIkit.notify("\""+respuesta+"\"", {status:'warning'});
       }
     });
+  }
 
-
-
-
+  $scope.delMatricula = function(idMatricula){
+    console.log('Calling delMatricula with params: idMatricula '+idMatricula);
+    gapi.client.helloworld.matriculas.delMatricula({'id':idMatricula} ).execute(function(resp){
+      console.log('Peticion al API Gateway de la eliminacion de una tupla en la tabla Matricula');
+      console.log(resp.message);
+      var respuesta=resp.message;
+      if (respuesta == 'OK'){
+        $.UIkit.notify("Alumno desmatriculado con muchísimo éxito.", {status:'success'});
+      }else{
+        $.UIkit.notify("\""+respuesta+"\"", {status:'warning'});
+      }
+    });
   }
 
   //Función que pide al gateway la lista de todos los profesores del sistema.
