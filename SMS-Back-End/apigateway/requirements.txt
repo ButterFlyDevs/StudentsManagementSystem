@@ -6,4 +6,6 @@
 #
 # Note: The `lib` directory is added to `sys.path` by `appengine_config.py`.
 
+#Instalamos el cliente de python de Cloud Storage de GAE
 GoogleAppEngineCloudStorageClient
+jsonpickle

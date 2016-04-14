@@ -1,4 +1,23 @@
 // app.js
+function googleOnLoadCallback(){
+  console.log('googleOnLoadCallback is calling');
+    var apisToLoad = 1; // must match number of calls to gapi.client.load()
+    var gCallback = function() {
+        if (--apisToLoad == 0) {
+            //Manual bootstraping of the application
+            var $injector = angular.bootstrap(document, ['routerApp']);
+            console.log('Angular bootstrap complete ');
+            console.log('Librería gAPI cargada: ');
+            console.log(gapi);
+        };
+    };
+    //gapi.client.load('helloWorld', 'v1', gCallback, '//' + window.location.host + '/_ah/api');
+    //Cargamos la gAPI de nuestro backend solo una vez para toda la aplicación.
+    var ROOT = 'http://localhost:8001/_ah/api';
+    gapi.client.load('helloworld', 'v1', gCallback, ROOT);
+}
+
+
 var routerApp = angular.module('routerApp', ['ui.router' ,'flow']);
 
 // ############# ENRUTADOR #################################### //
@@ -235,6 +254,7 @@ de la vista y se usan).
                 });
 
 
+
             };
             fileReader.readAsDataURL(flowFile.file);
       });
@@ -287,7 +307,11 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
                 console.log(urlImagenSubida);
 
                 //Una vez que se sube la imagen la subimos al usuario
-
+ var urlImagen = uploadFiles2(imagen);
+         while (urlImagen!=null){
+           console.log(urlImagen);
+           console.log('while');
+         };
 
               });
 
@@ -345,9 +369,13 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
          //console.log('salida: '+urlImagen);
 
          //Añadimos la url de la imagen a los datos a enviar:
-         window.setTimeout(function(){
-           datos.imagen=uploadFiles2(imagen);
-         },5000);
+         var urlImagen="";
+         urlImagen = uploadFiles2(imagen);
+         //while (urlImagen==""){
+           console.log(urlImagen);
+           console.log('while');
+
+         //};
 
 
          console.log(datos.imagen);
@@ -379,8 +407,7 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
     //   console.log($scope.formNuevoAlumno);
 
 
-       var ROOT = 'http://localhost:8001/_ah/api';
-       gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
        //llamamos al APIG con los datos creados antes.
        console.log("llamada a insertarAlumno()")
@@ -438,8 +465,7 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
   $scope.id=$stateParams.estudianteID;
 
 
-  var ROOT = 'http://localhost:8001/_ah/api';
-  gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
 
   //Pedimos al Gateway toda la informaicón del Alumno.
@@ -473,8 +499,7 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
        console.log("llamada a modAlumnoCompleto()")
        console.log($scope.alumno);
 
-       var ROOT = 'http://localhost:8001/_ah/api';
-       gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
        gapi.client.helloworld.alumnos.modAlumnoCompleto({
          //Aquí especificamos todos los datods del form que queremos que se envíen:
@@ -531,8 +556,7 @@ routerApp.controller('ControladorDetallesEstudiante', function($location, $scope
   $scope.delAlumno = function(){
     console.log("Pulsada confirmación eliminación alumno id: "+$stateParams.estudianteID)
 
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
     gapi.client.helloworld.alumnos.delAlumno({'id':$stateParams.estudianteID}).execute(function(resp){
       //Mostramos por consola la respuesta del servidor
@@ -567,8 +591,6 @@ routerApp.controller('ControladorDetallesEstudiante', function($location, $scope
 
   console.log("ID estudiante: "+$stateParams.estudianteID);
 
-  var ROOT = 'http://localhost:8001/_ah/api';
-  gapi.client.load('helloworld', 'v1', null, ROOT);
 
 
 
@@ -630,8 +652,6 @@ routerApp.controller('ControladorListaEstudiantes', function ($scope) {
   realiza la petición de la lista de Estudiantes y que la carga en el $scope bajo la variable "alumnos".
   */
 
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
 
  //service.greetings().listGreeting().execute()
         // Get the list of previous scores
@@ -667,8 +687,7 @@ routerApp.controller('ControladorListaProfesores', function ($scope) {
     Controlador que provee a la plantilla profesores-lista.html la lista simplificada de todos los profesores
     a trabés del API Gateway usando el método getProfesores()
     */
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
     gapi.client.helloworld.profesores.getProfesores().execute(function(resp) {
       console.log(resp.profesores);
@@ -684,8 +703,7 @@ routerApp.controller('ControladorDetallesProfesor', function($location, $scope, 
   $scope.delProfesor = function(){
     console.log("Pulsada confirmación eliminación profesor id: "+$stateParams.profesorID)
 
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
     gapi.client.helloworld.profesores.delProfesor({'id':$stateParams.profesorID}).execute(function(resp){
       //Mostramos por consola la respuesta del servidor
@@ -719,8 +737,6 @@ routerApp.controller('ControladorDetallesProfesor', function($location, $scope, 
   $scope.id=$stateParams.profesorID;
   console.log("ID profesor: "+$stateParams.profesorID);
 
-  var ROOT = 'http://localhost:8001/_ah/api';
-  gapi.client.load('helloworld', 'v1', null, ROOT);
 
 
   //Pedimos al Gateway toda la información del profesor.
@@ -781,8 +797,7 @@ routerApp.controller('ControladorNuevoProfesor', function ($scope) {
        console.log("llamada a addAlumno()")
        console.log($scope.alumno);
 
-       var ROOT = 'http://localhost:8001/_ah/api';
-       gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
        gapi.client.helloworld.alumnos.insertarAlumno({
          //Aquí especificamos todos los datods del form que queremos que se envíen:
@@ -838,8 +853,7 @@ routerApp.controller('ControladorListaAsignaturas', function ($scope) {
     Controlador que provee a la plantilla profesores-lista.html la lista simplificada de todos los profesores
     a trabés del API Gateway usando el método getProfesores()
     */
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
     gapi.client.helloworld.asignaturas.getAsignaturas().execute(function(resp) {
       console.log("recibido desde APIGATEWAY asignaturas.getAsignaturas(): ")
@@ -862,8 +876,7 @@ routerApp.controller('ControladorNuevaAsignatura', function ($scope){
        console.log("llamada a asginaturas.insertarAsignatura()")
        console.log($scope.alumno);
 
-       var ROOT = 'http://localhost:8001/_ah/api';
-       gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
        gapi.client.helloworld.asignaturas.insertarAsignatura({
          //Aquí especificamos todos los datods del form que queremos que se envíen:
@@ -909,8 +922,7 @@ routerApp.controller('ControladorDetallesAsignatura', function($location, $scope
   $scope.delAsignatura = function(){
     console.log("Pulsada confirmación asignatura alumno id: "+$stateParams.asignaturaID)
 
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
     gapi.client.helloworld.asignaturas.delAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp){
       //Mostramos por consola la respuesta del servidor
@@ -945,8 +957,6 @@ routerApp.controller('ControladorDetallesAsignatura', function($location, $scope
 
   console.log("ID asignatura: "+$stateParams.asignaturaID);
 
-  var ROOT = 'http://localhost:8001/_ah/api';
-  gapi.client.load('helloworld', 'v1', null, ROOT);
 
 
   //Pedimos al Gateway toda la informaicón de la asignatura.
@@ -996,9 +1006,6 @@ routerApp.controller('ControladorModificacionAsignatura', function($location, $s
   $scope.id=$stateParams.asignaturaID;
 
 
-  var ROOT = 'http://localhost:8001/_ah/api';
-  gapi.client.load('helloworld', 'v1', null, ROOT);
-
 
   //Pedimos al Gateway toda la informaicón del Alumno.
   gapi.client.helloworld.asignaturas.getAsignatura({'id':$stateParams.asignaturaID}).execute(function(resp) {
@@ -1030,8 +1037,6 @@ routerApp.controller('ControladorModificacionAsignatura', function($location, $s
        console.log("llamada a modAlumnoCompleto()")
        console.log($scope.alumno);
 
-       var ROOT = 'http://localhost:8001/_ah/api';
-       gapi.client.load('helloworld', 'v1', null, ROOT);
 
        gapi.client.helloworld.asignaturas.modAsignaturaCompleta({
          'id':$stateParams.asignaturaID,
@@ -1083,8 +1088,7 @@ routerApp.controller('ControladorListaClases', function ($scope) {
     Controlador que provee a la plantilla clases-lista.html la lista simplificada de todos las clases
     a trabés del API Gateway usando el método getClases()
     */
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
+
 
     gapi.client.helloworld.clases.getClases().execute(function(resp) {
       console.log("recibido desde APIGATEWAY clases.getClases(): ")
@@ -1142,8 +1146,6 @@ routerApp.controller('ControladorNuevaClase', function ($scope){
        console.log("llamada a asginaturas.insertarAsignatura()")
        console.log($scope.alumno);
 
-       var ROOT = 'http://localhost:8001/_ah/api';
-       gapi.client.load('helloworld', 'v1', null, ROOT);
 
        gapi.client.helloworld.clases.insertarClase({
          'curso':$scope.clase.curso,
@@ -1381,8 +1383,6 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
   $scope.delClase = function(clase){
     console.log("Pulsada confirmación eliminación clase con id: "+clase.id)
 
-    var ROOT = 'http://localhost:8001/_ah/api';
-    gapi.client.load('helloworld', 'v1', null, ROOT);
 
     gapi.client.helloworld.clases.delClase({'id':$stateParams.claseID}).execute(function(resp){
       //Mostramos por consola la respuesta del servidor
@@ -1417,8 +1417,6 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
 
   console.log("ID clase: "+$stateParams.claseID);
 
-  var ROOT = 'http://localhost:8001/_ah/api';
-  gapi.client.load('helloworld', 'v1', null, ROOT);
 
 
   //Pedimos al Gateway toda la informaicón de la clase.
