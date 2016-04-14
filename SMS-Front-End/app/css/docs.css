@@ -6,7 +6,7 @@
 
 /* Fonts
  ========================================================================== */
-
+/*
 @font-face {
     font-family: 'Proxima Nova';
     src: url('../fonts/proximanova-light-webfont.eot');
@@ -28,6 +28,7 @@
     font-weight: 400;
     font-style: normal;
 }
+*/
 
 body, h1, h2, h3, h4, h5, h6,
 .uk-navbar-nav > li > a { font-family: "Proxima Nova", "Helvetica Neue", Helvetica, Arial, sans-serif; }

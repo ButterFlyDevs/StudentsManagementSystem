@@ -38,6 +38,8 @@ class GestorAlumnos:
         INSERT INTO Alumno VALUES(NULL,'Maria','Fernández García',NULL,NULL,NULL,NULL,NULL,NULL);
         """
 
+        print '\n\n ### calling nuevoAlumno() ### \n\n'
+
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Alumno values("+"'"+nombre+"', "+ "'"+dni+"');"
 
@@ -72,12 +74,11 @@ class GestorAlumnos:
 
         query="INSERT INTO Alumno VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+','+imagen+");"
 
-        print query;
 
         if v:
             print apiName
             print "nuevoAlumno()"
-            print query
+            print '\n'+query.encode('utf-8')
 
         cursor = db.cursor()
         salida =''
@@ -86,10 +87,7 @@ class GestorAlumnos:
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
         try:
-            #Seteando los acentos.........#
-            mysql_query="SET NAMES 'utf8'"
-            cursor.execute(mysql_query)
-            #-----------------------------#
+
             salida = cursor.execute(query);
         except MySQLdb.Error, e:
             # Get data from database
@@ -169,7 +167,7 @@ class GestorAlumnos:
             print query
 
         try:
-            #Sacando los acentos...........
+            #Sacando los acentos (esta llamada debe ejecutarse solo en la lectura, NUNCA en la escritura............
             mysql_query="SET NAMES 'utf8'"
             cursor.execute(mysql_query)
             #-----------------------------#

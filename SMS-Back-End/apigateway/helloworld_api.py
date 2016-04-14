@@ -396,6 +396,12 @@ class HelloWorldApi(remote.Service):
           "telefono": request.telefono
         }
 
+        if request.imagen != None:
+            print 'Hay imagen recibida en insertarAlumno()'
+            form_fields['imagen'] = request.imagen
+            print form_fields
+
+
         if v:
             print "Llamando a: "+url
 
@@ -1154,7 +1160,7 @@ class HelloWorldApi(remote.Service):
 
         #Extraemos lo datos de la petición al endpoints
         form_fields = {
-          "nombre": request.nombre.encode('utf-8')
+          "nombre": formatTextInput(request.nombre)
         }
         if v:
             print 'form_fields:'

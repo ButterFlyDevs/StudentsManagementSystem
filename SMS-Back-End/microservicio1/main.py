@@ -56,15 +56,36 @@ def postAlumno():
         print "Petición: "
         print request.form
 
+        print 'aqui'
+        imagen = request.form.get('imagen')
 
-    salida = GestorAlumnos.nuevoAlumno(request.form['nombre'],
-                              request.form['apellidos'],
-                              request.form['dni'],
-                              request.form['direccion'],
-                              request.form['localidad'],
-                              request.form['provincia'],
-                              request.form['fecha_nacimiento'],
-                              request.form['telefono'])
+        print imagen
+
+        salida= "";
+
+    if imagen != None:
+        print 'Calling with image'
+        salida = GestorAlumnos.nuevoAlumno(request.form['nombre'],
+                                  request.form['apellidos'],
+                                  request.form['dni'],
+                                  request.form['direccion'],
+                                  request.form['localidad'],
+                                  request.form['provincia'],
+                                  request.form['fecha_nacimiento'],
+                                  request.form['telefono'],
+                                  request.form['imagen'])
+    else:
+        print 'Calling without image'
+        salida = GestorAlumnos.nuevoAlumno(request.form['nombre'],
+                                  request.form['apellidos'],
+                                  request.form['dni'],
+                                  request.form['direccion'],
+                                  request.form['localidad'],
+                                  request.form['provincia'],
+                                  request.form['fecha_nacimiento'],
+                                  request.form['telefono'])
+
+
     if salida == 'OK':
         return 'OK'
     else:
