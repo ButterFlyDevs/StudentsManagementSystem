@@ -65,25 +65,25 @@ def postAlumno():
 
     if imagen != None:
         print 'Calling with image'
-        salida = GestorAlumnos.nuevoAlumno(request.form['nombre'],
-                                  request.form['apellidos'],
-                                  request.form['dni'],
-                                  request.form['direccion'],
-                                  request.form['localidad'],
-                                  request.form['provincia'],
-                                  request.form['fecha_nacimiento'],
-                                  request.form['telefono'],
+        salida = GestorAlumnos.nuevoAlumno(request.form['nombre'].encode('latin-1'),
+                                  request.form['apellidos'].encode('latin-1'),
+                                  request.form['dni'].encode('latin-1'),
+                                  request.form['direccion'].encode('latin-1'),
+                                  request.form['localidad'].encode('latin-1'),
+                                  request.form['provincia'].encode('latin-1'),
+                                  request.form['fecha_nacimiento'].encode('latin-1'),
+                                  request.form['telefono'].encode('latin-1'),
                                   request.form['imagen'])
     else:
         print 'Calling without image'
-        salida = GestorAlumnos.nuevoAlumno(request.form['nombre'],
-                                  request.form['apellidos'],
-                                  request.form['dni'],
-                                  request.form['direccion'],
-                                  request.form['localidad'],
-                                  request.form['provincia'],
-                                  request.form['fecha_nacimiento'],
-                                  request.form['telefono'])
+        salida = GestorAlumnos.nuevoAlumno(request.form['nombre'].encode('latin-1'),
+                                  request.form['apellidos'].encode('latin-1'),
+                                  request.form['dni'].encode('latin-1'),
+                                  request.form['direccion'].encode('latin-1'),
+                                  request.form['localidad'].encode('latin-1'),
+                                  request.form['provincia'].encode('latin-1'),
+                                  request.form['fecha_nacimiento'].encode('latin-1'),
+                                  request.form['telefono'].encode('latin-1'))
 
 
     if salida == 'OK':
@@ -372,7 +372,10 @@ def postAsignatura():
     Inserta una nueva asignatura en el sistema.
     curl -d "nombre=ComputacionZZ" -i -X POST localhost:8002/asignaturas
     '''
-    salida = GestorAsignaturas.nuevaAsignatura(request.form['nombre'])
+    print 'REQUEST'
+    print request
+    salida = GestorAsignaturas.nuevaAsignatura(request.form['nombre'].encode('latin-1'))
+
     if salida == 'OK':
         return 'OK'
     else:

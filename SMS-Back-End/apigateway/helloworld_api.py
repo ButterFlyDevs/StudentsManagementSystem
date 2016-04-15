@@ -404,6 +404,8 @@ class HelloWorldApi(remote.Service):
 
         if v:
             print "Llamando a: "+url
+            print 'DATOS'
+            print form_fields
 
 
         ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
@@ -533,12 +535,12 @@ class HelloWorldApi(remote.Service):
 
         #Extraemos lo datos de la petición que se reciben aquí en el endpoints
         form_fields = {
-          "nombre": request.nombre,
-          "apellidos": request.apellidos,
-          "dni": request.dni,
-          "direccion": request.direccion,
-          "localidad": request.localidad,
-          "provincia": request.provincia,
+          "nombre": formatTextInput(request.nombre),
+          "apellidos": formatTextInput(request.apellidos),
+          "dni": formatTextInput(request.dni),
+          "direccion": formatTextInput(request.direccion),
+          "localidad": formatTextInput(request.localidad),
+          "provincia": formatTextInput(request.provincia),
           "fecha_nacimiento": request.fecha_nacimiento,
           "telefono": request.telefono
         }
@@ -1259,7 +1261,7 @@ class HelloWorldApi(remote.Service):
 
         #Extraemos lo datos de la petición que se reciben aquí en el endpoints
         form_fields = {
-          "nombre": request.nombre
+          "nombre": formatTextInput(request.nombre)
         }
 
         if v:

@@ -39,6 +39,8 @@ class GestorAlumnos:
         """
 
         print '\n\n ### calling nuevoAlumno() ### \n\n'
+        print locals()
+
 
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Alumno values("+"'"+nombre+"', "+ "'"+dni+"');"
@@ -72,20 +74,22 @@ class GestorAlumnos:
 
         #NULL por el campo id que es primary key y que se autoincrementa automat por la definición de la tabla Alumno en la BD. (ver DBCreator_v0_1.sql)
 
-        query="INSERT INTO Alumno VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+','+imagen+");"
+        query='INSERT INTO Alumno VALUES(NULL'+','+nombre+','+apellidos+','+dni+','+direccion+','+localidad+','+provincia+','+fecha_nacimiento+','+telefono+','+imagen+');'
+        #query2='INSERT INTO Alumno VALUES(NULL'+','+nombre+','+apellidos+','+dni+');'
 
 
         if v:
             print apiName
             print "nuevoAlumno()"
-            print '\n'+query.encode('utf-8')
+            print query
 
         cursor = db.cursor()
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
         salida =''
-        '''
-        Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el alumno con clave
-        que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
-        '''
+
         try:
 
             salida = cursor.execute(query);
@@ -285,7 +289,7 @@ class GestorAlumnos:
 
         if v:
             print apiName
-            print query
+            print '\n'+query.encode('utf-8')
 
         cursor = db.cursor()
         salida =''

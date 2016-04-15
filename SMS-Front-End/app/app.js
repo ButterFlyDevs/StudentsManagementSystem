@@ -16,7 +16,9 @@ function googleOnLoadCallback(){
     var ROOT = 'http://localhost:8001/_ah/api';
     gapi.client.load('helloworld', 'v1', gCallback, ROOT);
 }
-
+function encode_utf8(s) {
+  return unescape(encodeURIComponent(s));
+};
 
 var routerApp = angular.module('routerApp', ['ui.router' ,'flow']);
 
@@ -369,11 +371,11 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
        //Creamos un array con los elementos a enviar:
        var datos={
          //Aquí especificamos todos los datods del form que queremos que se envíen:
-         'nombre':$scope.formNuevoAlumno.nombre.$modelValue,
-         'apellidos':$scope.formNuevoAlumno.apellidos.$modelValue,
-         'direccion':$scope.formNuevoAlumno.direccion.$modelValue,
-         'localidad':$scope.formNuevoAlumno.localidad.$modelValue,
-         'provincia':$scope.formNuevoAlumno.provincia.$modelValue,
+         'nombre':encode_utf8($scope.formNuevoAlumno.nombre.$modelValue),
+         'apellidos':encode_utf8($scope.formNuevoAlumno.apellidos.$modelValue),
+         'direccion':encode_utf8($scope.formNuevoAlumno.direccion.$modelValue),
+         'localidad':encode_utf8($scope.formNuevoAlumno.localidad.$modelValue),
+         'provincia':encode_utf8($scope.formNuevoAlumno.provincia.$modelValue),
          'fecha_nacimiento':$scope.formNuevoAlumno.fecha_nacimiento.$modelValue,
          'telefono':$scope.formNuevoAlumno.telefono.$modelValue,
          'dni':$scope.formNuevoAlumno.dni.$modelValue
@@ -410,7 +412,7 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
 
                 //llamamos al APIG con los datos creados antes.
                 console.log("llamada a insertarAlumno()")
-                
+
                 gapi.client.helloworld.alumnos.insertarAlumno(datos).execute(function(resp){
                   //Mostramos por consola la respuesta del servidor
                   salidaEjecucion=resp.message;
@@ -889,6 +891,7 @@ routerApp.controller('ControladorListaAsignaturas', function ($scope) {
 
 });
 
+
 routerApp.controller('ControladorNuevaAsignatura', function ($scope){
   $scope.submitForm = function(formData){
     //Cuando el formulario es válido porque cumple con todas las especificaciones:
@@ -905,7 +908,8 @@ routerApp.controller('ControladorNuevaAsignatura', function ($scope){
 
        gapi.client.helloworld.asignaturas.insertarAsignatura({
          //Aquí especificamos todos los datods del form que queremos que se envíen:
-         'nombre':$scope.alumno.nombre,
+         'nombre':encode_utf8($scope.alumno.nombre),
+
        }
        ).execute(function(resp){
          //Mostramos por consola la respuesta del servidor

@@ -29,6 +29,10 @@ class GestorAsignaturas:
     @classmethod
     def nuevaAsignatura(self, nombre):
 
+        if v:
+            print 'Calling nuevaAsignatura() with params:'
+            print locals()
+
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
         #query="INSERT INTO Asignatura values("+"'"+nombre+"', "+ "'"+id+"');"
 
@@ -36,9 +40,16 @@ class GestorAsignaturas:
         nombre='\''+nombre+'\''
 
         query='INSERT INTO Asignatura VALUES(NULL'+','+nombre+');'
+
         if v:
-            print '\n'+query.encode('utf-8')
+            print query
+
+
         cursor = db.cursor()
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
         salida =''
         '''
         Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Asignatura con clave
@@ -206,7 +217,7 @@ class GestorAsignaturas:
 
         if v:
             print apiName
-            print query
+            print query.encode('utf-8')
 
         cursor = db.cursor()
         salida =''

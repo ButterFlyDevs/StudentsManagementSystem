@@ -18,7 +18,10 @@ def aprovisiona():
     #Insertamos 6 alumnos, cada insercción genera un id (unívco) para cada alumno.
     #Cabecera: nuevoAlumno(self,nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL')
     #id 1
+
+
     GestorAlumnos.nuevoAlumno('Rocío', 'Prida Ruíz', '99999999', 'C/ Ramon y Cajal Bloque 9. 2ºA', 'Albolote', 'Granada', '1800-03-23', '677112233')
+
     #id 2
     GestorAlumnos.nuevoAlumno('Eduardo', 'Martín Fernández', '12345678', 'C/ Ramón y Cajal Bloque 9. 2ºA', 'Albolote', 'Granada', '1800-03-23', '677262625')
     #id 3
@@ -29,6 +32,8 @@ def aprovisiona():
     GestorAlumnos.nuevoAlumno('Maria', 'Priero Rodriguez', '12345679', 'C/ Ramón y Cajal Bloque 9. 2ºA', 'Rocio Norte', 'Sevilla', '1800-03-23', '677262625')
     #id 6
     GestorAlumnos.nuevoAlumno('Estefanía', 'Cervera Gruillan', '12345670', 'C/ Ramón y Cajal Bloque 9. 2ºA', 'La isleta', 'Málaga', '1800-03-23', '677262625')
+    #id 7
+    GestorAlumnos.nuevoAlumno('Bob', 'Sponja', '21', 'Cerca de la casa de calamardo', 'Fondo de Bikini', 'Océano', '1984-1-1', '6172524', 'http://www.sempreantenados.com/wp-content/gallery/bob-esponja/bob-esponja-14.jpg')
 
 
     #Insertamos 3 profesores:
@@ -40,13 +45,15 @@ def aprovisiona():
     #id 3
     GestorProfesores.nuevoProfesor('Francisco', 'Cervera Gruillan', '12345670', 'C/ Ramón y Cajal Bloque 9. 2ºA', 'La isleta', 'Málaga', '1800-03-23', '677262625')
 
+
     #Creamos dos Asignaturas:
     #Cabecera: nuevaAsignatura(self, nombre)
     #1
-    GestorAsignaturas.nuevaAsignatura('Frances')
+    GestorAsignaturas.nuevaAsignatura('Francés')
     #2
-    GestorAsignaturas.nuevaAsignatura('Matematicas')
+    GestorAsignaturas.nuevaAsignatura('Matemáticas')
 
+    '''
     #Creamos dos Clases
     #Cabecera: nuevaClase(self, curso, grupo, nivel)
     #1
@@ -90,7 +97,7 @@ def aprovisiona():
     #id 6
     GestorMatriculas.nuevaMatricula('6','3') #Matriculamos al alumno con id=6 en Francés en 1ºB ESO.
 
-
+    '''
 
 
 if __name__ == '__main__':
