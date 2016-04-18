@@ -145,7 +145,7 @@ class GestorAlumnos:
             lista.append(alumno)
             #print row[0], row[1]
             row = cursor.fetchone()
-            print 'Nombre alumno: '+alumno.nombre
+            #print 'Nombre alumno: '+alumno.nombre
 
         cursor.close()
         db.close()

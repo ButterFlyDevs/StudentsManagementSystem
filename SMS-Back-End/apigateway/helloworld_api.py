@@ -52,6 +52,8 @@ def formatTextInput(cadena):
 class MensajeRespuesta(messages.Message):
     message = messages.StringField(1)
 
+class URL(messages.Message):
+    url = messages.StringField(1)
 
 class MensajePeticion(messages.Message):
     message = messages.StringField(1)
@@ -2182,8 +2184,7 @@ class HelloWorldApi(remote.Service):
         # curl -d "nombre=JuanAntonio" -i -X POST -G localhost:8001/_ah/api/helloworld/v1/imagenes/subirImagen
 
         '''
-        (echo -n '{"image": "'; base64 profile.jpg; echo '"}') | curl -H "Content-Type: application/json"  -d @-  localhost:8001/_ah/api/helloworld/v1/imagenes/subirImagen
-        (echo -n '{"image": "'; base64 profile2.jpg; echo '"}') | curl -H "Content-Type: application/json" -d @-  localhost:8001/_ah/api/helloworld/v1/imagenes/subirImagen
+         (echo -n '{"image": "'; base64 profile.jpg; echo '"}') | curl -H "Content-Type: application/json"  -d @-  localhost:8001/_ah/api/helloworld/v1/imagenes/subirImagen?name=prueba
         '''
 
         # curl -d "nombre=prueba" -X POST localhost:8001/_ah/api/helloworld/v1/imagenes/subirImagen
@@ -2206,6 +2207,13 @@ class HelloWorldApi(remote.Service):
 
         return MensajeRespuesta( message=str(url) )
 
-    #seguir aqu
+    @endpoints.method(URL, MensajeRespuesta, path='imagenes/eliminarImagen', http_method='POST', name='imagenes.eliminarImagen')
+    def eliminarImagen(self, request):
+        '''
+        curl -X POST localhost:8001/_ah/api/helloworld/v1/imagenes/eliminarImagen?url=http://localhost:8001/_ah/img/encoded_gs_file:YXBwX2RlZmF1bHRfYnVja2V0L3BydWViYS5qcGc=
+        '''
+        print (request.url)
+        from manejadorImagenes import ManejadorImagenes
+        return MensajeRespuesta( message=ManejadorImagenes.DeleteFile(request.url))
 
 APPLICATION = endpoints.api_server([HelloWorldApi])

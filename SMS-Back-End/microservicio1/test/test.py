@@ -1,15 +1,56 @@
-from flask import Flask
-from nose.tools import *
-import unittest
-import os
-import main
-import tempfile
-from flask.ext.testing import TestCase
+# -*- coding: utf-8 -*-
 
-class MainTestCase(unittest.TestCase):
+'''
+Para ejecutar el test sólo hay que hacer:
+python test.py, con -v para más detalles.
+
+
+Covertura:
+
+Para que genere contenido en html python-coverage html
+
+
+'''
+
+#Para hacer los tests unitarios de la api.
+import unittest
+#More about in: https://docs.python.org/2/library/unittest.html#unittest.TestCase.setUp
+
+
+#Importamos la propia api, que es 'app' en el fichero 'main.py'
+import sys, os
+sys.path.insert(0,os.pardir)
+from main import app
+
+import jsonpickle
+
+class MyTest(unittest.TestCase):
+
+    def setUp(self):
+        app.config['TESTING'] = True
+        self.app = app.test_client()
+
+    def test_getAlumnos(self):
+        respuesta = self.app.get('/alumnos')
+        #La respuesta es un tipo de dato response_objet, alias de la clase flask.Response, más info en http://flask.pocoo.org/docs/0.10/api/#flask.Response
+        jsonData = jsonpickle.decode(respuesta.data)
+        print len(jsonData)
+
+        self.assertTrue(('dni' in str(respuesta.data)) or ('[]' in str(respuesta.data)))
+
+
+if __name__ == '__main__':
+    unittest.main()
+
+
+
+
+
+
+
 
     #Inicio del esqueleto principal de tests en Flask
-
+    '''
     def setUp(self):
         self.db_fd, inicio.app.config['DATABASE'] = tempfile.mkstemp()
         inicio.app.config['TESTING'] = True
@@ -18,17 +59,19 @@ class MainTestCase(unittest.TestCase):
     def tearDown(self):
         os.close(self.db_fd)
         os.unlink(inicio.app.config['DATABASE'])
-
+    '''
     #Aqui acaba el esqueleto principal
 
     """
     Tests correspondientes a objetos Alumno
     """
-
+    '''
     #Comprobamos que la petición GET de /alumnos es correcta
     def test_alumnos_get(self):
         respuesta = self.app.get('/alumnos')
         self.assertTrue(('dni' in str(respuesta.data)) or ('[]' in str(respuesta.data)))
+
+
 
     #Comprobamos que la petición GET de /alumnos/argumentos es correcta
     def test_alumnos_get_with_arg(self, dni='11223344A'):
@@ -51,6 +94,7 @@ class MainTestCase(unittest.TestCase):
         respuesta = self.app.delete('/alumnos/11223344A')
         self.assertTrue('Elemento eliminado' in str(respuesta.data))
 
+
     #Comprobamos que la petición POST de /alumnos es correcta
     def test_alumnos_post(self):
         posibles_errores=[404, 400]
@@ -60,15 +104,10 @@ class MainTestCase(unittest.TestCase):
         self.assertTrue('OK' in str(respuesta.data) or respuesta.status_code in posibles_errores)  #agnadir lo que queda de elementos
         if 'OK' in str(respuesta.data):
             test_alumnos_get_with_arg('45601218Z')
+    '''
 
 
-    """
-    Tests correspondientes a objetos Profesor
-    """
-
-
-
-
+    '''
     #Ver si la página carga correctamente
     def test_home_status_code(self):
         # sends HTTP GET request to the application
@@ -76,7 +115,4 @@ class MainTestCase(unittest.TestCase):
         result = self.app.get('/')
         # assert the status code of the response
         self.assertEqual(result.status_code, 200)
-
-
-if __name__ == '__main__':
-    unittest.main()
+    '''

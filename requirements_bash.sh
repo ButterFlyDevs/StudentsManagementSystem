@@ -4,9 +4,12 @@ echo -e "\033[32m \n\t Gracias por contribuir \033[0m"
 echo "Preparando el entorno..."
 
 #Descargado el SDK de GAE
-echo -e "\n\033[31m 2. Instalando MySQL de forma desatendida \033[0m\n"
 
-echo "Downloading the Google App Engine SDK"
+echo -e "\n\033[32m 0.1 Instalando unzip \033[0m\n"
+sudo apt-get install unzip
+echo -e "\n\033[32m 0.2 Instalando curl \033[0m\n"
+sudo apt-get install curl
+echo -e "\n\033[31m 1. Descargando el SDK de Google App Engine \033[0m\n"
 curl -O https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.30.zip
 echo "Unzip SDK"
 unzip google_appengine_1.9.30.zip
