@@ -122,7 +122,7 @@ def getAlumno(id_alumno):
         return jsonpickle.encode(salida, unpicklable=False)
 
 @app.route('/alumnos/<string:id_alumno>',methods=['POST'])
-def modAlumno(id_alumno):
+def modAlumnoCompleto(id_alumno):
     '''
     Función que modifica los atributos de un alumno dado su identificación, usando la función
     modAlumnoCompleto de la APIDB
@@ -130,18 +130,41 @@ def modAlumno(id_alumno):
     '''
     if v:
         print 'Calling GestorAlumnos.modAlumnoCompleto()'
+        print "Petición: "
+        print request.form
 
-    #El id del alumno se pasa por la URL
-    salida = GestorAlumnos.modAlumnoCompleto(id_alumno,
-                                             request.form['nombre'],
-                                             request.form['apellidos'],
-                                             request.form['dni'],
-                                             request.form['direccion'],
-                                             request.form['localidad'],
-                                             request.form['provincia'],
-                                             request.form['fecha_nacimiento'],
-                                             request.form['telefono']
-                                            );
+    print 'aqui'
+    imagen = request.form.get('imagen')
+
+    print imagen
+
+    salida= "";
+
+    if imagen != None:
+        print 'Calling with image'
+        salida = GestorAlumnos.modAlumnoCompleto(
+                                  id_alumno,
+                                  request.form['nombre'].encode('latin-1'),
+                                  request.form['apellidos'].encode('latin-1'),
+                                  request.form['dni'].encode('latin-1'),
+                                  request.form['direccion'].encode('latin-1'),
+                                  request.form['localidad'].encode('latin-1'),
+                                  request.form['provincia'].encode('latin-1'),
+                                  request.form['fecha_nacimiento'].encode('latin-1'),
+                                  request.form['telefono'].encode('latin-1'),
+                                  request.form['imagen'])
+    else:
+        print 'Calling without image'
+        salida = GestorAlumnos.modAlumnoCompleto(
+                                  id_alumno,
+                                  request.form['nombre'].encode('latin-1'),
+                                  request.form['apellidos'].encode('latin-1'),
+                                  request.form['dni'].encode('latin-1'),
+                                  request.form['direccion'].encode('latin-1'),
+                                  request.form['localidad'].encode('latin-1'),
+                                  request.form['provincia'].encode('latin-1'),
+                                  request.form['fecha_nacimiento'].encode('latin-1'),
+                                  request.form['telefono'].encode('latin-1'))
 
     if v:
         print "SALIDA: "+str(salida)

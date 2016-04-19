@@ -3,6 +3,11 @@
 
 Defined here are the ProtoRPC messages needed to define Schemas for methods
 as well as those methods defined in an API.
+
+Para ver el servidor de exploración:
+
+    https://your_app_id.appspot.com/_ah/api/explorer
+
 """
 
 
@@ -187,6 +192,18 @@ class AsociacionCompleta(messages.Message):
 @endpoints.api(name='helloworld', version='v1')
 class HelloWorldApi(remote.Service):
     """Helloworld API v1."""
+
+
+    @endpoints.method(message_types.VoidMessage, MensajeRespuesta, path='holaMundo', http_method='GET', name='holaMundo')
+    def getSaludoHolaMundo(self, request):
+        '''
+        Función de prueba de exposición.
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/holaMundo
+        '''
+        return MensajeRespuesta(message='Hola mundo! \n')
+
+
+
 
     ##############################################
     #   métodos de ALUMNOS                       #
@@ -518,6 +535,12 @@ class HelloWorldApi(remote.Service):
         }
 
 
+        Ojo!
+        En el caso de que traiga una imagen debe comprobar que es distinta (la url) a la que el usuario ya disponía y en caso de serlo mandar
+        a borrar la antigua imagen con el manejador de imágenes y solo cuando se haya grabado correctamente en la base de datos el usuario
+        y eliminada correctamente la foto del datastore enviar el ok.
+
+
         '''
 
         if v:
@@ -546,6 +569,11 @@ class HelloWorldApi(remote.Service):
           "fecha_nacimiento": request.fecha_nacimiento,
           "telefono": request.telefono
         }
+
+        if request.imagen != None:
+            print 'Hay imagen recibida en modAlumno()'
+            form_fields['imagen'] = request.imagen
+            print form_fields
 
         if v:
             print "Llamando a: "+url
@@ -2210,7 +2238,7 @@ class HelloWorldApi(remote.Service):
     @endpoints.method(URL, MensajeRespuesta, path='imagenes/eliminarImagen', http_method='POST', name='imagenes.eliminarImagen')
     def eliminarImagen(self, request):
         '''
-        curl -X POST localhost:8001/_ah/api/helloworld/v1/imagenes/eliminarImagen?url=http://localhost:8001/_ah/img/encoded_gs_file:YXBwX2RlZmF1bHRfYnVja2V0L3BydWViYS5qcGc=
+        curl -X POST localhost:8001/_ah/api/helloworld/v1/imagenes/eliminarImagen?url=http://localhost:8001/_ah/img/encoded_gs_file:YXBwX2RlZmF1bHRfYnVja2V0L2Zpbm4uanBlZw==
         '''
         print (request.url)
         from manejadorImagenes import ManejadorImagenes

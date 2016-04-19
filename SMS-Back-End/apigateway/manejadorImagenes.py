@@ -39,7 +39,7 @@ class ManejadorImagenes:
         key = blobstore.create_gs_key(blobstore_filename)
 
 
-        #Devolvemos la url con la que se puede acceder a la imagen obtenida a partir
+        #Devolvemos la url con la que se puede acceder a la imagen obtenida a partir de la key.
         return get_serving_url(key)
 
 
@@ -47,15 +47,15 @@ class ManejadorImagenes:
     def DeleteFile(self, url):
         '''
         Eliminaremos la imagen a través de la url que tenemos de ella, extrayendo la clave del blob que se encuentra en la última parte.
+
         '''
-        #key = url[30:]
-        key = 'YXBwX2RlZmF1bHRfYnVja2V0L3BydWViYS5qcGc='
+
+        key = url[30:]
         print 'url: '+url
         print 'key: '+key
 
-        key2 = '/app_default_bucket/prueba.jpg'
-        print 'key2: '+key2
 
+        '''
         #Obtengo una lista de todos los fichetros del bucket
         list = gcs.listbucket("/app_default_bucket")
 
@@ -67,16 +67,11 @@ class ManejadorImagenes:
 
 
         print '\n\n\n\n'
-
         '''
+
         try:
-            gcs.delete(key2)
+            #gcs.delete(key2)
+            salida=blobstore.delete(key)
+            return 'OK'
         except gcs.NotFoundError:
-            pass
-        '''
-
-        #salida=gcs.delete(key)
-
-
-
-        return 'COOL'
+            return 'FAIL'

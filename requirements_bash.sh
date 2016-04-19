@@ -42,7 +42,9 @@ echo -e "\033[0m"
 echo -e "\n\033[31m 3. Instalando la librería de python para mysql \033[0m\n"
 sudo apt-get install python-mysqldb
 
-
+#Instalando el gestor de paquetes de python.
+echo -e "\n\033[31m 4. Instaladon el gestor de paquetes de python \033[0m\n"
+sudo apt-get install python-pip
 
 #Ayuda:
 echo "Si alguno de los paquetes no se ha instalado correctamente por favor inténtelo manualmente. Para conocer más

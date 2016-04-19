@@ -491,7 +491,86 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
   //$scope.id = $stateParams.estudianteID;
   $scope.id=$stateParams.estudianteID;
 
+  /*
+  Función que sube los datos del usuario junto a la imagen.
+  */
+  function modificacionUsuarioConNuevaImagen(datos, imagen)
+  {
+    console.log('calling modificaiconUsuarioConNuevaImagen con datos e imagen')
+    console.log(imagen)
+    console.log(imagen.files)
+    //Llamamos a la función que sube la imagen:
+    //subirImagen($scope.file, 'caca');
 
+    var urlImagenSubida="";
+
+    angular.forEach(imagen.files, function(flowFile, i){
+       var fileReader = new FileReader();
+          var nombre = flowFile.file.name;
+
+          fileReader.onload = function (event) {
+            var uri = event.target.result;
+              //$scope.imageStrings[i] = uri;
+
+              var res = uri.slice(23);
+              //console.log('Sending2 : ' + res);
+
+              var urlImagenSubida;
+              //Estamos usando como nombre de la imagen el nombrel del fichero.
+
+              gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
+                //console.log("calling subirImagen with image: "+res);
+                //console.log(resp);
+                urlImagenSubida=resp.message;
+                console.log('Respuesta del servidor imagen: ');
+                console.log(urlImagenSubida);
+
+                datos.imagen=urlImagenSubida;
+
+                console.log('Datos después de añadir imagen');
+                console.log(datos);
+
+                gapi.client.helloworld.alumnos.modAlumnoCompleto(datos).execute(function(resp){
+                  //Mostramos por consola la respuesta del servidor
+                  salidaEjecucion=resp.message;
+                  console.log("Respuesta servidor: "+salidaEjecucion);
+                  console.log(salidaEjecucion);
+
+                   if (salidaEjecucion == 'OK'){
+
+                     $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
+                     insertado=1;
+                     console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+                     $location.path("/estudiantes/main");
+                   }else{
+                     $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+                     insertado=0;
+                     console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+                   }
+
+                  $scope.$apply();
+                });
+
+
+
+
+              });
+
+
+              console.log('salida¡')
+              console.log(urlImagenSubida)
+
+          };
+
+
+
+          fileReader.readAsDataURL(flowFile.file);
+    });
+
+    //setTimeout(this, 5000);
+    console.log('return urlImagenSubida: '+urlImagenSubida)
+    return urlImagenSubida;
+  }
 
 
 
@@ -511,23 +590,76 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
   });
 
 
-  $scope.submitForm = function(formData){
+  var eliminacionImagen=false;
 
+  $scope.eliminaImagen = function(){
+    console.log('eliminaImagen');
+    console.log($scope.alumno.imagen);
+    if ($scope.alumno.imagen != null){
+      console.log('!= null');
+      $scope.alumno.imagen = null;
+      eliminacionImagen = true;
+    }
+  };
+
+
+  $scope.submitForm = function(imagen){
+
+    console.log('imagen');
+    console.log(imagen);
 
     //Lógica del formulario.
 
     //Cuando el formulario es válido porque cumple con todas las especificaciones:
-    if ($scope.formNuevoAlumno.$valid) {
+    if ($scope.formModAlumno.$valid) {
        console.log('Formulario válido');
        console.log('Se progecede a guardar la modificación del alumno en la base de datos.')
 
-       var salidaEjecucion;
 
-       console.log("llamada a modAlumnoCompleto()")
-       console.log($scope.alumno);
+       var datos={
+         //Aquí especificamos todos los datods del form que queremos que se envíen:
+         'nombre':encode_utf8($scope.formModAlumno.nombre.$modelValue),
+         'apellidos':encode_utf8($scope.formModAlumno.apellidos.$modelValue),
+         'direccion':encode_utf8($scope.formModAlumno.direccion.$modelValue),
+         'localidad':encode_utf8($scope.formModAlumno.localidad.$modelValue),
+         'provincia':encode_utf8($scope.formModAlumno.provincia.$modelValue),
+         'fecha_nacimiento':$scope.formModAlumno.fecha_nacimiento.$modelValue,
+         'telefono':$scope.formModAlumno.telefono.$modelValue,
+         'dni':$scope.formModAlumno.dni.$modelValue,
+
+         /*Como vamos a modificar un alumno tamién necesitamos su id (para identif. en la BD)
+         y lo recogemos del paso de params como antes para conseguir todos sus datos.*/
+         'id':$stateParams.estudianteID
+
+       };
+
+       console.log(datos);
+
+       if (imagen.files.length!=0){
+         console.log('Se ha añadido una imagen para modificar la del usuario (tuviera este o no)');
+
+         //Entonces se envían los datos junto a la imagen a la funció que realiza la modificación con una nueva imagen.
+         modificacionUsuarioConNuevaImagen(datos, imagen);
 
 
 
+      }else{
+        //No se ha añadido ninguna imagen desde el equipo, entonces:
+
+
+        //1. Puede que si haya modificado la imagen eliminando la que tenía pero sin subir una nueva.
+        if(eliminacionImagen){
+          console.log('Se elimina la imagen del usuario que tenía y queda sin imagen.');
+
+        //2. Puede que no haya modificado la imagen.
+        }else{
+          console.log('No se realizan cambios en la imagen del usuario');
+        };
+      };
+
+
+
+       /*
        gapi.client.helloworld.alumnos.modAlumnoCompleto({
          //Aquí especificamos todos los datods del form que queremos que se envíen:
          'id':$stateParams.estudianteID,
@@ -546,10 +678,7 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
          console.log(salidaEjecucion);
 
           if (salidaEjecucion == 'OK'){
-            /*
-            Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
-            de este componente, esto lo hcemos en la plantilla (html)
-            */
+
             $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
           }else{
             $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
@@ -557,6 +686,8 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
 
          $scope.$apply();
        });
+
+       */
 
 
 

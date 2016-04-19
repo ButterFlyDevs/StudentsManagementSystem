@@ -255,7 +255,7 @@ class GestorAlumnos:
             return 'Elemento no encontrado'
 
     @classmethod
-    def modAlumnoCompleto(self, idAlumno, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
+    def modAlumnoCompleto(self, idAlumno, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL',  imagen='NULL'):
         '''
         Modifica todos los atributos de un alumno dado su id al mismo tiempo.
         '''
@@ -265,6 +265,7 @@ class GestorAlumnos:
             print apiName
             print "Llamada a modAlumnoCompleto"
             print '\n'
+            print locals()
 
         db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
         query="UPDATE Alumno SET"
@@ -285,13 +286,18 @@ class GestorAlumnos:
 
 
         query=query+" , telefono= "+'\''+telefono+'\''
+        query=query+" , url_imagen= "+'\''+imagen+'\''
         query=query+" WHERE id_alumno="+idAlumno+";"
 
         if v:
             print apiName
-            print '\n'+query.encode('utf-8')
+            print '\n'+query
 
         cursor = db.cursor()
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
         salida =''
 
         try:
