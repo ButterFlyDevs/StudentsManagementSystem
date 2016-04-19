@@ -29,6 +29,7 @@ from google.appengine.api import modules
 #Para la decodificaciónd e los datos recibidos en JSON desde las APIs
 import jsonpickle
 
+from manejadorImagenes import ManejadorImagenes
 
 #Variable habilitadora del modo verbose
 v=True
@@ -401,8 +402,6 @@ class HelloWorldApi(remote.Service):
         #Añadimos el servicio al que queremos conectarnos.
         url+="alumnos"
 
-
-
         #Extraemos lo datos de la petición al endpoints
         form_fields = {
           "nombre": formatTextInput(request.nombre),
@@ -574,6 +573,30 @@ class HelloWorldApi(remote.Service):
             print 'Hay imagen recibida en modAlumno()'
             form_fields['imagen'] = request.imagen
             print form_fields
+
+
+            '''
+            En este momento se está recibiendo una URL en el campo imagen y por tanto tenemos que comprobar si es la misma que el usuario ya tenía.
+            Si es la misma, no se hace nada y el proceso sigue igual, pero si es distinta se debe eliminar la anterior para que no se acumule basura en el servidor
+            y después el proceso sigue igual.
+            '''
+
+            print '\n\n Comprobación de la igualdad de la imagen \n\n'
+
+            #Para eso primero pasamos los datos de la base de datos del estudiante:
+            #Lo único que modificamos es el método con el que se lama a la colección alumnos con el id de uno de ellos
+            respuesta = urlfetch.fetch(url=url, method=urlfetch.GET)
+            print 'respuesta'
+            print respuesta.content
+            alumno = jsonpickle.decode(respuesta.content)
+            #Se comprueba el dato recibido desde la base de datos con el pasado en la petición al endpoint.
+            if alumno.get('urlImagen') == request.imagen:
+                print '\n Se trata de la misma imagen (NO SE HA CAMBIADO ESTA) no se hace nada \n'
+            else:
+                print '\n Se trata de imágenes distintas, hay que mandar a borrar la antigua. \n'
+                #Mandamos a borrar la url de la imagen antingua del alumno.
+                ManejadorImagenes.DeleteFile(alumno.get('urlImagen'))
+
 
         if v:
             print "Llamando a: "+url
@@ -2228,7 +2251,7 @@ class HelloWorldApi(remote.Service):
 
         #print request.image.decode(encoding='UTF-8')
 
-        from manejadorImagenes import ManejadorImagenes
+
         print 'URL \n'
         url = ManejadorImagenes.CreateFile(request.name, request.image)
         print url
@@ -2241,7 +2264,6 @@ class HelloWorldApi(remote.Service):
         curl -X POST localhost:8001/_ah/api/helloworld/v1/imagenes/eliminarImagen?url=http://localhost:8001/_ah/img/encoded_gs_file:YXBwX2RlZmF1bHRfYnVja2V0L2Zpbm4uanBlZw==
         '''
         print (request.url)
-        from manejadorImagenes import ManejadorImagenes
         return MensajeRespuesta( message=ManejadorImagenes.DeleteFile(request.url))
 
 APPLICATION = endpoints.api_server([HelloWorldApi])

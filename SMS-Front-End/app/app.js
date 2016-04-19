@@ -635,27 +635,53 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
 
        console.log(datos);
 
+       var salidaEjecucion = false;
+
+
        if (imagen.files.length!=0){
          console.log('Se ha añadido una imagen para modificar la del usuario (tuviera este o no)');
 
          //Entonces se envían los datos junto a la imagen a la funció que realiza la modificación con una nueva imagen.
-         modificacionUsuarioConNuevaImagen(datos, imagen);
+         salidaEjecucion = modificacionUsuarioConNuevaImagen(datos, imagen);
 
 
-
-      }else{
-        //No se ha añadido ninguna imagen desde el equipo, entonces:
-
-
-        //1. Puede que si haya modificado la imagen eliminando la que tenía pero sin subir una nueva.
-        if(eliminacionImagen){
-          console.log('Se elimina la imagen del usuario que tenía y queda sin imagen.');
-
-        //2. Puede que no haya modificado la imagen.
         }else{
-          console.log('No se realizan cambios en la imagen del usuario');
+          //No se ha añadido ninguna imagen desde el equipo, entonces:
+
+
+          //1. Puede que si haya modificado la imagen eliminando la que tenía pero sin subir una nueva.
+          if(eliminacionImagen){
+            console.log('Se elimina la imagen del usuario que tenía y queda sin imagen.');
+
+            //Entonces se llama al procedimiento que modifica el usuario en el BackEnd (sin que haya que subir una imagen nueva antes)
+            //y cuando vea que lleva null si
+            //el usuario tenía imagen anteriormente cargada, que lo comprobará, 1. la eliminará del servidor y 2. el
+            //campo de imagen del usuario lo pondrá a null.
+
+            salidaEjecucion = modificacionUsuarioSimple(datos);
+
+
+
+          //2. Puede que no haya modificado la imagen.
+          }else{
+            console.log('No se realizan cambios en la imagen del usuario');
+
+            //Se llama al procedimiento que modifica el usuario sin que haya que subir una imagen nueva antes,
+            // y en el Backend se verá que no se han hecho cambios en la url de la imagen del usuario y solo modificará
+            // los campos de texto.
+
+            salidaEjecucion = modificacionUsuarioSimple(datos);
+
+          };
+
         };
-      };
+
+        if (salidaEjecucion == 'OK'){
+
+          $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
+        }else{
+          $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+        }
 
 
 
@@ -701,7 +727,7 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
 
 
 
-  };
+  }; //Fin submitForm function()
 
 
 
