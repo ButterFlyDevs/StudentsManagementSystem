@@ -494,8 +494,7 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
   /*
   Función que sube los datos del usuario junto a la imagen.
   */
-  function modificacionUsuarioConNuevaImagen(datos, imagen)
-  {
+  function modificacionUsuarioConNuevaImagen(datos, imagen){
     console.log('calling modificaiconUsuarioConNuevaImagen con datos e imagen')
     console.log(imagen)
     console.log(imagen.files)
@@ -573,12 +572,40 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
   }
 
 
+  function modificacionUsuarioSimple(datos){
+    gapi.client.helloworld.alumnos.modAlumnoCompleto(datos).execute(function(resp){
+      //Mostramos por consola la respuesta del servidor
+      salidaEjecucion=resp.message;
+      console.log("Respuesta servidor: "+salidaEjecucion);
+      console.log(salidaEjecucion);
+
+       if (salidaEjecucion == 'OK'){
+
+         $.UIkit.notify("Alumno modificado con muchísimo éxito.", {status:'success'});
+         insertado=1;
+         console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+         $location.path("/estudiantes/main");
+       }else{
+         $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+         insertado=0;
+         console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+       }
+
+      $scope.$apply();
+    });
+  }
+
 
   //Pedimos al Gateway toda la informaicón del Alumno.
   gapi.client.helloworld.alumnos.getAlumno({'id':$stateParams.estudianteID}).execute(function(resp) {
 
     console.log("calling getAlumno with id: "+$stateParams.estudianteID);
     console.log(resp);
+    if(resp.imagen=='NULL'){
+      console.log('Imagen viene con null, vamos a eliminarla del bloque');
+      delete resp.imagen;
+      console.log(resp);
+    };
     $scope.alumno = resp;
     console.log(resp.nombre);
     $scope.$apply();
@@ -635,14 +662,12 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
 
        console.log(datos);
 
-       var salidaEjecucion = false;
-
 
        if (imagen.files.length!=0){
          console.log('Se ha añadido una imagen para modificar la del usuario (tuviera este o no)');
 
          //Entonces se envían los datos junto a la imagen a la funció que realiza la modificación con una nueva imagen.
-         salidaEjecucion = modificacionUsuarioConNuevaImagen(datos, imagen);
+         modificacionUsuarioConNuevaImagen(datos, imagen);
 
 
         }else{
@@ -658,7 +683,9 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
             //el usuario tenía imagen anteriormente cargada, que lo comprobará, 1. la eliminará del servidor y 2. el
             //campo de imagen del usuario lo pondrá a null.
 
-            salidaEjecucion = modificacionUsuarioSimple(datos);
+            //Se pone el valor de imagen del conjunto de datos a null.
+            datos.imagen="NULL";
+            modificacionUsuarioSimple(datos);
 
 
 
@@ -670,18 +697,18 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
             // y en el Backend se verá que no se han hecho cambios en la url de la imagen del usuario y solo modificará
             // los campos de texto.
 
-            salidaEjecucion = modificacionUsuarioSimple(datos);
+            console.log($scope.alumno);
+            console.log(datos);
+            datos.imagen = $scope.alumno.imagen;
+            console.log('Después');
+            console.log(datos);
+            modificacionUsuarioSimple(datos);
 
           };
 
         };
 
-        if (salidaEjecucion == 'OK'){
 
-          $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
-        }else{
-          $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
-        }
 
 
 
@@ -783,6 +810,11 @@ routerApp.controller('ControladorDetallesEstudiante', function($location, $scope
 
     console.log("calling getAlumno with id: "+$stateParams.estudianteID);
     console.log(resp);
+    if(resp.imagen=='NULL'){
+      console.log('Imagen viene con null, vamos a eliminarla del bloque');
+      delete resp.imagen;
+      console.log(resp);
+    };
     $scope.alumno = resp;
     console.log(resp.nombre);
     $scope.$apply();

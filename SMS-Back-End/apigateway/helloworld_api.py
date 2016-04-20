@@ -569,7 +569,15 @@ class HelloWorldApi(remote.Service):
           "telefono": request.telefono
         }
 
-        if request.imagen != None:
+
+        print '\n\nComprobación de la imagen recibida, esté o no\n\n'
+
+        if not request.imagen:
+            print '\n\n No hay imagen \n\n'
+
+        print request.imagen;
+
+        if request.imagen != None or request.imagen == 'NULL':
             print 'Hay imagen recibida en modAlumno()'
             form_fields['imagen'] = request.imagen
             print form_fields
@@ -593,9 +601,13 @@ class HelloWorldApi(remote.Service):
             if alumno.get('urlImagen') == request.imagen:
                 print '\n Se trata de la misma imagen (NO SE HA CAMBIADO ESTA) no se hace nada \n'
             else:
-                print '\n Se trata de imágenes distintas, hay que mandar a borrar la antigua. \n'
-                #Mandamos a borrar la url de la imagen antingua del alumno.
-                ManejadorImagenes.DeleteFile(alumno.get('urlImagen'))
+                if alumno.get('urlImagen')!= 'NULL':
+                    print '\n Se trata de imágenes distintas, hay que mandar a borrar la antigua. \n'
+                    #Mandamos a borrar la url de la imagen antingua del alumno.
+                    ManejadorImagenes.DeleteFile(alumno.get('urlImagen'))
+                #Ya que pùede que no tenga imagen antes y no hay que borrar nada.
+
+
 
 
         if v:
