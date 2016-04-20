@@ -3,8 +3,10 @@
 Interfaz de interacción con la entidad Alumno de la base de datos.
 
 Última modificación: Feb 2016
+
+Para mostrar texto por terminal usar -> dbParams.formatOutputText(cadena) <-
 """
-import MySQLdb
+
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 from Alumno import *
 from Profesor import *
@@ -42,7 +44,8 @@ class GestorAlumnos:
         print locals()
 
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+
+        db = dbParams.conecta(); #La conexión está clara.
         #query="INSERT INTO Alumno values("+"'"+nombre+"', "+ "'"+dni+"');"
 
 
@@ -121,7 +124,10 @@ class GestorAlumnos:
         Devuelve una lista de todos los alumnos almacenados en la base de datos simplificada, solo con los
         campos id, nombre y apellidos.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+
+        db = dbParams.conecta()
+
+        #db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -162,7 +168,7 @@ class GestorAlumnos:
             idAlumno: identificador unívoco del alumno en la tabla
 
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         idAlumno='\''+idAlumno+'\''
         query='select * from Alumno where id_alumno='+idAlumno+';'
@@ -171,10 +177,6 @@ class GestorAlumnos:
             print query
 
         try:
-            #Sacando los acentos (esta llamada debe ejecutarse solo en la lectura, NUNCA en la escritura............
-            mysql_query="SET NAMES 'utf8'"
-            cursor.execute(mysql_query)
-            #-----------------------------#
             salida = cursor.execute(query);
             row = cursor.fetchone()
         except MySQLdb.Error, e:
@@ -204,7 +206,7 @@ class GestorAlumnos:
             alm.telefono=row[8]
             alm.urlImagen = row[9]
 
-            print 'Nombre alumno: '+alm.nombre
+            print 'Nombre alumno: '+dbParams.formatOutputText(alm.nombre)
 
             return alm
         if salida==0:
@@ -218,7 +220,7 @@ class GestorAlumnos:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idAlumno='\''+idAlumno+'\''
         query="UPDATE Alumno SET "+campoACambiar+"="+nuevoValor+" WHERE id_alumno="+idAlumno+";"
@@ -267,7 +269,7 @@ class GestorAlumnos:
             print '\n'
             print locals()
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         query="UPDATE Alumno SET"
         query=query+" nombre= "+'\''+nombre+'\''
         query=query+" , apellidos= "+'\''+apellidos+'\''
@@ -287,7 +289,9 @@ class GestorAlumnos:
 
         query=query+" , telefono= "+'\''+telefono+'\''
         query=query+" , url_imagen= "+'\''+imagen+'\''
-        query=query+" WHERE id_alumno="+idAlumno+";"
+
+        #Codificamos el id porque es el único que no viene codificado desde la api para que no de problema al concatenar con la sentencia SQL
+        query=query+" WHERE id_alumno="+dbParams.formatOutputText(idAlumno)+";"
 
         if v:
             print apiName
@@ -330,7 +334,7 @@ class GestorAlumnos:
     @classmethod
     def delAlumno(self, idAlumno):
         #print "Intentado eliminar alumno con dni "+str(dniAlumno)
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         idAlumno='\''+idAlumno+'\''
         query='delete from Alumno WHERE id_alumno='+idAlumno+';'
@@ -363,7 +367,7 @@ class GestorAlumnos:
     @classmethod
     def getNumAlumnos(self):
         '''Devuelve el número de alumnos de la BD'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="select count(*) from Alumno;"
         salida =''
@@ -402,7 +406,7 @@ class GestorAlumnos:
 
             idAlumno: El id del alumno del que se pide la información.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
         idAlumno='\''+idAlumno+'\''
 
@@ -455,7 +459,7 @@ class GestorAlumnos:
     def getAsignaturas(self, idAlumno):
         """Devuelve una lista con las asignaturas en las que ese alumno está matriculado
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -504,7 +508,7 @@ class GestorAlumnos:
         """
         Devuelve una lista con las clases en las que ese alumno está matriculado, aunque en la mayoría de los casos será una.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
