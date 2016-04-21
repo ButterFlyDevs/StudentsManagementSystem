@@ -5,8 +5,7 @@ Last mod: Feb 2016
 @about: Fichero de creación de la interfaz de interacción con la entidad Asignatura de la base de datos.
 """
 
-import MySQLdb
-#Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
+
 from Asignatura import *
 from Clase import *
 from Profesor import *
@@ -33,7 +32,7 @@ class GestorAsignaturas:
             print 'Calling nuevaAsignatura() with params:'
             print locals()
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta() #La conexión está clara.
         #query="INSERT INTO Asignatura values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
@@ -78,7 +77,7 @@ class GestorAsignaturas:
 
     @classmethod
     def getAsignaturas(self):
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -118,7 +117,7 @@ class GestorAsignaturas:
         """
         Recupera TODA la información de un Asignatura en concreto a través de la clave primaria, su id.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="select * from Asignatura where id_asignatura='"+idAsignatura+"';"
         if v:
@@ -162,7 +161,7 @@ class GestorAsignaturas:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idAsignatura='\''+idAsignatura+'\''
         query="UPDATE Asignatura SET "+campoACambiar+"="+nuevoValor+" WHERE id_asignatura="+idAsignatura+";"
@@ -210,7 +209,7 @@ class GestorAsignaturas:
             print "Llamada a modAsignaturaCompleta"
             print '\n'
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         query="UPDATE Asignatura SET"
         query=query+" nombre= "+'\''+nombre+'\''
         query=query+" WHERE id_asignatura="+idAsignatura+";"
@@ -252,7 +251,7 @@ class GestorAsignaturas:
     def delAsignatura(self, idAsignatura):
         if v:
             print "Intentado eliminar asignatura con id "+str(idAsignatura)
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="delete from Asignatura where id_asignatura='"+idAsignatura+"';"
         salida =''
@@ -279,7 +278,7 @@ class GestorAsignaturas:
     @classmethod
     def getNumAsignaturas(self):
         '''Devuelve el número de asignaturas de la BD'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="select count(*) from Asignatura;"
         salida =''
@@ -316,7 +315,7 @@ class GestorAsignaturas:
         '''
         Devuelve una lista con todos los clases donde se imparte la asignatura.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -356,7 +355,7 @@ class GestorAsignaturas:
         '''
         Devuelve una lista con todos los profesores que imparte clase en esa asignatura.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -394,7 +393,7 @@ class GestorAsignaturas:
         '''
         Devuelve una lista con todos los alumnos matriculados en esa asignatura en total.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........

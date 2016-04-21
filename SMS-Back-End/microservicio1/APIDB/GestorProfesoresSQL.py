@@ -32,7 +32,7 @@ class GestorProfesores:
         Necesita como mínimo un nombre y un dni
         '''
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
 
         nombre='\''+nombre+'\''
         if(apellidos!='NULL'):
@@ -86,7 +86,7 @@ class GestorProfesores:
         '''Devuelve una lista simplificada de todos los profesores registrados en el sistema, con los campos nombre,
         apellidos y dni.'''
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -128,7 +128,7 @@ class GestorProfesores:
         """
         Recupera TODA la información de un Profesor en concreto a través de la clave primaria, su DNI.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="select * from Profesor where id_profesor='"+idProfesor+"';"
 
@@ -177,7 +177,7 @@ class GestorProfesores:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idProfesor='\''+idProfesor+'\''
         query="UPDATE Profesor SET "+campoACambiar+"="+nuevoValor+" WHERE id_profesor="+idProfesor+";"
@@ -227,7 +227,7 @@ class GestorProfesores:
             print "Llamada a modProfesorCompleto"
             print '\n'
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         query="UPDATE Profesor SET"
         query=query+" nombre= "+'\''+nombre+'\''
         query=query+" , apellidos= "+'\''+apellidos+'\''
@@ -285,7 +285,7 @@ class GestorProfesores:
     @classmethod
     def delProfesor(self, idProfesor):
         #print "Intentado eliminar profesor con dni "+str(dniProfesor)
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="delete from Profesor where id_profesor='"+idProfesor+"';"
         if v:
@@ -319,7 +319,7 @@ class GestorProfesores:
     @classmethod
     def getNumProfesores(self):
         '''Devuelve el número de profesores de la BD'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="select count(*) from Profesor;"
         salida =''
@@ -360,7 +360,7 @@ class GestorProfesores:
             dniProfesor: El dni del profsor del que se pide la información.<
 
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -405,7 +405,7 @@ class GestorProfesores:
     def getAsignaturas(self, idProfesor):
         """Devuelve una lista con las asignaturas que ese profesor imparte.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -453,7 +453,7 @@ class GestorProfesores:
         """
         Devuelve una lista con las clases en los que ese profesor da clase, normalmente será al menos uno.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........

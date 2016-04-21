@@ -27,7 +27,7 @@ class GestorMatriculas:
         Da de alta una matrícula en el sistema.
         '''
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         #query="INSERT INTO Matricula values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
@@ -70,7 +70,7 @@ class GestorMatriculas:
 
     @classmethod
     def getMatriculas(self):
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -105,7 +105,7 @@ class GestorMatriculas:
     @classmethod
     def getMatricula(self, id_alumno, id_clase, id_asignatura):
         '''Recupera TODA la información de un Matricula en concreto a través de la clave primaria.'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         cursor = db.cursor()
 
         id_asignatura='\''+id_asignatura+'\''
@@ -155,7 +155,7 @@ class GestorMatriculas:
         se haga, para modificar la relación antes tendremos que destruirla y volverla a crear.
 
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         nuevoValor='\''+nuevoValor+'\''
         id_asignatura='\''+id_asignatura+'\''
         id_clase='\''+id_clase+'\''
@@ -196,7 +196,7 @@ class GestorMatriculas:
 
     @classmethod
     def delMatricula(self, id_matricula):
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         cursor = db.cursor()
         id_matricula='\''+id_matricula+'\''
         query="delete from Matricula where id_matricula="+id_matricula+";"

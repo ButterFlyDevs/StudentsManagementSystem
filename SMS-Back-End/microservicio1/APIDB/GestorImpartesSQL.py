@@ -24,7 +24,7 @@ class GestorImpartes:
     @classmethod
     def nuevoImparte(self, id_asociacion, id_profesor):
         '''Introduce una tupla en la tabla Imparte de la base de datos'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         #query="INSERT INTO Imparte values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
@@ -71,7 +71,7 @@ class GestorImpartes:
     @classmethod
     def getImpartes(self):
         '''Devuelve una lista simlifacada de todos los elementos Imparte de la tabla imparte de la bd'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -107,7 +107,7 @@ class GestorImpartes:
     @classmethod
     def getImparte(self, id_clase, id_asignatura, id_profesor):
         ''' Recupera TODA la información de un Imparte en concreto a través de la clave primaria, su id. '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         id_clase='\''+id_clase+'\''
@@ -148,7 +148,7 @@ class GestorImpartes:
     @classmethod
     def delImparte(self, id_imparte):
         '''Elimina una tupla imparte de la tabla Imparte'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
         id_imparte='\''+id_imparte+'\''
         query="delete from Imparte where id_imparte="+id_imparte+";"
@@ -178,7 +178,7 @@ class GestorImpartes:
     def delImparteSinClave(self, id_asociacion, id_profesor):
         '''Elimina una tupla imparte de la tabla Imparte usando los ides de la asociacion y del profesor,
         se usa cuando no se tiene el id de la tupla imparte en concreto.'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
         id_asociacion='\''+id_asociacion+'\''
         id_profesor='\''+id_profesor+'\''
@@ -216,7 +216,7 @@ class GestorImpartes:
         Este caso puede ser delicado al tener sólo dos atributos y ambos ser claves foráneas. Por eso no permitiremos que
         se haga, para modificar la relación antes tendremos que destruirla y volverla a crear.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
 
         id_clase='\''+id_clase+'\''
         id_asignatura='\''+id_asignatura+'\''

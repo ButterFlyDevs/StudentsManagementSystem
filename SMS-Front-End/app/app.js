@@ -11,10 +11,27 @@ function googleOnLoadCallback(){
             console.log(gapi);
         };
     };
+
+
+
     //gapi.client.load('helloWorld', 'v1', gCallback, '//' + window.location.host + '/_ah/api');
     //Cargamos la gAPI de nuestro backend solo una vez para toda la aplicación.
-    var ROOT = 'http://localhost:8001/_ah/api';
+    /*
+    Dependiendo de donde estemos se cargará la api desde el local o desde el backend desplegado en GAE.
+    */
+    var ROOT;
+
+    if(document.location.hostname=="localhost"){
+        ROOT = 'http://localhost:8001/_ah/api';
+        console.log('Conectando con APIGateway en localhost');
+    }else{
+        ROOT = 'https://sms-backend.appspot.com/_ah/api';
+        console.log('Conectando con APIGateway en sms-backend');
+    }
     gapi.client.load('helloworld', 'v1', gCallback, ROOT);
+
+
+
 }
 function encode_utf8(s) {
   return unescape(encodeURIComponent(s));

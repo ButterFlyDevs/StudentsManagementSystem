@@ -27,7 +27,7 @@ class GestorAsociaciones:
     def nuevaAsociacion(self, id_clase, id_asignatura):
         '''Introduce entidades en la tabla Asocia'''
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
         id_asignatura='\''+id_asignatura+'\''
@@ -71,7 +71,7 @@ class GestorAsociaciones:
         '''
         Devuelve una lista simplificada de todas las asociaciones dadas de alta en el sistema.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -109,7 +109,7 @@ class GestorAsociaciones:
         """
         Recupera TODA la información de un Asociacion en concreto a través de la clave primaria, su id.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -167,7 +167,7 @@ class GestorAsociaciones:
         Este caso puede ser delicado al tener sólo dos atributos y ambos ser claves foráneas. Por eso no permitiremos que
         se haga, para modificar la relación antes tendremos que destruirla y volverla a crear.
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         nuevoValor='\''+nuevoValor+'\''
         id_asignatura='\''+id_asignatura+'\''
         id_clase='\''+id_clase+'\''
@@ -203,7 +203,7 @@ class GestorAsociaciones:
 
     @classmethod
     def delAsociacion(self, id_asociacion):
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
         id_asociacion='\''+id_asociacion+'\''
 
@@ -235,7 +235,7 @@ class GestorAsociaciones:
     @classmethod
     def getNumAsociaciones(self):
         '''Devuelve el número de asociaciones de la BD'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="select count(*) from Asocia;"
         salida =''
@@ -274,7 +274,7 @@ class GestorAsociaciones:
         Devuelve una lista con los alumnos matriculados en esa asignatura y grupo
         Devuelve: id del alumno, nombre, apellidos e id
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -328,7 +328,7 @@ class GestorAsociaciones:
         Devuelve todos los profesores que imparte esa asignatura a esa asociacion Asignatura-Clase (Frances-1AESO)
         Devuelve nombre, apellidos e id.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........

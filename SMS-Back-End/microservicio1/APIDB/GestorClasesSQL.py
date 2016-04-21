@@ -33,7 +33,7 @@ class GestorClases:
         Introduce una nueva clase en la base de datos. Son necesarios los tres primeros parámetros.
         '''
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         #query="INSERT INTO Curso values("+"'"+nombre+"', "+ "'"+id+"');"
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
@@ -81,7 +81,7 @@ class GestorClases:
         la flexibilidad de esta clase y que permitiera buscar  todas las clases de un nivel o de un curso
         en concreto.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -122,7 +122,7 @@ class GestorClases:
         Aunque ahora sea poca información, la misión de esta función es traer toda la información de esa asignatura en lugar
         de la versión reducida que trae getClases.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         idClase='\''+idClase+'\''
         query="select * from Clase where id_clase="+idClase+";"
@@ -165,7 +165,7 @@ class GestorClases:
         campoACambiar: nombre del atributo que se quiere cambiar
         nuevoValor: nuevo valor que se quiere guardar en ese campo.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
 
         idClase='\''+idClase+'\''
@@ -215,7 +215,7 @@ class GestorClases:
             print "Llamada a modClaseCompleta"
             print '\n'
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db);
+        db = dbParams.conecta();
         query="UPDATE Clase SET"
         query=query+" curso= "+'\''+curso+'\''
         query=query+" , grupo= "+'\''+grupo+'\''
@@ -259,7 +259,7 @@ class GestorClases:
     def delClase(self, idClase):
         if v:
             print "Intentado eliminar Clase con id_clase "+str(idClase)
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="delete from Clase  WHERE id_clase="+idClase+";"
         salida =''
@@ -290,7 +290,7 @@ class GestorClases:
     @classmethod
     def getNumClases(self):
         '''Devuelve el número de clases de la BD'''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db); #La conexión está clara.
+        db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         query="select count(*) from Clase;"
         salida =''
@@ -336,7 +336,7 @@ class GestorClases:
         Devuelve: Una lista de objetos de tipo asignatura
 
         """
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
 
         #Sacando los acentos...........
@@ -373,7 +373,7 @@ class GestorClases:
         Devuelve una lista con los alumnos matriculados en esa clase.
         Campos devueltos: id, nombre y apellidos.
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
         #Sacando los acentos...........
         mysql_query="SET NAMES 'utf8'"
@@ -415,7 +415,7 @@ class GestorClases:
         Devuelve la lista de profesores que están impartien a esa clase.
         Devuelve dni, nombre y apellidos
         '''
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
         #Sacando los acentos...........
         mysql_query="SET NAMES 'utf8'"
@@ -450,7 +450,7 @@ class GestorClases:
     @classmethod
     def getAsociaciones(self, idClase):
 
-        db = MySQLdb.connect(dbParams.host, dbParams.user, dbParams.password, dbParams.db)
+        db = dbParams.conecta()
         cursor = db.cursor()
         #Sacando los acentos...........
         mysql_query="SET NAMES 'utf8'"
