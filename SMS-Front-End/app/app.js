@@ -206,7 +206,7 @@ de la vista y se usan).
                 controller: 'ControladorDetallesClase'
               })
               .state('clases.modificacion-clase',{
-                url: '/modificacion/:asignaturaID',
+                url: '/modificacion/:claseID',
                 templateUrl: 'clases/clases-modificacion.html',
                 controller: 'ControladorModificacionClase'
               })
@@ -1419,6 +1419,85 @@ routerApp.controller('ControladorNuevaClase', function ($scope){
 
 
   };
+});
+
+routerApp.controller('ControladorModificacionClase', function($location, $scope, $stateParams){
+
+  //Rescatamos el id de la url y la enviamos con el scope a la vista
+  //$scope.id = $stateParams.estudianteID;
+  $scope.id=$stateParams.claseID;
+  console.log('claseID : '+$stateParams.claseID);
+  console.log($stateParams);
+
+
+  //Pedimos al Gateway toda la asignatura (esta información la podríamos ahorrar si viniera desde el otro controlador).
+  gapi.client.helloworld.clases.getClase({'id':$stateParams.claseID}).execute(function(resp) {
+    console.log("calling getClase with id: "+$stateParams.claseID);
+    console.log('Datos recibidos: ')
+    console.log(resp);
+    $scope.clase = resp;
+    $scope.$apply();
+  });
+
+
+  $scope.submitFormModAsignatura = function(formData){
+
+    console.log("Solicitud de formulario")
+
+    //Cuando el formulario es válido porque cumple con todas las especificaciones:
+    if ($scope.formModificacionClase.$valid) {
+       console.log('Formulario válido');
+       console.log('Se progecede a guardar la modificación de la clase en la BD.')
+
+       var salidaEjecucion;
+
+
+       console.log('Datos de llamada:')
+       console.log('id:'+$stateParams.claseID);
+       console.log($scope.clase);
+
+
+       gapi.client.helloworld.clases.modClaseCompleta({
+         'id': $stateParams.claseID,
+         'curso': $scope.clase.curso,
+         'grupo': $scope.clase.grupo,
+         'nivel': $scope.clase.nivel
+       }).execute(function(resp){
+         //Mostramos por consola la respuesta del servidor
+         salidaEjecucion=resp.message;
+         console.log("Respuesta servidor: "+salidaEjecucion);
+         console.log(salidaEjecucion);
+
+          if (salidaEjecucion == 'OK'){
+            /*
+            Para que los notify de UIkit funcionen deben estar cargdos tanto el fichero de estilo como el javascript
+            de este componente, esto lo hcemos en la plantilla (html)
+            */
+            $.UIkit.notify("Clase modificada con muchísimo éxito.", {status:'success'});
+          }else{
+            $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+          }
+
+         $scope.$apply();
+       });
+
+
+
+     }
+     else {
+         //if form is not valid set $scope.addContact.submitted to true
+         console.log('Formulario inválido');
+         clase="uk-class-danger"
+         $scope.formModificacionClase.submitted=true;
+     };
+
+
+
+  };
+
+
+
+
 });
 
 routerApp.controller('ControladorDetallesClase', function($location, $scope, $stateParams, $window){

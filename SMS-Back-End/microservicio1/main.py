@@ -530,6 +530,31 @@ def getClase(id_clase):
     else:
         return jsonpickle.encode(salida)
 
+@app.route('/clases/<string:id_clase>',methods=['POST'])
+def modClaseCompleta(id_clase):
+    '''
+    Función que modifica los atributos de una clase completa dada su identificación
+    curl -d "curso=1&grupo=B&nivel=ESO" -i -X POST localhost:8002/clases/1
+
+    '''
+    if v:
+        print 'Calling GestorClases.modClaseCompleta()'
+
+    #El id del alumno se pasa por la URL
+    salida = GestorClases.modClaseCompleta(id_clase, request.form['curso'], request.form['grupo'], request.form['nivel']);
+
+    if v:
+        print "SALIDA: "+str(salida)
+
+    if salida == 'OK':
+        return 'OK'
+    else:
+        return salida
+
+
+
+
+
 @app.route('/clases/<string:id_clase>',methods=['DELETE'])
 def delClase(id_clase):
     '''

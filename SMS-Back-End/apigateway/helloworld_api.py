@@ -1522,7 +1522,7 @@ class HelloWorldApi(remote.Service):
             raise endpoints.BadRequestException('Peticion erronea')
 
         if str(result.status_code) == '404':
-            raise endpoints.NotFoundException('Profesor con ID %s no encontrado.' % (request.id))
+            raise endpoints.NotFoundException('Clase con ID %s no encontrada.' % (request.id))
 
         clase = jsonpickle.decode(result.content)
 
@@ -1640,7 +1640,7 @@ class HelloWorldApi(remote.Service):
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
-    @endpoints.method(ClaseCompleta,MensajeRespuesta,path='clases/modClaseCompleta', http_method='POST', name='clases.modClaseCompleta')
+    @endpoints.method(ClaseCompleta, MensajeRespuesta, path='clases/modClaseCompleta', http_method='POST', name='clases.modClaseCompleta')
     def modificarClaseCompleta(self, request):
         '''
         Modifica todos los atributos de una clase, aunque algunos queden igual.
@@ -1649,7 +1649,7 @@ class HelloWorldApi(remote.Service):
 
         if v:
             print nombreMicroservicio
-            print "Petición POST a asignaturas.modAsignaturaCompleta"
+            print "Petición POST a clases.modClaseCompleta"
             print "Contenido de la petición:"
             print str(request)
             print '\n'

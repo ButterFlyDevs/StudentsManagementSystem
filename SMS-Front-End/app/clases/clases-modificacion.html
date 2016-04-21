@@ -7,18 +7,35 @@ Diseño de la vista de la pestaña de detalles del estudiante.
 <script type="text/javascript" src="app/js/components/notify.js"></script>
 
 <!--Título de la sección -->
-<h3>Modificación de la asignatura</h3>
+<h3>Modificación de la clase</h3>
 <hr>
-<!-- Con ng-submit especificamos la función que dentro del controlador que gestiona esta plantilla. -->
-<form class="uk-form" name="formModificacionAsignatura" ng-submit="submitForm()" novalidate>
+
+<form class="uk-form" name="formModificacionClase" ng-submit="submitFormModAsignatura()" novalidate>
 
      <fieldset data-uk-margin>
 
-        <!-- Campo nombre -->
-        <input type="text" placeholder={{asignatura.nombre}} name="nombre" ng-class="{ 'uk-form-danger' : formModificacionAsignatura.nombre.$invalid && !formModificacionAsignatura.$pristine }" ng-minlength="3"  ng-model="asignatura.nombre" required>
+        <!-- Campo curso -->
+        <input type="text" placeholder={{clase.curso}} name="curso" ng-class="{ 'uk-form-danger' : formNuevaClase.curso.$invalid && !formNuevaClase.$pristine }" ng-minlength="1"   ng-model="clase.curso" required>
+
+        <!-- Campo grupo -->
+        <input type="text" placeholder={{clase.grupo}} name="grupo" ng-class="{ 'uk-form-danger' : formNuevaClase.grupo.$invalid && !formNuevaClase.$pristine }" ng-minlength="1"  ng-model="clase.grupo" required>
+
+        <!-- Campo nivel -->
+        <input type="text" placeholder={{clase.nivel}} name="nivel" ng-class="{ 'uk-form-danger' : formNuevaClase.nivel.$invalid && !formNuevaClase.$pristine }" ng-minlength="3"  ng-model="clase.nivel" required>
 
         <!-- Mensajes de error -->
-        <p ng-show="formModificacionAsignatura.nombre.$error.minlength" class="uk-text-danger"><i class="uk-icon-info-circle"></i>   El nombre es demasiado corto.</p>
+        <p ng-show="formNuevaClase.nombre.$error.minlength" class="uk-text-danger"><i class="uk-icon-info-circle"></i>   El nombre es demasiado corto.</p>
+
+
+
+        <!-- Botón de enviar
+        Este botón responde a la función definida en el controlador con el nombre puesto en ng-submit, en este caso:submitForm()
+        -->
+        <br class="uk-margin-bottom">
+
+        <!--Añadimos el CSS y el javascript necesarios para poder usar las notificaciones flotantes -->
+        <link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
+        <script type="text/javascript" src="app/js/components/notify.js"></script>
 
 
         <br class="uk-margin-top">
