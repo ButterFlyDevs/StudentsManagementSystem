@@ -87,15 +87,17 @@ class GestorAlumnos:
             print query
 
         cursor = db.cursor()
-        #Sacando los acentos...........
-        mysql_query="SET NAMES 'utf8'"
-        cursor.execute(mysql_query)
-        #-----------------------------#
-        salida =''
 
+        salida =''
+        idAlumno=''
+
+        import MySQLdb
         try:
 
             salida = cursor.execute(query);
+            idAlumno = cursor.lastrowid
+
+            #idAlumno=cursor.execute('SELECT LAST_INSERT_ID();')
         except MySQLdb.Error, e:
             # Get data from database
             try:
@@ -110,13 +112,25 @@ class GestorAlumnos:
         cursor.close()
         db.close()
 
+
+
         if v:
             print "salida MySQL: "+str(salida)
+            print "salida idAlumno:"+str(idAlumno)
+
+        dic={'status':salida, 'idAlumno':str(idAlumno)}
+
 
         if salida==1:
-            return 'OK'
+            dic['status']= 'OK'
+            #return 'OK'
         if salida==1062:
-            return 'Elemento duplicado'
+            dic['status']= 'Elemento duplicado'
+            #return 'Elemento duplicado'
+
+        #Devolvemos el diccionario
+        print dic
+        return dic
 
     @classmethod
     def getAlumnos(self):

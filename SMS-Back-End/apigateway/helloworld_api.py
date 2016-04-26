@@ -373,6 +373,110 @@ class HelloWorldApi(remote.Service):
 
         return alumno
 
+    class AlumnoCompletoConImagen(messages.Message):
+        id = messages.StringField(1)
+        nombre = messages.StringField(2)
+        apellidos = messages.StringField(3)
+        dni = messages.StringField(4)
+        direccion = messages.StringField(5)
+        localidad = messages.StringField(6)
+        provincia = messages.StringField(7)
+        fecha_nacimiento = messages.StringField(8)
+        telefono = messages.StringField(9)
+        #En esta ocasión la imagen no es una URL sino los Bytes en crudo.
+        imagen  = messages.BytesField(10)
+
+    @endpoints.method(AlumnoCompletoConImagen, MensajeRespuesta, path='alumnos/insertarAlumno2', http_method='POST', name='alumnos.insertarAlumno2')
+    def insertar_alumno2(self, request):
+        '''
+
+        Función que inserta un alumno en el sistema con o sin imagen.
+
+        Ejemplo de llamada SIN imagen:
+        curl -i -d "nombre=Juan&apellidos=Fernandez&dni=45301218&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno2
+
+        Ejmplo de llamada CON imagen:
+
+        curl -d "nombre=Juan&apellidos=Fernandez&dni=45301218&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" --data-urlencode 'imagen='"$( base64 profile.jpg)"''  -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno2
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a alumnos.insertarAlumno2"
+            print "Contenido de la petición:"
+            print request
+            print '\n'
+
+        #Construimos un diccionario con los datos del alumno recibidos en la petición.
+        datos = {
+          "nombre": formatTextInput(request.nombre),
+          "apellidos": formatTextInput(request.apellidos),
+          "dni": request.dni,
+          "direccion": formatTextInput(request.direccion),
+          "localidad": formatTextInput(request.localidad),
+          "provincia": formatTextInput(request.provincia),
+          "fecha_nacimiento": request.fecha_nacimiento,
+          "telefono": request.telefono
+        }
+
+        #Sea con imagen o sin imagen insertamos al alumno en el sistema:
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="alumnos"
+
+        #Codificamos los datos.
+        form_data = urllib.urlencode(datos)
+        #Realizamos la petición al servicio con los datos codificados al microservicio apropiado.
+        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+        if v:
+            print nombreMicroservicio
+            print "Resultado de la petición: "
+            print result.content
+            print "Código de estado: "
+            print result.status_code
+            print '\n\n'
+
+        #Analizamos la respuesta y si todo ha ido bien habremos recibido algo así: {'idAlumno': '42', 'status': 'OK'}
+        json = jsonpickle.decode(result.content)
+
+        #Definimos el mensaje de salida:
+        salida = ''
+
+        if json['status'] == 'OK':
+            #Es que el alumno se ha guardado con éxito, entonces procedemos a guardar su imagen
+
+            #Si se detecta que no se ha enviado información en el campo imagen, es que no se está enviando una imagen:
+            if request.imagen == None:
+                print 'Petición a insertarAlumno2 SIN imagen en el request.\n'
+                salida = json['status']
+
+            else:
+                print 'Petición a insertarAlumno2 CON imagen en el request.\n'
+
+                #Pero antes ponemos el nombre de forma correcta, usando el id del alumno y la extensión de la imagen
+                nombreImagen = 'alumnos/imagenes_perfil/' + json['idAlumno'] + '.jpg'
+
+                urlImagenAlumno = ManejadorImagenes.CreateFile(nombreImagen, request.imagen)
+
+                #Una vez guardada la imagen pasamos a setear el campo imagen del alumno en cuestión.
+                url2 = "http://%s/" % modules.get_hostname(module="microservicio1")
+                url2+="alumnos/"+json['idAlumno']
+
+                #Añadimos la imagen a los datos:
+                datos['imagen'] = urlImagenAlumno;
+
+                resultadoModificacion = urlfetch.fetch(url=url2, payload=urllib.urlencode(datos), method=urlfetch.POST)
+
+                print 'Resultado Modificacion'
+                print str(resultadoModificacion.content)
+                json2 = jsonpickle.decode(resultadoModificacion.content)
+                salida = json2['status']
+
+        return MensajeRespuesta(message=salida)
+
+
+    #### possibly deprecated ####
     @endpoints.method(AlumnoCompleto,MensajeRespuesta, path='alumnos/insertarAlumno', http_method='POST', name='alumnos.insertarAlumno')
     def insertar_alumno(self, request):
         '''

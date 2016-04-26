@@ -294,7 +294,7 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
   /*
   Controlador que manejará los datos del formulario enviándolos al servidor.
   */
-  function uploadFiles2(e, datos)
+  function insertarAlumno2ConImagen(e, datos)
   {
     console.log('HOla uploadFile')
     console.log(e)
@@ -404,32 +404,37 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
        //Primero cargamos la imagen del usuario:
        console.log('Procesamiento de la imagen:');
 
-       if (imagen.files.length!=0){ //Si existe una imagen cargada
+
+
+       //Variable de control para los mensajes tipo notify.
+       var salidaEjecucion=''
+
+
+       // ##### Si existe una imagen para subir ##### //
+       //Si hay imágenes cargadas en ng-flow se llama a la función que las lee y llama a insertarAlumno.
+       if (imagen.files.length!=0){
          console.log('Añadiendo imagen!!!!: ');
-         //Subimos la imagen al sistema.
-         //console.log('salida: '+urlImagen);
 
-         //Añadimos la url de la imagen a los datos a enviar:
-         var urlImagen="";
-         urlImagen = uploadFiles2(imagen, datos);
-         //while (urlImagen==""){
-           console.log(urlImagen);
-           console.log('while');
-
-         //};
+          salidaEjecucion = insertarAlumno2ConImagen(imagen, datos);
 
 
-         console.log(datos.imagen);
-         console.log('Fin añadiendo imagen!!!');
-
-         //Vamos a esperar un poco a que se suba la imagen :)
-
-
+       // ##### Si NO existe una imagen para subir ##### //
        }else{
 
-                //llamamos al APIG con los datos creados antes.
-                console.log("llamada a insertarAlumno()")
+                //Se llama al backend solo con los datos recogidos del formulario.
 
+                gapi.client.helloworld.alumnos.insertarAlumno2(datos).execute(function(resp){
+                  console.log('llamada a insertarAlumno2()');
+                  //Mostramos por consola la respuesta del servidor
+                  salidaEjecucion=resp.message;
+                  console.log("Respuesta servidor: "+salidaEjecucion);
+                  console.log(salidaEjecucion);
+
+
+                });
+
+
+/*
                 gapi.client.helloworld.alumnos.insertarAlumno(datos).execute(function(resp){
                   //Mostramos por consola la respuesta del servidor
                   salidaEjecucion=resp.message;
@@ -450,8 +455,22 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
 
                   $scope.$apply();
                 });
-
+*/
        }
+
+       if (salidaEjecucion == 'OK'){
+
+         $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
+         insertado=1;
+         console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+         $location.path("/estudiantes/main");
+       }else{
+         $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+         insertado=0;
+         console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+       }
+
+      $scope.$apply();
 
 
 
@@ -500,7 +519,10 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
 
 
 
-});
+}); //Fin de controlador nuevo estudiante.
+
+
+
 
 routerApp.controller('ControladorModificacionEstudiante', function($location, $scope, $stateParams){
 

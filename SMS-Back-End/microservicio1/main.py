@@ -89,7 +89,7 @@ def postAlumno():
     if salida == 'OK':
         return 'OK'
     else:
-        return salida
+        return jsonpickle.encode(salida, unpicklable=False)
         #abort(404)
 
 
