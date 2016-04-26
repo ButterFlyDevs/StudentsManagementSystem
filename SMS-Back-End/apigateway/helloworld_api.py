@@ -747,6 +747,7 @@ class HelloWorldApi(remote.Service):
             salida = ManejadorImagenes.DeleteFile2(nombreImagen = 'alumnos/imagenes_perfil/' + request.id + '.jpg')
             print salida;
             #2. Borrar la url que de la imagen tiene el user en sus datos. (modificar al alumno)
+            datos['imagen'] = 'NULL';
             result = urlfetch.fetch(url=url, payload=urllib.urlencode(datos), method=urlfetch.POST)
             print 'Respuesta'
             print result.content

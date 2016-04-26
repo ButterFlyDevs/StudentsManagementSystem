@@ -508,22 +508,9 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
               var urlImagenSubida;
               //Estamos usando como nombre de la imagen el nombrel del fichero.
 
+                datos.imagen=res;
 
-              // 1. PRIMERA LLAMADA
-              gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
-                //console.log("calling subirImagen with image: "+res);
-                //console.log(resp);
-                urlImagenSubida=resp.message;
-                console.log('Respuesta del servidor imagen: ');
-                console.log(urlImagenSubida);
-
-                datos.imagen=urlImagenSubida;
-
-                console.log('Datos después de añadir imagen');
-                console.log(datos);
-
-                // 2. SEGUNDA LLAMADA ANIDADA
-                gapi.client.helloworld.alumnos.modAlumnoCompleto(datos).execute(function(resp){
+                gapi.client.helloworld.alumnos.modAlumnoCompleto2(datos).execute(function(resp){
                   //Mostramos por consola la respuesta del servidor
                   salidaEjecucion=resp.message;
                   console.log("Respuesta servidor: "+salidaEjecucion);
@@ -547,7 +534,7 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
 
 
 
-              });
+
 
 
               console.log('salida¡')
@@ -567,7 +554,7 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
 
 
   function modificacionUsuarioSimple(datos){
-    gapi.client.helloworld.alumnos.modAlumnoCompleto(datos).execute(function(resp){
+    gapi.client.helloworld.alumnos.modAlumnoCompleto2(datos).execute(function(resp){
       //Mostramos por consola la respuesta del servidor
       salidaEjecucion=resp.message;
       console.log("Respuesta servidor: "+salidaEjecucion);
@@ -678,7 +665,7 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
             //campo de imagen del usuario lo pondrá a null.
 
             //Se pone el valor de imagen del conjunto de datos a null.
-            datos.imagen="NULL";
+            datos.imagen="ZGVs"; //ZGVs parámetro especial que es 'del' en base64 para hacer que se elimine en el server.
             modificacionUsuarioSimple(datos);
 
 
