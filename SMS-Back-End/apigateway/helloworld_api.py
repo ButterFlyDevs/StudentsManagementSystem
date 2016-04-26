@@ -470,8 +470,9 @@ class HelloWorldApi(remote.Service):
 
                 print 'Resultado Modificacion'
                 print str(resultadoModificacion.content)
-                json2 = jsonpickle.decode(resultadoModificacion.content)
-                salida = json2['status']
+                salida = resultadoModificacion.content
+                #json2 = jsonpickle.decode(resultadoModificacion.content)
+                #salida = json2['status']
 
         return MensajeRespuesta(message=salida)
 
@@ -551,26 +552,12 @@ class HelloWorldApi(remote.Service):
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
-
-
-
-    @endpoints.method(ID,MensajeRespuesta,path='delAlumno', http_method='DELETE', name='alumnos.delAlumno')
+    @endpoints.method(ID,MensajeRespuesta,path='alumnos/delAlumno', http_method='DELETE', name='alumnos.delAlumno')
     def eliminar_alumno(self, request):
+
         '''
-
-        delAlumno()  [DELETE con dniAlumno]
-
         #Ejemplo de borrado de un recurso pasando el dni de un alumno
-        Ubuntu> curl -d "id=1" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/alumnos/eliminaralumn
-        {
-         "message": "OK"
-        }
-
-        #Ejemplo de ejecución en el caso de no encontrar el recurso:
-        Ubuntu> curl -d "id=1" -X DELETE -G localhost:8001/_ah/api/hellworld/v1/alumnos/eliminaralumno
-        {
-         "message": "Elemento no encontrado"
-        }
+        curl -d "id=87" -X DELETE -G localhost:8001/_ah/api/helloworld/v1/alumnos/delAlumno
         '''
 
         if v:
@@ -597,10 +584,23 @@ class HelloWorldApi(remote.Service):
         #Extraemos el argumento id de la petición y la añadimos a la URL
         url+='alumnos/'+request.id
 
-        if v:
-            print "Llamando a: "+url
+        #1. Primero consultamos si ese alumno tenía imagen (porque tendremos que borrarla del Cloud Storage)
+        datosAlumno = urlfetch.fetch(url=url, method=urlfetch.GET)
+        jsonDatosAlumno = jsonpickle.decode(datosAlumno.content)
 
-        #Realizamos la petición a la url del servicio con el método apropiado.
+        #2. Si se tiene imagen se manda a borrar
+        if(jsonDatosAlumno['urlImagen']!='NULL'):
+
+            print '\n Modificando imagen actual del usuario con id: '+str(jsonDatosAlumno['id'])
+
+            #1. Se ha de borrar la antigua imagen del Cloud Storage
+            #Primero componenmos el nombre de l aimagen:
+            nombreImagen = 'alumnos/imagenes_perfil/' + str(jsonDatosAlumno['id']) + '.jpg'
+            #Después se manda a borrar
+            print 'Eliminacion imagen:' + str(ManejadorImagenes.DeleteFile2(nombreImagen))
+
+
+        #3. Realizamos la petición a la url del servicio con el método apropiado para borrarlos definitivament.
         result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
 
         #Infro después de la petición:
@@ -615,6 +615,147 @@ class HelloWorldApi(remote.Service):
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return MensajeRespuesta(message=result.content)
 
+    @endpoints.method(AlumnoCompletoConImagen,MensajeRespuesta,path='alumnos/modAlumnoCompleto2', http_method='POST', name='alumnos.modAlumnoCompleto2')
+    def modificarAlumnoCompleto2(self, request):
+        '''
+        Ejemplo de llamada SIN imagen:
+        curl -i -d "id=85&nombre=Maria2&apellidos=Fernandez&dni=45301218&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/modAlumnoCompleto2
+
+        Ejmplo de llamada CON imagen:
+
+        curl -i -d "id=87&nombre=Juan&apellidos=Fernandez&dni=45301218&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" --data-urlencode 'imagen='"$( base64 profile.jpg)"''  -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/modAlumnoCompleto2
+
+        Con otra imagen:
+        curl -i -d "id=87&nombre=Juan&apellidos=Fernandez&dni=45301218&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" --data-urlencode 'imagen='"$( base64 profile2.jpg)"''  -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/modAlumnoCompleto2
+
+        Ejemplo de llamada con ELIMINACION de imagen:
+        curl -i -d "imagen=ZGVs&id=87&nombre=Juan&apellidos=Fernandez&dni=45301218&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459"   -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/modAlumnoCompleto2
+
+
+        Ojo!
+        En el caso de que traiga una imagen debe comprobar que es distinta (la url) a la que el usuario ya disponía y en caso de serlo mandar
+        a borrar la antigua imagen con el manejador de imágenes y solo cuando se haya grabado correctamente en la base de datos el usuario
+        y eliminada correctamente la foto del datastore enviar el ok.
+
+
+        '''
+
+        if v:
+            print nombreMicroservicio
+            print "Petición POST a alumnos.modAlumnoCompleto2"
+            print "Contenido de la petición:"
+            #print str(request)
+            print '\n'
+
+
+
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+
+        #Añadimos el recurso al que queremos conectarnos, colección alumnos / alumno con id concreto.
+        url+="alumnos/"+request.id
+
+        #Extraemos lo datos de la petición que se reciben aquí en el endpoints
+        datos = {
+          "nombre": formatTextInput(request.nombre),
+          "apellidos": formatTextInput(request.apellidos),
+          "dni": formatTextInput(request.dni),
+          "direccion": formatTextInput(request.direccion),
+          "localidad": formatTextInput(request.localidad),
+          "provincia": formatTextInput(request.provincia),
+          "fecha_nacimiento": request.fecha_nacimiento,
+          "telefono": request.telefono
+        }
+
+
+        # La imagen se quiere sustituir #
+        if request.imagen is not None:
+            print '\n\nHAY imagen, la imagen actual se quiere actualizar. \n\n'
+            #1. Averiguamos si el usuario tenía imagen ya o no, para borrarla, usamos la url especificada antes pero con el metodo GET
+            datosAlumno = urlfetch.fetch(url=url, method=urlfetch.GET)
+            jsonDatosAlumno = jsonpickle.decode(datosAlumno.content)
+
+            print jsonDatosAlumno
+
+            #### Si el usuario no tenía imagen: ####
+            if(jsonDatosAlumno['urlImagen']=='NULL'):
+
+                print 'Grabando imagen al usuario con id: '+str(jsonDatosAlumno['id'])
+
+                #1. Se graba la imagen en el Cloud Storage
+                nombreImagen = 'alumnos/imagenes_perfil/' + str(jsonDatosAlumno['id']) + '.jpg'
+
+                urlImagenAlumno = ManejadorImagenes.CreateFile(nombreImagen, request.imagen)
+
+                #2. Y después se modifican los datos del alumno, añadiendo la url a esta
+
+                #Una vez guardada la imagen pasamos a setear el campo imagen del alumno en cuestión.
+                url2 = "http://%s/" % modules.get_hostname(module="microservicio1")
+                url2+="alumnos/"+str(jsonDatosAlumno['id'])
+
+                #Añadimos la imagen a los datos:
+                datos['imagen'] = urlImagenAlumno;
+                #Realizamos la modificaion llamando a la api del microservicio.
+                resultadoModificacion = urlfetch.fetch(url=url2, payload=urllib.urlencode(datos), method=urlfetch.POST)
+
+                print 'Resultado Modificacion'
+                print str(resultadoModificacion.content)
+
+            #### Si el usuario SI tenía imagen ####
+            if(jsonDatosAlumno['urlImagen']!='NULL'):
+
+                print '\n Modificando imagen actual del usuario con id: '+str(jsonDatosAlumno['id'])
+
+                #1. Se ha de borrar la antigua imagen del Cloud Storage
+                #Primero componenmos el nombre de l aimagen:
+                nombreImagen = 'alumnos/imagenes_perfil/' + str(jsonDatosAlumno['id']) + '.jpg'
+                #Después se manda a borrar
+                print 'Eliminacion imagen:' + str(ManejadorImagenes.DeleteFile2(nombreImagen))
+
+
+                #2. Se debe de guardar la nueva, con el mismo nombre:
+                urlImagenAlumno = ManejadorImagenes.CreateFile(nombreImagen, request.imagen)
+
+
+                #3. Se ha de modificar la url en los datos del estudiante
+                #Una vez guardada la imagen pasamos a setear el campo imagen del alumno en cuestión.
+                url2 = "http://%s/" % modules.get_hostname(module="microservicio1")
+                url2+="alumnos/"+str(jsonDatosAlumno['id'])
+
+                #Añadimos la imagen a los datos:
+                datos['imagen'] = urlImagenAlumno;
+                #Realizamos la modificaion llamando a la api del microservicio.
+                resultadoModificacion = urlfetch.fetch(url=url2, payload=urllib.urlencode(datos), method=urlfetch.POST)
+
+                print 'Resultado Modificacion'
+                print str(resultadoModificacion.content)
+
+
+        # NO HAY IMAGEN #
+        if not request.imagen:
+            print '\n\n No hay imagen \n\n'
+            #En el caso de que no haya imagen en la petición es que se quiere mantener la que está y solo modificar los datos.
+            result = urlfetch.fetch(url=url, payload=urllib.urlencode(datos), method=urlfetch.POST)
+            print 'Respuesta'
+            print result.content
+
+        print request.imagen;
+
+        # NO HAY IMAGEN y además se quiere eliminar la que el usuario tenga #
+        if  request.imagen == 'del':
+            print '\n\n El parámetro pasado es ZGVs (del en Base64), la imagen actual se quiere borrar. \n\n'
+            #1. Borrar la imagen del Cloud Storage
+            salida = ManejadorImagenes.DeleteFile2(nombreImagen = 'alumnos/imagenes_perfil/' + request.id + '.jpg')
+            print salida;
+            #2. Borrar la url que de la imagen tiene el user en sus datos. (modificar al alumno)
+            result = urlfetch.fetch(url=url, payload=urllib.urlencode(datos), method=urlfetch.POST)
+            print 'Respuesta'
+            print result.content
+
+
+
+        return MensajeRespuesta(message='OK')
+
+    #### possibly deprecated ####
     @endpoints.method(AlumnoCompleto,MensajeRespuesta,path='alumnos/modAlumnoCompleto', http_method='POST', name='alumnos.modAlumnoCompleto')
     def modificarAlumnoCompleto(self, request):
         '''

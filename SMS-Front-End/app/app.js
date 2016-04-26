@@ -302,7 +302,6 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
     //Llamamos a la función que sube la imagen:
     //subirImagen($scope.file, 'caca');
 
-    var urlImagenSubida="";
 
     angular.forEach(e.files, function(flowFile, i){
        var fileReader = new FileReader();
@@ -315,50 +314,34 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
               var res = uri.slice(23);
               //console.log('Sending2 : ' + res);
 
+              //Añadimos la imagen a los datos:
+              datos['imagen'] = res;
+
               var urlImagenSubida;
               //Estamos usando como nombre de la imagen el nombrel del fichero.
+              gapi.client.helloworld.alumnos.insertarAlumno2(datos).execute(function(resp){
+                //Mostramos por consola la respuesta del servidor
+                var salidaEjecucion=resp.message;
+                console.log("Respuesta servidor insertarAlumno2: "+salidaEjecucion);
+                console.log(salidaEjecucion);
 
-              gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
-                //console.log("calling subirImagen with image: "+res);
-                //console.log(resp);
-                urlImagenSubida=resp.message;
-                console.log('Respuesta del servidor imagen: ');
-                console.log(urlImagenSubida);
+                console.log("Respuesta servidor: "+salidaEjecucion);
+                console.log(salidaEjecucion);
 
-                datos.imagen=urlImagenSubida;
+                if (salidaEjecucion == 'OK'){
 
-                console.log('Datos después de añadir imagen');
-                console.log(datos);
+                  $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
+                  insertado=1;
+                  console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+                  $location.path("/estudiantes/main");
+                }else{
+                  $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+                  insertado=0;
+                  console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+                }
 
-                gapi.client.helloworld.alumnos.insertarAlumno(datos).execute(function(resp){
-                  //Mostramos por consola la respuesta del servidor
-                  salidaEjecucion=resp.message;
-                  console.log("Respuesta servidor: "+salidaEjecucion);
-                  console.log(salidaEjecucion);
-
-                   if (salidaEjecucion == 'OK'){
-
-                     $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
-                     insertado=1;
-                     console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
-                     $location.path("/estudiantes/main");
-                   }else{
-                     $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
-                     insertado=0;
-                     console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
-                   }
-
-                  $scope.$apply();
-                });
-
-
-
-
+                $scope.$apply();
               });
-
-
-              console.log('salida¡')
-              console.log(urlImagenSubida)
 
           };
 
@@ -367,17 +350,9 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
           fileReader.readAsDataURL(flowFile.file);
     });
 
-    //setTimeout(this, 5000);
-    console.log('return urlImagenSubida: '+urlImagenSubida)
-    return urlImagenSubida;
   }
   var insertado = 0;
   $scope.submitForm = function(imagen){
-
-
-
-
-    //Lógica del formulario.
 
     //Cuando el formulario es válido porque cumple con todas las especificaciones:
     if ($scope.formNuevoAlumno.$valid) {
@@ -406,16 +381,14 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
 
 
 
-       //Variable de control para los mensajes tipo notify.
-       var salidaEjecucion=''
+
 
 
        // ##### Si existe una imagen para subir ##### //
        //Si hay imágenes cargadas en ng-flow se llama a la función que las lee y llama a insertarAlumno.
        if (imagen.files.length!=0){
          console.log('Añadiendo imagen!!!!: ');
-
-          salidaEjecucion = insertarAlumno2ConImagen(imagen, datos);
+         insertarAlumno2ConImagen(imagen, datos);
 
 
        // ##### Si NO existe una imagen para subir ##### //
@@ -426,51 +399,30 @@ routerApp.controller('ControladorNuevoEstudiante', function ($location, $scope) 
                 gapi.client.helloworld.alumnos.insertarAlumno2(datos).execute(function(resp){
                   console.log('llamada a insertarAlumno2()');
                   //Mostramos por consola la respuesta del servidor
-                  salidaEjecucion=resp.message;
+                  var salidaEjecucion=resp.message;
                   console.log("Respuesta servidor: "+salidaEjecucion);
                   console.log(salidaEjecucion);
 
+                  if (salidaEjecucion == 'OK'){
 
-                });
-
-
-/*
-                gapi.client.helloworld.alumnos.insertarAlumno(datos).execute(function(resp){
-                  //Mostramos por consola la respuesta del servidor
-                  salidaEjecucion=resp.message;
-                  console.log("Respuesta servidor: "+salidaEjecucion);
-                  console.log(salidaEjecucion);
-
-                   if (salidaEjecucion == 'OK'){
-
-                     $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
-                     insertado=1;
-                     console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
-                     $location.path("/estudiantes/main");
-                   }else{
-                     $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
-                     insertado=0;
-                     console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
-                   }
+                    $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
+                    insertado=1;
+                    console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+                    $location.path("/estudiantes/main");
+                  }else{
+                    $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+                    insertado=0;
+                    console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
+                  }
 
                   $scope.$apply();
+
+
                 });
-*/
+
        }
 
-       if (salidaEjecucion == 'OK'){
 
-         $.UIkit.notify("Alumno guardado con muchísimo éxito.", {status:'success'});
-         insertado=1;
-         console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
-         $location.path("/estudiantes/main");
-       }else{
-         $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
-         insertado=0;
-         console.log("Valor insertar DENTRO DE FUNCION: "+insertado);
-       }
-
-      $scope.$apply();
 
 
 

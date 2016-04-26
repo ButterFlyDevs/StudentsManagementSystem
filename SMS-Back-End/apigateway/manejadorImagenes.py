@@ -95,3 +95,18 @@ class ManejadorImagenes:
             return 'OK'
         except gcs.NotFoundError:
             return 'FAIL'
+
+
+    @classmethod
+    def DeleteFile2(self, nombreImagen):
+        '''
+        Eliminaremos la imagen a partir del nombre
+        '''
+        bucket_name = os.environ.get('BUCKET_NAME', app_identity.get_default_gcs_bucket_name())
+        bucket = '/' + bucket_name
+        filename = bucket + '/' + nombreImagen
+        try:
+            salida=gcs.delete(filename)
+            return 'OK'
+        except gcs.NotFoundError:
+            return 'FAIL'
