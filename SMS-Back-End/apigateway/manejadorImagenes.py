@@ -50,7 +50,27 @@ class ManejadorImagenes:
 
         '''
 
-        key = url[30:]
+
+        '''
+        Ejemplo de url en el servidor Cloud Storage
+        http://lh3.googleusercontent.com/B_Wu0n-9mAiuFtTttGLIEjXsoXj2gFpup_fJ91z44IewODcaY1Adi-cyRc6Yy0MaFL8NfgnOUhyKB_VyL4v0KNg
+        Para obtener la key hay que quitar los primeros 33 caracteres.
+
+        Ejemplo de url en el dev-server:
+        http://localhost:8001/_ah/img/encoded_gs_file:YXBwX2RlZmF1bHRfYnVja2V0L2pha2UuanBn
+        Para obtener la key hay que quitar los primeros 30 caracteres.
+        '''
+
+
+        #Prueba:
+        #Si estamos en el servidor de producción eliminamos los 33 primeros caracteres.
+        if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
+            key = url[33:]
+        #Si estamos en el servidor de desarrollo quitamos los 30 primeros caracteres.
+        else:
+            key = url[30:]
+
+
         print 'url: '+url
         print 'key: '+key
 

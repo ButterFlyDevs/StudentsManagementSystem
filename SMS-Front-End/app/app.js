@@ -534,6 +534,8 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
               var urlImagenSubida;
               //Estamos usando como nombre de la imagen el nombrel del fichero.
 
+
+              // 1. PRIMERA LLAMADA
               gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
                 //console.log("calling subirImagen with image: "+res);
                 //console.log(resp);
@@ -546,6 +548,7 @@ routerApp.controller('ControladorModificacionEstudiante', function($location, $s
                 console.log('Datos después de añadir imagen');
                 console.log(datos);
 
+                // 2. SEGUNDA LLAMADA ANIDADA
                 gapi.client.helloworld.alumnos.modAlumnoCompleto(datos).execute(function(resp){
                   //Mostramos por consola la respuesta del servidor
                   salidaEjecucion=resp.message;
