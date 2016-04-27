@@ -37,11 +37,24 @@ function encode_utf8(s) {
   return unescape(encodeURIComponent(s));
 };
 
+
+
+
+//Definición de la aplicación:
+//https://github.com/angular-ui/ui-router
 var routerApp = angular.module('routerApp', ['ui.router' ,'flow']);
+
+//Podemos hacer lo mismo para los roles dentro del sistema:
+routerApp.constant('USER_ROLES', {
+  all: '*',
+  admin: 'admin',
+  editor: 'editor',
+  guest: 'guest'
+});
 
 // ############# ENRUTADOR #################################### //
 
-routerApp.config(function($stateProvider, $urlRouterProvider) {
+routerApp.config(function($stateProvider, $urlRouterProvider, USER_ROLES) {
 /*
 
 Configura el enrutamiento de todas las vistas de la web. Implementa a que URLs
@@ -53,6 +66,20 @@ de la vista y se usan).
     $urlRouterProvider.otherwise('/home');
 
     $stateProvider
+
+
+       //Configuración de la pantalla de login
+       .state('login', {
+
+         url: '/login',
+         templateUrl:'login.html',
+         data: {
+           authorizedRoles: [USER_ROLES.guest]
+         }
+
+       })
+
+
 
        //Configura la URL principal
        .state('#',{
@@ -189,7 +216,10 @@ de la vista y se usan).
 
              .state('clases', {
                  url: '/clases',
-                 templateUrl: 'clases/clases.html'
+                 templateUrl: 'clases/clases.html',
+                 data: {
+                   authorizedRoles: [USER_ROLES.admin, USER_ROLES.editor]
+                 }
              })
              .state('clases.main', {
                  url: '/main',
@@ -231,55 +261,225 @@ de la vista y se usan).
             template: 'This is an another page'
         });
 
+});//Final de config.
+
+
+// #############
+// Controlador de Login
+// #############
+/*
+routerApp.run(function ($rootScope, $location, Auth) {
+ // Redirect to login if route requires auth and you're not logged in
+     $rootScope.$on('$stateChangeStart', function (event, toState, toParams) {
+       Auth.isLoggedInAsync(function(loggedIn) {
+         if (toState.authenticate && !loggedIn) {
+               $rootScope.returnToState = toState.url;
+               $rootScope.returnToStateParams = toParams.Id;
+               $location.path('/login');
+           }
+       });
+     });
+   ]);
+
+*/
+/*
+routeApp.run(function ($rootScope) {
+
+  $rootScope.$on('$stateChangeStart', function (event, toState, toParams) {
+    var requireLogin = toState.data.requireLogin;
+
+    if (requireLogin && typeof $rootScope.currentUser === 'undefined') {
+      event.preventDefault();
+      // get me a login modal!
+    }
+  });
+
+});
+*/
+
+//Definimos un monton de constantes.
+routerApp.constant('AUTH_EVENTS', {
+  loginSuccess: 'auth-login-success',
+  loginFailed: 'auth-login-failed',
+  logoutSuccess: 'auth-logout-success',
+  sessionTimeout: 'auth-session-timeout',
+  notAuthenticated: 'auth-not-authenticated',
+  notAuthorized: 'auth-not-authorized'
 });
 
-  /*
-  routerApp.controller('UploadCtrl2', function ($scope) {
+
+
+//Para las sesiones:
+routerApp.service('Session', function () {
+  this.create = function (sessionId, userId, userRole) {
+    console.log('create in service Session');
+    console.log('sessionID: '+sessionId);
+    console.log('userId: '+userId);
+    console.log('userRole: '+userRole);
+    this.id = sessionId;
+    this.userId = userId;
+    this.userRole = userRole;
+  };
+  this.destroy = function () {
+    this.id = null;
+    this.userId = null;
+    this.userRole = null;
+  };
+})
+
+//La lógica relacionada con la autentificación y la autorización (control de acceso) es mejor
+//agruparla junta en un servicio.
+
+/*
+$http es un Service que facilita las comunicaciones con servidores HTTP remotos vía XMLHttpRequest object or via JSONP.
+Doc aquí: https://docs.angularjs.org/api/ng/service/$http
+*/
+routerApp.factory('AuthService', function ($http, Session) {
+  var authService = {};
+
+  authService.login = function (credentials) {
+
+    console.log('Inside authService.login');
+
+    /*
+    Aquí estamos realizando una petición a una url concreta pasándole unos datos concretos
+    y devuelve una promesa.
+    */
+    /*
+    return $http
+      .post('/login', credentials).then(function (res) {
+                                  Session.create(res.data.id, res.data.user.id, res.data.user.role);
+                                  return res.data.user;
+                                  });
+    */
+    //Vamos a pasar de la petición al servidor y vamos a hacer que se cree la sesión:
+
+    var p1 = new Promise(function(resolve, reject) {
+
+      //En esta función tenríamos que comprobar que el usuario está en el sistema
+      console.log('Checking credentials')
+      console.log(credentials)
+
+      if (credentials.username == 'juan' && credentials.password == '677164459'){
+        console.log('Goods credentials');
+        //Si está en el sistema devovlemos sus datos.
+
+        var sesionUsuario = {
+          id : '1',
+          user :{
+            name: 'Juanito',
+            id: '32471',
+            role: 'admin'
+          },
+        };
 
 
 
-
-    $scope.uploadFiles = function(e)
-  	{
-      console.log('HOla uploadFile')
-      console.log(e)
-      console.log(e.files)
-      //Llamamos a la función que sube la imagen:
-      //subirImagen($scope.file, 'caca');
-
-      var urlImagenSubida="";
-
-      angular.forEach(e.files, function(flowFile, i){
-         var fileReader = new FileReader();
-            var nombre = flowFile.file.name;
-
-            fileReader.onload = function (event) {
-              var uri = event.target.result;
-                //$scope.imageStrings[i] = uri;
-
-                var res = uri.slice(23);
-                //console.log('Sending2 : ' + res);
-
-                //Estamos usando como nombre de la imagen el nombrel del fichero.
-                gapi.client.helloworld.imagenes.subirImagen({'name':nombre, 'image':res}).execute(function(resp) {
-                  //console.log("calling subirImagen with image: "+res);
-                  console.log(resp);
-                  urlImagenSubida=resp;
-                });
+        //resolve("Success!");
+        resolve(sesionUsuario);
+      }else{
+        //Si no está en el sistema devolvemos un error.
+        console.log('BAD credentials');
+        reject ("Error!");
+      }
 
 
+    //  resolve("Success!");
+      // or
+      // reject ("Error!");
+    });
 
-            };
-            fileReader.readAsDataURL(flowFile.file);
-      });
+    p1.then(function(value) {
+      console.log(value); // Success!
+      //Session.create('11387', '1', 'admin');
+      Session.create(value.id, value.user.id, value.user.role);
+      //el return se pone auqneu parece que no hace nada
+      return value.user;
+      //return '1';
+    //Session.create(res.data.id, res.data.user.id, res.data.user.role);
+    //  return res.data.user;
+    }, function(reason) {
+      console.log(reason); // Error!
+    });
+
+    //Session.create('11387', '1', 'admin');
+    //return '1';
+
+    return p1;
+
+  };
+
+  authService.isAuthenticated = function () {
+    return !!Session.userId;
+  };
+
+  authService.isAuthorized = function (authorizedRoles) {
+    if (!angular.isArray(authorizedRoles)) {
+      authorizedRoles = [authorizedRoles];
+    }
+    return (authService.isAuthenticated() &&
+      authorizedRoles.indexOf(Session.userRole) !== -1);
+  };
+
+  return authService;
+})
+
+routerApp.controller('LoginController', function ($scope, $rootScope, AUTH_EVENTS, AuthService) {
+
+  $scope.credentials = {
+    username: '',
+    password: ''
+  };
+  $scope.login = function (credentials) {
+
+    console.log(credentials);
+
+    //.then devuelve una promesa
+    AuthService.login(credentials).then(function (usuario) {
+      $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
+      $scope.setCurrentUser(usuario.user);
+    }, function () {
+      $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
+    });
+  };
+});
+
+routerApp.controller('ApplicationController', function ($scope,
+                                               USER_ROLES,
+                                               AuthService) {
+  $scope.currentUser = null;
+  $scope.userRoles = USER_ROLES;
+  $scope.isAuthorized = AuthService.isAuthorized;
+
+  $scope.setCurrentUser = function (user) {
+    console.log('Inside setCurrentUser');
+    console.log('user in setCurrentUser:');
+    console.log(user);
+    $scope.currentUser = user;
+    $scope.$apply();
+  };
+});
 
 
-
-      return urlImagenSubida;
-  	}
+routerApp.run(function ($rootScope, AUTH_EVENTS, AuthService) {
+  $rootScope.$on('$stateChangeStart', function (event, next) {
+    console.log('Authorized roles here: ');
+    console.log(next.data.authorizedRoles);
+    var authorizedRoles = next.data.authorizedRoles;
+    if (!AuthService.isAuthorized(authorizedRoles)) {
+      event.preventDefault();
+      if (AuthService.isAuthenticated()) {
+        // user is not allowed
+        console.log('Not allowed!!!!!!');
+        $rootScope.$broadcast(AUTH_EVENTS.notAuthorized);
+      } else {
+        // user is not logged in
+        console.log('Not logged in !!!!!!!!');
+        $rootScope.$broadcast(AUTH_EVENTS.notAuthenticated);
+      }
+    }
   });
-  */
-
+});
 
 
 // #################################

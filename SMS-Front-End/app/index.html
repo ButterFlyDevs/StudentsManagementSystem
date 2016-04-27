@@ -53,7 +53,7 @@ inicialice primero la gAPI que nos conecta con nuestro BackEnd lo hacemos de otr
 API cogerá e insertará en el documento (en el body) la app routerApp de angularJS, y no antes. Por eso no ponemos nada en la etiqueta body y funciona.
 -->
 
-<body>
+<body ng-controller="ApplicationController">
 
  <!--
  Menú principal , construido con ui-sref, que nos envía al lugar que nos diga el urlProvider dentro de app.js.
@@ -160,6 +160,7 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
 
         <div class="uk-panel">
             <p>Granada @ 2016</a>
+              <div ng-if="currentUser">Welcome, {{ currentUser.name }}</div>
         </div>
 
     </div>
