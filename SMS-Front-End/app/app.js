@@ -233,16 +233,11 @@ de la vista y se usan).
 
 });
 
+  /*
   routerApp.controller('UploadCtrl2', function ($scope) {
 
 
-    /*
-    $scope.processFiles = function(files){
-      console.log('processFiles:');
-      console.log(files);
 
-    };
-    */
 
     $scope.uploadFiles = function(e)
   	{
@@ -283,6 +278,7 @@ de la vista y se usan).
       return urlImagenSubida;
   	}
   });
+  */
 
 
 

@@ -30,7 +30,7 @@ class ManejadorImagenes:
 
         write_retry_params = gcs.RetryParams(backoff_factor=1.1)
 
-        gcs_file = gcs.open(filename, 'w', content_type='image/jpeg', options={'x-goog-meta-foo': 'foo', 'x-goog-meta-bar': 'bar'}, retry_params=write_retry_params)
+        gcs_file = gcs.open(filename, 'w', content_type='image/jpeg', options={'x-goog-meta-foo': 'foo', 'x-goog-meta-bar': 'bar', 'x-goog-acl': 'public-read'}, retry_params=write_retry_params)
         gcs_file.write(datos)
         gcs_file.close()
 
@@ -39,8 +39,14 @@ class ManejadorImagenes:
         key = blobstore.create_gs_key(blobstore_filename)
 
 
+        #Si se encuentra en el servidor de Google
+        if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
+            return 'http://storage.googleapis.com'+filename
+        #Si está en entorno de desarrollo local:
+        else:
+            return get_serving_url(key)
         #Devolvemos la url con la que se puede acceder a la imagen obtenida a partir de la key.
-        return get_serving_url(key)
+
 
 
     @classmethod
