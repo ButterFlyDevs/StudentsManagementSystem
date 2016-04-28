@@ -1,0 +1,17 @@
+../markupsafe/tests.py
+../markupsafe/_compat.py
+../markupsafe/_native.py
+../markupsafe/__init__.py
+../markupsafe/_constants.py
+../markupsafe/_speedups.c
+../markupsafe/tests.pyc
+../markupsafe/_compat.pyc
+../markupsafe/_native.pyc
+../markupsafe/__init__.pyc
+../markupsafe/_constants.pyc
+./
+not-zip-safe
+PKG-INFO
+dependency_links.txt
+top_level.txt
+SOURCES.txt

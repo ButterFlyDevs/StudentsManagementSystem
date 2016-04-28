@@ -1,0 +1,10 @@
+# Este fichero de requerimientos instala todas las dependencias de terceros para este proyecto.
+#
+# Ejecute 'pip install -r requirements.txt -t lib/' para instalar estas dependencias
+# en el subdirectorio `lib/` .
+#
+# Note: The `lib` directory is added to `sys.path` by `appengine_config.py`.
+Flask==0.10
+Flask-Testing>=0.4.1
+unittest2>=0.5
+jsonpickle
