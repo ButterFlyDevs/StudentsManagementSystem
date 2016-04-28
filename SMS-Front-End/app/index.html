@@ -67,7 +67,8 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
            <!-- <a class="uk-navbar-brand uk-hidden-small" ui-sref="#" >SMS</a> -->
            <a class="uk-navbar-brand uk-hidden-small" href="../index.html"><img class="uk-margin uk-margin-remove" src="images/sms.png" width="90" height="30" title="UIkit" alt="UIkit"></a>
 
-           <ul class="uk-navbar-nav uk-hidden-small">
+           <!--Si el usuario no está logueado no se ven las opciones del menu -->
+           <ul ng-if="currentUser" class="uk-navbar-nav uk-hidden-small">
                <!--
                <li class="uk-active">
                    <a href="layouts_frontpage.html">Frontpage</a>
@@ -82,6 +83,14 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
                <li><a ui-sref="clases.main">Docencia</a></li>
 
                <li><a ui-sref="about">Otros</a></li>
+
+               <li ng-controller="LoginController">
+
+                   {{ currentUser.name }}
+                   <a ui-sref="login" ng-click="logout()">Log Out</a>
+
+               </li>
+
                <!--
                <li>
                    <a href="layouts_documentation.html">Documentation</a>
@@ -94,14 +103,16 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
                </li>
              -->
            </ul>
-           <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
+
+           <!--Si no existe usuario actual logueado no se muestra el menu -->
+           <a ng-if="currentUser" href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
            <!--Especificaciones cuando se hace pequeña -->
            <div class="uk-navbar-brand uk-navbar-center uk-visible-small"><img class="uk-margin uk-margin-remove" src="images/sms.png" width="90" height="30" title="UIkit" alt="UIkit"></div>
  </nav>
 
  <!-- Menú de navegación lateral -->
- <div id="offcanvas" class="uk-offcanvas">
-     <div class="uk-offcanvas-bar">
+ <div  id="offcanvas" class="uk-offcanvas">
+     <div ng-controller="LoginController" class="uk-offcanvas-bar">
          <ul class="uk-nav uk-nav-offcanvas">
 
 
@@ -116,11 +127,11 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
            <li><a ui-sref="about">Otros</a></li>
 
            <li>
-             <div ng-if="currentUser" ng-controller="LoginController">
+
                {{ currentUser.name }}
              </br>
-               <a href="#" ng-click="logout()">Log Out</a>
-             </div>
+               <a ui-sref="login" ng-click="logout()">Log Out</a>
+
            </li>
 
 
@@ -151,9 +162,12 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
 
 <!-- AQUÍ ES DONDE EMPIEZA A ANIDARSE EL CONTENIDO DE LAS VISTAS GRACIAS A ui-sref ============================== -->
 
+<!-- Hemos quitado esta parte para que sean las vistas anidadas internas las que decidan que margen dejar dentro.
 <div class="uk-container uk-margin-large-top uk-margin-large-bottom" ui-view>
-</div>
+</div>-->
 
+<div ui-view>
+</div>
 
 <!-- Footer general-->
 <div class="tm-background tm-footer">
@@ -169,7 +183,7 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
         -->
 
         <div class="uk-panel" >
-            <p>Granada @ 2016</a>
+            <p><strong>ButterFlyDevs</strong> - Granada @ 2016</a>
               <div ng-if="currentUser">Welcome, {{ currentUser.name }}</div>
         </div>
 
