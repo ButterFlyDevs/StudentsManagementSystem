@@ -114,6 +114,16 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
            <li><a ui-sref="clases.main">Docencia</a></li>
 
            <li><a ui-sref="about">Otros</a></li>
+
+           <li>
+             <div ng-if="currentUser" ng-controller="LoginController">
+               {{ currentUser.name }}
+             </br>
+               <a href="#" ng-click="logout()">Log Out</a>
+             </div>
+           </li>
+
+
             <!--
 
              <li class="uk-active">
@@ -158,7 +168,7 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
         </ul>
         -->
 
-        <div class="uk-panel">
+        <div class="uk-panel" >
             <p>Granada @ 2016</a>
               <div ng-if="currentUser">Welcome, {{ currentUser.name }}</div>
         </div>

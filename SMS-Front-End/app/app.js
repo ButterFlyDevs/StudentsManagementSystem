@@ -63,7 +63,7 @@ que piden los datos donde proceda y los cargan en las vistas donde serán usados
 de la vista y se usan).
 */
 
-    $urlRouterProvider.otherwise('/home');
+    $urlRouterProvider.otherwise('/login');
 
     $stateProvider
 
@@ -73,9 +73,11 @@ de la vista y se usan).
 
          url: '/login',
          templateUrl:'login.html',
+
          data: {
-           authorizedRoles: [USER_ROLES.guest]
+           authorizedRoles: [USER_ROLES.all]
          }
+
 
        })
 
@@ -84,7 +86,10 @@ de la vista y se usan).
        //Configura la URL principal
        .state('#',{
          url:'/home',
-         templateUrl:'main.html'
+         templateUrl:'main.html',
+         data: {
+           authorizedRoles: [USER_ROLES.admin]
+         }
        })
 
         /*Definición de VISTAS ANIDADAS, dentro de una vista general que es la de estudiantes se incrustan
@@ -95,7 +100,11 @@ de la vista y se usan).
         */
         .state('estudiantes', {
             url: '/estudiantes',
-            templateUrl: 'estudiantes/estudiantes.html'
+            templateUrl: 'estudiantes/estudiantes.html',
+            //El rol de autorización se hereda a los hijos de esta vista.
+            data: {
+              authorizedRoles: [USER_ROLES.admin]
+            }
         })
 
         /*
@@ -152,7 +161,10 @@ de la vista y se usan).
 
          .state('profesores', {
              url: '/profesores',
-             templateUrl: 'profesores/profesores.html'
+             templateUrl: 'profesores/profesores.html',
+             data: {
+               authorizedRoles: [USER_ROLES.admin]
+             }
          })
          .state('profesores.main', {
              url: '/main',
@@ -182,7 +194,10 @@ de la vista y se usan).
 
            .state('asignaturas', {
                url: '/asignaturas',
-               templateUrl: 'asignaturas/asignaturas.html'
+               templateUrl: 'asignaturas/asignaturas.html',
+               data: {
+                 authorizedRoles: [USER_ROLES.admin]
+               }
            })
            .state('asignaturas.main', {
                url: '/main',
@@ -218,7 +233,7 @@ de la vista y se usan).
                  url: '/clases',
                  templateUrl: 'clases/clases.html',
                  data: {
-                   authorizedRoles: [USER_ROLES.admin, USER_ROLES.editor]
+                   authorizedRoles: [USER_ROLES.admin]
                  }
              })
              .state('clases.main', {
@@ -258,7 +273,10 @@ de la vista y se usan).
         .state('about', {
             // we'll get to this in a bit
             url:'/about',
-            template: 'This is an another page'
+            template: 'This is an another page',
+            data: {
+              authorizedRoles: [USER_ROLES.admin]
+            }
         });
 
 });//Final de config.
@@ -334,7 +352,7 @@ routerApp.service('Session', function () {
 $http es un Service que facilita las comunicaciones con servidores HTTP remotos vía XMLHttpRequest object or via JSONP.
 Doc aquí: https://docs.angularjs.org/api/ng/service/$http
 */
-routerApp.factory('AuthService', function ($http, Session) {
+routerApp.factory('AuthService', function ($rootScope, $http, Session, AUTH_EVENTS) {
   var authService = {};
 
   authService.login = function (credentials) {
@@ -409,29 +427,52 @@ routerApp.factory('AuthService', function ($http, Session) {
 
   };
 
+  //log out the user and broadcast the logoutSuccess event
+	authService.logout = function(){
+
+	}
+
   authService.isAuthenticated = function () {
     return !!Session.userId;
   };
 
   authService.isAuthorized = function (authorizedRoles) {
+
+    console.log('Inside isAuthorized');
+    console.log(authorizedRoles[0]);
+    //Doc here: https://docs.angularjs.org/api/ng/function/angular.isArray
+    // isArray es una función de Angular que comprueba si lo pasado es o no un array.
     if (!angular.isArray(authorizedRoles)) {
+      console.log('Dentro del if');
       authorizedRoles = [authorizedRoles];
+    }else{
+      console.log('Se trata de un array');
     }
-    return (authService.isAuthenticated() &&
-      authorizedRoles.indexOf(Session.userRole) !== -1);
+    //Imprimimos por pantalla lo que devolvería:
+    console.log(authService.isAuthenticated() && authorizedRoles.indexOf(Session.userRole) !== -1);
+    if (authorizedRoles[0] == '*'){
+      console.log('Debería estar autorizado');
+      return true
+    }else{
+      return (authService.isAuthenticated() && authorizedRoles.indexOf(Session.userRole) !== -1);
+    }
   };
 
+  //Cuando se usa la factoría se usa una instancia de ella misma que es lo que se devuelve aquí
   return authService;
 })
 
-routerApp.controller('LoginController', function ($scope, $rootScope, AUTH_EVENTS, AuthService) {
+//Controlador de la vista de la sección de login
+routerApp.controller('LoginController', function ($scope, $rootScope, AUTH_EVENTS, AuthService, Session) {
 
   $scope.credentials = {
     username: '',
     password: ''
   };
+
   $scope.login = function (credentials) {
 
+    console.log('Logueando al usuario con credenciales:')
     console.log(credentials);
 
     //.then devuelve una promesa
@@ -442,6 +483,16 @@ routerApp.controller('LoginController', function ($scope, $rootScope, AUTH_EVENT
       $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
     });
   };
+
+  $scope.logout = function (){
+    AuthService.logout();
+    Session.destroy();
+    //$window.sessionStorage.removeItem("userInfo");
+    $rootScope.$broadcast(AUTH_EVENTS.logoutSuccess);
+    $scope.setCurrentUser(null);
+  }
+
+
 });
 
 routerApp.controller('ApplicationController', function ($scope,
@@ -465,9 +516,27 @@ routerApp.run(function ($rootScope, AUTH_EVENTS, AuthService) {
   $rootScope.$on('$stateChangeStart', function (event, next) {
     console.log('Authorized roles here: ');
     console.log(next.data.authorizedRoles);
+    //Extraemos los datos de autorización de la página a la que vamos.
     var authorizedRoles = next.data.authorizedRoles;
+
+    //Comprobamos si le está permitido o no.
+
+    //SI NO ESTÁ PERMITIDO ...
+
+    /*
+    Se usa la factoría AuthService, la función isAuthorized a la que se le pasan
+    los datos de autorización de la página a la que estamos accediendo.
+
+    En este caso los datos que se están pasando
+    Array [ "guest" ]
+
+    */
+
     if (!AuthService.isAuthorized(authorizedRoles)) {
+
+
       event.preventDefault();
+
       if (AuthService.isAuthenticated()) {
         // user is not allowed
         console.log('Not allowed!!!!!!');
@@ -477,6 +546,7 @@ routerApp.run(function ($rootScope, AUTH_EVENTS, AuthService) {
         console.log('Not logged in !!!!!!!!');
         $rootScope.$broadcast(AUTH_EVENTS.notAuthenticated);
       }
+
     }
   });
 });
