@@ -392,7 +392,6 @@ routerApp.factory('AuthService', function ($rootScope, $http, Session, AUTH_EVEN
         };
 
 
-
         //resolve("Success!");
         resolve(sesionUsuario);
       }else{
@@ -463,7 +462,7 @@ routerApp.factory('AuthService', function ($rootScope, $http, Session, AUTH_EVEN
 })
 
 //Controlador de la vista de la sección de login
-routerApp.controller('LoginController', function ($scope, $rootScope, AUTH_EVENTS, AuthService, Session) {
+routerApp.controller('LoginController', function ($scope, $rootScope,  AUTH_EVENTS, AuthService, Session) {
 
   $scope.credentials = {
     username: '',
@@ -479,6 +478,10 @@ routerApp.controller('LoginController', function ($scope, $rootScope, AUTH_EVENT
     AuthService.login(credentials).then(function (usuario) {
       $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
       $scope.setCurrentUser(usuario.user);
+
+
+
+
     }, function () {
       $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
     });
@@ -495,9 +498,7 @@ routerApp.controller('LoginController', function ($scope, $rootScope, AUTH_EVENT
 
 });
 
-routerApp.controller('ApplicationController', function ($scope,
-                                               USER_ROLES,
-                                               AuthService) {
+routerApp.controller('ApplicationController', function ($scope, $location, USER_ROLES, AuthService) {
   $scope.currentUser = null;
   $scope.userRoles = USER_ROLES;
   $scope.isAuthorized = AuthService.isAuthorized;
@@ -507,7 +508,12 @@ routerApp.controller('ApplicationController', function ($scope,
     console.log('user in setCurrentUser:');
     console.log(user);
     $scope.currentUser = user;
+
+    //Tras la autenticación del usuario y su seteo como usuario actual llevamos a la ventana principal.
+    $location.path("/home");
+
     $scope.$apply();
+
   };
 });
 
@@ -1328,7 +1334,7 @@ routerApp.controller('ControladorListaAsignaturas', function ($scope) {
 });
 
 
-routerApp.controller('ControladorNuevaAsignatura', function ($scope){
+routerApp.controller('ControladorNuevaAsignatura', function ($scope, $location){
   $scope.submitForm = function(formData){
     //Cuando el formulario es válido porque cumple con todas las especificaciones:
     if ($scope.formNuevaAsignatura.$valid) {
@@ -1359,6 +1365,7 @@ routerApp.controller('ControladorNuevaAsignatura', function ($scope){
             de este componente, esto lo hcemos en la plantilla (html)
             */
             $.UIkit.notify("Asignatura guardado con muchísimo éxito.", {status:'success'});
+            $location.path("/asignaturas/main");
           }else{
             $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
           }
