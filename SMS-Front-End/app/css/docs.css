@@ -286,6 +286,7 @@ html {
     border-radius: 3px !important;
     text-shadow: none;
     font-size: 15px;
+    color:  #BDBDBD;
 }
 
 .tm-navbar .uk-navbar-nav > li { margin-left: 20px; }
@@ -295,7 +296,7 @@ html {
 .tm-navbar .uk-navbar-nav > li > a:focus,
 .tm-navbar .uk-navbar-nav > li.uk-open > a {
     border: none;
-    color: #FFF;
+    color:  #FFF8F8;
 }
 
 /* Active */
@@ -311,7 +312,7 @@ html {
  * Nav
  */
 
-.tm-nav > li > a { color: #777; }
+.tm-nav > li > a { color:  #FFF8F8; }
 
 /* Hover */
 .tm-nav > li > a:hover,

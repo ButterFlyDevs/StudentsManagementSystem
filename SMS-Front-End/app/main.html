@@ -2,85 +2,59 @@
 Plantilla (página) principal de la aplicación.
 -->
 
-<h1> This is the main page </h1>
+<div class="uk-container uk uk-margin-top">
+
+<h2> Página principal </h2>
+
+<!--Una linea divisoria-->
+<div class="uk-grid-divider"></div>
 
 
-<div class="uk-grid">
+<!--Creamos un grid de elementos y añadimos data-uk-grid-margin para que exista un margen entre estos -->
+<div class="uk-grid" data-uk-grid-margin>
 
-    <!--Sección de personal -->
-    <div class="uk-width-medium-1-2">
-
-        <!--Sección donde incluiremos una gráfica con el número de profesores y estudiantes dentro del sistema. -->
-        <div class="uk-panel uk-panel-box uk-margin-large-top">
-
-            <h3 class="uk-panel-title">Población</h3>
-
-            <!--Gráfica especial de highcharts -->
-
-            <div id="container" style="width:90%; height:350px;"></div>
-            <script>
-            $(function () {
-                      $('#container').highcharts({
-                          chart: {
-                              plotBackgroundColor: null,
-                              plotBorderWidth: 0,
-                              plotShadow: false
-                          },
-                          title: {
-                              text: 'Personal',
-                              align: 'center',
-                              verticalAlign: 'middle',
-                              y: 60
-                          },
-                          tooltip: {
-                              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                          },
-                          plotOptions: {
-                              pie: {
-                                  dataLabels: {
-                                      enabled: true,
-                                      distance: -50,
-                                      style: {
-                                          fontWeight: 'bold',
-                                          color: 'white',
-                                          textShadow: '0px 1px 2px black'
-                                      }
-                                  },
-                                  startAngle: -90,
-                                  endAngle: 90,
-                                  center: ['50%', '75%']
-                              }
-                          },
-                          series: [{
-                              type: 'pie',
-                              name: 'Número',
-                              innerSize: '50%',
-                              data: [
-                                  ['Estudiantes',   40.38],
-                                  ['Profesores',       56.33],
-                                  {
-                                      name: 'Proprietary or Undetectable',
-                                      y: 0.2,
-                                      dataLabels: {
-                                          enabled: false
-                                      }
-                                  }
-                              ]
-                          }]
-                      });
-                  });
-            </script>
-
-
-
-
-
-        </div>
-
+    <!--Bloque estudiantes -->
+    <div class="uk-width-medium-1-5">
+          <a class="uk-panel uk-panel-hover" href="">
+              <h3 class="uk-panel-title"><i class="uk-icon-users"></i>   Estudiantes</h3>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
+          </a>
     </div>
 
-    <div class="uk-width-medium-1-2">
-
+    <!--Bloque Profesores -->
+    <div class="uk-width-medium-1-5">
+          <a class="uk-panel uk-panel-hover" href="">
+              <h3 class="uk-panel-title"><i class="uk-icon-users"></i>   Profesores</h3>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
+          </a>
     </div>
+
+    <!--Bloque Asignaturas -->
+    <div class="uk-width-medium-1-5">
+          <a class="uk-panel uk-panel-hover" href="">
+              <h3 class="uk-panel-title"><i class="uk-icon-book"></i>   Asignaturas</h3>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
+          </a>
+    </div>
+
+    <!--Bloque Docencia -->
+    <div class="uk-width-medium-1-5">
+          <a class="uk-panel uk-panel-hover" href="">
+              <h3 class="uk-panel-title"><i class="uk-icon-users"></i>   Docencia</h3>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
+          </a>
+    </div>
+
+    <!--Bloque Otros -->
+    <div class="uk-width-medium-1-5">
+          <a class="uk-panel uk-panel-hover" href="">
+              <h3 class="uk-panel-title"><i class="uk-icon-stethoscope"></i>   Otros</h3>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
+          </a>
+    </div>
+
+
+
+</div><!--Fin del grid-->
 
 </div>

@@ -3,12 +3,15 @@
 <!-- Sección de estudiantes, contiene la sección lateral izquierda con el submenú y la parte derecha con el contenido
   uk-grid-divide introduce una linea divisorea entre ambase secciones.
 -->
+
+<div class="uk-container uk uk-margin-top">
+
 <div class="uk-grid uk-grid-divider data-uk-grid-margin">
     <!--El usar medium es por temas de responsive : http://getuikit.com/docs/grid.html -->
     <div class="uk-width-medium-1-4">
 
 
-          <h1><a ui-sref="asignaturas.main">Asignaturas</a></h1>
+          <h1><a class="uk-icon-angle-double-left" ui-sref="#"></a>  <a ui-sref="asignaturas.main">Asignaturas</a></h1>
           <p>Sección de administración</p>
           <ul class="uk-list">
             <li><a ui-sref=".list" class="btn btn-primary">Listar asignaturas</a></li>
@@ -22,4 +25,6 @@
     <div ui-view></div>
 
     </div>
+</div>
+
 </div>
