@@ -17,6 +17,7 @@ from APIDB.GestorClasesSQL import GestorClases
 from APIDB.GestorMatriculasSQL import GestorMatriculas
 from APIDB.GestorImpartesSQL import GestorImpartes
 from APIDB.GestorAsociacionesSQL import GestorAsociaciones
+from APIDB.GestorCredencialesSQL import GestorCredenciales
 
 app = Flask(__name__)
 
@@ -761,6 +762,34 @@ def delAsociacion(id_asociacion):
         abort(404)
     else:
         return str(salida)
+
+
+##########################
+# COLECCIÓN CREDENCIALES #
+##########################
+
+@app.route('/credenciales', methods=['GET'])
+def getCredenciales():
+    '''
+    Devuelve las credenciales de todos los usuarios almacenadas en la base de datos.
+    curl -i -X GET localhost:8002/credenciales
+    '''
+    return jsonpickle.encode(GestorCredenciales.getCredenciales())
+
+
+@app.route('/credenciales', methods=['POST'])
+def postCredenciales():
+    '''
+    Introduce las credenciales de un usuario en el sistema.
+    añadir ejemplo
+    '''
+    return jsonpickle.encode(GestorCredenciales.getCredenciales())
+
+
+
+
+
+
 
 
 
