@@ -2,6 +2,11 @@
 from google.appengine.ext import ndb
 
 class ControlAsistencia(ndb.Model):
+
+    '''
+    Contro de asistencia
+    '''
+
     # id_ca = ndb.IntegerProperty() --< NO NECESARIO: id_key autoimplementado en ndb
     fecha_hora = ndb.DateTimeProperty() #Queremos que se guarde a la hora
     uniforme = ndb.BooleanProperty()

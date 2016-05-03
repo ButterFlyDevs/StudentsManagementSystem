@@ -8,6 +8,8 @@ from flask import Flask
 from flask import abort
 from flask import request
 import jsonpickle
+import Estructuras
+from NDBlib import EstrutcutrasNDB.ControlAsistencia
 
 
 #Definición del nombre de la aplicación
