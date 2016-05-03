@@ -11,6 +11,4 @@ automatic_scaling:
 
 handlers:
 - url: /.*
-  script: main.app
-
-
+  script: api.app
