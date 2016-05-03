@@ -18,6 +18,9 @@ class ControlAsistencia(ndb.Model):
     def devolver_todo(cls,clave_ancestra):
         return cls.query(ancestor=clave_ancestra).order(-cls.fecha_hora)
 
+#Crear clase NO NDB en un fichero pytthon que sea CA simple y CA complejo. El CA simple tiene estos datos,
+#CA complejo tiene estos datos mas lo s nombres de cada uno.
+#Se utilizará para devolver los objetos en las funciones
 
 class Resumen_ControlAsistencia(ndb.Model):
 
