@@ -149,29 +149,34 @@ routerApp.factory('AuthService', function ($rootScope, $http, Session, AUTH_EVEN
 
       //En esta función tenríamos que comprobar que el usuario está en el sistema
       console.log('Checking credentials')
-      console.log(credentials)
-
-      if (credentials.username == 'juan' && credentials.password == '677164459'){
-        console.log('Goods credentials');
-        //Si está en el sistema devovlemos sus datos.
-
-        var sesionUsuario = {
-          id : '1',
-          user :{
-            name: 'Juanito',
-            id: '32471',
-            role: 'admin'
-          },
-        };
+      console.log(credentials.username)
+      console.log(credentials.password)
 
 
-        //resolve("Success!");
-        resolve(sesionUsuario);
-      }else{
-        //Si no está en el sistema devolvemos un error.
-        console.log('BAD credentials');
-        reject ("Error!");
-      }
+
+
+      gapi.client.helloworld.login.loginUser({'username': credentials.username, 'password': credentials.password}).execute(function(resp){
+          console.log('Respuesta del servidor');
+          console.log(resp);
+
+          if (resp.message != 'Usuario no encontrado'){
+            //Construimos el tipo de dato sesionUsuario
+            var sesionUsuario = {
+              id : '1',
+              user :{
+                name: resp.nombre,
+                id: resp.idUser,
+                role: resp.rol
+              },
+            };
+
+            resolve(sesionUsuario);
+          }else{
+            console.log('BAD credentials');
+            reject ("Error!");
+          }
+
+      });
 
 
     //  resolve("Success!");
@@ -237,26 +242,36 @@ routerApp.factory('AuthService', function ($rootScope, $http, Session, AUTH_EVEN
 //Controlador de la vista de la sección de login
 routerApp.controller('LoginController', function ($scope, $rootScope,  AUTH_EVENTS, AuthService, Session) {
 
-  $scope.credentials = {
-    username: '',
-    password: ''
-  };
+  $scope.prueba = function(){
+    $.UIkit.notify("prueba", {status:'warning'});
+  }
 
   $scope.login = function (credentials) {
 
     console.log('Logueando al usuario con credenciales:')
     console.log(credentials);
 
-    //.then devuelve una promesa
+    /*
+    Al llamar a AuthService.login le pasamos las credenciales y en caso de la que la función tenga éxito
+    se ejecuta la primera función y en caso de no tener y recibir el mensaje de fallo se ejecuta la segunda función.
+    .then devuelve una promesa
+    */
     AuthService.login(credentials).then(function (usuario) {
       $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
       $scope.setCurrentUser(usuario.user);
 
 
 
-
+    //Implementamos una función que defina que hacer en caso de no haber tenido éxito.
     }, function () {
       $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
+      //Mostramos un mensaje diciendo que no ha sido encontrado ese usuario.
+      $.UIkit.notify("Usuario no encontrado.", {status:'warning'});
+
+      //Y vaciamos los campos.
+      $scope.credentials='null';
+      $scope.$apply();
+
     });
   };
 

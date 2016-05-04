@@ -34,7 +34,7 @@ from manejadorImagenes import ManejadorImagenes
 #Variable habilitadora del modo verbose
 v=True
 
-nombreMicroservicio = '\n## API Gateway ##\n'
+nombreMicroservicio = '\n ## API Gateway ##'
 
 # TODO: Replace the following lines with client IDs obtained from the APIs
 # Console or Cloud Console.
@@ -188,6 +188,10 @@ class AsociacionCompleta(messages.Message):
     listaAlumnos = messages.MessageField(AlumnoSimpleExtendido, 3, repeated=True)
     idAsociacion = messages.StringField(4)
 
+class salidaLogin(messages.Message):
+    idUser = messages.StringField(1, required=True)
+    nombre = messages.StringField(2, required=True)
+    rol = messages.StringField(3, required=True)
 
 #Decorador que establace nombre y versión de la api
 @endpoints.api(name='helloworld', version='v1')
@@ -2523,5 +2527,61 @@ class HelloWorldApi(remote.Service):
         '''
         print (request.url)
         return MensajeRespuesta( message=ManejadorImagenes.DeleteFile(request.url))
+
+
+    ##############################################
+    #   métodos de CREDENCIALES                  #
+    ##############################################
+
+    class Login(messages.Message):
+        username = messages.StringField(1, required=True)
+        password = messages.StringField(2, required=True)
+
+
+
+    @endpoints.method(Login, salidaLogin, path='login/loginUser', http_method='POST', name='login.loginUser' )
+    def loginUser(self, request):
+        '''
+        Comprueba si un usaurio está en elsistema y en caso de estarlo devuelve su ron y su número de identificación.
+        curl -d "username=46666&password=46666" -i -X POST -G localhost:8001/_ah/api/helloworld/v1/login/loginUser
+        '''
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Petición POST a login.loginUser'
+            print ' Request: \n '+str(request)+'\n'
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el metodo al que queremos conectarnos.
+        url+="comprobarAccesoUsuario"
+
+
+        #Extraemos lo datos de la petición al endpoints y empaquetamos un dict.
+        datos = {
+          "username": formatTextInput(request.username),
+          "password": formatTextInput(request.password),
+        }
+
+        #Petición al microservicio:
+        result = urlfetch.fetch(url=url, payload=urllib.urlencode(datos), method=urlfetch.POST)
+
+        json = jsonpickle.decode(result.content)
+
+        if json=='Usuario no encontrado':
+            raise endpoints.NotFoundException('Usuario no encontrado')
+        else:
+            mensajeSalida=salidaLogin(idUser=str(json['idUsuario']), nombre=str(json['nombre']), rol=str(json['rol']))
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Return: '+str(mensajeSalida)+'\n'
+
+
+        return mensajeSalida
+
+
 
 APPLICATION = endpoints.api_server([HelloWorldApi])

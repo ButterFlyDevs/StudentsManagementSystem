@@ -136,11 +136,14 @@ CREATE TABLE Matricula(
 );
 
 CREATE TABLE Credenciales(
+
   id_credenciales INT NOT NULL AUTO_INCREMENT,
   id_usuario INT,
+  nombre CHAR(100),
   username CHAR(100),
   password CHAR(100),
-  rol CHAR(50), 
+  rol CHAR(50),
+  PRIMARY KEY (id_credenciales),
   #Para que no pueda haber dos usuario con el mismo nombre
-  PRIMARY KEY (username)
+  UNIQUE (username)
 );

@@ -23,7 +23,7 @@ app = Flask(__name__)
 
 #Activar modo verbose
 v=1
-nombreMicroservicio = '\n## Microservicio BD ##\n'
+nombreMicroservicio = ' ## Microservicio BD ##'
 
 ############################
 #   COLECCIÓN ALUMNOS      #
@@ -256,8 +256,9 @@ def postProfesor():
 
     '''
     if v:
-        print "Calling postProfesor()"
-        print str(request.form)
+        print nombreMicroservicio
+        print " Calling postProfesor()"
+        print " "+str(request.form)
 
     salida = GestorProfesores.nuevoProfesor(request.form['nombre'],
                               request.form['apellidos'],
@@ -268,11 +269,21 @@ def postProfesor():
                               request.form['fecha_nacimiento'],
                               request.form['telefono'],
                               )
-    if salida == 'OK':
-        return 'OK'
-    else:
-        #abort(404)
-        return salida
+
+
+    if salida['status']=='OK':
+        print ' Profesor creado con éxito. Creando sus credenciales de acceso al sistema.'
+        #Creamos las credenciales del usuario en la tabla credenciales usando el id del usuario que devuelve nuevoProfesor
+        #Por defecto el alias y el password de un profesor en el sistemas serán su dni
+        #salida Creacion Credenciales
+        salidaCC=GestorCredenciales.postCredenciales(salida['idProfesor'], request.form['nombre'], request.form['dni'], request.form['dni'], 'admin')
+        if salidaCC != 'OK':
+            salida['status']='ERROR'
+
+    if v:
+        print ' Return: '+str(salida)
+
+    return str(salida)
 
 
 #######################
@@ -781,11 +792,33 @@ def getCredenciales():
 def postCredenciales():
     '''
     Introduce las credenciales de un usuario en el sistema.
-    añadir ejemplo
+    curl -d "idUsuario=1&nombre=lucas&username=juan&password=677164459&rol=admin" -i -X POST localhost:8002/credenciales
     '''
-    return jsonpickle.encode(GestorCredenciales.getCredenciales())
+    #Devolvemos directamente la salida de la función.
+    return GestorCredenciales.postCredenciales(request.form['idUsuario'], request.form['nombre'], request.form['username'], request.form['password'], request.form['rol'] )
 
+@app.route('/comprobarAccesoUsuario', methods=['POST'])
+def comprobarAccesoUsuario():
+    '''
+    Comprueba que el login y el password de un usuario le da acceso al sistema.
+    curl -d "username=46666&password=46666" -i -X POST localhost:8002/comprobarAccesoUsuario
+    '''
 
+    if v:
+        print nombreMicroservicio
+        print ' Recurso: /comprobarAccesoUsuario , metodo: POST'
+        print " Petición: "
+        print ' '+str(request.form)
+
+    salida=GestorCredenciales.comprobarUsuario(request.form['username'], request.form['password'])
+
+    if v:
+        print nombreMicroservicio
+        print salida
+        print ' Return /comprobarAccesoUsuario: '+str(salida)+'\n'
+
+    #Devolvemos los datos en formato JSON
+    return jsonpickle.encode(salida)
 
 
 

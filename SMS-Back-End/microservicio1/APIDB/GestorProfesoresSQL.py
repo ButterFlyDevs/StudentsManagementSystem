@@ -15,7 +15,7 @@ from Clase import *
 import dbParams
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
-apiName='\n## API DB ##\n'
+apiName='\n ## API DB ##'
 
 '''Clase controladora de profesores. Que usando la clase que define el modelo de Profesor (la info en BD que de el se guarda)
 ofrece una interface de gestión que simplifica y abstrae el uso.
@@ -31,6 +31,11 @@ class GestorProfesores:
         Introduce un nuevo elemento Profesor en la base de datos.
         Necesita como mínimo un nombre y un dni
         '''
+
+        if v:
+            print apiName
+            print ' Calling '+ str(locals()['self'])
+            print ' '+str(locals())
 
         db = dbParams.conecta(); #La conexión está clara.
 
@@ -52,16 +57,18 @@ class GestorProfesores:
         query="INSERT INTO Profesor VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
 
         if v:
-            print '\n'+query
+            print ' '+query+'\n'
 
         cursor = db.cursor()
         salida =''
+        idProfesor=''
         '''
         Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Profesor con clave
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
         try:
-            salida = cursor.execute(query);
+            salida = cursor.execute(query)
+            idProfesor = cursor.lastrowid
         except MySQLdb.Error, e:
             # Get data from database
             try:
@@ -76,10 +83,16 @@ class GestorProfesores:
         cursor.close()
         db.close()
 
+        dic={'status':salida, 'idProfesor':str(idProfesor)}
+
+
         if salida==1:
-            return 'OK'
+            dic['status']= 'OK'
+            #return 'OK'
         if salida==1062:
-            return 'Elemento duplicado'
+            dic['status']= 'Elemento duplicado'
+
+        return dic
 
     @classmethod
     def getProfesores(self):

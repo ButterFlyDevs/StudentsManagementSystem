@@ -9,7 +9,7 @@ from flask import abort
 from flask import request
 import jsonpickle
 import Estructuras
-from NDBlib import EstrutcutrasNDB.ControlAsistencia
+#from NDBlib import EstrutcutrasNDB.ControlAsistencia
 
 
 #Definición del nombre de la aplicación
@@ -17,7 +17,7 @@ app = Flask(__name__)
 
 #Activar modo verbose para mensajes por terminal.
 v=1
-nombreMicroservicio = '\n## Microservicio SCE ##\n'
+nombreMicroservicio = '\n ## Microservicio SCE ##'
 
 #Recurso de prueba el estado del servicio.
 @app.route('/prueba',methods=['GET'])
@@ -25,10 +25,11 @@ def doSomething():
     '''
     Prueba del estado de la API.
     curl -i -X GET localhost:8003/prueba
-    '''
+    '''    
     if v:
         print nombreMicroservicio
-        print 'Llamando a /prueba GET doSomething() \n'
+        print ' Llamando a /prueba GET doSomething() \n'
+
 
     return 'SCE MicroService is RUNING!\n'
 

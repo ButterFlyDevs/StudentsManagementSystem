@@ -3,6 +3,7 @@
 
 # Añadir la detección del directorio google_appengine y en caso de no exisitir decir que se ejecute el requirements
 
+#Mensajes por pantalla
 echo -e "\033[32m \n  ### SMS, un proyecto de \033[35m ButterFlyDevs \033[32m ### \033[0m"
 echo -e "\033[32m \n  >> Arrancando el BackEnd en local. \033[32m \033[0m"
 
@@ -12,7 +13,7 @@ echo -e "\033[36m  Levantando mservicio SCE (Control de Estudiantes) en el puert
 
 echo -e "\033[36m  Servidor de Administración corriendo en el puerto 8082 (http://localhost:8082) \033[0m"
 
-echo -e "\033[32m \n  Gracias por contribuir \n\n \033[0m"
+echo -e "\033[32m \n  ¡Gracias por contribuir! \n\n \033[0m"
 
 #Ejecución del comando que levanta el dev_appserver
 
