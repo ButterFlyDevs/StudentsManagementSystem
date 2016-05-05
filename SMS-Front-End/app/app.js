@@ -269,7 +269,7 @@ routerApp.controller('LoginController', function ($scope, $rootScope,  AUTH_EVEN
       $.UIkit.notify("Usuario no encontrado.", {status:'warning'});
 
       //Y vaciamos los campos.
-      $scope.credentials='null';
+      $scope.credentials=null;
       $scope.$apply();
 
     });
@@ -1374,15 +1374,8 @@ routerApp.controller('ControladorListaClases', function ($scope) {
 
         console.log(clases[i].nivel);
 
-/*
-        if niveles.indexOf()
-
-        //SEGUIR AQUÍIIIIIIIIIIASDFASDF
-        ASDFASFDS
-        DSFADSF
-        Puede que sea mejor idea que sea el Gateway quien nos prepare la información como
-        la queremos para no tenga que hacer ese procesamiento el cliente.
-*/
+        //Puede que sea mejor idea que sea el Gateway quien nos prepare la información como
+        //la queremos para no tenga que hacer ese procesamiento el cliente.
 
       }
 
@@ -1860,3 +1853,48 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
 
 
 }); //Fin controlador detalles asignatura
+
+// ###################################
+// # Controlador de página de perfil #
+// ###################################
+
+routerApp.controller('ControladorProfilePage', function($scope){
+
+  console.log($scope.currentUser);
+
+  //Pedimos al Gateway toda la informaicón del usuario, en este caso del profesor, ya que es el único
+  //tipo de usuario por el momento que tiene página de perfil y acceso al sistema como tal.
+
+  //Obtenemos los datos del profesor en cuestión usando el id que está almacenado en la información de sesión
+  //en la variable currentUser
+  gapi.client.helloworld.profesores.getProfesor({'id': $scope.currentUser.id}).execute(function(resp) {
+    console.log("calling profesores.getProfesor with id: 1");
+    console.log(resp);
+    $scope.profesor = resp;
+    $scope.$apply();
+  });
+
+});
+
+// ###########################################
+// # Controladores de Control de Estudiantes #
+// ###########################################
+routerApp.controller('ControladorCE-asistencia-historico', function($scope){
+
+  $scope.resumenes='Muchos resumenes';
+
+});
+
+routerApp.controller('ControladorCE-asistencia-nuevo', function($scope){
+
+
+  gapi.client.helloworld.profesores.getAsociacionesProfesor({'id': '1'}).execute(function(resp){
+    console.log('calling profesor.getAsociacionesProfesor with id 1');
+    console.log(resp);
+    $scope.asociaciones = resp.asociaciones;
+    $scope.$apply();
+  });
+
+
+
+});

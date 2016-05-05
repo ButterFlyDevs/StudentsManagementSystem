@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Hello World API implemented using Google Cloud Endpoints.
+'''
+
+Hello World API implemented using Google Cloud Endpoints.
 
 Defined here are the ProtoRPC messages needed to define Schemas for methods
 as well as those methods defined in an API.
@@ -8,7 +10,31 @@ Para ver el servidor de exploración:
 
     https://your_app_id.appspot.com/_ah/api/explorer
 
-"""
+
+ > Estandar de log por terminal <
+
+ Intentamos que el código tenga la mayor depuración posible por terminal ya que son tantos pasos de mensajes
+ que es más fácil de detectar errores así. Existe una variable v=1 (por defecto) que habilita todos los mensajes y se sigue
+ un estandar más o menos regular.
+
+ Cuando se realiza la llamada a un método de la api se añade justo a la entrada el bloque (ajustado al método):
+
+     #Info de seguimiento
+     if v:
+         print nombreMicroservicio
+         print ' Petición GET a profesores.getProfesor'
+         print ' Request: \n '+str(request)+'\n'
+
+ y para conocer la salida otro que siga el formato:
+
+     #Info de seguimiento
+     if v:
+         print nombreMicroservicio
+         print ' Return: '+str(profesor)+'\n'
+
+ para saber a que método se ha llamado y con qué parámetros.
+
+'''
 
 
 import endpoints
@@ -164,6 +190,7 @@ class Asociacion(messages.Message):
     id_clase = messages.StringField(2)
     id_asignatura = messages.StringField(3)
     nombreAsignatura = messages.StringField(4)
+    nombreClase = messages.StringField(5)
 
 class ListaAsociaciones(messages.Message):
     asociaciones = messages.MessageField(Asociacion, 1, repeated=True)
@@ -180,6 +207,20 @@ class AlumnoSimpleExtendido(messages.Message):
     apellidos = messages.StringField(2)
     id = messages.StringField(3)
     idMatricula = messages.StringField(4)
+
+class ResumenControlAsistencia(messages.Message):
+    key = messages.StringField(1)
+    fecha = messages.StringField(2)
+    idclase = messages.StringField(3)
+    nombreClase = messages.StringField(4)
+    idasignatura = messages.StringField(5)
+    nombreAsignatura = messages.StringField(6)
+    idprofesor = messages.StringField(7)
+    nombreProfesor = messages.StringField(8)
+
+class ListaResumenControlAsistencia(messages.Message):
+    resumenes = messages.MessageField(ResumenControlAsistencia, 1, repeated=True)
+
 
 #Definimos un tipo especial de mensaje
 class AsociacionCompleta(messages.Message):
@@ -598,7 +639,7 @@ class HelloWorldApi(remote.Service):
             print '\n Modificando imagen actual del usuario con id: '+str(jsonDatosAlumno['id'])
 
             #1. Se ha de borrar la antigua imagen del Cloud Storage
-            #Primero componenmos el nombre de l aimagen:
+            #Primero componenmos el nombre de aso aimagen:
             nombreImagen = 'alumnos/imagenes_perfil/' + str(jsonDatosAlumno['id']) + '.jpg'
             #Después se manda a borrar
             print 'Eliminacion imagen:' + str(ManejadorImagenes.DeleteFile2(nombreImagen))
@@ -1022,9 +1063,8 @@ class HelloWorldApi(remote.Service):
         #Info de seguimiento
         if v:
             print nombreMicroservicio
-            print "Petición GET a profesores.getProfesor"
-            print "request: "+str(request)
-            print '\n'
+            print ' Petición GET a profesores.getProfesor'
+            print ' Request: \n '+str(request)+'\n'
 
         #Cuando se llama a este recurso lo que se quiere es recibir toda la información
         #de una entidad Alumno, para ello primero vamos a recuperar la información del microsrevicio apropiado:
@@ -1084,6 +1124,11 @@ class HelloWorldApi(remote.Service):
                                 fecha_nacimiento=str(profesor.get('fecha_nacimiento')),
                                 telefono=str(profesor.get('telefono'))
                                 )
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Return: '+str(profesor)+'\n'
 
         return profesor
 
@@ -1346,6 +1391,46 @@ class HelloWorldApi(remote.Service):
         for clase in listaClases:
             clasesItems.append(Clase(id=str(clase.get('id')),curso=str(clase.get('curso')),grupo=str(clase.get('grupo')),nivel=str(clase.get('nivel'))))
         return ListaClases(clases=clasesItems)
+
+    @endpoints.method(ID, ListaAsociaciones, path='profesores/getAsociacionesProfesor', http_method='GET', name='profesores.getAsociacionesProfesor')
+    def getAsociacionesProfesor(self, request):
+        '''
+        Devuelve una lista con las asociaciones a las que un profesor imparte clase
+        Ejemplo de llamada:
+        curl -i -X GET localhost:8001/_ah/api/helloworld/v1/profesores/getAsociacionesProfesor?id=1
+        '''
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print " Petición GET a profesores.getAsociacionesProfesor"
+            print " request: "+str(request)
+            print '\n'
+
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url+='profesores/'+request.id+"/asociaciones"
+        result = urlfetch.fetch(url)
+        if v:
+            print ' RESULTADO de la petición'
+            print result.content
+        listaAsociaciones = jsonpickle.decode(result.content)
+        if v:
+            print 'lista asociaciones'
+            print listaAsociaciones
+
+        vectorAsociaciones= []
+        for asociacion in listaAsociaciones:
+            print 'asociacion'
+            print asociacion
+            vectorAsociaciones.append(Asociacion(id_asociacion=str(asociacion.get('id')),
+                                                 id_clase=str(asociacion.get('idClase')),
+                                                 id_asignatura=str(asociacion.get('idAsignatura')),
+                                                 nombreAsignatura=str(asociacion.get('nombreAsignatura')),
+                                                 nombreClase=str(asociacion.get('nombreClase'))
+                                                 ))
+        return ListaAsociaciones(asociaciones=vectorAsociaciones)
 
 
     ##############################################
@@ -2479,6 +2564,15 @@ class HelloWorldApi(remote.Service):
 
         return AsociacionCompleta( nombreAsignatura=formatText(iac['nombreAsignatura']), listaProfesores=profesores, listaAlumnos=alumnos, idAsociacion=request.id)
 
+
+    ##############################################
+    #   métodos de CONTROL DE ESTUDIANTES        #
+    #               mServicio SCE                #
+    ##############################################
+
+
+    #@endpoints.method(message_types.VoidMessage, ListaResumenControlAsistencia )
+    #def getAllResumenesControlAsistencia(self, request):
 
 
 

@@ -11,11 +11,12 @@ Plantilla (página) principal de la aplicación.
 
 
 <!--Creamos un grid de elementos y añadimos data-uk-grid-margin para que exista un margen entre estos -->
-<div class="uk-grid" data-uk-grid-margin>
+<div class="uk-grid uk-margin-large-bottom" data-uk-grid-margin>
+
 
     <!--Bloque estudiantes -->
     <div class="uk-width-medium-1-5">
-          <a class="uk-panel uk-panel-hover" href="">
+          <a class="uk-panel uk-panel-hover" ui-sref="estudiantes.main">
               <h3 class="uk-panel-title"><i class="uk-icon-users"></i>   Estudiantes</h3>
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
           </a>
@@ -23,7 +24,7 @@ Plantilla (página) principal de la aplicación.
 
     <!--Bloque Profesores -->
     <div class="uk-width-medium-1-5">
-          <a class="uk-panel uk-panel-hover" href="">
+          <a class="uk-panel uk-panel-hover" ui-sref="profesores.main">
               <h3 class="uk-panel-title"><i class="uk-icon-users"></i>   Profesores</h3>
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
           </a>
@@ -31,7 +32,7 @@ Plantilla (página) principal de la aplicación.
 
     <!--Bloque Asignaturas -->
     <div class="uk-width-medium-1-5">
-          <a class="uk-panel uk-panel-hover" href="">
+          <a class="uk-panel uk-panel-hover" ui-sref="asignaturas.main">
               <h3 class="uk-panel-title"><i class="uk-icon-book"></i>   Asignaturas</h3>
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
           </a>
@@ -39,19 +40,28 @@ Plantilla (página) principal de la aplicación.
 
     <!--Bloque Docencia -->
     <div class="uk-width-medium-1-5">
-          <a class="uk-panel uk-panel-hover" href="">
+          <a class="uk-panel uk-panel-hover" ui-sref="clases.main">
               <h3 class="uk-panel-title"><i class="uk-icon-users"></i>   Docencia</h3>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
+          </a>
+    </div>
+
+    <!--Bloque Control Estudiantes -->
+    <div class="uk-width-medium-1-5">
+          <a class="uk-panel uk-panel-hover" <a ui-sref="control-estudiantes.main">
+              <h3 class="uk-panel-title"><i class="uk-icon-stethoscope"></i>   Control Estudiantes</h3>
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
           </a>
     </div>
 
     <!--Bloque Otros -->
     <div class="uk-width-medium-1-5">
-          <a class="uk-panel uk-panel-hover" href="">
+          <a class="uk-panel uk-panel-hover" ui-sref="about">
               <h3 class="uk-panel-title"><i class="uk-icon-stethoscope"></i>   Otros</h3>
               Lorem ipsum dolor sit amet, consectetur adipisicing elit. <code>.uk-panel-hover</code>
           </a>
     </div>
+
 
 
 

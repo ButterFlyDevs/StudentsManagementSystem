@@ -1,0 +1,32 @@
+<!-- partial-home-list.html -->
+
+<h3><strong>Controles de Asistencia</strong></h3>
+
+<!-- Nuevo -->
+
+<ul class="uk-tab" data-uk-tab>
+    <li> <a ui-sref="control-estudiantes.asistencia-inicio">Inicio</a></li>
+    <li> <a ui-sref="control-estudiantes.asistencia-historico">Historico</a></li>
+    <li class="uk-active"><a ui-sref="control-estudiantes.asistencia-nuevo">Nuevo</a></li>
+    <li class="uk-disabled"> <a href="">Otros</a></li>
+</ul>
+
+
+<div class="uk-container-center">
+
+<div class="uk-margin-top uk-margin-bottom">
+  Nuevo <strong>C</strong>ontrol de <strong>A</strong>sistencia.
+
+  <br>
+  Para realizar un control de asitencia primero eliga el grupo que desea.
+
+  <ul class="uk-list uk-list-striped" ng-repeat="asociacion in asociaciones">
+    <li>{{asociacion.nombreAsignatura}} {{asociacion.nombreClase}}</li>
+  </ul>
+
+</div>
+
+
+
+
+</div>

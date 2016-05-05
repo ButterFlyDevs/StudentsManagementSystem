@@ -9,4 +9,4 @@ class Asociacion:
         self.idAsignatura = ""
         self.nombreAsignatura = ""
         self.idClase = ""
-        
+        self.nombreClase = ""

@@ -93,6 +93,8 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
 
                <li><a ui-sref="clases.main">Docencia</a></li>
 
+               <li><a ui-sref="control-estudiantes.main"><strong>Control Estudiantes</strong></a></li>
+
                <li><a ui-sref="about">Otros</a></li>
 
                <!--
@@ -168,6 +170,8 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
 
            <li><a ui-sref="clases.main">Docencia</a></li>
 
+           <li><a ui-sref="control-estudiantes.main"><strong>Control Estudiantes</strong></a></li>
+
            <li><a ui-sref="about">Otros</a></li>
 
            <!--Añadimos una división -->
@@ -218,7 +222,7 @@ API cogerá e insertará en el documento (en el body) la app routerApp de angula
 Si ponemos uk-position-bottom forzaremos que se vaya a la parte inferior.
 -->
 <div class="tm-background tm-footer ">
-    <div class="uk-container uk-container-center uk-text-center">
+    <div class="uk-container uk-container-center uk-text-center ">
 
         <!-- Menú que había antes
         <ul class="uk-subnav uk-subnav-line uk-flex-center">
@@ -229,7 +233,7 @@ Si ponemos uk-position-bottom forzaremos que se vaya a la parte inferior.
         </ul>
         -->
 
-        <div class="uk-panel" >
+        <div class="uk-panel " >
             <p><strong>ButterFlyDevs</strong> - Granada @ 2016</a>
               <div ng-if="currentUser">Welcome, {{ currentUser.name }}</div>
         </div>

@@ -11,8 +11,11 @@ from Profesor import *
 from Alumno import *
 from Asignatura import *
 from Clase import *
+from Asociacion import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
+
+
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
 apiName='\n ## API DB ##'
@@ -508,3 +511,15 @@ class GestorProfesores:
 
             cursor.close()
             db.close()
+
+    @classmethod
+    def getAsociaciones(self, idProfesor):
+        asociacion = Asociacion()
+        asociacion.id='1'
+        asociacion.nombreAsignatura='Frances'
+        asociacion.nombreClase='1 A ESO'
+
+        lista = []
+        lista.append(asociacion)
+
+        return lista

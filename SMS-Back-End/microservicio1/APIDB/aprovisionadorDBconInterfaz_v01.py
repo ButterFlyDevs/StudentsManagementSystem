@@ -53,7 +53,7 @@ def aprovisiona():
     #2
     GestorAsignaturas.nuevaAsignatura('Matemáticas')
 
-    '''
+
     #Creamos dos Clases
     #Cabecera: nuevaClase(self, curso, grupo, nivel)
     #1
@@ -97,7 +97,7 @@ def aprovisiona():
     #id 6
     GestorMatriculas.nuevaMatricula('6','3') #Matriculamos al alumno con id=6 en Francés en 1ºB ESO.
 
-    '''
+    
 
 
 if __name__ == '__main__':

@@ -386,6 +386,22 @@ def getClasesProfesor(id_profesor):
     return jsonpickle.encode(GestorProfesores.getClases(id_profesor))
 
 
+@app.route('/profesores/<string:id_profesor>/asociaciones', methods=['GET'])
+def getAsociacionesProfesor(id_profesor):
+    '''
+    Devuelve la lista de todas las asociaciones (relación asignatura-clase) de un profesor en concreto.
+    Esta lista no solo se compone de los ids sino de el nombre de la asignatura y el nombre de la clase también.
+
+    curl -i -X GET localhost:8002/profesores/1/asociaciones
+    '''
+    if v:
+        print nombreMicroservicio
+        print ' Recurso: /profesores/<id_profesor>/asociaciones , metodo: POST'
+        print " Petición: "
+        print ' '+str(request.form)
+        
+    return jsonpickle.encode(GestorProfesores.getAsociaciones(id_profesor))
+
 
 ############################
 #   COLECCIÓN ASIGNATURAS  #

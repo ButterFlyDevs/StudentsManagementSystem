@@ -30,9 +30,10 @@ de la vista y se usan).
        .state('profile', {
          url: '/profile',
          templateUrl:'profile.html',
+         controller: 'ControladorProfilePage',
 
          data: {
-           authorizedRoles: [USER_ROLES.all]
+           authorizedRoles: [USER_ROLES.admin]
          }
        })
 
@@ -218,10 +219,34 @@ de la vista y se usan).
                   controller: 'ControladorNuevaClase'
               })
 
+              //Controladores de la sección de control de estudiantes.
+              .state('control-estudiantes', {
+                  url: '/control-estudiantes',
+                  templateUrl: 'controlEstudiantes/control-estudiantes.html',
+                  data: {
+                    authorizedRoles: [USER_ROLES.admin]
+                  }
+              })
+              .state('control-estudiantes.main', {
+                  //La url se conforma extendiendo la del padre: /control-estudiantes/main
+                  url: '/main',
+                  templateUrl: 'controlEstudiantes/control-estudiantes-main.html',
+              })
 
-
-
-
+              .state('control-estudiantes.asistencia-inicio', {
+                  url: '/asistencia-inicio',
+                  templateUrl: 'controlEstudiantes/control-estudiantes-asistencia-inicio.html',
+              })
+              .state('control-estudiantes.asistencia-historico', {
+                  url: '/asistencia-historico',
+                  templateUrl: 'controlEstudiantes/control-estudiantes-asistencia-historico.html',
+                  controller: 'ControladorCE-asistencia-historico',
+              })
+              .state('control-estudiantes.asistencia-nuevo', {
+                  url: '/asistencia-nuevo',
+                  templateUrl: 'controlEstudiantes/control-estudiantes-asistencia-nuevo.html',
+                  controller: 'ControladorCE-asistencia-nuevo',
+              })
 
 
         // ABOUT PAGE AND MULTIPLE NAMED VIEWS =================================
