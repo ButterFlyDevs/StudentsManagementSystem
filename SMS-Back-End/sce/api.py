@@ -9,6 +9,10 @@ from flask import abort
 from flask import request
 import jsonpickle
 import Estructuras
+from NDBlib import gestor
+
+
+
 #from NDBlib import EstrutcutrasNDB.ControlAsistencia
 
 
@@ -25,7 +29,7 @@ def doSomething():
     '''
     Prueba del estado de la API.
     curl -i -X GET localhost:8003/prueba
-    '''    
+    '''
     if v:
         print nombreMicroservicio
         print ' Llamando a /prueba GET doSomething() \n'
@@ -59,7 +63,7 @@ def  insertaControlAsistencia():
     if v:
         print nombreMicroservicio
         print 'Llamando a /controlesAsistencia POST insertaControlAsistencia() \n'
-
+        gestor.insertarControlAsistencia()
     return 'insertaControlAsistencia()\n'
 
 ###############################################

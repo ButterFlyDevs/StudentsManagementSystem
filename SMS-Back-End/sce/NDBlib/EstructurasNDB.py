@@ -20,8 +20,8 @@ class ControlAsistencia(ndb.Model):
 
     #Método que devuelve todo lo guardado. En la práctica no se usará
     @classmethod
-    def devolver_todo(cls,clave_ancestra):
-        return cls.query(ancestor=clave_ancestra).order(-cls.fecha_hora)
+    def devolver_todo(cls):
+        return cls.query().order(-cls.fecha_hora)
 
 #Crear clase NO NDB en un fichero pytthon que sea CA simple y CA complejo. El CA simple tiene estos datos,
 #CA complejo tiene estos datos mas lo s nombres de cada uno.
