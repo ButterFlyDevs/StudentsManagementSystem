@@ -1,9 +1,9 @@
-from NDBlib import EstructurasNDB.ControlAsistencia
-from NDBlib import EstructurasNDB.Resumen_ControlAsistencia
-from NDBlib import EstructurasNDB.Alumnos_NombreID
-from NDBlib import EstructurasNDB.Profesores_NombreID
-from NDBlib import EstructurasNDB.Clases_NombreID
-from NDBlib import EstructurasNDB.Asignaturas_NombreID
+import EstructurasNDB.ControlAsistencia
+import EstructurasNDB.Resumen_ControlAsistencia
+import EstructurasNDB.Alumnos_NombreID
+import EstructurasNDB.Profesores_NombreID
+import EstructurasNDB.Clases_NombreID
+import EstructurasNDB.Asignaturas_NombreID
 import Estructuras
 
 
@@ -13,7 +13,7 @@ class Gestor(self):
     def obtenerALLCA():
         listaCA = []
         listaCA = ControlAsistencia.devolver_todo().fetch(100000)
-        
+
     @classmethod
     def obtenerControlAsistencia(id):
         pass
