@@ -1898,3 +1898,10 @@ routerApp.controller('ControladorCE-asistencia-nuevo', function($scope){
 
 
 });
+
+routerApp.controller('ControladorCE-asistencia-realizacion', function($scope){
+
+  $scope.alumnos = 'lista de alumnos rechulones';
+  $scope.date = new Date();
+
+});

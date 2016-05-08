@@ -248,6 +248,12 @@ de la vista y se usan).
                   controller: 'ControladorCE-asistencia-nuevo',
               })
 
+              .state('control-estudiantes-asistencia-realizacion', {
+                  url: '/cear',
+                  templateUrl: 'controlEstudiantes/control-estudiantes-asistencia-realizacion.html',
+                  controller: 'ControladorCE-asistencia-realizacion',
+              })
+
 
         // ABOUT PAGE AND MULTIPLE NAMED VIEWS =================================
         .state('about', {
