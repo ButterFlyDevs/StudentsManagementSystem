@@ -1885,9 +1885,11 @@ routerApp.controller('ControladorCE-asistencia-historico', function($scope){
 
 });
 
-routerApp.controller('ControladorCE-asistencia-nuevo', function($scope){
+routerApp.controller('ControladorCE-asistencia-nuevo', function($scope, $location, $rootScope){
 
 
+  //LLamamos al APIG para mostrar todas las asociaciones (Asignatura-Clase) que imparter clase cierto profesor.
+  //El id del profesor lo cojemos los valores del usuario logueado.
   gapi.client.helloworld.profesores.getAsociacionesProfesor({'id': '1'}).execute(function(resp){
     console.log('calling profesor.getAsociacionesProfesor with id 1');
     console.log(resp);
@@ -1896,12 +1898,158 @@ routerApp.controller('ControladorCE-asistencia-nuevo', function($scope){
   });
 
 
+  /*
+  Tendremos que crear un método que al pulsar sobre una asocaicion la grabe en el scope y
+  entonces llame a la página de la realización del CE-asistencia y donde se lea allí.
+  Si se hiciera pasándolo por la url entonces cualquier usuario podría poner la url y acceder
+  a la realización de un CE-asistencia sobre los alumnos de una asociacion que puede no ser la suya,
+  para evitar esto también podriamos comprobar si ese usuario puede hacer ese CE en ese idasociacon
+  comprobando si pertenece a sus asociaciones pero sería tener que llamar otra vez a getAsociacionesProfesor
+  en otro controlador.
+  */
+
+  $scope.goCE = function(idAsociacion) {
+    console.log('ID_Asociacion en goCE: '+idAsociacion);
+    $rootScope.id_asociacion=idAsociacion;
+
+    $location.path("/cear");
+    //grabar el id en el scope
+
+    //ir a la realización del CE
+  };
+
 
 });
 
-routerApp.controller('ControladorCE-asistencia-realizacion', function($scope){
+routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $rootScope){
 
-  $scope.alumnos = 'lista de alumnos rechulones';
+
+  console.log('realización de control de estudiantes con: ')
+  console.log($rootScope.id_asociacion);
+
+
+  gapi.client.helloworld.asociaciones.getAlumnos({'id': $rootScope.id_asociacion}).execute(function(resp){
+    alumnos= resp.alumnos;
+    //Asignamos ciertos valors por defecto a todos los estudiantes:
+    for(var i=0; i < alumnos.length; ++i){
+      //El alumno ha venido a clase:
+      alumnos[i].asistencia=1;
+      //El alumno ha sido puntual:
+      alumnos[i].retraso=0;
+      //Por tanto no necesita justificante de retraso:
+      alumnos[i].retrasoJustificado=0;
+      //Ha traido el uniforme
+      alumnos[i].uniforme=1;
+    }
+    console.log(alumnos);
+    //Una vez modificados los pasamos a la vista a través del scope
+    $scope.alumnos = alumnos;
+    //console.log(resp.alumnos);
+    $scope.$apply();
+  });
+
+
+
+  /*
+  var a1 = new Object();
+  a1.nombre="Marco Aureliio ";
+  a1.apellidos="Barrancos Martinez";
+  a1.id=1;
+  a1.asistencia=1;
+  a1.retraso=10;
+  a1.retrasoJustificado=0;
+  a1.uniforme=1;
+
+  var a2 = new Object();
+  a2.nombre="Antonia ";
+  a2.apellidos="San Juan";
+  a2.id=2;
+  a2.asistencia=1;
+  a2.retraso=0;
+  a2.retrasoJustificado=0;
+  a2.uniforme=1;
+
+  var alumnos = [];
+  alumnos.push(a1);
+  alumnos.push(a2);
+
+  $scope.alumnos=alumnos;
+ */
+
+  $scope.anotarAsistencia = function(idAlumno, asistencia){
+    console.log('anotarAsistencia with line '+idAlumno+'  asistencia: '+asistencia);
+    //Ahora buscamos al alumno con id=idAlumno y marcar el campo asistencia al valor que nos pase la función.
+    //No podemos usar filter porque devuelve un array de objetos, no su índice. Más info en: https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/Array/filter
+    for(var i=0; i < alumnos.length; ++i){
+      console.log(alumnos[i].id);
+      if (alumnos[i].id==idAlumno){
+        //Cuando encontramos el alumnos que es ponemos su asisntecia como nos dice la UI
+        alumnos[i].asistencia=asistencia;
+      }
+    }
+  }
+
+  $scope.justificarRetraso = function(idAlumno){
+    console.log('justificarRetraso with line '+idAlumno);
+    for(var i=0; i < alumnos.length; ++i){
+      console.log(alumnos[i].id);
+      if (alumnos[i].id==idAlumno){
+        //Cuando encontramos el alumnos que es ponemos su justificacion como nos dice la UI
+        if(alumnos[i].retrasoJustificado==0){
+          alumnos[i].retrasoJustificado=1;
+        }else{
+          alumnos[i].retrasoJustificado=0;
+        }
+
+      }
+    }
+  }
+
+  $scope.anotarUniforme = function(idAlumno, uniforme){
+    console.log('anotarUniforme with line '+idAlumno+'  uniforme: '+uniforme);
+    //Ahora buscamos al alumno con id=idAlumno y marcar el campo uniforme al valor que nos pase la función.
+    //No podemos usar filter porque devuelve un array de objetos, no su índice. Más info en: https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/Array/filter
+    for(var i=0; i < alumnos.length; ++i){
+      console.log(alumnos[i].id);
+      if (alumnos[i].id==idAlumno){
+        //Cuando encontramos el alumnos que es ponemos su asisntecia como nos dice la UI
+        alumnos[i].uniforme=uniforme;
+      }
+    }
+  }
+
+  $scope.anotarRetraso = function(idAlumno){
+    console.log('AnotarREtraso');
+    console.log('Retraso del estudiante id: '+idAlumno);
+    //Con cada llamada se aumenta el retraso del estudiante en 10 min: 0 -> 10 -> 20 o más.
+    //Primero buscamos al alumno:
+    for(var i=0; i < alumnos.length; ++i){
+      if (alumnos[i].id==idAlumno){
+        console.log('encontrado');
+        console.log(alumnos[i].retraso);
+        //Vamos cambiando entre las tres opciones de retraso que puede haber.
+        if(alumnos[i].retraso==0){
+          console.log('Cambiando a 10');
+          alumnos[i].retraso=10;
+        }else if(alumnos[i].retraso==10){
+          alumnos[i].retraso=20;
+        }else if(alumnos[i].retraso==20){
+          alumnos[i].retraso=0;
+        }
+      }
+    }
+  }
+
+  $scope.isSelected = false;
+      $scope.toggleButtonState = function(){
+          $scope.isSelected = !$scope.isSelected;
+      }
+
+  $scope.activeButton = function() {
+      console.log('PRESS BUTTON');
+      $scope.isActive = !$scope.isActive;
+    }
+  //$scope.alumnos = 'lista de alumnos rechulones';
   $scope.date = new Date();
 
 });

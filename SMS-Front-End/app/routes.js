@@ -251,6 +251,9 @@ de la vista y se usan).
               .state('control-estudiantes-asistencia-realizacion', {
                   url: '/cear',
                   templateUrl: 'controlEstudiantes/control-estudiantes-asistencia-realizacion.html',
+                  data: {
+                    authorizedRoles: [USER_ROLES.all]
+                  },
                   controller: 'ControladorCE-asistencia-realizacion',
               })
 

@@ -23,7 +23,7 @@ app = Flask(__name__)
 
 #Activar modo verbose
 v=1
-nombreMicroservicio = ' ## Microservicio BD ##'
+nombreMicroservicio = '\n ## Microservicio BD ##'
 
 ############################
 #   COLECCIÓN ALUMNOS      #
@@ -399,7 +399,7 @@ def getAsociacionesProfesor(id_profesor):
         print ' Recurso: /profesores/<id_profesor>/asociaciones , metodo: POST'
         print " Petición: "
         print ' '+str(request.form)
-        
+
     return jsonpickle.encode(GestorProfesores.getAsociaciones(id_profesor))
 
 
@@ -761,7 +761,6 @@ def getTodoSobreAsociacion(id_asociacion):
 
     return jsonpickle.encode(asociacion)
 
-
 @app.route('/asociaciones',methods=['POST'])
 def postAsociacion():
     '''
@@ -789,6 +788,31 @@ def delAsociacion(id_asociacion):
         abort(404)
     else:
         return str(salida)
+
+#Métodos que relacionan con otras entidades
+@app.route('/asociaciones/<string:id_asociacion>/alumnos', methods=['GET'])
+def getAlumnosAsociacion(id_asociacion):
+    '''
+    Devuelve una lista con todos los alumnos de una asociación concreta
+    curl -i -X GET localhost:8002/asociaciones/1/alumnos
+    '''
+
+    #Info de seguimiento
+    if v:
+        print nombreMicroservicio
+        print ' Recurso: /asociaciones/'+str(id_asociacion)+'/alumnos , metodo: GET \n'
+
+    salida = GestorAsociaciones.getAlumnos(id_asociacion)
+
+    #Info de seguimiento
+    if v:
+        print nombreMicroservicio
+        print ' Recurso: /asociaciones/'+str(id_asociacion)+'/alumnos '
+        print ' Return: '+str(salida)+'\n'
+
+    #Devolvemos los datos en formato JSON
+    return jsonpickle.encode(salida)
+
 
 
 ##########################
@@ -820,6 +844,7 @@ def comprobarAccesoUsuario():
     curl -d "username=46666&password=46666" -i -X POST localhost:8002/comprobarAccesoUsuario
     '''
 
+    #Info de seguimiento
     if v:
         print nombreMicroservicio
         print ' Recurso: /comprobarAccesoUsuario , metodo: POST'
@@ -828,6 +853,7 @@ def comprobarAccesoUsuario():
 
     salida=GestorCredenciales.comprobarUsuario(request.form['username'], request.form['password'])
 
+    #Info de seguimiento
     if v:
         print nombreMicroservicio
         print salida

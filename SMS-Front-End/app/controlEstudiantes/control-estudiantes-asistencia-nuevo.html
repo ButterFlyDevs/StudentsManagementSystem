@@ -21,8 +21,10 @@
   Para realizar un control de asitencia primero eliga el grupo que desea.
 
   <ul class="uk-list uk-list-striped" ng-repeat="asociacion in asociaciones">
-    <li><a ui-sref="control-estudiantes-asistencia-realizacion">{{asociacion.nombreAsignatura}} {{asociacion.nombreClase}}</a></li>
+    <li><a ng-click="goCE(asociacion.id_asociacion);">{{asociacion.nombreAsignatura}} {{asociacion.nombreClase}}</a></li>    
   </ul>
+
+
 
 </div>
 

@@ -2564,6 +2564,50 @@ class HelloWorldApi(remote.Service):
 
         return AsociacionCompleta( nombreAsignatura=formatText(iac['nombreAsignatura']), listaProfesores=profesores, listaAlumnos=alumnos, idAsociacion=request.id)
 
+    #Relación con otras entidades.
+
+    @endpoints.method(ID, ListaAlumnos, path='asociaciones/getAlumnos', http_method='GET', name='asociaciones.getAlumnos')
+    def getAlumnosAsociacion(self, request):
+        '''
+        Devuelve una lista con todos los alumnos matriculados a una asociacion (Asignatura-Clase) específica.
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/asociaciones/getAlumnos?id=1
+        '''
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Petición GET a asociaciones.getAlumnos'
+            print ' Request: \n '+str(request)+'\n'
+
+
+        module = modules.get_current_module_name()
+        instance = modules.get_current_instance_id()
+        #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
+        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        #Añadimos el recurso al que queremos conectarnos.
+        url+="asociaciones/"+request.id+"/alumnos"
+        result = urlfetch.fetch(url)
+        respuestaMServicio= jsonpickle.decode(result.content)
+        #Creamos un array de alumnos
+        vector_alumnos = []
+
+        for alumno in respuestaMServicio:
+            idAlumno = str(alumno.get('id'))
+            nombreAlumno = alumno.get('nombre')
+            apellidosAlumno = alumno.get('apellidos')
+            vector_alumnos.append(Alumno( id=idAlumno, nombre=formatText(nombreAlumno), apellidos=formatText(apellidosAlumno) ) )
+
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Respuesta de asociaciones.getAlumnos'
+            print ' Return: '+str(vector_alumnos)+'\n'
+
+        return ListaAlumnos(alumnos=vector_alumnos)
+
+
+
 
     ##############################################
     #   métodos de CONTROL DE ESTUDIANTES        #
