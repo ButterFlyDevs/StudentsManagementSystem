@@ -1,9 +1,12 @@
 #!/bin/bash
 
 #Contamos las lineas del mServicio apigateway
-APIG_lines="$(wc -l $(find SMS-Back-End/apigateway/ ! -name *.pyc ! -name *.jpg ! -path 'SMS-Back-End/apigateway/lib/*' ! -wholename SMS-Back-End/apigateway/lib ! -wholename SMS-Back-End/apigateway/) | grep 'total' | awk '{print $1}')"
+cd SMS-Back-End/apigateway
+APIG_lines="$(wc -l $(ls -I*.pyc -Ilib -I*.jpg) | grep 'total' | awk '{print $1}')"
+cd ../..
 
-UI_lines="$(wc -l $(find SMS-Front-End/ ! -name *.pyc ! -name *.jpg ! -path 'SMS-Back-End/apigateway/lib/*' ! -wholename SMS-Back-End/apigateway/lib ! -wholename SMS-Back-End/apigateway/) | grep 'total' | awk '{print $1}')"
+echo $APIG_lines
+
 
 #Contamos las lineas del mServicio Base de Datos
 mSBD_lines="$(wc -l SMS-Back-End/microservicio1/*.py SMS-Back-End/microservicio1/*.txt SMS-Back-End/microservicio1/*.yaml | grep 'total' | cut -d' ' -f2)"

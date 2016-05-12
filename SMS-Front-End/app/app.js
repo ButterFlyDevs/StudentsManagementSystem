@@ -1139,7 +1139,6 @@ routerApp.controller('ControladorNuevaAsignatura', function ($scope, $location){
        gapi.client.helloworld.asignaturas.insertarAsignatura({
          //Aquí especificamos todos los datods del form que queremos que se envíen:
          'nombre':encode_utf8($scope.alumno.nombre),
-
        }
        ).execute(function(resp){
          //Mostramos por consola la respuesta del servidor
@@ -1908,9 +1907,11 @@ routerApp.controller('ControladorCE-asistencia-nuevo', function($scope, $locatio
   en otro controlador.
   */
 
-  $scope.goCE = function(idAsociacion) {
+  $scope.goCE = function(idAsociacion, asignatura, clase) {
     console.log('ID_Asociacion en goCE: '+idAsociacion);
     $rootScope.id_asociacion=idAsociacion;
+    $rootScope.asignatura=asignatura;
+    $rootScope.clase=clase;
 
     $location.path("/cear");
     //grabar el id en el scope
@@ -1926,6 +1927,8 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
 
   console.log('realización de control de estudiantes con: ')
   console.log($rootScope.id_asociacion);
+  $scope.nombreAsignatura=$rootScope.asignatura;
+  $scope.nombreClase=$rootScope.clase;
 
 
   gapi.client.helloworld.asociaciones.getAlumnos({'id': $rootScope.id_asociacion}).execute(function(resp){

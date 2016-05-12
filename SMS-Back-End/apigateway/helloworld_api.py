@@ -234,6 +234,12 @@ class salidaLogin(messages.Message):
     nombre = messages.StringField(2, required=True)
     rol = messages.StringField(3, required=True)
 
+# Mensajes del Servicio Control de Estudiantes
+
+class controlAsistencia(messages.Message):
+    
+
+
 #Decorador que establace nombre y versión de la api
 @endpoints.api(name='helloworld', version='v1')
 class HelloWorldApi(remote.Service):
