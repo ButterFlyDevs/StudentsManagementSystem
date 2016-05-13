@@ -1930,6 +1930,43 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
   $scope.nombreAsignatura=$rootScope.asignatura;
   $scope.nombreClase=$rootScope.clase;
 
+  /*
+  jsonData2=JSON.stringify('{"controles": [{"asistencia" : 1},{"asistencia" : 0}]}');
+  console.log(jsonData2);
+  */
+  /*
+  var a1 = new Object();
+  a1.nombre="Marco Aureliio ";
+  a1.apellidos="Barrancos Martinez";
+  a1.id=1;
+  a1.asistencia=1;
+  a1.retraso=10;
+  a1.retrasoJustificado=0;
+  a1.uniforme=1;
+
+  var a2 = new Object();
+  a2.nombre="Antonia ";
+  a2.apellidos="San Juan";
+  a2.id=2;
+  a2.asistencia=1;
+  a2.retraso=0;
+  a2.retrasoJustificado=0;
+  a2.uniforme=1;
+
+  var alumnos2 = [];
+  alumnos2.push(a1);
+  alumnos2.push(a2);
+  */
+
+
+  //jsonData=JSON.stringify({"controles" : alumnos2});
+  /*
+  gapi.client.helloworld.controles.insertarControl({"controles" : alumnos2}).execute(function(resp){
+    console.log(resp);
+    console.log(resp.message);
+  });
+  */
+
 
   gapi.client.helloworld.asociaciones.getAlumnos({'id': $rootScope.id_asociacion}).execute(function(resp){
     alumnos= resp.alumnos;
@@ -1953,38 +1990,15 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
 
 
 
-  /*
-  var a1 = new Object();
-  a1.nombre="Marco Aureliio ";
-  a1.apellidos="Barrancos Martinez";
-  a1.id=1;
-  a1.asistencia=1;
-  a1.retraso=10;
-  a1.retrasoJustificado=0;
-  a1.uniforme=1;
 
-  var a2 = new Object();
-  a2.nombre="Antonia ";
-  a2.apellidos="San Juan";
-  a2.id=2;
-  a2.asistencia=1;
-  a2.retraso=0;
-  a2.retrasoJustificado=0;
-  a2.uniforme=1;
 
-  var alumnos = [];
-  alumnos.push(a1);
-  alumnos.push(a2);
-
-  $scope.alumnos=alumnos;
- */
 
   $scope.anotarAsistencia = function(idAlumno, asistencia){
     console.log('anotarAsistencia with line '+idAlumno+'  asistencia: '+asistencia);
     //Ahora buscamos al alumno con id=idAlumno y marcar el campo asistencia al valor que nos pase la función.
     //No podemos usar filter porque devuelve un array de objetos, no su índice. Más info en: https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/Array/filter
     for(var i=0; i < alumnos.length; ++i){
-      console.log(alumnos[i].id);
+      //console.log(alumnos[i].id);
       if (alumnos[i].id==idAlumno){
         //Cuando encontramos el alumnos que es ponemos su asisntecia como nos dice la UI
         alumnos[i].asistencia=asistencia;
@@ -1995,7 +2009,7 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
   $scope.justificarRetraso = function(idAlumno){
     console.log('justificarRetraso with line '+idAlumno);
     for(var i=0; i < alumnos.length; ++i){
-      console.log(alumnos[i].id);
+      //console.log(alumnos[i].id);
       if (alumnos[i].id==idAlumno){
         //Cuando encontramos el alumnos que es ponemos su justificacion como nos dice la UI
         if(alumnos[i].retrasoJustificado==0){
@@ -2013,7 +2027,7 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
     //Ahora buscamos al alumno con id=idAlumno y marcar el campo uniforme al valor que nos pase la función.
     //No podemos usar filter porque devuelve un array de objetos, no su índice. Más info en: https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/Array/filter
     for(var i=0; i < alumnos.length; ++i){
-      console.log(alumnos[i].id);
+      //console.log(alumnos[i].id);
       if (alumnos[i].id==idAlumno){
         //Cuando encontramos el alumnos que es ponemos su asisntecia como nos dice la UI
         alumnos[i].uniforme=uniforme;
@@ -2053,6 +2067,28 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
       $scope.isActive = !$scope.isActive;
     }
   //$scope.alumnos = 'lista de alumnos rechulones';
-  $scope.date = new Date();
+
+
+  $scope.enviarDatos = function(){
+
+    //Función que envía los datos al servidor.
+
+    console.log('Llamada a enviarDatos() con datos:');
+    console.log(alumnos);
+    //Los datos hay quer terminar de prepararlos
+
+    Enviar los datos de los controles y el id del alumno, del profesor, de la asig y de la clase por separadao ya que son comunes a todas las tuplas.
+
+    //Los datos que se insertan en la llamada a APIG son en formato JSON, por tanto lo único que tenemos que hacer es componer una lista de
+    //controles etiquetándolo con el nombre que se espera: controles y añadiendo ahí los alumnos que se recogen de la UI
+    gapi.client.helloworld.controles.insertarControl({"controles" : alumnos}).execute(function(resp){
+
+
+      console.log(resp);
+      console.log(resp.message);
+    });
+  }
+
+
 
 });

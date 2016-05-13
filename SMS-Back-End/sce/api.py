@@ -24,12 +24,6 @@ app = Flask(__name__)
 v=1
 nombreMicroservicio = '\n ## Microservicio SCE ##'
 
-def parseBoolean(cadena):
-    if cadena=='True' or cadena== '1':
-        return True
-    if cadena=='False' or cadena == '0':
-        return False
-
 #Recurso de prueba el estado del servicio.
 @app.route('/prueba',methods=['GET'])
 def doSomething():
@@ -79,18 +73,42 @@ def  getAllControlesAsistencia():
 
 @app.route('/controlesAsistencia', methods=['POST'])
 def  insertaControlAsistencia():
+    '''
+    Inserta un control de asistencia en el sistema. Compuesto por muchos controles a estudiantes para una asignatura en una clase con un
+    profesor en una fecha y hora determinadas.
 
 
+    Debería recibir una lista de controles de asistencia sin fecha ni hora porque se la colocará este microservicio (para evitar múltiples problemas)
+    Esta lista de controles se envía en formato JSON
+
+    Prueba del método:
+    curl -X POST  -H 'content-type: application/json' -d @pruebaJson.json localhost:8003/controlesAsistencia
+    El fichero sigue el estandar JSON, ver pruebaJson.json. Se pueden validar los ficheros en webs como http://jsonlint.com/.
+
     '''
-    Inserta un control de asitencia
-    curl -d "fecha=05-10-2016-12-30&asistencia=1&uniforme=1&retraso=0&retraso_tiempo=0&retraso_justificado=1&id_alumno=11&id_profesor=22&id_clase=33&id_asignatura=44" -i -X POST localhost:8003/controlesAsistencia
-    '''
+
+    print 'yeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    print request
+    print 'yeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+
+    #Extraemos el JSON de la petición.
+    json = request.get_json()
+
+
     if v:
         print nombreMicroservicio
         print ' Llamando a /controlesAsistencia POST insertaControlAsistencia()'
-        print " Petición: "
-        print request.form
+        print str(len(json['controles'])) +' controles recibidos\n'
+        print " Controles: "
+        print json
+    
 
+    #Llamamos a la función de NDBlib que inserta el conjunto
+    status = Gestor.insertarConjuntoControlAsistencia(json['controles'])
+
+
+
+    '''
 
     #Dividimos la fecha en partes usando el separador -
     fecha = request.form['fecha'].split('-')
@@ -116,15 +134,16 @@ def  insertaControlAsistencia():
                                         int(request.form['id_clase']),
                                         int(request.form['id_asignatura']),
                                         )
+    '''
 
 
     if v:
         print nombreMicroservicio
         print ' /controlesAsistencia POST insertaControlAsistencia()'
-        print ' Return:'+str(clave)+'\n'
+        print ' Return:'+str(status)+'\n'
 
     #Devolvemos la clave que ha sido introducida
-    return str(clave)
+    return str(status)
 
 
 

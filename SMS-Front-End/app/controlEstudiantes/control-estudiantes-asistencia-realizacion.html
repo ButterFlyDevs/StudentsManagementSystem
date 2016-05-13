@@ -14,7 +14,7 @@
 </br>
 
 Clase: <strong>{{nombreClase}}</strong>  Asignatura: <strong>{{nombreAsignatura}}</strong> Profesor: <strong>{{ currentUser.name }}</strong>
-<strong style="color: purple;">{{date | date:'dd-MM-yyyy'}}</strong>
+<strong style="color: purple;">{{fecha}}</strong> {{hora}}
 
 </br>
 
@@ -128,7 +128,7 @@ Clase: <strong>{{nombreClase}}</strong>  Asignatura: <strong>{{nombreAsignatura}
 
 
   </br>
-  <button class="uk-button uk-button-success" type="button">Guardar</button>
+  <button ng-click="enviarDatos()" class="uk-button uk-button-success" type="button">Guardar</button>
   <button class="uk-button uk-button-danger" type="button">Cancelar</button>
 
 

@@ -40,26 +40,26 @@ class ControlAsistencia(ndb.Model):
 #CA complejo tiene estos datos mas lo s nombres de cada uno.
 #Se utilizará para devolver los objetos en las funciones
 
-class Resumen_ControlAsistencia(ndb.Model):
+class ResumenControlAsistencia(ndb.Model):
 
-    lista_idCA = ndb.IntegerProperty(repeated=True) # La propiedad repeated hace que el campo sea una lista y pueda tomar varios valores, en lugar de solo unof
+    lista_idCA = ndb.KeyProperty(repeated=True) # La propiedad repeated hace que el campo sea una lista y pueda tomar varios valores, en lugar de solo unof
     fecha_hora = ndb.DateTimeProperty()
     id_profesor = ndb.IntegerProperty()
     id_clase = ndb.IntegerProperty()
     id_asignatura = ndb.IntegerProperty()
 
-class Alumnos_NombreID(ndb.Model):
+class AlumnosNombreID(ndb.Model):
     id_alumno = ndb.IntegerProperty(required=True)
     nombre_alumno = ndb.StringProperty(required=True)
 
-class Profesores_NombreID(ndb.Model):
+class ProfesoresNombreID(ndb.Model):
     id_profesor = ndb.IntegerProperty(required=True)
     nombre_profesor = ndb.StringProperty(required=True)
 
-class Clases_NombreID(ndb.Model):
+class ClasesNombreID(ndb.Model):
     id_clase = ndb.IntegerProperty(required=True)
     nombre_clase = ndb.StringProperty(required=True)
 
-class Asignaturas_NombreID(ndb.Model):
+class AsignaturasNombreID(ndb.Model):
     id_asignatura = ndb.IntegerProperty(required=True)
     nombre_asignatura = ndb.StringProperty(required=True)

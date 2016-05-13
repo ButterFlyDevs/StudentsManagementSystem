@@ -55,6 +55,8 @@ from google.appengine.api import modules
 #Para la decodificaciónd e los datos recibidos en JSON desde las APIs
 import jsonpickle
 
+import json
+
 from manejadorImagenes import ManejadorImagenes
 
 #Variable habilitadora del modo verbose
@@ -208,8 +210,28 @@ class AlumnoSimpleExtendido(messages.Message):
     id = messages.StringField(3)
     idMatricula = messages.StringField(4)
 
+#####################################################
+## Mensajes del servicio de Control de Estudiantes ##
+#####################################################
+
+#Todos los campos son obligatorios
+class ControlAsistencia(messages.Message):
+    asistencia = messages.IntegerField(1, required=True)
+    retraso = messages.IntegerField(2, required=True)
+    retrasoTiempo = messages.IntegerField(3, required=True)
+    retrasoJustificado = messages.IntegerField(4, required=True)
+    uniforme =  messages.IntegerField(5, required=True)
+    idAlumno = messages.IntegerField(6, required=True)
+    idProfesor = messages.IntegerField(7, required=True)
+    idClase = messages.IntegerField(8, required=True)
+    idAsignatura = messages.IntegerField(9, required=True)
+
+class ListaControlAsistencia(messages.Message):
+    controles = messages.MessageField(ControlAsistencia, 1, repeated=True)
+
+
 class ResumenControlAsistencia(messages.Message):
-    key = messages.StringField(1)
+    key = messages.StringField(1, required=True)
     fecha = messages.StringField(2)
     idclase = messages.StringField(3)
     nombreClase = messages.StringField(4)
@@ -236,8 +258,8 @@ class salidaLogin(messages.Message):
 
 # Mensajes del Servicio Control de Estudiantes
 
-class controlAsistencia(messages.Message):
-    
+#class controlAsistencia(messages.Message):
+
 
 
 #Decorador que establace nombre y versión de la api
@@ -2624,6 +2646,68 @@ class HelloWorldApi(remote.Service):
     #@endpoints.method(message_types.VoidMessage, ListaResumenControlAsistencia )
     #def getAllResumenesControlAsistencia(self, request):
 
+
+
+    @endpoints.method(ListaControlAsistencia, MensajeRespuesta, path='controles/insertarControl', http_method='POST', name='controles.insertarControl')
+    def subirControl(self, request):
+        '''
+        Permite subir una lista de controles de asistencia.
+        '''
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Petición POST a controles.insertarControl'
+            print ' Request: \n '+str(request.controles)+'\n'
+
+
+        #Parseo de los datos en formato message de RPC a JSON enviable a los microservicios a través del urlfetch (seguro que hay una forma mas bonita de hacerlo)
+
+        #Creamos un diciconario con una lista dentro llamada controles.
+        diccionario = { 'controles': []}
+        '''
+        Recorremos los controles que nos envían en el mensaje ListaControlAsistencia. Esto podemos hacerlo porque el formato de mensaje es
+        class ListaControlAsistencia(messages.Message):
+            controles = messages.MessageField(ControlAsistencia, 1, repeated=True)
+        '''
+        for a in request.controles:
+            #Creamos un diccionario por cada elemento dentro de controles, que es de tipo ControlAsistencia
+            tmpDic = {}
+            #Extraemos los datos y los insertarmos en el dic
+            tmpDic['asistencia'] = a.asistencia
+            tmpDic['retraso'] = a.retraso
+            tmpDic['retrasoTiempo'] = a.retrasoTiempo
+            tmpDic['retrasoJustificado'] = a.retrasoJustificado
+            tmpDic['uniforme'] = a.uniforme
+            tmpDic['idAlumno'] = a.idAlumno
+            tmpDic['idProfesor'] = a.idProfesor
+            tmpDic['idClase'] = a.idClase
+            tmpDic['idAsignatura'] = a.idAsignatura
+
+            #Añadimo este tmpDic a la lista controles del diccionario principal.
+            diccionario['controles'].append(tmpDic)
+
+        #Usamos la librería json para terminar de darle formato y listo para usar.
+        jsonData = json.dumps(diccionario)
+        #Fin del proceso de conversión.
+
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        #Añadimos el metodo al que queremos conectarnos.
+        url+="controlesAsistencia"
+
+        #Petición al microservicio, pasándole como payload los datos recibidos aquí en el endpoint
+        result = urlfetch.fetch(url=url, payload=jsonData, method=urlfetch.POST, headers = {"Content-Type": "application/json"})
+
+        print ' Status code from microservice response: '+str(result.status_code)
+
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+#            print ' Respuesta de controles.insertarControl '+str(result)
+
+        return MensajeRespuesta( message='yeah' )
 
 
 
