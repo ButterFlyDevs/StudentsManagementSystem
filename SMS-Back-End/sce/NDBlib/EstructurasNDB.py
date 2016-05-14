@@ -17,10 +17,10 @@ class ControlAsistencia(ndb.Model):
     asistencia = ndb.BooleanProperty()
     #Si ha traido o no el uniforme.
     uniforme = ndb.BooleanProperty()
-    #Si ha llegado o no con retraso.
-    retraso = ndb.BooleanProperty()
+    #Si el alumno no ha llegado con retraso será un 0, pero puede ser un retraso de 10 min o de 20 min o mas en cuyo caso será 10 o 20 el valor
+    retraso = ndb.IntegerProperty()
     #En caso de llegar con retraso de cuanto se ha tratado. 10 o 20 o + minutos
-    retraso_tiempo= ndb.IntegerProperty()
+    #retraso_tiempo= ndb.IntegerProperty()
     #En caso de llegar con retraso si este ha sido justificado o no
     retraso_justificado = ndb.BooleanProperty()
 

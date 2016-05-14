@@ -1907,10 +1907,13 @@ routerApp.controller('ControladorCE-asistencia-nuevo', function($scope, $locatio
   en otro controlador.
   */
 
-  $scope.goCE = function(idAsociacion, asignatura, clase) {
+  $scope.goCE = function(idAsociacion, asignatura, idAsignatura, clase, idClase) {
     console.log('ID_Asociacion en goCE: '+idAsociacion);
-    $rootScope.id_asociacion=idAsociacion;
+    //SE cargan en el root scope los datos pasados al llamar a una asociación concreta
+    $rootScope.idAsociacion=idAsociacion;
     $rootScope.asignatura=asignatura;
+    $rootScope.idAsignatura=idAsignatura;
+    $rootScope.idClase=idClase;
     $rootScope.clase=clase;
 
     $location.path("/cear");
@@ -1925,8 +1928,7 @@ routerApp.controller('ControladorCE-asistencia-nuevo', function($scope, $locatio
 routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $rootScope){
 
 
-  console.log('realización de control de estudiantes con: ')
-  console.log($rootScope.id_asociacion);
+  console.log('realización de control de estudiantes con: asociacion'+$rootScope.idAsociacion);
   $scope.nombreAsignatura=$rootScope.asignatura;
   $scope.nombreClase=$rootScope.clase;
 
@@ -1968,7 +1970,7 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
   */
 
 
-  gapi.client.helloworld.asociaciones.getAlumnos({'id': $rootScope.id_asociacion}).execute(function(resp){
+  gapi.client.helloworld.asociaciones.getAlumnos({'id': $rootScope.idAsociacion}).execute(function(resp){
     alumnos= resp.alumnos;
     //Asignamos ciertos valors por defecto a todos los estudiantes:
     for(var i=0; i < alumnos.length; ++i){
@@ -2071,18 +2073,24 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
 
   $scope.enviarDatos = function(){
 
-    //Función que envía los datos al servidor.
+    //Función que envía los datos al servidor, usando el vector de alumnos que se ha creado al solicitarlos
+    //al servidor y los ids de la asignatura y de la clase cargados en el rootScope
 
     console.log('Llamada a enviarDatos() con datos:');
+    console.log('alumnos');
     console.log(alumnos);
-    //Los datos hay quer terminar de prepararlos
+    console.log('idAsignatura');
+    console.log($rootScope.idAsignatura);
+    console.log('idClase');
+    console.log($rootScope.idClase);
+    console.log('Profesor');
+    console.log($scope.currentUser.id);
 
-    Enviar los datos de los controles y el id del alumno, del profesor, de la asig y de la clase por separadao ya que son comunes a todas las tuplas.
+    //Enviar los datos de los controles y el id del alumno, del profesor, de la asig y de la clase por separadao ya que son comunes a todas las tuplas.
 
     //Los datos que se insertan en la llamada a APIG son en formato JSON, por tanto lo único que tenemos que hacer es componer una lista de
     //controles etiquetándolo con el nombre que se espera: controles y añadiendo ahí los alumnos que se recogen de la UI
-    gapi.client.helloworld.controles.insertarControl({"controles" : alumnos}).execute(function(resp){
-
+    gapi.client.helloworld.controles.insertarControl({"controles" : alumnos, "idProfesor" : $scope.currentUser.id, "idClase" : $rootScope.idClase, "idAsignatura" : $rootScope.idAsignatura}).execute(function(resp){
 
       console.log(resp);
       console.log(resp.message);

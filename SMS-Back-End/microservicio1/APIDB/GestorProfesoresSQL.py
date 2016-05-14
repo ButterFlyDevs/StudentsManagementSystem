@@ -517,7 +517,9 @@ class GestorProfesores:
         asociacion = Asociacion()
         asociacion.id='1'
         asociacion.nombreAsignatura='Frances'
+        asociacion.idAsignatura='1'
         asociacion.nombreClase='1 A ESO'
+        asociacion.idClase='1'
 
         lista = []
         lista.append(asociacion)

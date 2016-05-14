@@ -217,17 +217,17 @@ class AlumnoSimpleExtendido(messages.Message):
 #Todos los campos son obligatorios
 class ControlAsistencia(messages.Message):
     asistencia = messages.IntegerField(1, required=True)
+    #Si el retraso es 0: no hay retraso 10: retraso de 10 min 20: retraso de 20 min o más
     retraso = messages.IntegerField(2, required=True)
-    retrasoTiempo = messages.IntegerField(3, required=True)
-    retrasoJustificado = messages.IntegerField(4, required=True)
-    uniforme =  messages.IntegerField(5, required=True)
-    idAlumno = messages.IntegerField(6, required=True)
-    idProfesor = messages.IntegerField(7, required=True)
-    idClase = messages.IntegerField(8, required=True)
-    idAsignatura = messages.IntegerField(9, required=True)
+    retrasoJustificado = messages.IntegerField(3, required=True)
+    uniforme =  messages.IntegerField(4, required=True)
+    id = messages.IntegerField(5, required=True)
 
 class ListaControlAsistencia(messages.Message):
     controles = messages.MessageField(ControlAsistencia, 1, repeated=True)
+    idProfesor = messages.IntegerField(7, required=True)
+    idClase = messages.IntegerField(8, required=True)
+    idAsignatura = messages.IntegerField(9, required=True)
 
 
 class ResumenControlAsistencia(messages.Message):
@@ -2657,7 +2657,8 @@ class HelloWorldApi(remote.Service):
         if v:
             print nombreMicroservicio
             print ' Petición POST a controles.insertarControl'
-            print ' Request: \n '+str(request.controles)+'\n'
+            print ' Request: \n '+str(request)+'\n'
+            print ' Request-CONTROLES: \n '+str(request.controles)+'\n'
 
 
         #Parseo de los datos en formato message de RPC a JSON enviable a los microservicios a través del urlfetch (seguro que hay una forma mas bonita de hacerlo)
@@ -2675,13 +2676,14 @@ class HelloWorldApi(remote.Service):
             #Extraemos los datos y los insertarmos en el dic
             tmpDic['asistencia'] = a.asistencia
             tmpDic['retraso'] = a.retraso
-            tmpDic['retrasoTiempo'] = a.retrasoTiempo
+            #tmpDic['retrasoTiempo'] = a.retrasoTiempo
             tmpDic['retrasoJustificado'] = a.retrasoJustificado
             tmpDic['uniforme'] = a.uniforme
-            tmpDic['idAlumno'] = a.idAlumno
-            tmpDic['idProfesor'] = a.idProfesor
-            tmpDic['idClase'] = a.idClase
-            tmpDic['idAsignatura'] = a.idAsignatura
+            tmpDic['idAlumno'] = a.id
+            #Los tres restantes vienen por la parte común.
+            tmpDic['idProfesor'] = request.idProfesor
+            tmpDic['idClase'] = request.idClase
+            tmpDic['idAsignatura'] = request.idAsignatura
 
             #Añadimo este tmpDic a la lista controles del diccionario principal.
             diccionario['controles'].append(tmpDic)

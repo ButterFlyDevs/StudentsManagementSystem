@@ -101,9 +101,9 @@ class Gestor:
         los tres últimos parámetros usamos el primer control pasado en la lista.
         '''
 
-        keyResumen=Gestor.insertarResumenControlAsistencia(keys, fechahora, (listaAsistencias[0])['id_profesor'],
-                                                                 (listaAsistencias[0])['id_asignatura'],
-                                                                 (listaAsistencias[0])['id_clase']
+        keyResumen=Gestor.insertarResumenControlAsistencia(keys, fechahora, (listaAsistencias[0])['idProfesor'],
+                                                                 (listaAsistencias[0])['idAsignatura'],
+                                                                 (listaAsistencias[0])['idClase']
                                                )
 
         return 'OK'
@@ -128,14 +128,14 @@ class Gestor:
         #Se rellena de datos, ajustándolos a los que esperamos.
         nuevoCA.fecha_hora=datetime #Usamos directamente la fecha y hora que nos pasan.
         nuevoCA.asistencia=parseBoolean(control['asistencia'])
-        nuevoCA.retraso=parseBoolean(control['retraso'])
-        nuevoCA.retraso_tiempo=int(control['retraso_tiempo'])
-        nuevoCA.retraso_justificado=parseBoolean(control['retraso_justificado'])
+        nuevoCA.retraso=int(control['retraso'])
+        #nuevoCA.retraso_tiempo=int(control['retraso_tiempo'])
+        nuevoCA.retraso_justificado=parseBoolean(control['retrasoJustificado'])
         nuevoCA.uniforme=parseBoolean(control['uniforme'])
-        nuevoCA.id_alumno=int(control['id_alumno'])
-        nuevoCA.id_profesor=int(control['id_profesor'])
-        nuevoCA.id_clase=int(control['id_clase'])
-        nuevoCA.id_asignatura=int(control['id_asignatura'])
+        nuevoCA.id_alumno=int(control['idAlumno'])
+        nuevoCA.id_profesor=int(control['idProfesor'])
+        nuevoCA.id_clase=int(control['idClase'])
+        nuevoCA.id_asignatura=int(control['idAsignatura'])
 
         #Se guarda en el data store
         nuevoCA_clave = nuevoCA.put()
