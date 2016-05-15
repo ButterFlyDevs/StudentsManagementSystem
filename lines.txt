@@ -2,3 +2,4 @@ Formato: num commit;fecha del commit;lineas UI;lineas APIG;lineas mSBD;lineas mS
 181;05-06-2016;1241;2858;193;324
 181;05-06-2016;1241;2858;193;324
 181;05-06-2016;1241;2858;193;324
+187;2016-05-15;6080;3011;5969;607
