@@ -1800,7 +1800,6 @@ routerApp.controller('ControladorDetallesClase', function($location, $scope, $st
   en esta clase en concreto que además imparte un profesor en concreto.
   */
 
-
   //Creamos un array donde guardamos todos los bloques de información que nos vengan
   var listaAsociacionesCompleta = new Array();
 
