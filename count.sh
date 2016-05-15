@@ -1,5 +1,11 @@
 #!/bin/bash
 
+
+#Contamos las lineas del mServicio UI (User Interface)
+cd SMS-Front-End
+
+
+
 #Contamos las lineas del mServicio apigateway
 cd SMS-Back-End/apigateway
 APIG_lines="$(wc -l $(ls -I*.pyc -Ilib -I*.jpg) | grep 'total' | awk '{print $1}')"
