@@ -13,8 +13,7 @@ layout: default
 
 				<header class="special container">
 					<span class="icon fa-calendar"></span>
-					<h2><strong>TIMELINE</strong> del proyecto</h2>
-					<p>Estado</p>
+					<h2><strong>EVOLUCIÓN</strong> del tamaño.</h2>					
 				</header>
 
 				<div id="container" style="width:100%; height:350px;"></div>
@@ -41,7 +40,6 @@ layout: default
 							            if(rawFile.status === 200 || rawFile.status == 0)
 							            {
 							                var allText = rawFile.responseText;
-							                alert(allText);
 
 							            }
 							        }
@@ -120,7 +118,7 @@ layout: default
 									        },
 									        tooltip: {
                               useHTML: true,
-                              headerFormat: '<small>commit {point.key}</small></br>',        	  
+                              headerFormat: '<small>commit {point.key}</small></br>',
 									            valueSuffix: 'lineas'
 									        },
 									        legend: {
