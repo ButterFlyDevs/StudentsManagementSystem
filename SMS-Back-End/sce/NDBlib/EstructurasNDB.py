@@ -48,18 +48,18 @@ class ResumenControlAsistencia(ndb.Model):
     id_clase = ndb.IntegerProperty()
     id_asignatura = ndb.IntegerProperty()
 
-class AlumnosNombreID(ndb.Model):
-    id_alumno = ndb.IntegerProperty(required=True)
-    nombre_alumno = ndb.StringProperty(required=True)
+class Alumno(ndb.Model):
+    idAlumno = ndb.IntegerProperty(required=True)
+    nombreAlumno = ndb.StringProperty(required=True)
 
-class ProfesoresNombreID(ndb.Model):
-    id_profesor = ndb.IntegerProperty(required=True)
-    nombre_profesor = ndb.StringProperty(required=True)
+class Profesor(ndb.Model):
+    idProfesor = ndb.IntegerProperty(required=True)
+    nombreProfesor = ndb.StringProperty(required=True)
 
-class ClasesNombreID(ndb.Model):
-    id_clase = ndb.IntegerProperty(required=True)
-    nombre_clase = ndb.StringProperty(required=True)
+class Clase(ndb.Model):
+    idClase = ndb.IntegerProperty(required=True)
+    nombreClase = ndb.StringProperty(required=True)
 
-class AsignaturasNombreID(ndb.Model):
-    id_asignatura = ndb.IntegerProperty(required=True)
-    nombre_asignatura = ndb.StringProperty(required=True)
+class Asignatura(ndb.Model):
+    idAsignatura = ndb.IntegerProperty(required=True)
+    nombreAsignatura = ndb.StringProperty(required=True)

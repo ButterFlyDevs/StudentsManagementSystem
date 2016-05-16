@@ -24,6 +24,18 @@ def parseBoolean(cadena):
         return False
 
 
+class RCA:
+
+    def __init__(self):
+        key = ""
+        fecha = ""
+        idClase = ""
+        nombreClase = ""
+        idAsignatura = ""
+        nombreAsignatura = ""
+        idProfesor = ""
+        nombreProfesor = ""
+
 class Gestor:
 
     @classmethod
@@ -58,11 +70,91 @@ class Gestor:
         pass
 
     @classmethod
-    def obtenerResumenControlAsistencia(idProfesor, idASignatura, idClase, fechaHora):
+    def obtenerResumenesControlAsistencia(self, idProfesor=None, idASignatura=None, idClase=None, fechaHora=None):
         '''
+        Con todos los parámetros a None esta función puede ser llamada con desde 0 a 4 parámetros.
         Debe devolver también nombres (DEBE DEVOLVER UN RCA_complejo)
+
+        Tipo de resumen a devolver.
+        Lo que tiene que devolver el gateway:
+        class ResumenControlAsistencia(messages.Message):
+            key = messages.StringField(1, required=True)
+            fecha = messages.StringField(2)
+            idClase = messages.StringField(3)
+            nombreClase = messages.StringField(4)
+            idAsignatura = messages.StringField(5)
+            nombreAsignatura = messages.StringField(6)
+            idProfesor = messages.StringField(7)
+            nombreProfesor = messages.StringField(8)
+
+        class ResumenControlAsistencia(ndb.Model):
+
+            lista_idCA = ndb.KeyProperty(repeated=True) # La propiedad repeated hace que el campo sea una lista y pueda tomar varios valores, en lugar de solo unof
+            fecha_hora = ndb.DateTimeProperty()
+            id_profesor = ndb.IntegerProperty()
+            id_clase = ndb.IntegerProperty()
+            id_asignatura = ndb.IntegerProperty()
+
+        Los datos que se tienen en la NDB siguen el anterior esquema, pero el APIG necesit más datos. Por ello
+        crearemos un tipo de objeto nuevo que contenga todo lo que necesita y por el que no haya que modificar
+        la definiión de la BD NDB.
+
         '''
-        pass
+        if v:
+            print libName
+            print " Llamada a obtenerResumenesControlAsistencia "
+            print locals()
+
+        #Creamos una lista de resúmenes que vamos a devoler.
+        resumenes = []
+
+        if (idProfesor!=None):
+            #Formamos la query
+            query = ResumenControlAsistencia.query(ResumenControlAsistencia.id_profesor == int(idProfesor))
+            #Ejecutamos la query en NDB, y por cada elemento creamos un objeto RCA y le volcamos los datos.
+            for a in query:
+                rca = RCA()
+                rca.key = a.key
+                rca.fecha = a.fecha_hora
+                rca.idClase = a.id_clase
+                rca.idAsignatura = a.id_asignatura
+                rca.idProfesor = a.id_profesor
+
+                #Ahora tenemos que añadir los nombre de la clase, asignatura y profesor.
+
+                #Clase
+                query = Clase.query(Clase.idClase==int(1))
+                clase = query.get()
+                rca.nombreClase=clase.nombreClase
+
+                #Asignatura
+                query = Asignatura.query(Asignatura.idAsignatura==int(1))
+                asignatura = query.get()
+                rca.nombreAsignatura=asignatura.nombreAsignatura
+
+                #Profesor
+                query = Profesor.query(Profesor.idProfesor==int(1))
+                profesor = query.get()
+                rca.nombreProfesor=profesor.nombreProfesor
+
+                #Con esto queda el objeto preparado para devolverlo al APIG
+
+                #print 'RCA parseado'
+                # Para ver todos los atributos de un objeto con sus valores podemos implementar la función __str__ o usar __dict__
+                # print rca.__dict__
+
+                #Lo añadimos a la lista
+                resumenes.append(rca)
+
+
+        if v:
+            print libName
+            print " Return obtenerResumenesControlAsistencia "
+            for r in resumenes:
+                print r.__dict__
+
+        #Devolvemos la lista, tenga 0, 1 o n elementos.
+        return resumenes
 
 
     ###
@@ -79,7 +171,7 @@ class Gestor:
         if v:
             print libName
             print " Llamada a insertarConjuntoControlAsistencia "
-            print listaAsistencias
+            print locals()
 
         #Creamos una lista donde guardaremos las keys que la base de datos nos devuelva al guardar los controles.
         keys = []
@@ -179,8 +271,100 @@ class Gestor:
 
 
     @classmethod
-    def obtenerNombreAlumnos(idAlumnos):
-        pass
+    def insertarAlumno(self, idAlumno, nombreAlumno):
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Llamada a insertarAlumno con params: "
+            print locals()
+            print '\n'
+
+        alumno = Alumno()
+        alumno.idAlumno=int(idAlumno)
+        alumno.nombreAlumno=nombreAlumno
+
+        nuevoAlumnoClave = alumno.put()
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Return de insertarAlumno: "+str(nuevoAlumnoClave)+'\n'
+
+        return str(nuevoAlumnoClave)
+
+
+    @classmethod
+    def insertarProfesor(self, idProfesor, nombreProfesor):
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Llamada a insertarProfesor con params: "
+            print locals()
+            print '\n'
+
+        profesor = Profesor()
+        profesor.idProfesor=int(idProfesor)
+        profesor.nombreProfesor=nombreProfesor
+
+        nuevoProfesorClave = profesor.put()
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Return de insertarProfesor: "+str(nuevoProfesorClave)+'\n'
+
+        return str(nuevoProfesorClave)
+
+    @classmethod
+    def insertarClase(self, idClase, nombreClase):
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Llamada a insertarClase con params: "
+            print locals()
+            print '\n'
+
+        clase = Clase()
+        clase.idClase=int(idClase)
+        clase.nombreClase=nombreClase
+
+        nuevaClaseClave = clase.put()
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Return de insertarClase: "+str(nuevaClaseClave)+'\n'
+
+        return str(nuevaClaseClave)
+
+
+    @classmethod
+    def insertarAsignatura(self, idAsignatura, nombreAsignatura):
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Llamada a insertarAsignatura con params: "
+            print locals()
+            print '\n'
+
+        asignatura = Asignatura()
+        asignatura.idAsignatura=int(idAsignatura)
+        asignatura.nombreAsignatura=nombreAsignatura
+
+        nuevaAsignaturaClave = asignatura.put()
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Return de insertarAsignatura: "+str(nuevaAsignaturaClave)+'\n'
+
+        return str(nuevaAsignaturaClave)
+
+
 
     @classmethod
     def obtenerNombreProfesores(idProfesor):

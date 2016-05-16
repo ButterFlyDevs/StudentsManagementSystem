@@ -87,13 +87,8 @@ def  insertaControlAsistencia():
 
     '''
 
-    print 'yeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-    print request
-    print 'yeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-
     #Extraemos el JSON de la petición.
     json = request.get_json()
-
 
     if v:
         print nombreMicroservicio
@@ -101,7 +96,7 @@ def  insertaControlAsistencia():
         print str(len(json['controles'])) +' controles recibidos\n'
         print " Controles: "
         print json
-    
+
 
     #Llamamos a la función de NDBlib que inserta el conjunto
     status = Gestor.insertarConjuntoControlAsistencia(json['controles'])
@@ -164,17 +159,99 @@ def  getAllResumenesControlesAsistencia():
 
     return 'getAllResumenesControlesAsistencia()\n'
 
-@app.route('/resumenesControlesAsistenciaEspecificos', methods=['GET'])
+@app.route('/resumenesControlesAsistenciaEspecificos', methods=['POST'])
 def  getResumenesControlesAsistenciaConParametros():
     '''
-    Devuelve todos los controles de asistencia que cumplen los parámetros pasados
-    curl -i -X GET localhost:8003/resumenesControlesAsistenciaEspecificos
+    curl -d "idProfesor=4" -i -X POST localhost:8003/resumenesControlesAsistenciaEspecificos
+    Devuelve una lista (puede estar vacía) con todos los controles de asistencia que han realizado según
+    lo que se esté pididiendo. Si se pasa idProfesor, todos los de ese profesor.
+    No de vuelve una lista con todos los alumnos y lo que el profesor puso sino un resumen de este control realizado,
+    así cuando un profesor quiera ver todos los detalles entonces podrá pinchár y se le devolverán todos los datos, pero de
+    eso se encarga otra función.
+    Los datos a devolver son:
+
+        key = messages.StringField(1, required=True) Clave del resumen para pedir todas los controles en otro momento.
+        fecha = messages.StringField(2)
+        idclase = messages.StringField(3)
+        nombreClase = messages.StringField(4)
+        idasignatura = messages.StringField(5)
+        nombreAsignatura = messages.StringField(6)
+        idprofesor = messages.StringField(7)
+        nombreProfesor = messages.StringField(8)
+
     '''
     if v:
         print nombreMicroservicio
-        print 'Llamando a /resumenesControlesAsistencia GET resumenesControlesAsistencia() \n'
-    return 'getResumenesControlesAsistenciaConParametros()\n'
+        print ' Request: '+str(request.form)
+        print ' Llamando a /resumenesControlesAsistencia GET resumenesControlesAsistencia() \n'
 
+    return jsonpickle.encode(Gestor.obtenerResumenesControlAsistencia(idProfesor=request.form['idProfesor']))
+
+
+@app.route('/alumnos', methods=['POST'])
+def insetarAlumno():
+    '''
+    curl -X POST -d "idAlumno=1&nombreAlumno=Fernando"  localhost:8003/alumnos
+    '''
+    if v:
+        print nombreMicroservicio
+        print ' Llamando a /alumnos POST insertarAlumno()'
+        print " Request: "
+        print request.form
+
+
+    status = Gestor.insertarAlumno(request.form['idAlumno'], request.form['nombreAlumno'])
+
+    return status
+
+
+@app.route('/asignatura', methods=['POST'])
+def insetarAsignatura():
+    '''
+    curl -X POST -d "idAsignatura=1&nombreAsignatura=Frances"  localhost:8003/asignatura
+    '''
+    if v:
+        print nombreMicroservicio
+        print ' Llamando a /asignatura POST insertaAsignatura()'
+        print " Request: "
+        print request.form
+
+
+    status = Gestor.insertarAsignatura(request.form['idAsignatura'], request.form['nombreAsignatura'])
+
+    return status
+
+@app.route('/clase', methods=['POST'])
+def insetarClase():
+    '''
+    curl -X POST -d "idClase=1&nombreClase=1AESO"  localhost:8003/clase
+    '''
+    if v:
+        print nombreMicroservicio
+        print ' Llamando a /clase POST insertarClase()'
+        print " Request: "
+        print request.form
+
+
+    status = Gestor.insertarClase(request.form['idClase'], request.form['nombreClase'])
+
+    return status
+
+@app.route('/profesor', methods=['POST'])
+def insetarProfesor():
+    '''
+    curl -X POST -d "idProfesor=1&nombreProfesor=Eduardo Ros"  localhost:8003/profesor
+    '''
+    if v:
+        print nombreMicroservicio
+        print ' Llamando a /profesor POST insertarProfesor()'
+        print " Request: "
+        print request.form
+
+
+    status = Gestor.insertarProfesor(request.form['idProfesor'], request.form['nombreProfesor'])
+
+    return status
 
 
 

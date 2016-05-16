@@ -233,11 +233,11 @@ class ListaControlAsistencia(messages.Message):
 class ResumenControlAsistencia(messages.Message):
     key = messages.StringField(1, required=True)
     fecha = messages.StringField(2)
-    idclase = messages.StringField(3)
+    idClase = messages.StringField(3)
     nombreClase = messages.StringField(4)
-    idasignatura = messages.StringField(5)
+    idAsignatura = messages.StringField(5)
     nombreAsignatura = messages.StringField(6)
-    idprofesor = messages.StringField(7)
+    idProfesor = messages.StringField(7)
     nombreProfesor = messages.StringField(8)
 
 class ListaResumenControlAsistencia(messages.Message):
