@@ -161,8 +161,13 @@ def  getAllResumenesControlesAsistencia():
 
 @app.route('/resumenesControlesAsistenciaEspecificos', methods=['POST'])
 def  getResumenesControlesAsistenciaConParametros():
+
     '''
+
     curl -d "idProfesor=4" -i -X POST localhost:8003/resumenesControlesAsistenciaEspecificos
+    (Dame todos los controles de asistencia (los resúmenes) realizados por el profesor con idProfesor 4)
+
+
     Devuelve una lista (puede estar vacía) con todos los controles de asistencia que han realizado según
     lo que se esté pididiendo. Si se pasa idProfesor, todos los de ese profesor.
     No de vuelve una lista con todos los alumnos y lo que el profesor puso sino un resumen de este control realizado,
@@ -183,7 +188,7 @@ def  getResumenesControlesAsistenciaConParametros():
     if v:
         print nombreMicroservicio
         print ' Request: '+str(request.form)
-        print ' Llamando a /resumenesControlesAsistencia GET resumenesControlesAsistencia() \n'
+        print ' Llamando a /resumenesControlesAsistencia POST resumenesControlesAsistencia() \n'
 
     return jsonpickle.encode(Gestor.obtenerResumenesControlAsistencia(idProfesor=request.form['idProfesor']))
 

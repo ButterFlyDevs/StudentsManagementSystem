@@ -1879,7 +1879,15 @@ routerApp.controller('ControladorProfilePage', function($scope){
 // ###########################################
 routerApp.controller('ControladorCE-asistencia-historico', function($scope){
 
-  $scope.resumenes='Muchos resumenes';
+
+  gapi.client.helloworld.controles.getResumenes({'idProfesor':'4' }).execute(function(resp){
+    console.log('calling controles.getResumenes with idProfesor = 4');
+    console.log(resp);
+    $scope.resumenes=resp.resumenes;
+    $scope.$apply();
+  });
+
+
 
 });
 

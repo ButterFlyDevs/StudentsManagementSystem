@@ -114,8 +114,11 @@ class Gestor:
             #Ejecutamos la query en NDB, y por cada elemento creamos un objeto RCA y le volcamos los datos.
             for a in query:
                 rca = RCA()
-                rca.key = a.key
-                rca.fecha = a.fecha_hora
+                #Guardamos el id de la clave
+                rca.key = a.key.id()
+                
+                #Convertimos la fecha en algo legible con el formato que queramos.
+                rca.fecha = datetime.datetime.strftime(a.fecha_hora, "%d-%m-%Y %H:%M")
                 rca.idClase = a.id_clase
                 rca.idAsignatura = a.id_asignatura
                 rca.idProfesor = a.id_profesor

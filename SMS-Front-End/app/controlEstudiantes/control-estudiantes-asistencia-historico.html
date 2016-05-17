@@ -14,21 +14,14 @@
 
 <div class="uk-container-center">
 
-<div class="uk-margin-top uk-margin-bottom">
-  Listado de controles de asistencia realizados:
-
-  {{resumenes}}
+  <div class="uk-margin-top uk-margin-bottom">
+    Listado de controles de asistencia realizados:
+    
+  <ul class="uk-list uk-list-striped" ng-repeat="resumen in resumenes">
+      <li><a href="#">{{resumen.nombreAsignatura}} {{resumen.nombreClase}} {{resumen.fecha}} </a></li>
+  </ul>
 
 </div>
-
-
-<ul class="uk-list uk-list-striped ">
-    <li>List item 1</li>
-    <li>List item 2</li>
-    <li>List item 3</li>
-</ul>
-
-
 
 
 </div>
