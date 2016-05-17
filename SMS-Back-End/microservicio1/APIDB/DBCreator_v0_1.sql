@@ -141,7 +141,7 @@ CREATE TABLE Credenciales(
   id_usuario INT,
   nombre CHAR(100),
   username CHAR(100),
-  password CHAR(100),
+  password VARBINARY(150) NOT NULL,
   rol CHAR(50),
   PRIMARY KEY (id_credenciales),
   #Para que no pueda haber dos usuario con el mismo nombre

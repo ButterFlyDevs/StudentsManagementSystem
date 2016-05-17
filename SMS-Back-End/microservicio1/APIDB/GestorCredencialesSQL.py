@@ -98,7 +98,7 @@ class GestorCredenciales:
         nombre='\''+nombre+'\''
         rol='\''+rol+'\''
 
-        query='INSERT INTO Credenciales VALUES(NULL'+','+idUsuario+','+nombre+','+username+','+password+','+rol+');'
+        query='INSERT INTO Credenciales VALUES(NULL'+','+idUsuario+','+nombre+','+username+',AES_ENCRYPT('+password+',"CLAVESECRETA"),'+rol+');'
 
         if v:
             print ' '+query+'\n'
@@ -173,7 +173,7 @@ class GestorCredenciales:
             salida = cursor.execute(query)
             row = cursor.fetchone()
 
-            if row != None:                
+            if row != None:
                 cred.idUsuario=row[1]
                 cred.nombre=row[2]
                 cred.rol=row[5]
