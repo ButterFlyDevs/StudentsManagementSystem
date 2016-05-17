@@ -152,7 +152,7 @@ class GestorCredenciales:
         username='\''+username+'\''
         password='\''+password+'\''
 
-        query='SELECT * FROM Credenciales WHERE username='+username+' and password='+password+';'
+        query='SELECT * FROM Credenciales WHERE username='+username+' and password= AES_ENCRYPT('+password+',"CLAVESECRETA");'
 
         if v:
             print ' '+query
