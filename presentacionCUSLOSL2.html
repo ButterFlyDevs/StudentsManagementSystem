@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>SMS - Agilizador de procesos para centros docentes.</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="reveal/css/reveal.css">
+		<link rel="stylesheet" href="reveal/css/theme/league.css" id="theme">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="reveal/lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal/css/print/pdf.css' : 'reveal/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+		<style>
+					.spinner {
+			  margin: 100px auto;
+			  width: 40px;
+			  height: 40px;
+			  position: relative;
+			}
+
+			.cube1, .cube2 {
+			  background-color: #333;
+			  width: 15px;
+			  height: 15px;
+			  position: absolute;
+			  top: 0;
+			  left: 0;
+
+			  -webkit-animation: sk-cubemove 1.8s infinite ease-in-out;
+			  animation: sk-cubemove 1.8s infinite ease-in-out;
+			}
+
+			.cube2 {
+			  -webkit-animation-delay: -0.9s;
+			  animation-delay: -0.9s;
+			}
+
+			@-webkit-keyframes sk-cubemove {
+			  25% { -webkit-transform: translateX(42px) rotate(-90deg) scale(0.5) }
+			  50% { -webkit-transform: translateX(42px) translateY(42px) rotate(-180deg) }
+			  75% { -webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5) }
+			  100% { -webkit-transform: rotate(-360deg) }
+			}
+
+			@keyframes sk-cubemove {
+			  25% {
+			    transform: translateX(42px) rotate(-90deg) scale(0.5);
+			    -webkit-transform: translateX(42px) rotate(-90deg) scale(0.5);
+			  } 50% {
+			    transform: translateX(42px) translateY(42px) rotate(-179deg);
+			    -webkit-transform: translateX(42px) translateY(42px) rotate(-179deg);
+			  } 50.1% {
+			    transform: translateX(42px) translateY(42px) rotate(-180deg);
+			    -webkit-transform: translateX(42px) translateY(42px) rotate(-180deg);
+			  } 75% {
+			    transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
+			    -webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
+			  } 100% {
+			    transform: rotate(-360deg);
+			    -webkit-transform: rotate(-360deg);
+			  }
+			}
+		</style>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<!-- Slide inicial -->
+				<section>
+
+					<h1>SMS</h1>
+
+					<p>Students Management System</p>
+
+					<p>
+						<small>Un proyecto de <a href="http://hakim.se">ButterFlyDevs</a> </small>
+					</p>
+
+				</section>
+
+				<!--Mini introducción-->
+				<section>
+					<h3>Un Agilizador de procesos para centros docentes</h3>
+					<p>
+						La idea de software a medida convertida en un proyecto <strong>Open Source</strong>
+					</p>
+				</section>
+
+
+				<section>
+					<section data-transition="slide" data-background="#7D2418" data-background-transition="zoom">
+						<h2>El problema</h2>
+						<ul>
+						<li class="fragment"><p>Papel como principal soporte.</p></li>
+						<li class="fragment"><p>Procesamiento y análisis manual de la información.</p></li>
+						<li class="fragment"><p>Procesos internos manuales.</p></li>
+						<li class="fragment"><p>Procesos internos manuales.</p></li>
+					</ul>
+					</section>
+					<section data-transition="slide" data-background="images/paper2.jpg" data-background-transition="zoom">
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+							<h2>Un sistema ineficiente</h2>
+						</div>
+					</section>
+
+					<!--La solución-->
+					<section data-transition="slide" data-background="#40AB67" data-background-transition="zoom">
+						<h2>Nuestra solución</h2>
+
+						<p class="fragment">
+							Un sistema en la <strong>nube</strong> que centralice y aporte valor a los datos y procesos.
+						</p>
+
+					</section>
+
+					<section data-transition="slide" data-background="#40AB67" data-background-transition="zoom">
+						<h2>¿Cómo?</h2>
+
+						<p class="fragment">Digitalizando la mayoría de la información y procesos sensibles.</p>
+						<p class="fragment">Ofreciendo una interfaz sencilla y potente.</p>
+						<p class="fragment">Posibilitando la recolección y análisis de datos instantánea.</p>
+
+					</section>
+
+					<section data-transition="slide" data-background="images/laptop.png" data-background-transition="zoom">
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+							<h2>Todo en una aplicación web</h2>
+							<p class="fragment">Corriendo en cualquier dispositivo con un navegador.</p>
+							<p class="fragment">Sin inversión en infraestructura hardware.</p>
+							<p class="fragment">Con una disponibilidad 24x7x12 por un coste mínimo.</p>
+						</div>
+					</section>
+
+					<section>
+						<h2>connection with third party apps</h2>
+					</section>
+
+					<section>
+						<img width="900" height="400" data-src="images/seneca-sms.png" alt="Up arrow">
+					</section>
+
+					<section data-background="images/power.gif" >
+						<img width="500" height="250" data-src="images/sms.png" alt="Up arrow">
+						<h3>Stand Alone</h3>
+					</section>
+
+					<section>
+						<img width="900" height="400" data-src="images/any-sms.png" alt="Up arrow">
+					</section>
+
+				</section>
+
+
+
+
+
+				<!-- Slides de la arquitectura -->
+				<section>
+
+					<section>
+						<h2>Arquitectura</h2>
+					</section>
+
+					<section>
+						<h2>Microservicios</h2>
+						<ul>
+							<li class="fragment">Escalabilidad.</li>
+						  <li class="fragment">Mantenibilidad.</li>
+							<li class="fragment">Despliegue progresivo.</li>
+					    <li class="fragment">Alto desacople.</li>
+							<li class="fragment">Fragmentación del desarrollo.</li>
+						</ul>
+					</section>
+
+					<section>
+						<img width="900" height="500" data-src="images/microservices.png" alt="Up arrow">
+					</section>
+
+				</section>
+
+
+				<!-- Slides de la tecnología -->
+				<section>
+					<section>
+						<h2>Tecnología</h2>
+					</section>
+
+					<!--AngularJS -->
+					<section data-background-video="videos/angularMini.mp4" data-background-color="#000000">
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+							<img style="border:none;" width="178" height="200" data-src="https://luisfarzati.github.io/angulartics/images/angularjs.png" alt="Down arrow">
+							<h2>Angular JS</h2>
+						</div>
+					</section>
+
+
+					<section data-background="images/python.jpg">
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+							<h2>Python</h2>
+						</div>
+					</section>
+
+					<section data-background="images/restFlask.jpg">
+						<div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+							<img style="border:none;" width="578" height="200" data-src="images/flask.png" alt="Down arrow">
+							<h2>REST</h2>
+							<p>Representational State Transfer</p>
+						</div>
+					</section>
+
+					<section>
+						<img style="border:none;" width="378" height="270" data-src="images/grpc.png" alt="Down arrow">
+						<p>Google's Remote Procedure Calls Library</p>
+					</section>
+
+					<section>
+							<img style="border:none;" width="378" height="378" data-src="images/mysql.png" alt="Down arrow">
+					</section>
+
+					<section>
+						<img style="border:none;" width="800" height="450" data-src="images/nosql.png" alt="Down arrow">
+					</section>
+
+				</section>
+
+
+				<!-- Slides de la tecnología -->
+				<section>
+					<section>
+						<h2>Infraestructura</h2>
+					</section>
+
+					<section id="fragments">
+						<p>¿Dónde realizamos el despliegue de la aplicación?</p>
+						<p class="fragment">¿Amazon AWS?</p>
+						<p class="fragment">¿Microsoft Azure?</p>
+						<p class="fragment">¿Heroku?</p>
+						<p class="fragment">¿Open Shift?</p>
+						<p class="fragment">¿Google App Engine?</p>
+						<p class="fragment">...</p>
+						<br>
+					</section>
+
+					<!--GAE -->
+					<section data-background="images/googleServers.jpg" data-background-color="#000000">
+						<div style="background-color: rgba(0, 0, 0, 1); color: #fff; padding: 10px;">
+							<img style="border: none;" width="700" height="400" data-src="https://resources.atlasnet.eu/images/pages/training/gcp-header-logo.png" alt="Down arrow">
+							<!--<pre><code class="hljs" style="word-wrap: break-word;">&lt;section data-background-video="video.mp4,video.webm"&gt;</code></pre>-->
+						</div>
+					</section>
+
+					<section>
+						  <p>Primera aproximación</p>
+							<img style="border: none;" width="900" height="500" data-src="images/gae.jpg" alt="Down arrow">
+					</section>
+
+
+				</section>
+
+
+				<!-- Slides del equipo -->
+				<section>
+
+					<section>
+						<h2>El equipo</h2>
+					</section>
+
+					<section>
+						<p>¿Quién hay detrás de todo esto?</p>
+
+						<table class="fragment" style="width:80%">
+
+							<tr style="border: none;">
+						    <td><img width="178" height="200" data-src="images/gonza.jpeg"></td>
+								<td><img width="178" height="200" data-src="images/juanA.jpeg"></td>
+						  </tr>
+
+							<!--Perfiles -->
+							<tr style="border-style:hidden;">
+								<!--Gonza-->
+								<td>
+									<i class="fa fa-github"></i> <small  style="margin-top: 10px;"><a href="https://github.com/JA-Gonz">JA_Gonz</a></small>
+								  </br>
+									<i class="fa fa-twitter"></i> <small  style="margin-top: 10px;"><a href="https://twitter.com/---">@jagonza</a></small>
+								</td>
+								<!--Juan A.-->
+								<td>
+									<i class="fa fa-github"></i> <small  style="margin-top: 10px;"><a href="https://github.com/juanAFernandez">juanAFernandez</a></small>
+								  </br>
+									<i class="fa fa-twitter"></i> <small  style="margin-top: 10px;"><a href="https://twitter.com/sinclair_88">@sinclair_88</a></small>
+								</td>
+							</tr>
+
+						</table>
+
+					</section>
+
+					<section data-background="images/geek.gif">
+						<h2>... pero nos faltas tú!</h2>
+					</section>
+
+				</section>
+
+				<section data-background-color="#000000">
+					<h2>something else?</h2>
+					<p>
+						<strong>Ask us!</strong>
+					</p>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="reveal/lib/js/head.min.js"></script>
+		<script src="reveal/js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'reveal/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal/plugin/zoom-js/zoom.js', async: true },
+					{ src: 'reveal/plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
