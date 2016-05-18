@@ -2811,7 +2811,7 @@ class HelloWorldApi(remote.Service):
             print 'nombreClase'
             print resumen.get('nombreClase')
 
-            
+
             resumenesItems.append( ResumenControlAsistencia( key=int(resumen.get('key')),
                                                              fecha=str(resumen.get('fecha')),
                                                              idClase=int(resumen.get('idClase')),
@@ -2822,7 +2822,14 @@ class HelloWorldApi(remote.Service):
                                                              nombreProfesor=formatText(resumen.get('nombreProfesor'))
                                                            ))
 
+        # Pequeño delay para pruebas con el css
+        import time
+        time.sleep(2)
+
+
         return ListaResumenControlAsistencia(resumenes=resumenesItems)
+
+
 
         #return MensajeRespuesta(message="Hola ke ase!")
 

@@ -6,7 +6,6 @@
 
 <div class="uk-margin-top uk-margin-bottom">
 
-<a href=""><i style="color: red;" class="uk-icon-chevron-circle-left uk-icon-large"></i></a>
 <h2 style="display: inline;"><strong>Nuevo control de asistencia</strong> </h2>
 
 <hr>
@@ -128,8 +127,43 @@ Clase: <strong>{{nombreClase}}</strong>  Asignatura: <strong>{{nombreAsignatura}
 
 
   </br>
-  <button ng-click="enviarDatos()" class="uk-button uk-button-success" type="button">Guardar</button>
-  <button class="uk-button uk-button-danger" type="button">Cancelar</button>
+  <button data-uk-modal="{target:'#Modal'}" class="uk-button uk-button-success" type="button">Guardar</button>
+  <button ui-sref="control-estudiantes.asistencia-nuevo" class="uk-button uk-button-danger" type="button">Cancelar</button>
+
+
+    <!--DISEÑO DEL MODAL -->
+
+        <!--Definición del mensaje que se muestra -->
+        <div id="Modal" class="uk-modal" aria-hidden="true">
+          <div class="uk-modal-dialog uk-modal-dialog">
+            ¿Está seguro de que quiere enviar el control de asistencia?
+            <hr>
+            <!-- LA implementación de la acción asociada al botón puede estar en el script incluido abajo o
+            en el propio app.js para poder usar el scope.-->
+            <button id="sendButton" ng-click="enviarDatos()" class="uk-button uk-button-success">Enviar</button>
+            <button id="CancelButton" class="uk-button uk-button-danger uk-modal-close " >Cancelar</button>
+
+          </div>
+        </div>
+
+    <!--Fin DISEÑO MODAL -->
+
+    <!--Inclusión del fichero donde se implementa la lógica en JavaScript del modal -->
+    <script>
+      var eventHandlerType = (UIkit.support.touch) ? 'tap' : 'click',
+        modalA = UIkit.modal('#Modal', {
+          bgclose: false
+        });
+      console.log('manejadorEventosModal: ' + eventHandlerType);
+      $('#sendButton').on(eventHandlerType, function(e) {
+        console.log("Modal: confirmación del envío del control de asistencia.")
+        e.preventDefault();
+        //Oculta el modal
+        modalA.hide();
+      });
+    </script>
+
+
 
 
 

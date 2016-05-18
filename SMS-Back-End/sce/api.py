@@ -42,6 +42,7 @@ def doSomething():
 #   COLECCIÓN Control Asistencia      #
 #######################################
 
+#Maybe be deprecated
 @app.route('/controlesAsistencia', methods=['GET'])
 def  getAllControlesAsistencia():
     '''
@@ -141,23 +142,30 @@ def  insertaControlAsistencia():
     return str(status)
 
 
+@app.route('/controlAsistencia/<string:idControlAsistencia>', methods=['GET'])
+def getControlAsistencia(idControlAsistencia):
+    '''
+    Devuelve un control de asitencia completo, es decir, un control realizado por un profesor que
+    imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos.
 
+    curl -i -X GET localhost:8003/controlAsistencia/3672873682
+    '''
+
+    #Info de seguimiento
+    if v:
+        print nombreMicroservicio
+        print ' Llamando a /controlAsistencia/'+ idControlAsistencia +' GET getControlAsistencia()'
+        print locals()
+
+    #llamada al gestor
+
+
+
+    return 'cool'
 
 ###############################################
 #   COLECCIÓN Resumen Control Asistencia      #
 ###############################################
-
-@app.route('/resumenesControlesAsistencia', methods=['GET'])
-def  getAllResumenesControlesAsistencia():
-    '''
-    Devuelve todos los controles de asistencia.
-    curl -i -X GET localhost:8003/resumenesControlesAsistencia
-    '''
-    if v:
-        print nombreMicroservicio
-        print 'Llamando a /resumenesControlesAsistencia GET resumenesControlesAsistencia() \n'
-
-    return 'getAllResumenesControlesAsistencia()\n'
 
 @app.route('/resumenesControlesAsistenciaEspecificos', methods=['POST'])
 def  getResumenesControlesAsistenciaConParametros():
@@ -192,6 +200,9 @@ def  getResumenesControlesAsistenciaConParametros():
 
     return jsonpickle.encode(Gestor.obtenerResumenesControlAsistencia(idProfesor=request.form['idProfesor']))
 
+############################################################
+#   COLECCIÓNES AUXILIARES relacionadas de referencia      #
+############################################################
 
 @app.route('/alumnos', methods=['POST'])
 def insetarAlumno():
@@ -208,7 +219,6 @@ def insetarAlumno():
     status = Gestor.insertarAlumno(request.form['idAlumno'], request.form['nombreAlumno'])
 
     return status
-
 
 @app.route('/asignatura', methods=['POST'])
 def insetarAsignatura():
@@ -257,11 +267,6 @@ def insetarProfesor():
     status = Gestor.insertarProfesor(request.form['idProfesor'], request.form['nombreProfesor'])
 
     return status
-
-
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)

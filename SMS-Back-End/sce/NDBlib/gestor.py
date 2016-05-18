@@ -116,7 +116,7 @@ class Gestor:
                 rca = RCA()
                 #Guardamos el id de la clave
                 rca.key = a.key.id()
-                
+
                 #Convertimos la fecha en algo legible con el formato que queramos.
                 rca.fecha = datetime.datetime.strftime(a.fecha_hora, "%d-%m-%Y %H:%M")
                 rca.idClase = a.id_clase

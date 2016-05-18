@@ -1880,10 +1880,13 @@ routerApp.controller('ControladorProfilePage', function($scope){
 routerApp.controller('ControladorCE-asistencia-historico', function($scope){
 
 
+  $scope.hayrespuesta = false;
+
   gapi.client.helloworld.controles.getResumenes({'idProfesor':'4' }).execute(function(resp){
     console.log('calling controles.getResumenes with idProfesor = 4');
     console.log(resp);
     $scope.resumenes=resp.resumenes;
+    $scope.hayrespuesta = true;
     $scope.$apply();
   });
 
@@ -1932,7 +1935,8 @@ routerApp.controller('ControladorCE-asistencia-nuevo', function($scope, $locatio
 
 });
 
-routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $rootScope){
+
+routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $rootScope, $location){
 
 
   console.log('realización de control de estudiantes con: asociacion'+$rootScope.idAsociacion);
@@ -2101,9 +2105,32 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
 
       console.log(resp);
       console.log(resp.message);
+      salidaEjecucion = resp.message;
+
+      if (salidaEjecucion == 'yeah'){
+         console.log('Mostrando mensaje confirmación CA realizado con éxito')
+         $.UIkit.notify("Control de asistencia realizado con éxito.", {status:'success'});
+
+         //No se va a la url (no se por qué)
+         $location.path('/control-estudiantes/main');
+
+       }else{
+         $.UIkit.notify("\""+salidaEjecucion+"\"", {status:'warning'});
+         console.log("Error en la salida de realización del CA: "+salidaEjecucion);
+      }
+
     });
   }
 
 
+
+});
+
+
+
+routerApp.controller('ControladorCE-asistencia-visualizacion', function($scope, $stateParams){
+
+  console.log('ControladorCE-asistencia-visualizacion');
+  $scope.key=$stateParams.resumenID;
 
 });
