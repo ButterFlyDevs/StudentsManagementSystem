@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from google.appengine.ext.db import Key
 '''
 import EstructurasNDB.ControlAsistencia
 import EstructurasNDB.Resumen_ControlAsistencia
@@ -66,8 +66,31 @@ class Gestor:
         return listaCA
 
     @classmethod
-    def obtenerControlAsistencia(id):
-        pass
+    def obtenerControlAsistencia(self, id):
+        '''
+        Devuelve un control de asistencia completo realizado, con la lista de todos los alumnos, y los datos de ese
+        control en concreto.
+        '''
+        #Una vez obtenido la clave del resumen vamos a obtener todas los controles que se realizaron en
+        #ese control y para ello lo primero que tenemos que recuperar es la lista de las claves de los controles
+        #refiriéndonos con control al control que se hace de un estudiante individual.
+
+        print 'KEY'
+        print id
+        #print ndb.Key(ResumenControlAsistencia, id).get()
+        key = Key(ResumenControlAsistencia, id);
+        print key
+        print 'end'
+        #key_obj = Key(key)
+
+
+        #query = ResumenControlAsistencia.query(ResumenControlAsistencia.key == key)
+
+        print '\n OBTENER CONTROL ASISTENCIA '
+
+
+
+        return 'Result'
 
     @classmethod
     def obtenerResumenesControlAsistencia(self, idProfesor=None, idASignatura=None, idClase=None, fechaHora=None):
@@ -115,7 +138,10 @@ class Gestor:
             for a in query:
                 rca = RCA()
                 #Guardamos el id de la clave
+
                 rca.key = a.key.id()
+                #rca.key = a.key.urlsafe
+
 
                 #Convertimos la fecha en algo legible con el formato que queramos.
                 rca.fecha = datetime.datetime.strftime(a.fecha_hora, "%d-%m-%Y %H:%M")
@@ -154,6 +180,8 @@ class Gestor:
             print libName
             print " Return obtenerResumenesControlAsistencia "
             for r in resumenes:
+                #print 'KEY'
+                #print r.key
                 print r.__dict__
 
         #Devolvemos la lista, tenga 0, 1 o n elementos.

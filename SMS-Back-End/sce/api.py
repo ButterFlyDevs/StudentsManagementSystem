@@ -148,7 +148,7 @@ def getControlAsistencia(idControlAsistencia):
     Devuelve un control de asitencia completo, es decir, un control realizado por un profesor que
     imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos.
 
-    curl -i -X GET localhost:8003/controlAsistencia/3672873682
+    curl -i -X GET localhost:8003/controlAsistencia/4644337115725824
     '''
 
     #Info de seguimiento
@@ -158,7 +158,7 @@ def getControlAsistencia(idControlAsistencia):
         print locals()
 
     #llamada al gestor
-
+    Gestor.obtenerControlAsistencia(idControlAsistencia)
 
 
     return 'cool'
