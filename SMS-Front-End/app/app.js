@@ -2131,6 +2131,16 @@ routerApp.controller('ControladorCE-asistencia-realizacion', function($scope, $r
 routerApp.controller('ControladorCE-asistencia-visualizacion', function($scope, $stateParams){
 
   console.log('ControladorCE-asistencia-visualizacion');
-  $scope.key=$stateParams.resumenID;
+  gapi.client.helloworld.controles.getControl({"id" : $stateParams.resumenID}).execute(function(resp){
+    console.log('Geting data controles.getControl')
+    $scope.controlAsistencia=resp;
+    console.log(resp);
+    $scope.$apply();
+
+    
+
+
+
+  });
 
 });

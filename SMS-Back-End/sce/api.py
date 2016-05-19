@@ -157,11 +157,11 @@ def getControlAsistencia(idControlAsistencia):
         print ' Llamando a /controlAsistencia/'+ idControlAsistencia +' GET getControlAsistencia()'
         print locals()
 
-    #llamada al gestor
-    Gestor.obtenerControlAsistencia(idControlAsistencia)
+    #Llamamos al gestor y convertimos su respuesta en un objeto json
+    return jsonpickle.encode(Gestor.obtenerControlAsistencia(idControlAsistencia))
 
 
-    return 'cool'
+
 
 ###############################################
 #   COLECCIÓN Resumen Control Asistencia      #
@@ -255,7 +255,7 @@ def insetarClase():
 @app.route('/profesor', methods=['POST'])
 def insetarProfesor():
     '''
-    curl -X POST -d "idProfesor=1&nombreProfesor=Eduardo Ros"  localhost:8003/profesor
+    curl -X POST -d "idProfesor=4&nombreProfesor=Eduardo Ros"  localhost:8003/profesor
     '''
     if v:
         print nombreMicroservicio

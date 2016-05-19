@@ -3,9 +3,18 @@
 
   <div class="uk-margin-top uk-margin-bottom">
 
-    <h2>Control de asistencia {{key}} </h2>
-    <h3>Asignatura, clase, profesor, fecha y hora</h3>
+    Plantilla controlAsistencia
 
+    {{ controlAsistencia.fecha }}
+    {{controlAsistencia.nombreAsignatura}}
+    {{controlAsistencia.nombreClase}}
+    {{controlAsistencia.nombreProfesor}}
+
+    <ul  class="uk-list uk-list-striped" >
+        <li ng-repeat="control in controlAsistencia.controles">
+          {{control.nombreAlumno}} {{control.asistencia}}
+        </li>
+    </ul>
 
   </div>
 
