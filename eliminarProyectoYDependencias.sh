@@ -39,6 +39,11 @@ sudo apt-get --purge -y remove python-mysqldb
 echo -e "\n\033[31m 4. Instaladon el gestor de paquetes de python \033[0m\n"
 sudo apt-get --purge -y remove python-pip
 
+#Eliminando librerias de Pytrhon de los microservicios
+
+rm -rf SMS-Back-End/microservicio1/lib/
+rm -rf SMS-Back-End/microservicio2/lib/
+rm -rf SMS-Back-End/sce/lib/
 #Ayuda:
 echo "Si alguno de los paquetes no se ha instalado correctamente por favor inténtelo manualmente. Para conocer más
 información lea el fichero contributing.md, la sección [Entorno de desarrollo]."
