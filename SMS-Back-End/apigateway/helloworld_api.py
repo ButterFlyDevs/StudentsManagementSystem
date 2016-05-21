@@ -215,33 +215,48 @@ class AlumnoSimpleExtendido(messages.Message):
 #####################################################
 
 #Todos los campos son obligatorios
-class ControlAsistencia(messages.Message):
+class ControlAsistencia(messages.Message): #Debería llamarse mControlAsistencia (micro)
     asistencia = messages.IntegerField(1, required=True)
     #Si el retraso es 0: no hay retraso 10: retraso de 10 min 20: retraso de 20 min o más
     retraso = messages.IntegerField(2, required=True)
     retrasoJustificado = messages.IntegerField(3, required=True)
     uniforme =  messages.IntegerField(4, required=True)
     id = messages.IntegerField(5, required=True)
+    #Campo solo necesario para los controles de asistencia de salida, proceso: obtenerControlAsistencia
+    nombreAlumno = messages.StringField(6)
 
-class ListaControlAsistencia(messages.Message):
+class ListaControlAsistencia(messages.Message):  #Debería llamarse ControlAsistencia
     controles = messages.MessageField(ControlAsistencia, 1, repeated=True)
-    idProfesor = messages.IntegerField(7, required=True)
-    idClase = messages.IntegerField(8, required=True)
-    idAsignatura = messages.IntegerField(9, required=True)
-
+    idProfesor = messages.IntegerField(2, required=True)
+    idClase = messages.IntegerField(3, required=True)
+    idAsignatura = messages.IntegerField(4, required=True)
+    #Campos solo necesarios para los controles de asistencia de salida, proceso:
+    nombreClase = messages.StringField(5)
+    nombreAsignatura = messages.StringField(6)
+    nombreProfesor = messages.StringField(7)
+    fecha = messages.StringField(8)
 
 class ResumenControlAsistencia(messages.Message):
-    key = messages.StringField(1, required=True)
+    key = messages.IntegerField(1, required=True)
     fecha = messages.StringField(2)
-    idClase = messages.StringField(3)
+    idClase = messages.IntegerField(3)
     nombreClase = messages.StringField(4)
-    idAsignatura = messages.StringField(5)
+    idAsignatura = messages.IntegerField(5)
     nombreAsignatura = messages.StringField(6)
-    idProfesor = messages.StringField(7)
+    idProfesor = messages.IntegerField(7)
     nombreProfesor = messages.StringField(8)
 
 class ListaResumenControlAsistencia(messages.Message):
     resumenes = messages.MessageField(ResumenControlAsistencia, 1, repeated=True)
+
+#Cuando pedimos los resumenes de los controles de asistencia los podemos pedir usando parámetros o sin ellos.
+class ParametrosPeticionResumen(messages.Message):
+    idProfesor = messages.IntegerField(1)
+    idAsignatura = messages.IntegerField(2)
+    idClase = messages.IntegerField(3)
+    fechaHora = messages.StringField(4)
+
+#### FIN DE LOS MENSAJES PARA EL SCE
 
 
 #Definimos un tipo especial de mensaje
@@ -256,9 +271,6 @@ class salidaLogin(messages.Message):
     nombre = messages.StringField(2, required=True)
     rol = messages.StringField(3, required=True)
 
-# Mensajes del Servicio Control de Estudiantes
-
-#class controlAsistencia(messages.Message):
 
 
 
@@ -2647,7 +2659,7 @@ class HelloWorldApi(remote.Service):
     #def getAllResumenesControlAsistencia(self, request):
 
 
-
+    #La url hay que mejorarla no necesita el /insertarControl (se identifica con el método)
     @endpoints.method(ListaControlAsistencia, MensajeRespuesta, path='controles/insertarControl', http_method='POST', name='controles.insertarControl')
     def subirControl(self, request):
         '''
@@ -2680,10 +2692,13 @@ class HelloWorldApi(remote.Service):
             tmpDic['retrasoJustificado'] = a.retrasoJustificado
             tmpDic['uniforme'] = a.uniforme
             tmpDic['idAlumno'] = a.id
-            #Los tres restantes vienen por la parte común.
+
+
+            #Los tres restantes vienen por la PARTE COMÚN (no en los controles)
             tmpDic['idProfesor'] = request.idProfesor
             tmpDic['idClase'] = request.idClase
             tmpDic['idAsignatura'] = request.idAsignatura
+            #A partir de este momento se incrustan en cada control
 
             #Añadimo este tmpDic a la lista controles del diccionario principal.
             diccionario['controles'].append(tmpDic)
@@ -2707,9 +2722,191 @@ class HelloWorldApi(remote.Service):
         #Info de seguimiento
         if v:
             print nombreMicroservicio
-#            print ' Respuesta de controles.insertarControl '+str(result)
+        #print ' Respuesta de controles.insertarControl '+str(result)
 
         return MensajeRespuesta( message='yeah' )
+
+
+    @endpoints.method(ParametrosPeticionResumen, ListaResumenControlAsistencia, path='controles/resumenes', http_method='GET', name='controles.getResumenes')
+    def getResumenesControlesAsistenciaConParametros(self, request):
+        '''
+        Devuelve una lista con todos los resumenes de los controles de estudiantes almacenados en el sistema filtrados
+        por cualquiera de los campos.
+
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/controles/resumenes?idProfesor=4
+
+
+        class ResumenControlAsistencia(messages.Message):
+            key = messages.StringField(1, required=True)
+            fecha = messages.StringField(2)
+            idClase = messages.StringField(3)
+            nombreClase = messages.StringField(4)
+            idAsignatura = messages.StringField(5)
+            nombreAsignatura = messages.StringField(6)
+            idProfesor = messages.StringField(7)
+            nombreProfesor = messages.StringField(8)
+
+        class ListaResumenControlAsistencia(messages.Message):
+            resumenes = messages.MessageField(ResumenControlAsistencia, 1, repeated=True)
+
+        #Cuando pedimos los resumenes de los controles de asistencia los podemos pedir usando parámetros o sin ellos.
+        class ParametrosPeticionResumen(messages.Message):
+            idProfesor = messages.IntegerField(1)
+            idAsignatura = messages.IntegerField(2)
+            idClase = messages.IntegerField(3)
+            fechaHora = messages.StringFiedl(4)
+
+        '''
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Petición POST a controles.getResumenes'
+            print ' Request: \n '+str(request)+'\n'
+
+
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        url+="resumenesControlesAsistenciaEspecificos"
+
+
+        #Extraemos los datos pasados a la petición y los empaquetamos en un dict.
+
+        #Creamos un diccionario
+        datos = {}
+
+        #Si viene por parámetro el id del profesor lo añadimos al diccionario
+        if request.idProfesor != None:
+            datos['idProfesor']=request.idProfesor
+        #Hacemos lo mismo con el resto:
+        if request.idAsignatura != None:
+            datos['idAsignatura']=request.idAsignatura
+        if request.idClase != None:
+            datos['idClase']=request.idClase
+        if request.fechaHora != None:
+            datos['fechaHora']=request.fechaHora
+
+        #Vemos como queda datos
+        print datos
+
+        #Petición al microservicio:
+        result = urlfetch.fetch(url=url, payload=urllib.urlencode(datos), method=urlfetch.POST)
+        listaResumenes = jsonpickle.decode(result.content)
+        print 'Resultado'
+        print listaResumenes
+
+
+        '''
+        class ResumenControlAsistencia(messages.Message):
+            key = messages.StringField(1, required=True)
+            fecha = messages.StringField(2)
+            idClase = messages.StringField(3)
+            nombreClase = messages.StringField(4)
+            idAsignatura = messages.StringField(5)
+            nombreAsignatura = messages.StringField(6)
+            idProfesor = messages.StringField(7)
+            nombreProfesor = messages.StringField(8)
+
+        class ListaResumenControlAsistencia(messages.Message):
+            resumenes = messages.MessageField(ResumenControlAsistencia, 1, repeated=True)
+        '''
+
+        resumenesItems= []
+
+        for resumen in listaResumenes:
+            print 'RESUMEN'
+            print resumen
+            print 'nombreClase'
+            print resumen.get('nombreClase')
+
+
+            resumenesItems.append( ResumenControlAsistencia( key=int(resumen.get('key')),
+                                                             fecha=str(resumen.get('fecha')),
+                                                             idClase=int(resumen.get('idClase')),
+                                                             nombreClase=formatText(resumen.get('nombreClase')),
+                                                             idAsignatura=int(resumen.get('idAsignatura')),
+                                                             nombreAsignatura=formatText(resumen.get('nombreAsignatura')),
+                                                             idProfesor=int(resumen.get('idProfesor')),
+                                                             nombreProfesor=formatText(resumen.get('nombreProfesor'))
+                                                           ))
+
+        # Pequeño delay para pruebas con el css
+        import time
+        time.sleep(2)
+
+
+        return ListaResumenControlAsistencia(resumenes=resumenesItems)
+
+
+
+        #return MensajeRespuesta(message="Hola ke ase!")
+
+    #La url hay que mejorarla, no necesita el /getControl (Se identifica con el método)
+    @endpoints.method(ID, ListaControlAsistencia, path='controles/getControl', http_method='GET', name='controles.getControl')
+    def getControlAsistencia(self, request):
+        '''
+
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/controles/getControl?id=4644337115725824
+
+        Devuelve un control de asistencia completo que se le pide con el id pasado.
+        '''
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Petición POST a controles.getContol'
+            print ' Request: \n '+str(request)+'\n'
+
+
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        url+="controlAsistencia/"+request.id
+
+        if v:
+            print "Llamando a: "+str(url)
+
+        #Petición al microservicio
+        result = urlfetch.fetch(url=url, method=urlfetch.GET)
+
+        print "RESULTADO:"+str(result.status_code)
+
+        #Convertimos el json a un objeto python
+        controlAsistencia = jsonpickle.decode(result.content)
+
+        print 'controlAsistencia'
+        print controlAsistencia
+
+        #Convertirmos este objeto python al mensja de rpc para ser enviado.
+
+        resumenesItems= []
+
+        #Recorremos todos los elementos de la lista 'controles' del diccionario devuelto por el mservicio sce.
+        listaControles = []
+        for mControl in controlAsistencia['controles']:
+            #print 'mControl'
+            #print mControl
+            listaControles.append(ControlAsistencia( asistencia=int(mControl['asistencia']),
+                                                     retraso=int(mControl['retraso']),
+                                                     retrasoJustificado=int(mControl['retrasoJustificado']),
+                                                     uniforme=int(mControl['uniforme']),
+                                                     nombreAlumno=formatText(mControl['nombreAlumno']),
+                                                     id=int(mControl['idAlumno'])
+                                                   ))
+
+        #Una vez que tenemos la lista componemos el mensaje final
+        return ListaControlAsistencia( controles=listaControles,
+                                       idProfesor=int(controlAsistencia['idProfesor']),
+                                       idClase=int(controlAsistencia['idClase']),
+                                       idAsignatura=int(controlAsistencia['idAsignatura']),
+                                       nombreClase=formatText(controlAsistencia['nombreClase']),
+                                       nombreAsignatura=formatText(controlAsistencia['nombreAsignatura']),
+                                       nombreProfesor=formatText(controlAsistencia['nombreProfesor']),
+                                       fecha=controlAsistencia['fechaHora']
+                                     )
+
+    ##############################################
+    #   Manejo de imágenes                       #
+    ##############################################
 
 
 

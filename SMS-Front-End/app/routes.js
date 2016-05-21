@@ -223,6 +223,7 @@ de la vista y se usan).
               .state('control-estudiantes', {
                   url: '/control-estudiantes',
                   templateUrl: 'controlEstudiantes/control-estudiantes.html',
+                  //Los permisos se heredan a todos las rutas hijas
                   data: {
                     authorizedRoles: [USER_ROLES.admin]
                   }
@@ -251,12 +252,20 @@ de la vista y se usan).
               .state('control-estudiantes-asistencia-realizacion', {
                   url: '/cear',
                   templateUrl: 'controlEstudiantes/control-estudiantes-asistencia-realizacion.html',
-                  data: {
-                    authorizedRoles: [USER_ROLES.all]
-                  },
                   controller: 'ControladorCE-asistencia-realizacion',
+                  data: {
+                    authorizedRoles: [USER_ROLES.admin]
+                  }
               })
 
+              .state('control-estudiantes-asistencia-visualizacion', {
+                  url: '/cevisualizacion/:resumenID',
+                  templateUrl: 'controlEstudiantes/control-estudiantes-asistencia-visualizacion.html',
+                  controller: 'ControladorCE-asistencia-visualizacion',
+                  data: {
+                    authorizedRoles: [USER_ROLES.admin]
+                  }
+              })
 
         // ABOUT PAGE AND MULTIPLE NAMED VIEWS =================================
         .state('about', {

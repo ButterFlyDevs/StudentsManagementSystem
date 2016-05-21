@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from google.appengine.ext.db import Key
 '''
 import EstructurasNDB.ControlAsistencia
 import EstructurasNDB.Resumen_ControlAsistencia
@@ -23,6 +23,12 @@ def parseBoolean(cadena):
     if cadena=='False' or cadena == 0 or cadena == '0' :
         return False
 
+
+def boolToInt(boolean):
+    if boolean == True:
+        return 1
+    if boolean == False:
+        return 0
 
 class RCA:
 
@@ -66,8 +72,120 @@ class Gestor:
         return listaCA
 
     @classmethod
-    def obtenerControlAsistencia(id):
-        pass
+    def obtenerControlAsistencia(self, id):
+        '''
+        Devuelve un control de asistencia completo realizado, con la lista de todos los alumnos, y los datos de ese
+        control en concreto.
+        '''
+        #Una vez obtenido la clave del resumen vamos a obtener todas los controles que se realizaron en
+        #ese control y para ello lo primero que tenemos que recuperar es la lista de las claves de los controles
+        #refiriéndonos con control al control que se hace de un estudiante individual.
+
+        print 'KEY'
+        print id
+        #Convertimos el id recibido en una clave procesable por ndb
+        key = ndb.Key('ResumenControlAsistencia', long(id));
+        print key
+
+        #Realizamos la consulta
+        query = ResumenControlAsistencia.query(ResumenControlAsistencia.key == key)
+
+        print '\n PROCESO OBTENCIÓN CONTROL ASISTENCIA '
+
+        #Comprobamos cuantos resultados hemos obtenido.
+        #https://cloud.google.com/appengine/docs/python/ndb/queryclass#Query_count
+        #Si se ha encontrado un control con ese id
+        if (query.count()==1):
+            #Rescatamos el resumen
+            resumen = query.get()
+
+            print 'RESUMEN'
+            print str(resumen)
+
+            #Una vez recuperado el resumen tendremos que componer una lista donde cada elemento será el control de un
+            #estudiante en concreto al que llegaremos gracias a que resumen tiene sus claves almacenadas.
+
+            #Rescatamos la lista de Controles de Asistencia
+            listaKeysMCA=resumen.lista_idCA
+
+
+            #Vamos a usar algo parecido a los struct de C para estructurar un objeto que devolver.
+            #http://docs.python.org.ar/tutorial/2/classes.html
+
+            class Control:
+                pass
+            class CA:
+                pass
+
+            listaControles = []
+
+            #Recorremos la lista (que contiene las claves de los mcontroles) para rellenar las litas de controles
+            for key in listaKeysMCA:
+                query = ControlAsistencia.query(ControlAsistencia.key==key)
+                #mc=mcontrol=microcontrol
+                mc=query.get()
+                print 'microcontrol leido'
+                print mc
+                #Creamos un registro de Control vacío
+                control = Control()
+                #Llenamos los campos del registro con lo que nos interesa
+                control.asistencia=boolToInt(mc.asistencia)
+                control.retraso=mc.retraso
+                control.retrasoJustificado=mc.retraso_justificado
+                control.uniforme=mc.uniforme
+                control.idAlumno=mc.id_alumno
+
+                #Además tb queremos añadir su nombre para que se vea en la interfaz
+                query = Alumno.query(Alumno.idAlumno==int(mc.id_alumno))
+                alumno = query.get()
+                control.nombreAlumno=alumno.nombreAlumno
+
+                listaControles.append(control)
+                print 'Objeto control creado'
+                print control.__dict__
+
+
+            #Ahora creamos el objeto ControlAsistencia añadiendo los datos  comunes a todos los mcontrolesAsistencia
+            ca = CA()
+            #La lista
+            ca.controles=listaControles
+
+            #Los datos comunes a todos que obtnemos del primer elemento (podría ser de cualquiera)
+            cualquiera = ControlAsistencia.query(ControlAsistencia.key==listaKeysMCA[0]).get()
+            ca.idProfesor = cualquiera.id_profesor
+            ca.idClase = cualquiera.id_clase
+            ca.idAsignatura = cualquiera.id_asignatura
+
+            #Además queremos añadir a la parte común el nombre de la clase, de la asignatura y del profesor,
+            #ya que son comunes y queremos que se muestren en la UI
+
+            #Clase
+            query = Clase.query(Clase.idClase==int(cualquiera.id_clase))
+            clase = query.get()
+            ca.nombreClase=clase.nombreClase
+
+            #Asignatura
+            query = Asignatura.query(Asignatura.idAsignatura==int(cualquiera.id_asignatura))
+            asignatura = query.get()
+            ca.nombreAsignatura=asignatura.nombreAsignatura
+
+            #Profesor
+            query = Profesor.query(Profesor.idProfesor==int(cualquiera.id_profesor))
+            profesor = query.get()
+            ca.nombreProfesor=profesor.nombreProfesor
+
+            #Devolvemos la fecha en texto plano ya formateado
+            ca.fechaHora = datetime.datetime.strftime(cualquiera.fecha_hora, "%d-%m-%Y %H:%M")
+
+            print 'Finally'
+            print ca.__dict__
+
+            #Devolvemos el control de asistencia construido
+            return ca
+
+        else:
+            return 'Error not found.'
+
 
     @classmethod
     def obtenerResumenesControlAsistencia(self, idProfesor=None, idASignatura=None, idClase=None, fechaHora=None):
@@ -113,9 +231,12 @@ class Gestor:
             query = ResumenControlAsistencia.query(ResumenControlAsistencia.id_profesor == int(idProfesor))
             #Ejecutamos la query en NDB, y por cada elemento creamos un objeto RCA y le volcamos los datos.
             for a in query:
+                #Creamos el objeto
                 rca = RCA()
-                rca.key = a.key
-                rca.fecha = a.fecha_hora
+                #Guardamos el id de la clave
+                rca.key = a.key.id()
+                #Convertimos la fecha en algo legible con el formato que queramos.
+                rca.fecha = datetime.datetime.strftime(a.fecha_hora, "%d-%m-%Y %H:%M")
                 rca.idClase = a.id_clase
                 rca.idAsignatura = a.id_asignatura
                 rca.idProfesor = a.id_profesor
@@ -151,6 +272,8 @@ class Gestor:
             print libName
             print " Return obtenerResumenesControlAsistencia "
             for r in resumenes:
+                #print 'KEY'
+                #print r.key
                 print r.__dict__
 
         #Devolvemos la lista, tenga 0, 1 o n elementos.

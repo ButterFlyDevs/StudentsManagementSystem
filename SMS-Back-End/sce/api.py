@@ -42,6 +42,7 @@ def doSomething():
 #   COLECCIÓN Control Asistencia      #
 #######################################
 
+#Maybe be deprecated
 @app.route('/controlesAsistencia', methods=['GET'])
 def  getAllControlesAsistencia():
     '''
@@ -141,28 +142,40 @@ def  insertaControlAsistencia():
     return str(status)
 
 
+@app.route('/controlAsistencia/<string:idControlAsistencia>', methods=['GET'])
+def getControlAsistencia(idControlAsistencia):
+    '''
+    Devuelve un control de asitencia completo, es decir, un control realizado por un profesor que
+    imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos.
+
+    curl -i -X GET localhost:8003/controlAsistencia/4644337115725824
+    '''
+
+    #Info de seguimiento
+    if v:
+        print nombreMicroservicio
+        print ' Llamando a /controlAsistencia/'+ idControlAsistencia +' GET getControlAsistencia()'
+        print locals()
+
+    #Llamamos al gestor y convertimos su respuesta en un objeto json
+    return jsonpickle.encode(Gestor.obtenerControlAsistencia(idControlAsistencia))
+
+
 
 
 ###############################################
 #   COLECCIÓN Resumen Control Asistencia      #
 ###############################################
 
-@app.route('/resumenesControlesAsistencia', methods=['GET'])
-def  getAllResumenesControlesAsistencia():
-    '''
-    Devuelve todos los controles de asistencia.
-    curl -i -X GET localhost:8003/resumenesControlesAsistencia
-    '''
-    if v:
-        print nombreMicroservicio
-        print 'Llamando a /resumenesControlesAsistencia GET resumenesControlesAsistencia() \n'
-
-    return 'getAllResumenesControlesAsistencia()\n'
-
 @app.route('/resumenesControlesAsistenciaEspecificos', methods=['POST'])
 def  getResumenesControlesAsistenciaConParametros():
+
     '''
+
     curl -d "idProfesor=4" -i -X POST localhost:8003/resumenesControlesAsistenciaEspecificos
+    (Dame todos los controles de asistencia (los resúmenes) realizados por el profesor con idProfesor 4)
+
+
     Devuelve una lista (puede estar vacía) con todos los controles de asistencia que han realizado según
     lo que se esté pididiendo. Si se pasa idProfesor, todos los de ese profesor.
     No de vuelve una lista con todos los alumnos y lo que el profesor puso sino un resumen de este control realizado,
@@ -183,10 +196,13 @@ def  getResumenesControlesAsistenciaConParametros():
     if v:
         print nombreMicroservicio
         print ' Request: '+str(request.form)
-        print ' Llamando a /resumenesControlesAsistencia GET resumenesControlesAsistencia() \n'
+        print ' Llamando a /resumenesControlesAsistencia POST resumenesControlesAsistencia() \n'
 
     return jsonpickle.encode(Gestor.obtenerResumenesControlAsistencia(idProfesor=request.form['idProfesor']))
 
+############################################################
+#   COLECCIÓNES AUXILIARES relacionadas de referencia      #
+############################################################
 
 @app.route('/alumnos', methods=['POST'])
 def insetarAlumno():
@@ -203,7 +219,6 @@ def insetarAlumno():
     status = Gestor.insertarAlumno(request.form['idAlumno'], request.form['nombreAlumno'])
 
     return status
-
 
 @app.route('/asignatura', methods=['POST'])
 def insetarAsignatura():
@@ -240,7 +255,7 @@ def insetarClase():
 @app.route('/profesor', methods=['POST'])
 def insetarProfesor():
     '''
-    curl -X POST -d "idProfesor=1&nombreProfesor=Eduardo Ros"  localhost:8003/profesor
+    curl -X POST -d "idProfesor=4&nombreProfesor=Eduardo Ros"  localhost:8003/profesor
     '''
     if v:
         print nombreMicroservicio
@@ -252,11 +267,6 @@ def insetarProfesor():
     status = Gestor.insertarProfesor(request.form['idProfesor'], request.form['nombreProfesor'])
 
     return status
-
-
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
