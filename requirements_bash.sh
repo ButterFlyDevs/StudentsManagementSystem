@@ -49,13 +49,13 @@ sudo apt-get install -y python-pip
 #Instalando dependencias de librerias de Python con pip
 echo -e "\n\033[32m Instalando dependencias de librerias de Python con pip \033[0m\n"
 echo -e "\n\033[32m Instalando dependencias del microservicio 1 \033[0m\n"
-sudo pip install -r SMS-Back-End/microservicio1/requirements.txt
+sudo pip install -r SMS-Back-End/microservicio1/requirements.txt -t SMS-Back-End/microservicio1/lib/
 
 echo -e "\n\033[32m Instalando dependencias del microservicio 2 \033[0m\n"
-sudo pip install -r SMS-Back-End/microservicio2/requirements.txt
+sudo pip install -r SMS-Back-End/microservicio2/requirements.txt -t SMS-Back-End/microservicio2/lib/
 
 echo -e "\n\033[32m Instalando dependencias del microservicio SCE \033[0m\n"
-sudo pip install -r SMS-Back-End/sce/requirements.txt
+sudo pip install -r SMS-Back-End/sce/requirements.txt -t SMS-Back-End/sce/lib/
 #Ayuda:
 echo "Si alguno de los paquetes no se ha instalado correctamente por favor inténtelo manualmente. Para conocer más
 información lea el fichero contributing.md, la sección [Entorno de desarrollo]."
