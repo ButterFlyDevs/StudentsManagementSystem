@@ -6,9 +6,9 @@ echo "Preparando el entorno..."
 #Descargado el SDK de GAE
 
 echo -e "\n\033[32m 0.1 Instalando unzip \033[0m\n"
-sudo apt-get install unzip
+sudo apt-get install -y unzip
 echo -e "\n\033[32m 0.2 Instalando curl \033[0m\n"
-sudo apt-get install curl
+sudo apt-get install -y curl
 echo -e "\n\033[31m 1. Descargando el SDK de Google App Engine \033[0m\n"
 curl -O https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.30.zip
 echo "Unzip SDK"
@@ -40,11 +40,11 @@ echo -e "\033[0m"
 
 #Instalamos la librería de python
 echo -e "\n\033[31m 3. Instalando la librería de python para mysql \033[0m\n"
-sudo apt-get install python-mysqldb
+sudo apt-get install -y python-mysqldb
 
 #Instalando el gestor de paquetes de python.
 echo -e "\n\033[31m 4. Instaladon el gestor de paquetes de python \033[0m\n"
-sudo apt-get install python-pip
+sudo apt-get install -y python-pip
 
 #Ayuda:
 echo "Si alguno de los paquetes no se ha instalado correctamente por favor inténtelo manualmente. Para conocer más
