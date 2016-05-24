@@ -86,6 +86,7 @@ class GestorProfesores:
         cursor.close()
         db.close()
 
+        #Creamos un diccionario que nos da una salida comprensible de la lib.
         dic={'status':salida, 'idProfesor':str(idProfesor)}
 
 

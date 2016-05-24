@@ -56,6 +56,7 @@ class GestorAsignaturas:
         '''
         try:
             salida = cursor.execute(query);
+            idAsignatura = cursor.lastrowid
         except MySQLdb.Error, e:
             # Get data from database
             try:
@@ -70,10 +71,17 @@ class GestorAsignaturas:
         cursor.close()
         db.close()
 
+        #Creamos un diccionario que nos da una salida comprensible de la lib.
+        dic={'status':salida, 'idAsignatura':str(idAsignatura)}
+
+        #Transformación de los estados de MYSQL a mensajes comprensibles.
         if salida==1:
-            return 'OK'
+            dic['status']= 'OK'
+            #return 'OK'
         if salida==1062:
-            return 'Elemento duplicado'
+            dic['status']= 'Elemento duplicado'
+
+        return dic
 
     @classmethod
     def getAsignaturas(self):

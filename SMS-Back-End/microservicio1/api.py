@@ -19,6 +19,10 @@ from APIDB.GestorImpartesSQL import GestorImpartes
 from APIDB.GestorAsociacionesSQL import GestorAsociaciones
 from APIDB.GestorCredencialesSQL import GestorCredenciales
 
+from google.appengine.api import modules
+from google.appengine.api import urlfetch
+import urllib
+
 app = Flask(__name__)
 
 #Activar modo verbose
@@ -271,6 +275,7 @@ def postProfesor():
                               )
 
 
+    #Una vez creado el profesor añadimos sus crendenciales de acceso al sistema básicas
     if salida['status']=='OK':
         print ' Profesor creado con éxito. Creando sus credenciales de acceso al sistema.'
         #Creamos las credenciales del usuario en la tabla credenciales usando el id del usuario que devuelve nuevoProfesor
@@ -278,12 +283,32 @@ def postProfesor():
         #salida Creacion Credenciales
         salidaCC=GestorCredenciales.postCredenciales(salida['idProfesor'], request.form['nombre'], request.form['dni'], request.form['dni'], 'admin')
         if salidaCC != 'OK':
-            salida['status']='ERROR'
+            salida['status']='SBD ERROR'
+
+
+        #Una vez creadas las credenciales llamamos al servicio SCE para que actualice su sistema (### DISPARADOR ###)
+
+        #Conformamos la dirección:
+        module = modules.get_current_module_name()
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="profesores"
+
+        #Creamos un diccionario con los datos.
+        datos = {
+          "idProfesor": salida['idProfesor'],
+          "nombreProfesor": request.form['nombre']+' '+request.form['apellidos'],
+        }
+        form_data = urllib.urlencode(datos)
+        result=urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+        json = jsonpickle.decode(result.content)
+        if json['status']!='OK':
+            salida['status']='SCE ERROR'
 
     if v:
         print ' Return: '+str(salida)
 
-    return str(salida)
+    return jsonpickle.encode(salida)
 
 
 #######################
@@ -423,14 +448,43 @@ def postAsignatura():
     Inserta una nueva asignatura en el sistema.
     curl -d "nombre=ComputacionZZ" -i -X POST localhost:8002/asignaturas
     '''
-    print 'REQUEST'
-    print request
+    #Info de seguimiento
+    if v:
+        print nombreMicroservicio
+        print ' Recurso: /asignaturas, metodo: POST \n'
+        print ' Petición '
+        print request.form
+
     salida = GestorAsignaturas.nuevaAsignatura(request.form['nombre'].encode('latin-1'))
 
-    if salida == 'OK':
-        return 'OK'
-    else:
-        abort(404)
+    print "Salida del Gestor"
+    print salida
+
+    if salida['status'] == 'OK':
+
+        #Una vez insertada la asignatura en el SBD llamamos al servicio SCE para que actualice su sistema (### DISPARADOR ###)
+
+        #Conformamos la dirección:
+        module = modules.get_current_module_name()
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="asignaturas"
+
+        #Creamos un diccionario con los datos.
+        datos = {
+          "idAsignatura": salida['idAsignatura'],
+          "nombreAsignatura": request.form['nombre'],
+        }
+        form_data = urllib.urlencode(datos)
+        result=urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+        json = jsonpickle.decode(result.content)
+        if json['status']!='OK':
+            salida['status']='SCE ERROR'
+
+    if v:
+        print ' Return: '+str(salida)
+
+    return jsonpickle.encode(salida)
 
 #########################
 #   ENTIDAD ASIGNATURA  #

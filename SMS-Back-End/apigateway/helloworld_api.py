@@ -86,6 +86,13 @@ def formatTextInput(cadena):
 class MensajeRespuesta(messages.Message):
     message = messages.StringField(1)
 
+#Mensaje que usamos para devolver la información de estado sobre la creación de alguna entidad en el sistema
+# y además devuelve el id en sistema de la identidad creada. (Como por ejemplo en la insercción de un alumno)
+class StatusID(messages.Message):
+    status = messages.StringField(1)
+    statusCode = messages.StringField(2)
+    id = messages.IntegerField(3)
+
 class URL(messages.Message):
     url = messages.StringField(1)
 
@@ -471,7 +478,7 @@ class HelloWorldApi(remote.Service):
         #En esta ocasión la imagen no es una URL sino los Bytes en crudo.
         imagen  = messages.BytesField(10)
 
-    @endpoints.method(AlumnoCompletoConImagen, MensajeRespuesta, path='alumnos/insertarAlumno2', http_method='POST', name='alumnos.insertarAlumno2')
+    @endpoints.method(AlumnoCompletoConImagen, StatusID, path='alumnos/insertarAlumno2', http_method='POST', name='alumnos.insertarAlumno2')
     def insertar_alumno2(self, request):
         '''
 
@@ -559,7 +566,7 @@ class HelloWorldApi(remote.Service):
                 #json2 = jsonpickle.decode(resultadoModificacion.content)
                 #salida = json2['status']
 
-        return MensajeRespuesta(message=salida)
+        return StatusID(status=salida, id=int(json['idAlumno']))
 
 
     #### possibly deprecated ####
@@ -1172,13 +1179,15 @@ class HelloWorldApi(remote.Service):
 
         return profesor
 
-    @endpoints.method(ProfesorCompleto,MensajeRespuesta, path='profesores/insertarProfesor', http_method='POST', name='profesores.insertarProfesor')
+    @endpoints.method(ProfesorCompleto, StatusID, path='profesores/insertarProfesor', http_method='POST', name='profesores.insertarProfesor')
     def insertarProfesor(self, request):
         '''
         Introduce un nuevo profesor en el sistema.
 
         Ejemplo de llamada en terminal:
         curl -i -d "nombre=Juan&apellidos=Azustregui&dni=99&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/profesores/insertarProfesor
+
+
         (-i para ver las cabeceras)
 
         '''
@@ -1225,17 +1234,20 @@ class HelloWorldApi(remote.Service):
         #Infro después de la petición:
         if v:
             print nombreMicroservicio
-            print "Resultado de la petición: "
+            print "Resultado de la petición de profesores.insertarProfesor"
             print result.content
             print "Código de estado: "
             print result.status_code
+            #print str(result.content['status'])
+        json = jsonpickle.decode(result.content)
 
         if str(result.status_code) == '404':
             raise endpoints.NotFoundException('Alumno con ID %s ya existe en el sistema.' % (request.dni))
 
         #return MensajeRespuesta(message="Todo OK man!")
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
-        return MensajeRespuesta(message=result.content)
+        return StatusID(status=json['status'], id=int(json['idProfesor']), statusCode=str(result.status_code))
+
 
     @endpoints.method(ID,MensajeRespuesta,path='profesores/delProfesor', http_method='DELETE', name='profesores.delProfesor')
     def delProfesor(self, request):
@@ -1574,7 +1586,7 @@ class HelloWorldApi(remote.Service):
 
         return asignatura
 
-    @endpoints.method(AsignaturaCompleta, MensajeRespuesta, path='asignaturas/insertarAsignatura', http_method='POST', name='asignaturas.insertarAsignatura')
+    @endpoints.method(AsignaturaCompleta, StatusID, path='asignaturas/insertarAsignatura', http_method='POST', name='asignaturas.insertarAsignatura')
     def insertarAsignatura(self, request):
         '''
         Introduce un nuevo profesor en el sistema.
@@ -1624,7 +1636,14 @@ class HelloWorldApi(remote.Service):
             print "Código de estado: "
             print result.status_code
 
-        return MensajeRespuesta(message=result.content)
+
+        json = jsonpickle.decode(result.content)
+
+
+        #return MensajeRespuesta(message="Todo OK man!")
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return StatusID(status=json['status'], id=int(json['idAsignatura']), statusCode=str(result.status_code))
+        
 
     @endpoints.method(ID,MensajeRespuesta,path='asignaturas/delAsignatura', http_method='DELETE', name='asignaturas.delAsignatura')
     def delAsignatura(self, request):
@@ -2472,7 +2491,7 @@ class HelloWorldApi(remote.Service):
         '''
         Introduce una relación Asocia (una especificación de una asignatura en una clase concreta).
         Ejemplo de llamada en terminal:
-        curl -i -d "id_asignatura=2&id_clase=3" -X POST -G localhost:8001/_ah/api/helloworld/v1/asociaciones/insertaAsociacion
+        curl  -d "id_asignatura=2&id_clase=3" -X POST -G localhost:8001/_ah/api/helloworld/v1/asociaciones/insertaAsociacion
         '''
 
         if v:

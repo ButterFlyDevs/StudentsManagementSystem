@@ -157,7 +157,8 @@ class Gestor:
             ca.idAsignatura = cualquiera.id_asignatura
 
             #Además queremos añadir a la parte común el nombre de la clase, de la asignatura y del profesor,
-            #ya que son comunes y queremos que se muestren en la UI
+            #ya que son comunes y queremos que se muestren en la UI. Estos datos los tiene la NDB en tablas separadas,
+            #accedemos a los datos y los añadimos.
 
             #Clase
             query = Clase.query(Clase.idClase==int(cualquiera.id_clase))
@@ -431,14 +432,22 @@ class Gestor:
         profesor.idProfesor=int(idProfesor)
         profesor.nombreProfesor=nombreProfesor
 
-        nuevoProfesorClave = profesor.put()
+        salida = {}
+
+        try:
+            nuevoProfesorClave = profesor.put()
+            salida['status']='OK'
+        except ValueError:
+            salida['status']='FAIL'
 
         #Info de seguimiento
         if v:
             print libName
             print " Return de insertarProfesor: "+str(nuevoProfesorClave)+'\n'
 
-        return str(nuevoProfesorClave)
+        salida['id']=nuevoProfesorClave
+
+        return salida
 
     @classmethod
     def insertarClase(self, idClase, nombreClase):
@@ -478,14 +487,24 @@ class Gestor:
         asignatura.idAsignatura=int(idAsignatura)
         asignatura.nombreAsignatura=nombreAsignatura
 
-        nuevaAsignaturaClave = asignatura.put()
+
+        salida = {}
+
+        try:
+            nuevaAsignaturaClave = asignatura.put()
+            salida['status']='OK'
+        except ValueError:
+            salida['status']='FAIL'
+
 
         #Info de seguimiento
         if v:
             print libName
             print " Return de insertarAsignatura: "+str(nuevaAsignaturaClave)+'\n'
 
-        return str(nuevaAsignaturaClave)
+        salida['id']=nuevaAsignaturaClave
+
+        return salida
 
 
 

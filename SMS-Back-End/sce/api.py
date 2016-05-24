@@ -220,7 +220,7 @@ def insetarAlumno():
 
     return status
 
-@app.route('/asignatura', methods=['POST'])
+@app.route('/asignaturas', methods=['POST'])
 def insetarAsignatura():
     '''
     curl -X POST -d "idAsignatura=1&nombreAsignatura=Frances"  localhost:8003/asignatura
@@ -232,9 +232,7 @@ def insetarAsignatura():
         print request.form
 
 
-    status = Gestor.insertarAsignatura(request.form['idAsignatura'], request.form['nombreAsignatura'])
-
-    return status
+    return jsonpickle.encode(Gestor.insertarAsignatura(request.form['idAsignatura'], request.form['nombreAsignatura']))
 
 @app.route('/clase', methods=['POST'])
 def insetarClase():
@@ -252,10 +250,10 @@ def insetarClase():
 
     return status
 
-@app.route('/profesor', methods=['POST'])
-def insetarProfesor():
+@app.route('/profesores', methods=['POST'])
+def insertarProfesor():
     '''
-    curl -X POST -d "idProfesor=4&nombreProfesor=Eduardo Ros"  localhost:8003/profesor
+    curl -X POST -d "idProfesor=4&nombreProfesor=Eduardo Ros"  localhost:8003/profesores
     '''
     if v:
         print nombreMicroservicio
@@ -263,10 +261,7 @@ def insetarProfesor():
         print " Request: "
         print request.form
 
-
-    status = Gestor.insertarProfesor(request.form['idProfesor'], request.form['nombreProfesor'])
-
-    return status
+    return jsonpickle.encode(Gestor.insertarProfesor(request.form['idProfesor'], request.form['nombreProfesor']))
 
 if __name__ == '__main__':
     app.run(debug=True)

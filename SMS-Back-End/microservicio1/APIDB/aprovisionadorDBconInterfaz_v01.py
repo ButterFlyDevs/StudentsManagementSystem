@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+#MAYBE DEPRECATED
+
 # Aprovisionador de la base de datos que inserta datos bajo la
 # especificación del creador DBCreator_v0_1 usando sólo los métodos nuevo/a ala entidad o
 # relacion que se está añadiendo elementos.
@@ -18,10 +20,7 @@ def aprovisiona():
     #Insertamos 6 alumnos, cada insercción genera un id (unívco) para cada alumno.
     #Cabecera: nuevoAlumno(self,nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL')
     #id 1
-
-
     GestorAlumnos.nuevoAlumno('Rocío', 'Prida Ruíz', '99999999', 'C/ Ramon y Cajal Bloque 9. 2ºA', 'Albolote', 'Granada', '1800-03-23', '677112233')
-
     #id 2
     GestorAlumnos.nuevoAlumno('Eduardo', 'Martín Fernández', '12345678', 'C/ Ramón y Cajal Bloque 9. 2ºA', 'Albolote', 'Granada', '1800-03-23', '677262625')
     #id 3
@@ -97,7 +96,7 @@ def aprovisiona():
     #id 6
     GestorMatriculas.nuevaMatricula('6','3') #Matriculamos al alumno con id=6 en Francés en 1ºB ESO.
 
-    
+
 
 
 if __name__ == '__main__':
