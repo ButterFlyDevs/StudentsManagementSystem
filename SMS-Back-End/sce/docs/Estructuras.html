@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>Estructuras.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>Estructuras.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <h3><span id="control-asistencia-simple" href="control-asistencia-simple">Control Asistencia simple </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Clase que implementa la estructura de los controles de asistencia simples (se utilizará tal cual en la base de datos NDB)</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">CA_simple</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fechaHora</span><span class="p">,</span><span class="n">uniforme</span><span class="p">,</span><span class="n">rnj</span><span class="p">,</span><span class="n">rj</span><span class="p">,</span><span class="n">falta</span><span class="p">,</span><span class="n">idAlumno</span><span class="p">,</span><span class="n">idProfesor</span><span class="p">,</span><span class="n">idClase</span><span class="p">,</span><span class="n">id_asignatura</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fechaHora</span> <span class="o">=</span> <span class="n">fechaHora</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniforme</span><span class="o">=</span><span class="n">uniforme</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retraso_no_justificado</span><span class="o">=</span><span class="n">rnj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retraso_justificado</span> <span class="o">=</span> <span class="n">rj</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">falta</span> <span class="o">=</span> <span class="n">falta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idAlumno</span><span class="o">=</span><span class="n">idAlumno</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idProfesor</span><span class="o">=</span><span class="n">idProfesor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idClase</span><span class="o">=</span><span class="n">idClase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_asignatura</span><span class="o">=</span><span class="n">id_asignatura</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keyNDB</span> <span class="o">=</span> <span class="n">key</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <h3><span id="control-asistencia-complejo" href="control-asistencia-complejo">Control Asistencia Complejo </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Clase que implementa la estructura de los controles de asistencia complejos (completará la información aportada por los controles de asistencia
+simples, que se usará principalmente para mostrar información al usuario)</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">CA_complejo</span><span class="p">(</span><span class="n">CA_simple</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fecha</span><span class="p">,</span><span class="n">uniforme</span><span class="p">,</span><span class="n">rnj</span><span class="p">,</span><span class="n">rj</span><span class="p">,</span><span class="n">falta</span><span class="p">,</span><span class="n">idAlumno</span><span class="p">,</span><span class="n">idProfesor</span><span class="p">,</span><span class="n">idClase</span><span class="p">,</span><span class="n">id_asignatura</span><span class="p">,</span> <span class="n">nombreAlumno</span><span class="p">,</span><span class="n">nombreProfesor</span><span class="p">,</span><span class="n">nombreClase</span><span class="p">,</span><span class="n">nombreAsignatura</span><span class="p">):</span>
+        <span class="n">CA_simple</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">fecha</span><span class="p">,</span><span class="n">uniforme</span><span class="p">,</span><span class="n">rnj</span><span class="p">,</span><span class="n">rj</span><span class="p">,</span><span class="n">falta</span><span class="p">,</span><span class="n">idAlumno</span><span class="p">,</span><span class="n">idProfesor</span><span class="p">,</span><span class="n">idClase</span><span class="p">,</span><span class="n">id_asignatura</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nombreAlumno</span> <span class="o">=</span> <span class="n">nombreAlumno</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nombreProfesor</span><span class="o">=</span><span class="n">nombreProfesor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nombreClase</span><span class="o">=</span><span class="n">nombreClase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nombreAsignatura</span><span class="o">=</span><span class="n">nombreAsignatura</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <h3><span id="resumenes-control-asistencia-simple" href="resumenes-control-asistencia-simple">Resumenes Control Asistencia simple </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Clase que implementa la estructura de los resumenes de controles de asistencia simples (se utilizará tal cual en la base de datos NDB). Estos resumenes recogen todos los controles de asistencia creados para unprofesor, hora, clase y asginatura dados.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">RCA_simple</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listaIdCA</span><span class="p">,</span><span class="n">fechaHora</span><span class="p">,</span><span class="n">idProfesor</span><span class="p">,</span><span class="n">idClase</span><span class="p">,</span><span class="n">idAsignatura</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">listaIdCA</span><span class="o">=</span><span class="n">listaIdCA</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fechaHora</span><span class="o">=</span><span class="n">fechaHora</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idProfesor</span><span class="o">=</span><span class="n">idProfesor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idClase</span><span class="o">=</span><span class="n">idClase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idAsignatura</span><span class="o">=</span><span class="n">idAsignatura</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keyNDB</span> <span class="o">=</span> <span class="n">key</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <h3><span id="resumen-control-asistencia-complejo" href="resumen-control-asistencia-complejo">Resumen Control Asistencia Complejo </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Clase que implementa la estructura de los resumenes de controles de asistencia simples (se utilizará tal cual en la base de datos NDB). Estos resumenes recogen todos los controles de asistencia creados para unprofesor, hora, clase y asginatura dados. Estos datos se usarán para mostrar información al usuario</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">RCA_complejo</span><span class="p">(</span><span class="n">RCA_simple</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__init__</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listaIdCA</span><span class="p">,</span><span class="n">fechaHora</span><span class="p">,</span><span class="n">idProfesor</span><span class="p">,</span><span class="n">idClase</span><span class="p">,</span><span class="n">idAsignatura</span><span class="p">,</span><span class="n">nombreProfesor</span><span class="p">,</span><span class="n">nombreClase</span><span class="p">,</span><span class="n">nombreAsignatura</span><span class="p">):</span>
+        <span class="n">RCA_simple</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">listaIdCA</span><span class="p">,</span><span class="n">fechaHora</span><span class="p">,</span><span class="n">idProfesor</span><span class="p">,</span><span class="n">idClase</span><span class="p">,</span><span class="n">idAsignatura</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nombreProfesor</span><span class="o">=</span><span class="n">nombreProfesor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nombreClase</span><span class="o">=</span><span class="n">nombreClase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nombreAsignatura</span><span class="o">=</span><span class="n">nombreAsignatura</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

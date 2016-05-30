@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>api.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>api.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <h6></h6>
+<h1>DEFINICIÓN DE LA API REST del MICROSERVICIO SCE</h1>
+<h6></h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">abort</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">import</span> <span class="nn">jsonpickle</span>
+<span class="kn">import</span> <span class="nn">Estructuras</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">NDBlib.gestor</span> <span class="kn">import</span> <span class="n">Gestor</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Definición del nombre de la aplicación</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Activar modo verbose para mensajes por terminal.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">v</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">nombreMicroservicio</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> ## Microservicio SCE ##&#39;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <h3><span id="recurso-de-prueba-el-estado-del-servicio." href="recurso-de-prueba-el-estado-del-servicio.">Recurso de prueba el estado del servicio.</span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Función usada como prueba de vida del microservicio</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/prueba&#39;</span><span class="p">,</span><span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">doSomething</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Prueba del estado de la API.</span>
+<span class="sd">    curl -i -X GET localhost:8003/prueba</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; Llamando a /prueba GET doSomething() </span><span class="se">\n</span><span class="s1">&#39;</span>
+
+
+    <span class="k">return</span> <span class="s1">&#39;SCE MicroService is RUNING!</span><span class="se">\n</span><span class="s1">&#39;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <h6></h6>
+<h1>COLECCIÓN Control Asistencia</h1>
+<h6></h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Maybe be deprecated</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/controlesAsistencia&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span>  <span class="nf">getAllControlesAsistencia</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Devuelve todos los controles de asistencia.</span>
+<span class="sd">    curl -i -X GET localhost:8003/controlesAsistencia</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39;Llamando a /controlesAsistencia GET getAllControlesAsistencia()&#39;</span>
+
+    <span class="n">listaCAs</span><span class="o">=</span><span class="n">Gestor</span><span class="o">.</span><span class="n">obtenerALLCA</span><span class="p">()</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    for a in listaCAs:</span>
+<span class="sd">        print a.asistencia</span>
+<span class="sd">        json = jsonpickle.encode(a)</span>
+<span class="sd">        print jsonpickle.decode(json)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; Llamando a /controlesAsistencia GET getAllControlesAsistencia()&#39;</span>
+        <span class="k">print</span> <span class="s1">&#39; Salida: &#39;</span>
+        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">listaCAs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">jsonpickle</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">listaCAs</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <h3><span id="insertar-un-control-de-asistencia" href="insertar-un-control-de-asistencia"> Insertar un control de asistencia </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Inserta un control de asistencia en el sistema. Compuesto por muchos controles a estudiantes para una asignatura en una clase con un
+profesor en una fecha y hora determinadas.</p>
+<p>Debería recibir una lista de controles de asistencia sin fecha ni hora porque se la colocará este microservicio (para evitar múltiples problemas)
+Esta lista de controles se envía en formato JSON</p>
+<p>Prueba del método:
+curl -X POST  -H 'content-type: application/json' -d @pruebaJson.json localhost:8003/controlesAsistencia
+El fichero sigue el estandar JSON, ver pruebaJson.json. Se pueden validar los ficheros en webs como http://jsonlint.com/.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/controlesAsistencia&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span>  <span class="nf">insertaControlAsistencia</span><span class="p">():</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Extraemos el JSON de la petición.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">json</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; Llamando a /controlesAsistencia POST insertaControlAsistencia()&#39;</span>
+        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;controles&#39;</span><span class="p">]))</span> <span class="o">+</span><span class="s1">&#39; controles recibidos</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">print</span> <span class="s2">&quot; Controles: &quot;</span>
+        <span class="k">print</span> <span class="n">json</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Llamamos a la función de NDBlib que inserta el conjunto</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">status</span> <span class="o">=</span> <span class="n">Gestor</span><span class="o">.</span><span class="n">insertarConjuntoControlAsistencia</span><span class="p">(</span><span class="n">json</span><span class="p">[</span><span class="s1">&#39;controles&#39;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; /controlesAsistencia POST insertaControlAsistencia()&#39;</span>
+        <span class="k">print</span> <span class="s1">&#39; Return:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">status</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Devolvemos la clave que ha sido introducida</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">status</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <h3><span id="obtener-controles-de-asistenca" href="obtener-controles-de-asistenca">Obtener controles de Asistenca </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Devuelve un control de asitencia completo, es decir, un control realizado por un profesor que
+imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos.</p>
+<p>curl -i -X GET localhost:8003/controlAsistencia/4644337115725824</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/controlAsistencia/&lt;string:idControlAsistencia&gt;&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">getControlAsistencia</span><span class="p">(</span><span class="n">idControlAsistencia</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Info de seguimiento</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; Llamando a /controlAsistencia/&#39;</span><span class="o">+</span> <span class="n">idControlAsistencia</span> <span class="o">+</span><span class="s1">&#39; GET getControlAsistencia()&#39;</span>
+        <span class="k">print</span> <span class="nb">locals</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      <p>Llamamos al gestor y convertimos su respuesta en un objeto json</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">return</span> <span class="n">jsonpickle</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">Gestor</span><span class="o">.</span><span class="n">obtenerControlAsistencia</span><span class="p">(</span><span class="n">idControlAsistencia</span><span class="p">))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      <h3><span id="obtener-resumen-controles-de-asistencia" href="obtener-resumen-controles-de-asistencia"> OBtener Resumen controles de Asistencia </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      <p>curl -d "idProfesor=3" -i -X POST localhost:8003/resumenesControlesAsistenciaEspecificos
+(Dame todos los controles de asistencia (los resúmenes) realizados por el profesor con idProfesor 4)</p>
+<p>Devuelve una lista (puede estar vacía) con todos los controles de asistencia que han realizado según
+lo que se esté pididiendo. Si se pasa idProfesor, todos los de ese profesor.
+No de vuelve una lista con todos los alumnos y lo que el profesor puso sino un resumen de este control realizado,
+así cuando un profesor quiera ver todos los detalles entonces podrá pinchár y se le devolverán todos los datos, pero de
+eso se encarga otra función.
+Los datos a devolver son:</p>
+<ul>
+<li>key = messages.StringField(1, required=True) Clave del resumen para pedir todas los controles en otro momento.</li>
+<li>fecha = messages.StringField(2)</li>
+<li>idclase = messages.StringField(3)</li>
+<li>nombreClase = messages.StringField(4)</li>
+<li>idasignatura = messages.StringField(5)</li>
+<li>nombreAsignatura = messages.StringField(6)</li>
+<li>idprofesor = messages.StringField(7)</li>
+<li>nombreProfesor = messages.StringField(8)</li>
+</ul>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/resumenesControlesAsistenciaEspecificos&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span>  <span class="nf">getResumenesControlesAsistenciaConParametros</span><span class="p">():</span>
+
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; Llamando a /resumenesControlesAsistencia POST resumenesControlesAsistencia() </span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">print</span> <span class="s1">&#39; Request: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">jsonpickle</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">Gestor</span><span class="o">.</span><span class="n">obtenerResumenesControlAsistencia</span><span class="p">(</span><span class="n">idProfesor</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;idProfesor&#39;</span><span class="p">]))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-20'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-20'>#</a>
+      </div>
+      <h6></h6>
+<h1>COLECCIÓNES AUXILIARES relacionadas de referencia</h1>
+<h6></h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-21'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-21'>#</a>
+      </div>
+      <h3><span id="insertar-alumno" href="insertar-alumno"> Insertar alumno </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-22'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-22'>#</a>
+      </div>
+      <p>Función usada para insertar un alumno en la base de datos NDB.
+Utiliza la clase Gestor para insertar el alumno. Solamente inserta dos campos: el id del alumno y su nombre.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/alumnos&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">insetarAlumno</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    curl -X POST -d &quot;idAlumno=1&amp;nombreAlumno=Fernando&quot;  localhost:8003/alumnos</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; Llamando a /alumnos POST insertarAlumno()&#39;</span>
+        <span class="k">print</span> <span class="s2">&quot; Request: &quot;</span>
+        <span class="k">print</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
+
+
+    <span class="k">return</span> <span class="n">jsonpickle</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">Gestor</span><span class="o">.</span><span class="n">insertarAlumno</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;idAlumno&#39;</span><span class="p">],</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;nombreAlumno&#39;</span><span class="p">]))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-23'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-23'>#</a>
+      </div>
+      <h3><span id="insertar-asignatura" href="insertar-asignatura"> Insertar asignatura </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-24'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-24'>#</a>
+      </div>
+      <p>Función usada para insertar una asignatura en la base de datos NDB.
+Utiliza la clase Gestor para insertar la asignatura. Solamente inserta dos campos: id de asignatura y su nombre.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/asignaturas&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">insetarAsignatura</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    curl -X POST -d &quot;idAsignatura=1&amp;nombreAsignatura=Frances&quot;  localhost:8003/asignaturas</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; Llamando a /asignatura POST insertaAsignatura()&#39;</span>
+        <span class="k">print</span> <span class="s2">&quot; Request: &quot;</span>
+        <span class="k">print</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
+
+
+    <span class="k">return</span> <span class="n">jsonpickle</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">Gestor</span><span class="o">.</span><span class="n">insertarAsignatura</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;idAsignatura&#39;</span><span class="p">],</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;nombreAsignatura&#39;</span><span class="p">]))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-25'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-25'>#</a>
+      </div>
+      <h3><span id="insertar-clase" href="insertar-clase"> Insertar clase </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-26'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-26'>#</a>
+      </div>
+      <p>Función usada para insertar una clase en la base de datos NDB.
+Utiliza la clase Gestor para insertar la clase. Solamente inserta dos campos: id de clase y su nombre.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/clases&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">insetarClase</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    curl -X POST -d &quot;idClase=1&amp;nombreClase=1AESO&quot;  localhost:8003/clases</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; Llamando a /clase POST insertarClase()&#39;</span>
+        <span class="k">print</span> <span class="s2">&quot; Request: &quot;</span>
+        <span class="k">print</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
+
+
+    <span class="k">return</span> <span class="n">jsonpickle</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">Gestor</span><span class="o">.</span><span class="n">insertarClase</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;idClase&#39;</span><span class="p">],</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;nombreClase&#39;</span><span class="p">]))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-27'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-27'>#</a>
+      </div>
+      <h3><span id="insertar-profesor" href="insertar-profesor"> Insertar profesor </span></h3>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-28'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-28'>#</a>
+      </div>
+      <p>Función usada para insertar un profesor en la base de datos NDB.
+Utiliza la clase Gestor para insertar el profesor. Solamente inserta dos campos: id de profesor y su nombre.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/profesores&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">insertarProfesor</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    curl -X POST -d &quot;idProfesor=4&amp;nombreProfesor=Eduardo Ros&quot;  localhost:8003/profesores</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">nombreMicroservicio</span>
+        <span class="k">print</span> <span class="s1">&#39; Llamando a /profesor POST insertarProfesor()&#39;</span>
+        <span class="k">print</span> <span class="s2">&quot; Request: &quot;</span>
+        <span class="k">print</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span>
+
+    <span class="k">return</span> <span class="n">jsonpickle</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">Gestor</span><span class="o">.</span><span class="n">insertarProfesor</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;idProfesor&#39;</span><span class="p">],</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s1">&#39;nombreProfesor&#39;</span><span class="p">]))</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>
