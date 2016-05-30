@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-'''
+
+"""
 
 Hello World API implemented using Google Cloud Endpoints.
 
@@ -34,7 +35,7 @@ Para ver el servidor de exploración:
 
  para saber a que método se ha llamado y con qué parámetros.
 
-'''
+"""
 
 
 import endpoints
@@ -44,8 +45,8 @@ from protorpc import message_types
 from protorpc import remote
 import os
 
-##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
-##Librerías usadas para la llamada a las APIRest de los microservicios
+#Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+#Librerías usadas para la llamada a las APIRest de los microservicios
 from google.appengine.api import urlfetch
 import urllib
 
@@ -73,11 +74,8 @@ ANDROID_AUDIENCE = WEB_CLIENT_ID
 
 
 package = 'Hello'
-
+# Función que recibe una cadena como parámetro y la formatea para resolver el problema de los acentos.
 def formatText(cadena):
-    '''
-    Función que recibe una cadena como parámetro y la formatea para resolver el problema de los acentos.
-    '''
     return cadena.encode('utf-8').decode('utf-8')
 
 def formatTextInput(cadena):
@@ -86,8 +84,7 @@ def formatTextInput(cadena):
 class MensajeRespuesta(messages.Message):
     message = messages.StringField(1)
 
-#Mensaje que usamos para devolver la información de estado sobre la creación de alguna entidad en el sistema
-# y además devuelve el id en sistema de la identidad creada. (Como por ejemplo en la insercción de un alumno)
+#Mensaje que usamos para devolver la información de estado sobre la creación de alguna entidad en el sistema y además devuelve el id en sistema de la identidad creada. (Como por ejemplo en la insercción de un alumno)
 class StatusID(messages.Message):
     status = messages.StringField(1)
     statusCode = messages.StringField(2)
@@ -98,14 +95,19 @@ class URL(messages.Message):
 
 class MensajePeticion(messages.Message):
     message = messages.StringField(1)
-'''
+"""
 Como vemos, no aparecen argumentos en el cuerpo de la petición ya que se trata
 de una petición de tipo GET.
-'''
+"""
 
 #######################################
-# TIPOS DE MENSAJES QUE MANEJA LA API #
+## TIPOS DE MENSAJES QUE MANEJA LA API##
 #######################################
+
+"""
+A continuación se implementa la estrutura de cada tipo de mensaje que se puede enviar o recibir en
+el proyecto en el microservicio de apigateway.
+"""
 
 class Alumno(messages.Message):
     nombre = messages.StringField(1)
@@ -220,8 +222,10 @@ class AlumnoSimpleExtendido(messages.Message):
 #####################################################
 ## Mensajes del servicio de Control de Estudiantes ##
 #####################################################
+"""
+Estructura de mensajes intercambiados en el servicio de Control de estudiantes (sce)
+"""
 
-#Todos los campos son obligatorios
 class ControlAsistencia(messages.Message): #Debería llamarse mControlAsistencia (micro)
     asistencia = messages.IntegerField(1, required=True)
     #Si el retraso es 0: no hay retraso 10: retraso de 10 min 20: retraso de 20 min o más
@@ -237,7 +241,9 @@ class ListaControlAsistencia(messages.Message):  #Debería llamarse ControlAsist
     idProfesor = messages.IntegerField(2, required=True)
     idClase = messages.IntegerField(3, required=True)
     idAsignatura = messages.IntegerField(4, required=True)
-    #Campos solo necesarios para los controles de asistencia de salida, proceso:
+    """
+    Campos solo necesarios para los controles de asistencia de salida, proceso:
+    """
     nombreClase = messages.StringField(5)
     nombreAsignatura = messages.StringField(6)
     nombreProfesor = messages.StringField(7)
@@ -299,7 +305,7 @@ class HelloWorldApi(remote.Service):
 
 
     ##############################################
-    #   métodos de ALUMNOS                       #
+    ##   métodos de ALUMNOS                       #
     ##############################################
 
     @endpoints.method(message_types.VoidMessage, ListaAlumnos,
@@ -308,8 +314,9 @@ class HelloWorldApi(remote.Service):
                       #Puede que sea la forma en la que se llama desde la api:
                       #response = service.alumnos().listGreeting().execute()
                       name='alumnos.getAlumnos')
+
     def getAlumnos(self, unused_request):
-        '''
+        """
         getAlumnos()   [GET sin parámetros]
 
         Devuelve una lista con todos los estudiantes registrados en el sistema, de forma simplificada (solo nombre y ID)
@@ -318,7 +325,7 @@ class HelloWorldApi(remote.Service):
         curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumnos
         Llamada desde JavaScript:
         response =service.alumnos().getAlumnos().execute()
-        '''
+        """
         #Transformación de la llamada al endpoints a la llamada a la api rest del servicio.
 
         #Info de seguimiento
@@ -355,10 +362,10 @@ class HelloWorldApi(remote.Service):
 
         listaAlumnos = jsonpickle.decode(result.content)
 
-        '''
+        """
         miListaAlumnos=ListaAlumnos()
         miListaAlumnos.alumnos = listaAlumnos
-        '''
+        """
 
         #Creamos un vector
         alumnosItems= []
@@ -375,21 +382,18 @@ class HelloWorldApi(remote.Service):
             alumnosItems.append(Alumno( id=idAlumno, nombre=formatText(nombreAlumno), apellidos=formatText(apellidosAlumno) ) )
 
 
-        #id=str(alumno.get('id')),
-        #Los adaptamos al tipo de mensaje y enviamos
-        #return Greeting(message=str(result.content))
         return ListaAlumnos(alumnos=alumnosItems)
 
     @endpoints.method(ID, AlumnoCompleto, path='alumnos/getAlumno', http_method='GET', name='alumnos.getAlumno')
     def getAlumno(self,request):
-        '''
+        """
         getAlumno() [GET con dni]
 
         Devuelve toda la información de un estudiante en caso de estar en el sistema.
 
         Llamada ejemplo desde terminal:
         curl -X GET localhost:8001/_ah/api/helloworld/v1/alumnos/getAlumno?id=2
-        '''
+        """
 
         #Info de seguimiento
         if v:
@@ -408,12 +412,12 @@ class HelloWorldApi(remote.Service):
         #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
         url = "http://%s/" % modules.get_hostname(module="microservicio1")
 
-        '''
+        """
         Según la doc. de urlfetch (ver arriba) no podemos pasar parámetros con el payload, así que como conocemos
         la api del microservicios al que vamos a llamr realizamos la petición bajo su especificacion, según la cual
         solo tenemos que llamar a /alumnos/<id_alumno> entonces concatenamos a la url esa id qu recibimos en la llamada
         a este procedimiento.
-        '''
+        """
         #Recursos más entidad
         url+='alumnos/'+request.id
 
@@ -480,7 +484,7 @@ class HelloWorldApi(remote.Service):
 
     @endpoints.method(AlumnoCompletoConImagen, StatusID, path='alumnos/insertarAlumno2', http_method='POST', name='alumnos.insertarAlumno2')
     def insertar_alumno2(self, request):
-        '''
+        """
 
         Función que inserta un alumno en el sistema con o sin imagen.
 
@@ -490,7 +494,7 @@ class HelloWorldApi(remote.Service):
         Ejmplo de llamada CON imagen:
 
         curl -d "nombre=Juan&apellidos=Fernandez&dni=45301218&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" --data-urlencode 'imagen='"$( base64 profile.jpg)"''  -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno2
-        '''
+        """
 
         if v:
             print nombreMicroservicio
@@ -623,7 +627,7 @@ class HelloWorldApi(remote.Service):
             print form_fields
 
 
-        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        #Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
         form_data = urllib.urlencode(form_fields)
         #Realizamos la petición al servicio con los datos pasados al endpoint
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
@@ -1225,7 +1229,7 @@ class HelloWorldApi(remote.Service):
             print "Llamando a: "+url
 
 
-        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        #Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
         form_data = urllib.urlencode(form_fields)
         #Realizamos la petición al servicio con los datos pasados al endpoint
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
@@ -1622,7 +1626,7 @@ class HelloWorldApi(remote.Service):
             print "Llamando a: "+url
 
 
-        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        #Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
         form_data = urllib.urlencode(form_fields)
         #Realizamos la petición al servicio con los datos pasados al endpoint
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
@@ -1973,7 +1977,7 @@ class HelloWorldApi(remote.Service):
             print "Llamando a: "+url
 
 
-        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        #Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
         form_data = urllib.urlencode(form_fields)
         #Realizamos la petición al servicio con los datos pasados al endpoint
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
@@ -2262,7 +2266,7 @@ class HelloWorldApi(remote.Service):
             print "Llamando a: "+url
 
 
-        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        #Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
         form_data = urllib.urlencode(form_fields)
         #Realizamos la petición al servicio con los datos pasados al endpoint
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
@@ -2394,7 +2398,7 @@ class HelloWorldApi(remote.Service):
             print "Llamando a: "+url
 
 
-        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        #Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
         form_data = urllib.urlencode(form_fields)
         #Realizamos la petición al servicio con los datos pasados al endpoint
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
@@ -2526,7 +2530,7 @@ class HelloWorldApi(remote.Service):
             print "Llamando a: "+url
 
 
-        ##Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
+        #Doc de urlfetch: https://cloud.google.com/appengine/docs/python/refdocs/google.appengine.api.urlfetch
         form_data = urllib.urlencode(form_fields)
         #Realizamos la petición al servicio con los datos pasados al endpoint
         result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)

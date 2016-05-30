@@ -42,7 +42,8 @@ class RCA_simple:
         self.idClase=idClase
         self.idAsignatura=idAsignatura
         self.keyNDB = key
-#===Resumen Control Asistencia Complejo ==
+#===Resumen Control Asistencia Complejo ===
+
 """
 Clase que implementa la estructura de los resumenes de controles de asistencia simples (se utilizará tal cual en la base de datos NDB). Estos resumenes recogen todos los controles de asistencia creados para unprofesor, hora, clase y asginatura dados. Estos datos se usarán para mostrar información al usuario
 """

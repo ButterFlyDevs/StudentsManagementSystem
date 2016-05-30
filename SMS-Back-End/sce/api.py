@@ -13,10 +13,6 @@ import datetime
 from NDBlib.gestor import Gestor
 
 
-
-#from NDBlib import EstrutcutrasNDB.ControlAsistencia
-
-
 #Definición del nombre de la aplicación
 app = Flask(__name__)
 
@@ -25,6 +21,7 @@ v=1
 nombreMicroservicio = '\n ## Microservicio SCE ##'
 
 # ===Recurso de prueba el estado del servicio.===
+
 """
 Función usada como prueba de vida del microservicio
 """
@@ -42,7 +39,7 @@ def doSomething():
     return 'SCE MicroService is RUNING!\n'
 
 #######################################
-#   COLECCIÓN Control Asistencia      #
+##   COLECCIÓN Control Asistencia    ##
 #######################################
 
 #Maybe be deprecated
@@ -75,6 +72,7 @@ def  getAllControlesAsistencia():
     return jsonpickle.encode(listaCAs)
 
 # === Insertar un control de asistencia ===
+
 """
 Inserta un control de asistencia en el sistema. Compuesto por muchos controles a estudiantes para una asignatura en una clase con un
 profesor en una fecha y hora determinadas.
@@ -87,7 +85,6 @@ Prueba del método:
 curl -X POST  -H 'content-type: application/json' -d @pruebaJson.json localhost:8003/controlesAsistencia
 El fichero sigue el estandar JSON, ver pruebaJson.json. Se pueden validar los ficheros en webs como http://jsonlint.com/.
 """
-
 @app.route('/controlesAsistencia', methods=['POST'])
 def  insertaControlAsistencia():
 
@@ -105,37 +102,6 @@ def  insertaControlAsistencia():
     #Llamamos a la función de NDBlib que inserta el conjunto
     status = Gestor.insertarConjuntoControlAsistencia(json['controles'])
 
-
-
-    '''
-
-    #Dividimos la fecha en partes usando el separador -
-    fecha = request.form['fecha'].split('-')
-
-    print fecha
-
-    #Creamos un objeto datetime con estas divisiones, siguiendo el formato de datetime:
-
-    #Ejemplo: 05/10/09 18:00 ; date = datetime.datetime(2009, 10, 5, 18, 00)
-    #                 año        mes      día       hora     minutos
-    date = datetime.datetime(int(fecha[2]), int(fecha[1]), int(fecha[0]), int(fecha[3]), int(fecha[4]))
-
-    #Usando el gestor insertamos el objeto en la base de datos, ajustando los datos que nos llegan a los tipos que se esperan.
-    clave=Gestor.insertarControlAsistencia(
-                                        date,
-                                        parseBoolean(request.form['asistencia']),
-                                        parseBoolean(request.form['uniforme']),
-                                        parseBoolean(request.form['retraso']),
-                                        int(request.form['retraso_tiempo']),
-                                        parseBoolean(request.form['retraso_justificado']),
-                                        int(request.form['id_alumno']),
-                                        int(request.form['id_profesor']),
-                                        int(request.form['id_clase']),
-                                        int(request.form['id_asignatura']),
-                                        )
-    '''
-
-
     if v:
         print nombreMicroservicio
         print ' /controlesAsistencia POST insertaControlAsistencia()'
@@ -145,20 +111,16 @@ def  insertaControlAsistencia():
     return str(status)
 
 # ===Obtener controles de Asistenca ===
-"""
-    Devuelve un control de asitencia completo, es decir, un control realizado por un profesor que
-    imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos.
 
-    curl -i -X GET localhost:8003/controlAsistencia/4644337115725824
 """
+Devuelve un control de asitencia completo, es decir, un control realizado por un profesor que
+imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos.
+
+curl -i -X GET localhost:8003/controlAsistencia/4644337115725824
+"""
+
 @app.route('/controlAsistencia/<string:idControlAsistencia>', methods=['GET'])
 def getControlAsistencia(idControlAsistencia):
-    '''
-    Devuelve un control de asitencia completo, es decir, un control realizado por un profesor que
-    imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos.
-
-    curl -i -X GET localhost:8003/controlAsistencia/4644337115725824
-    '''
 
     #Info de seguimiento
     if v:
@@ -169,13 +131,8 @@ def getControlAsistencia(idControlAsistencia):
     #Llamamos al gestor y convertimos su respuesta en un objeto json
     return jsonpickle.encode(Gestor.obtenerControlAsistencia(idControlAsistencia))
 
-
-
-
-###############################################
-#   COLECCIÓN Resumen Control Asistencia      #
-###############################################
 # === OBtener Resumen controles de Asistencia ===
+
 """
 curl -d "idProfesor=3" -i -X POST localhost:8003/resumenesControlesAsistenciaEspecificos
 (Dame todos los controles de asistencia (los resúmenes) realizados por el profesor con idProfesor 4)
@@ -188,14 +145,14 @@ así cuando un profesor quiera ver todos los detalles entonces podrá pinchár y
 eso se encarga otra función.
 Los datos a devolver son:
 
-key = messages.StringField(1, required=True) Clave del resumen para pedir todas los controles en otro momento.
-fecha = messages.StringField(2)
-idclase = messages.StringField(3)
-nombreClase = messages.StringField(4)
-idasignatura = messages.StringField(5)
-nombreAsignatura = messages.StringField(6)
-idprofesor = messages.StringField(7)
-nombreProfesor = messages.StringField(8)
+* key = messages.StringField(1, required=True) Clave del resumen para pedir todas los controles en otro momento.
+* fecha = messages.StringField(2)
+* idclase = messages.StringField(3)
+* nombreClase = messages.StringField(4)
+* idasignatura = messages.StringField(5)
+* nombreAsignatura = messages.StringField(6)
+* idprofesor = messages.StringField(7)
+* nombreProfesor = messages.StringField(8)
 """
 @app.route('/resumenesControlesAsistenciaEspecificos', methods=['POST'])
 def  getResumenesControlesAsistenciaConParametros():
@@ -208,15 +165,15 @@ def  getResumenesControlesAsistenciaConParametros():
     return jsonpickle.encode(Gestor.obtenerResumenesControlAsistencia(idProfesor=request.form['idProfesor']))
 
 ############################################################
-#   COLECCIÓNES AUXILIARES relacionadas de referencia      #
+##   COLECCIÓNES AUXILIARES relacionadas de referencia    ##
 ############################################################
 
 # === Insertar alumno ===
+
 """
 Función usada para insertar un alumno en la base de datos NDB.
 Utiliza la clase Gestor para insertar el alumno. Solamente inserta dos campos: el id del alumno y su nombre.
 """
-
 @app.route('/alumnos', methods=['POST'])
 def insetarAlumno():
     '''
@@ -232,6 +189,7 @@ def insetarAlumno():
     return jsonpickle.encode(Gestor.insertarAlumno(request.form['idAlumno'], request.form['nombreAlumno']))
 
 # === Insertar asignatura ===
+
 """
 Función usada para insertar una asignatura en la base de datos NDB.
 Utiliza la clase Gestor para insertar la asignatura. Solamente inserta dos campos: id de asignatura y su nombre.
@@ -250,6 +208,7 @@ def insetarAsignatura():
 
     return jsonpickle.encode(Gestor.insertarAsignatura(request.form['idAsignatura'], request.form['nombreAsignatura']))
 # === Insertar clase ===
+
 """
 Función usada para insertar una clase en la base de datos NDB.
 Utiliza la clase Gestor para insertar la clase. Solamente inserta dos campos: id de clase y su nombre.
@@ -268,6 +227,7 @@ def insetarClase():
 
     return jsonpickle.encode(Gestor.insertarClase(request.form['idClase'], request.form['nombreClase']))
 # === Insertar profesor ===
+
 """
 Función usada para insertar un profesor en la base de datos NDB.
 Utiliza la clase Gestor para insertar el profesor. Solamente inserta dos campos: id de profesor y su nombre.
