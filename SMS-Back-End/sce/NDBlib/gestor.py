@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+asfdljaslkhfadsjkhfa
+
+"""
+
 from google.appengine.ext.db import Key
-'''
-import EstructurasNDB.ControlAsistencia
-import EstructurasNDB.Resumen_ControlAsistencia
-import EstructurasNDB.Alumnos_NombreID
-import EstructurasNDB.Profesores_NombreID
-import EstructurasNDB.Clases_NombreID
-import EstructurasNDB.Asignaturas_NombreID
-import Estructuras
-'''
 from EstructurasNDB import *
 import datetime
 
@@ -18,6 +14,31 @@ libName='\n ## Gestor NDB ##'
 
 
 def parseBoolean(cadena):
+    """This function does something.
+
+    Args:
+       name (str):  The name to use.
+
+    Kwargs:
+       state (bool): Current state to be in.
+
+    Returns:
+       int.  The return code::
+
+          0 -- Success!
+          1 -- No good.
+          2 -- Try again.
+
+    Raises:
+       AttributeError, KeyError
+
+    A really great idea.  A way you might use me is
+
+    >>> print public_fn_with_googley_docstring(name='foo', state=None)
+    0
+
+    BTW, this always returns 0.  **NEVER** use with :class:`MyPublicClass`.
+    """
     if cadena=='True' or cadena== 1 or cadena == '1' :
         return True
     if cadena=='False' or cadena == 0 or cadena == '0' :
