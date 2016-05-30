@@ -1643,7 +1643,7 @@ class HelloWorldApi(remote.Service):
         #return MensajeRespuesta(message="Todo OK man!")
         #Mandamos la respuesta que nos devuelve la llamada al microservicio:
         return StatusID(status=json['status'], id=int(json['idAsignatura']), statusCode=str(result.status_code))
-        
+
 
     @endpoints.method(ID,MensajeRespuesta,path='asignaturas/delAsignatura', http_method='DELETE', name='asignaturas.delAsignatura')
     def delAsignatura(self, request):
@@ -1936,7 +1936,7 @@ class HelloWorldApi(remote.Service):
 
         return clase
 
-    @endpoints.method(ClaseCompleta, MensajeRespuesta, path='clases/insertarClase', http_method='POST', name='clases.insertarClase')
+    @endpoints.method(ClaseCompleta, StatusID, path='clases/insertarClase', http_method='POST', name='clases.insertarClase')
     def insertarClase(self, request):
         '''
         Introduce una nueva clase en el sistema.
@@ -1987,7 +1987,12 @@ class HelloWorldApi(remote.Service):
             print "Código de estado: "
             print result.status_code
 
-        return MensajeRespuesta(message=result.content)
+
+        json = jsonpickle.decode(result.content)
+
+        #Mandamos la respuesta que nos devuelve la llamada al microservicio:
+        return StatusID(status=json['status'], id=int(json['idClase']), statusCode=str(result.status_code))
+
 
     @endpoints.method(ID,MensajeRespuesta,path='clases/delClase', http_method='DELETE', name='clases.delClase')
     def delClase(self, request):

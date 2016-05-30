@@ -211,7 +211,7 @@ class Gestor:
 
     @classmethod
     def obtenerResumenesControlAsistencia(self, idProfesor=None, idASignatura=None, idClase=None, fechaHora=None):
-        '''
+        """
         Con todos los parámetros a None esta función puede ser llamada con desde 0 a 4 parámetros.
         Debe devolver también nombres (DEBE DEVOLVER UN RCA_complejo)
 
@@ -239,10 +239,10 @@ class Gestor:
         crearemos un tipo de objeto nuevo que contenga todo lo que necesita y por el que no haya que modificar
         la definiión de la BD NDB.
 
-        '''
+        """
         if v:
             print libName
-            print " Llamada a obtenerResumenesControlAsistencia "
+            print " Llamada a NDBlib.gestor.obtenerResumenesControlAsistencia() "
             print locals()
 
         #Creamos una lista de resúmenes que vamos a devoler.
@@ -429,14 +429,22 @@ class Gestor:
         alumno.idAlumno=int(idAlumno)
         alumno.nombreAlumno=nombreAlumno
 
-        nuevoAlumnoClave = alumno.put()
+        salida = {}
+
+        try:
+            nuevoAlumnoClave = alumno.put()
+            salida['status']='OK'
+        except ValueError:
+            salida['status']='FAIL'
 
         #Info de seguimiento
         if v:
             print libName
             print " Return de insertarAlumno: "+str(nuevoAlumnoClave)+'\n'
 
-        return str(nuevoAlumnoClave)
+        salida['id']=nuevoAlumnoClave
+
+        return salida
 
 
     @classmethod
@@ -484,14 +492,22 @@ class Gestor:
         clase.idClase=int(idClase)
         clase.nombreClase=nombreClase
 
-        nuevaClaseClave = clase.put()
+        salida = {}
+
+        try:
+            nuevaClaseClave = clase.put()
+            salida['status']='OK'
+        except ValueError:
+            salida['status']='FAIL'
 
         #Info de seguimiento
         if v:
             print libName
             print " Return de insertarClase: "+str(nuevaClaseClave)+'\n'
 
-        return str(nuevaClaseClave)
+        salida['id']=nuevaClaseClave
+
+        return salida
 
 
     @classmethod

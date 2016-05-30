@@ -172,7 +172,7 @@ def  getResumenesControlesAsistenciaConParametros():
 
     '''
 
-    curl -d "idProfesor=4" -i -X POST localhost:8003/resumenesControlesAsistenciaEspecificos
+    curl -d "idProfesor=3" -i -X POST localhost:8003/resumenesControlesAsistenciaEspecificos
     (Dame todos los controles de asistencia (los resúmenes) realizados por el profesor con idProfesor 4)
 
 
@@ -195,8 +195,8 @@ def  getResumenesControlesAsistenciaConParametros():
     '''
     if v:
         print nombreMicroservicio
-        print ' Request: '+str(request.form)
         print ' Llamando a /resumenesControlesAsistencia POST resumenesControlesAsistencia() \n'
+        print ' Request: '+str(request.form)
 
     return jsonpickle.encode(Gestor.obtenerResumenesControlAsistencia(idProfesor=request.form['idProfesor']))
 
@@ -216,14 +216,13 @@ def insetarAlumno():
         print request.form
 
 
-    status = Gestor.insertarAlumno(request.form['idAlumno'], request.form['nombreAlumno'])
-
-    return status
+    return jsonpickle.encode(Gestor.insertarAlumno(request.form['idAlumno'], request.form['nombreAlumno']))
+    
 
 @app.route('/asignaturas', methods=['POST'])
 def insetarAsignatura():
     '''
-    curl -X POST -d "idAsignatura=1&nombreAsignatura=Frances"  localhost:8003/asignatura
+    curl -X POST -d "idAsignatura=1&nombreAsignatura=Frances"  localhost:8003/asignaturas
     '''
     if v:
         print nombreMicroservicio
@@ -234,10 +233,10 @@ def insetarAsignatura():
 
     return jsonpickle.encode(Gestor.insertarAsignatura(request.form['idAsignatura'], request.form['nombreAsignatura']))
 
-@app.route('/clase', methods=['POST'])
+@app.route('/clases', methods=['POST'])
 def insetarClase():
     '''
-    curl -X POST -d "idClase=1&nombreClase=1AESO"  localhost:8003/clase
+    curl -X POST -d "idClase=1&nombreClase=1AESO"  localhost:8003/clases
     '''
     if v:
         print nombreMicroservicio
@@ -246,9 +245,7 @@ def insetarClase():
         print request.form
 
 
-    status = Gestor.insertarClase(request.form['idClase'], request.form['nombreClase'])
-
-    return status
+    return jsonpickle.encode(Gestor.insertarClase(request.form['idClase'], request.form['nombreClase']))
 
 @app.route('/profesores', methods=['POST'])
 def insertarProfesor():

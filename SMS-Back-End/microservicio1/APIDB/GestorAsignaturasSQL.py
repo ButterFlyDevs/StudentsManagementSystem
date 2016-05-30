@@ -29,6 +29,7 @@ class GestorAsignaturas:
     def nuevaAsignatura(self, nombre):
 
         if v:
+            print apiName
             print 'Calling nuevaAsignatura() with params:'
             print locals()
 
@@ -54,6 +55,7 @@ class GestorAsignaturas:
         Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Asignatura con clave
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
+        idAsignatura=''
         try:
             salida = cursor.execute(query);
             idAsignatura = cursor.lastrowid

@@ -53,7 +53,7 @@ def delAlumnos():
 def postAlumno():
     '''
     Método que inserta un nuevo alumno en el sistema.
-    curl -d "nombre=Juan&dni=45601218Z&direccion=Calle arabl&localidad=Jerez de la frontera&provincia=Granada&fecha_nac=1988-2-6&telefono=677164459" -i -X POST localhost:8002/alumnos
+    curl -d "nombre=Juan&apellidos=Fernandez&dni=45601218&direccion=Calle arabl&localidad=Jerez de la frontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=677164459" -i -X POST localhost:8002/alumnos
     '''
     if v:
         print nombreMicroservicio
@@ -64,7 +64,7 @@ def postAlumno():
         print 'aqui'
         imagen = request.form.get('imagen')
 
-        print imagen
+        #print imagen
 
         salida= "";
 
@@ -91,12 +91,33 @@ def postAlumno():
                                   request.form['telefono'].encode('latin-1'))
 
 
-    if salida == 'OK':
-        return 'OK'
-    else:
-        return jsonpickle.encode(salida, unpicklable=False)
-        #abort(404)
+    if salida['status'] == 'OK':
 
+        #Una vez insertada la asignatura en el SBD llamamos al servicio SCE para que actualice su sistema (### DISPARADOR ###)
+
+        #Conformamos la dirección:
+        module = modules.get_current_module_name()
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="alumnos"
+
+        #Creamos un diccionario con los datos.
+        datos = {
+          "idAlumno": salida['idAlumno'],
+          "nombreAlumno": request.form['nombre']+' '+request.form['apellidos'],
+        }
+        form_data = urllib.urlencode(datos)
+        result=urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+        print 'yeahhhhhhhhhhhhhhhhhhhhhhhhhh';
+        print result.content
+        json = jsonpickle.decode(result.content)
+        if json['status']!='OK':
+            salida['status']='SCE ERROR'
+
+    if v:
+        print ' Return: '+str(salida)
+
+    return jsonpickle.encode(salida)
 
 
 #####################
@@ -590,10 +611,41 @@ def postClase():
     curl -d "curso=3&grupo=C&nivel=ESO" -i -X POST localhost:8002/clases
     '''
     salida = GestorClases.nuevaClase(request.form['curso'], request.form['grupo'], request.form['nivel'])
-    if salida == 'OK':
-        return 'OK'
-    else:
-        abort(404)
+
+
+    if salida['status'] == 'OK':
+
+        #Una vez insertada la asignatura en el SBD llamamos al servicio SCE para que actualice su sistema (### DISPARADOR ###)
+
+        #Conformamos la dirección:
+        module = modules.get_current_module_name()
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        #Añadimos el servicio al que queremos conectarnos.
+        url+="clases"
+        #Componemos el nombre como un solo string
+        nombreClase = request.form['curso']+request.form['grupo']+request.form['nivel']
+        print nombreClase
+        #Creamos un diccionario con los datos.
+        datos = {
+          "idClase": salida['idClase'],
+          "nombreClase": nombreClase,
+        }
+        form_data = urllib.urlencode(datos)
+        result=urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+        print result.content
+        json = jsonpickle.decode(result.content)
+
+        print 'AQUIIIIIIIIIIIIIIIIIIIIII'
+        print json['status']
+
+        if json['status']!='OK':
+            salida['status']='SCE ERROR'
+
+    if v:
+        print ' Return: '+str(salida)
+
+    return jsonpickle.encode(salida)
+
 
 #########################
 #   ENTIDAD CLASE       #

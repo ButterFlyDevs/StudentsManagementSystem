@@ -32,6 +32,10 @@ class GestorClases:
         '''
         Introduce una nueva clase en la base de datos. Son necesarios los tres primeros parámetros.
         '''
+        if v:
+            print apiName
+            print 'Calling nuevaClase() with params:'
+            print locals()
 
         db = dbParams.conecta(); #La conexión está clara.
         #query="INSERT INTO Curso values("+"'"+nombre+"', "+ "'"+id+"');"
@@ -45,13 +49,19 @@ class GestorClases:
         if v:
             print '\n'+query
         cursor = db.cursor()
+        #Sacando los acentos...........
+        mysql_query="SET NAMES 'utf8'"
+        cursor.execute(mysql_query)
+        #-----------------------------#
         salida =''
         '''
         Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Clase con clave
         que estamos pasando ya exista tendremos que tratar esas excepciones y conformar una respuesta entendible.
         '''
+        idClase=''
         try:
             salida = cursor.execute(query);
+            idClase = cursor.lastrowid
         except MySQLdb.Error, e:
             # Get data from database
             try:
@@ -66,10 +76,17 @@ class GestorClases:
         cursor.close()
         db.close()
 
+        #Creamos un diccionario que nos da una salida comprensible de la lib.
+        dic={'status':salida, 'idClase':str(idClase)}
+
+        #Transformación de los estados de MYSQL a mensajes comprensibles.
         if salida==1:
-            return 'OK'
+            dic['status']= 'OK'
+            #return 'OK'
         if salida==1062:
-            return 'Elemento duplicado'
+            dic['status']= 'Elemento duplicado'
+
+        return dic
 
     @classmethod
     def getClases(self):
