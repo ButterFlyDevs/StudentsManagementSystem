@@ -65,6 +65,10 @@ v=True
 
 nombreMicroservicio = '\n ## API Gateway ##'
 
+#Variable del nombre del microservicio de base de datos SBD
+sbd="sbd"
+
+
 # TODO: Replace the following lines with client IDs obtained from the APIs
 # Console or Cloud Console.
 WEB_CLIENT_ID = 'replace this with your web client application ID'
@@ -340,7 +344,7 @@ class HelloWorldApi(remote.Service):
         instance = modules.get_current_instance_id()
 
         #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el recurso al que queremos conectarnos.
         url+="alumnos"
         #result = urllib2.urlopen(url)
@@ -410,7 +414,7 @@ class HelloWorldApi(remote.Service):
         instance = modules.get_current_instance_id()
 
         #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         """
         Según la doc. de urlfetch (ver arriba) no podemos pasar parámetros con el payload, así que como conocemos
@@ -517,7 +521,7 @@ class HelloWorldApi(remote.Service):
 
         #Sea con imagen o sin imagen insertamos al alumno en el sistema:
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el servicio al que queremos conectarnos.
         url+="alumnos"
 
@@ -556,7 +560,7 @@ class HelloWorldApi(remote.Service):
                 urlImagenAlumno = ManejadorImagenes.CreateFile(nombreImagen, request.imagen)
 
                 #Una vez guardada la imagen pasamos a setear el campo imagen del alumno en cuestión.
-                url2 = "http://%s/" % modules.get_hostname(module="microservicio1")
+                url2 = "http://%s/" % modules.get_hostname(module=sbd)
                 url2+="alumnos/"+json['idAlumno']
 
                 #Añadimos la imagen a los datos:
@@ -599,7 +603,7 @@ class HelloWorldApi(remote.Service):
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el servicio al que queremos conectarnos.
         url+="alumnos"
 
@@ -664,7 +668,7 @@ class HelloWorldApi(remote.Service):
             print '\n'
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         '''
         Parece que urlfetch da problemas a al hora de pasar parámetros (payload) cuando se trata del
@@ -745,7 +749,7 @@ class HelloWorldApi(remote.Service):
 
 
 
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Añadimos el recurso al que queremos conectarnos, colección alumnos / alumno con id concreto.
         url+="alumnos/"+request.id
@@ -785,7 +789,7 @@ class HelloWorldApi(remote.Service):
                 #2. Y después se modifican los datos del alumno, añadiendo la url a esta
 
                 #Una vez guardada la imagen pasamos a setear el campo imagen del alumno en cuestión.
-                url2 = "http://%s/" % modules.get_hostname(module="microservicio1")
+                url2 = "http://%s/" % modules.get_hostname(module=sbd)
                 url2+="alumnos/"+str(jsonDatosAlumno['id'])
 
                 #Añadimos la imagen a los datos:
@@ -814,7 +818,7 @@ class HelloWorldApi(remote.Service):
 
                 #3. Se ha de modificar la url en los datos del estudiante
                 #Una vez guardada la imagen pasamos a setear el campo imagen del alumno en cuestión.
-                url2 = "http://%s/" % modules.get_hostname(module="microservicio1")
+                url2 = "http://%s/" % modules.get_hostname(module=sbd)
                 url2+="alumnos/"+str(jsonDatosAlumno['id'])
 
                 #Añadimos la imagen a los datos:
@@ -894,7 +898,7 @@ class HelloWorldApi(remote.Service):
         if request.nombre==None or request.apellidos==None or request.dni==None or request.direccion==None or request.localidad==None or request.provincia==None or request.fecha_nacimiento==None or request.telefono==None:
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Añadimos el recurso al que queremos conectarnos, colección alumnos / alumno con id concreto.
         url+="alumnos/"+request.id
@@ -988,7 +992,7 @@ class HelloWorldApi(remote.Service):
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Añadimos a la url la coleccion (alumnos), el recurso (alumno dado por su dni) y el recurso anidado de este (profesores)
         url+='alumnos/'+str(request.id)+"/profesores"
@@ -1026,7 +1030,7 @@ class HelloWorldApi(remote.Service):
             print ("Ejecución de getAsignaturasAlumno en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='alumnos/'+request.id+"/asignaturas"
         result = urlfetch.fetch(url)
         if v:
@@ -1049,7 +1053,7 @@ class HelloWorldApi(remote.Service):
             print ("Ejecución de getCursosAlumno en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='alumnos/'+request.id+"/clases"
         result = urlfetch.fetch(url)
         if v:
@@ -1081,7 +1085,7 @@ class HelloWorldApi(remote.Service):
         instance = modules.get_current_instance_id()
 
         #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el recurso al que queremos conectarnos.
         url+="profesores"
         if v:
@@ -1125,7 +1129,7 @@ class HelloWorldApi(remote.Service):
         instance = modules.get_current_instance_id()
 
         #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         '''
         Según la doc. de urlfetch (ver arriba) no podemos pasar parámetros con el payload, así que como conocemos
@@ -1208,7 +1212,7 @@ class HelloWorldApi(remote.Service):
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el servicio al que queremos conectarnos.
         url+="profesores"
 
@@ -1280,7 +1284,7 @@ class HelloWorldApi(remote.Service):
             print '\n'
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
 
         #Extraemos el argumento id de la petición y la añadimos a la URL
@@ -1321,7 +1325,7 @@ class HelloWorldApi(remote.Service):
         if request.nombre==None or request.apellidos==None or request.dni==None or request.direccion==None or request.localidad==None or request.provincia==None or request.fecha_nacimiento==None or request.telefono==None:
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Añadimos el recurso al que queremos conectarnos, colección alumnos / alumno con id concreto.
         url+="profesores/"+request.id
@@ -1374,7 +1378,7 @@ class HelloWorldApi(remote.Service):
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Añadimos a la url la coleccion (alumnos), el recurso (alumno dado por su dni) y el recurso anidado de este (profesores)
         url+='profesores/'+str(request.id)+"/alumnos"
@@ -1412,7 +1416,7 @@ class HelloWorldApi(remote.Service):
             print ("Ejecución de getAsignaturasProfesor en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='profesores/'+request.id+"/asignaturas"
         result = urlfetch.fetch(url)
         if v:
@@ -1436,7 +1440,7 @@ class HelloWorldApi(remote.Service):
             print ("Ejecución de getClasesProfesor en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='profesores/'+request.id+"/clases"
         result = urlfetch.fetch(url)
         if v:
@@ -1465,7 +1469,7 @@ class HelloWorldApi(remote.Service):
 
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='profesores/'+request.id+"/asociaciones"
         result = urlfetch.fetch(url)
         if v:
@@ -1508,7 +1512,7 @@ class HelloWorldApi(remote.Service):
         instance = modules.get_current_instance_id()
 
         #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el recurso al que queremos conectarnos.
         url+="asignaturas"
         if v:
@@ -1550,7 +1554,7 @@ class HelloWorldApi(remote.Service):
         instance = modules.get_current_instance_id()
 
         #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Recursos más entidad
         url+='asignaturas/'+request.id
@@ -1611,7 +1615,7 @@ class HelloWorldApi(remote.Service):
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el servicio al que queremos conectarnos.
         url+="asignaturas"
 
@@ -1676,7 +1680,7 @@ class HelloWorldApi(remote.Service):
             print '\n'
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
 
         #Extraemos el argumento id de la petición y la añadimos a la URL
@@ -1717,7 +1721,7 @@ class HelloWorldApi(remote.Service):
         if request.nombre==None or request.id==None:
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Añadimos el recurso al que queremos conectarnos, colección alumnos / alumno con id concreto.
         url+="asignaturas/"+request.id
@@ -1761,7 +1765,7 @@ class HelloWorldApi(remote.Service):
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         #Le decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Añadimos a la url la coleccion (alumnos), el recurso (alumno dado por su dni) y el recurso anidado de este (profesores)
         url+='asignaturas/'+str(request.id)+"/alumnos"
@@ -1803,7 +1807,7 @@ class HelloWorldApi(remote.Service):
             print ("Ejecución de getProfesoresAsignatura en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='asignaturas/'+request.id+"/profesores"
         result = urlfetch.fetch(url)
         if v:
@@ -1826,7 +1830,7 @@ class HelloWorldApi(remote.Service):
             print ("Ejecución de getClasesProfesor en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='asignaturas/'+request.id+"/clases"
         result = urlfetch.fetch(url)
         if v:
@@ -1861,7 +1865,7 @@ class HelloWorldApi(remote.Service):
         instance = modules.get_current_instance_id()
 
         #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el recurso al que queremos conectarnos.
         url+="clases"
         if v:
@@ -1901,7 +1905,7 @@ class HelloWorldApi(remote.Service):
         instance = modules.get_current_instance_id()
 
         #Le decimos al microservicio que queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Recursos más entidad
         url+='clases/'+request.id
@@ -1961,7 +1965,7 @@ class HelloWorldApi(remote.Service):
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el servicio al que queremos conectarnos.
         url+="clases"
 
@@ -2019,7 +2023,7 @@ class HelloWorldApi(remote.Service):
             print '\n'
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
 
         #Extraemos el argumento id de la petición y la añadimos a la URL
@@ -2060,7 +2064,7 @@ class HelloWorldApi(remote.Service):
         if  request.id==None or request.curso==None or request.grupo==None or request.nivel==None:
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
         #Añadimos el recurso al que queremos conectarnos, colección alumnos / alumno con id concreto.
         url+="clases/"+request.id
@@ -2103,7 +2107,7 @@ class HelloWorldApi(remote.Service):
 
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='clases/'+str(request.id)+"/alumnos"
 
         if v:
@@ -2132,7 +2136,7 @@ class HelloWorldApi(remote.Service):
             print ("Ejecución de getProfesoresAsignatura en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='clases/'+request.id+"/profesores"
         result = urlfetch.fetch(url)
         if v:
@@ -2155,7 +2159,7 @@ class HelloWorldApi(remote.Service):
             print ("Ejecución de getAsignaturasProfesor en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='clases/'+request.id+"/asignaturas"
         result = urlfetch.fetch(url)
         if v:
@@ -2176,7 +2180,7 @@ class HelloWorldApi(remote.Service):
             print ("Ejecución de getAsociacionesClase en apigateway")
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         url+='clases/'+request.id+"/asociaciones"
         result = urlfetch.fetch(url)
         if v:
@@ -2208,7 +2212,7 @@ class HelloWorldApi(remote.Service):
         instance = modules.get_current_instance_id()
 
         #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el recurso al que queremos conectarnos.
         url+="matriculas"
         if v:
@@ -2251,7 +2255,7 @@ class HelloWorldApi(remote.Service):
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el servicio al que queremos conectarnos.
         url+="matriculas"
 
@@ -2303,7 +2307,7 @@ class HelloWorldApi(remote.Service):
             print '\n'
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
 
         #Extraemos el argumento id de la petición y la añadimos a la URL
@@ -2341,7 +2345,7 @@ class HelloWorldApi(remote.Service):
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el recurso al que queremos conectarnos.
         url+="impartes"
         if v:
@@ -2383,7 +2387,7 @@ class HelloWorldApi(remote.Service):
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el servicio al que queremos conectarnos.
         url+="impartes"
 
@@ -2435,7 +2439,7 @@ class HelloWorldApi(remote.Service):
             print '\n'
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
 
         #Extraemos el argumento id de la petición y la añadimos a la URL
@@ -2473,7 +2477,7 @@ class HelloWorldApi(remote.Service):
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el recurso al que queremos conectarnos.
         url+="asociaciones"
         if v:
@@ -2515,7 +2519,7 @@ class HelloWorldApi(remote.Service):
             raise endpoints.BadRequestException('Peticion erronea, faltan datos.')
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el servicio al que queremos conectarnos.
         url+="asociaciones"
 
@@ -2567,7 +2571,7 @@ class HelloWorldApi(remote.Service):
             print '\n'
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
 
 
         #Extraemos el argumento id de la petición y la añadimos a la URL
@@ -2601,7 +2605,7 @@ class HelloWorldApi(remote.Service):
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el recurso al que queremos conectarnos.
         url+="asociaciones/"+request.id
         if v:
@@ -2651,7 +2655,7 @@ class HelloWorldApi(remote.Service):
         module = modules.get_current_module_name()
         instance = modules.get_current_instance_id()
         #Leclear decimos a que microservicio queremos conectarnos (solo usando el nombre del mismo), GAE descubre su URL solo.
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el recurso al que queremos conectarnos.
         url+="asociaciones/"+request.id+"/alumnos"
         result = urlfetch.fetch(url)
@@ -3008,7 +3012,7 @@ class HelloWorldApi(remote.Service):
             print ' Request: \n '+str(request)+'\n'
 
         #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module="microservicio1")
+        url = "http://%s/" % modules.get_hostname(module=sbd)
         #Añadimos el metodo al que queremos conectarnos.
         url+="comprobarAccesoUsuario"
 

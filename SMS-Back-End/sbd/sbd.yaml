@@ -1,0 +1,20 @@
+application: 65748238734626
+module: sbd
+version: uno
+runtime: python27
+api_version: 1
+threadsafe: true
+
+automatic_scaling:
+  min_idle_instances: 2
+  max_pending_latency: 1s
+
+handlers:
+- url: /.*
+  script: api.app
+
+#Especificamos las librerías que queremos usar de las que tienen disponibles en GAE y que no es necesario
+#añadir manualmente en /lib, como MySQLdb para la conexión con el la instancia de SQL
+libraries:
+- name: MySQLdb
+  version: "latest"

@@ -1,14 +1,14 @@
-application: simple-sample
+application: sms
 
 dispatch:
-# Default module serves the typical web resources and all static resources.
+# microsericio principal, puerta de entrada a la app
 - url: "*/favicon.ico"
-  module: APIGateway
+  module: apigateway
 
-# Send all mobile traffic to the mobile frontend.
-- url: "*/microservicio1/*"
-  module: microservicio1
+# microservicio de base de datos base del sistema
+- url: "*/sbd/*"
+  module: sbd
 
-# Send all work to the one static backend.
-- url: "*/microservicio2/*"
-  module: microservicio2
+# microservicio de control de estudiantes
+- url: "*/sce/*"
+  module: sce

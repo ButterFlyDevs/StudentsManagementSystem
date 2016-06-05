@@ -1,5 +1,12 @@
 # Students Management System
 
+![License](http://img.shields.io/badge/license-GPLv3-blue.svg)
+![Status](https://img.shields.io/badge/status-pre--alpha-red.svg)
+![coverage](https://img.shields.io/badge/coverage-10%25-orange.svg)
+
+<iframe src="https://ghbtns.com/github-btn.html?user=ButterFlyDevs&repo=StudentsManagementSystem&type=fork&count=true" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
+
+
 SMS es un sistema de gestión basado en una **aplicación web** para centros docentes que agiliza y mejora la administración de estudiantes haciéndola más simple y eficiente.
 
 ###Arquitectura del sistema

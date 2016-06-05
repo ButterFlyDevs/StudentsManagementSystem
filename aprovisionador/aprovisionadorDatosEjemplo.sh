@@ -5,8 +5,23 @@
 
 ##### Aprovisionador que sólo hace uso de la APIG para su interacción con el sistema ####
 
-
+cat << "EOF"
+ ▄▄▄▄▄▄▄▄▄▄▄  ▄▄       ▄▄  ▄▄▄▄▄▄▄▄▄▄▄
+▐░░░░░░░░░░░▌▐░░▌     ▐░░▌▐░░░░░░░░░░░▌
+▐░█▀▀▀▀▀▀▀▀▀ ▐░▌░▌   ▐░▐░▌▐░█▀▀▀▀▀▀▀▀▀
+▐░█▄▄▄▄▄▄▄▄▄ ▐░▌ ▐░▐░▌ ▐░▌▐░█▄▄▄▄▄▄▄▄▄
+▐░░░░░░░░░░░▌▐░▌  ▐░▌  ▐░▌▐░░░░░░░░░░░▌
+ ▀▀▀▀▀▀▀▀▀█░▌▐░▌   ▀   ▐░▌ ▀▀▀▀▀▀▀▀▀█░▌
+ ▄▄▄▄▄▄▄▄▄█░▌▐░▌       ▐░▌ ▄▄▄▄▄▄▄▄▄█░▌
+▐░░░░░░░░░░░▌▐░▌       ▐░▌▐░░░░░░░░░░░▌
+ ▀▀▀▀▀▀▀▀▀▀▀  ▀         ▀  ▀▀▀▀▀▀▀▀▀▀▀
+EOF
 echo -e "\n### Aprovisionador de datos de muestra del sistema ###\n"
+
+echo -e "\n### Reseteando Base de Datos en microSBD ###\n"
+mysql -u root -p'root' < ../SMS-Back-End/sbd/APIDB/DBCreatorv1.sql
+
+sleep 3
 
 #Insercción de 6 alumnos
 

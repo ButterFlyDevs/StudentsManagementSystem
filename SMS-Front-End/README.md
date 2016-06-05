@@ -1,49 +1,6 @@
-![status: inactive](https://img.shields.io/badge/status-inactive-red.svg)
+![](frontend.png)
 
-This project has moved.  
+Implementación de la interfaz gŕafica del usuario, usando el framework de javascript [AngularJS](https://angularjs.org/) y el kit de css [UIKit](http://getuikit.com/). Hace uso del microservicio APIGateway del Back-End para todas sus operaciones. Implementada como otra aplicación más para Google App Engine distinta (a todos los efectos) se entiende como  otro *microservicio* del proyecto.
 
-For new work on this check out [python-docs-samples/appengine/angular](https://github.com/GoogleCloudPlatform/python-docs-samples/tree/master/appengine/angular)
-
-## App Engine AngularJS "Hello World" Python
-
-A simple [AngularJS](http://angularjs.org/) CRUD application
-for [Google App Engine](https://appengine.google.com/).
-
-Author: Fred Sauer <fredsa@google.com>
-
-
-## Project setup
-
-1. Install the [App Engine Python SDK](https://developers.google.com/appengine/downloads)
-
-
-## Testing the app locally
-
-To run the app locally:
-
-```
-dev_appserver.py .
-```
-
-
-## Deploying
-
-To deploy the application:
-
-1. Use the [Google Cloud Console](https://cloud.google.com/console) to create a project
-1. Replace `your-app-id` in `app.yaml` with the project id from the previous step
-1. Deploy the application:
-
-```
-appcfg.py --oauth2 update .
-```
-
-
-## Contributing changes
-
-See [CONTRIB.md](CONTRIB.md)
-
-
-# Licensing
-
-See [LICENSE](LICENSE)
+![License](http://img.shields.io/badge/license-GPLv3-blue.svg)
+![coverage](https://img.shields.io/badge/coverage-0%25-red.svg)
