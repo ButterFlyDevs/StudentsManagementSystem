@@ -4,3 +4,5 @@ Conforma el conjunto de microservicios que forman el back end de la aplicación,
 
 
 ![](backend.png)
+
+> Para lanzar todo el subsistema podemos ejecutar el script <code>run.sh</code>, que pone en ejecución cada servicio bajo el mismo sevidor de desarrollo asignando puertos de conexión específicos.

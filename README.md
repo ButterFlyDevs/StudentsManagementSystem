@@ -1,36 +1,46 @@
-# Students Management System
+![](sms.png)
 
 ![License](http://img.shields.io/badge/license-GPLv3-blue.svg)
 ![Status](https://img.shields.io/badge/status-pre--alpha-red.svg)
 ![coverage](https://img.shields.io/badge/coverage-10%25-orange.svg)
 
-<iframe src="https://ghbtns.com/github-btn.html?user=ButterFlyDevs&repo=StudentsManagementSystem&type=fork&count=true" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
 
+**S**tudent **M**anagement **S**ystem en un agilizador de procesos para centros docentes diseñado para mejorar la recolección, gestión y análisis de datos académicos en tiempo real, potenciando y haciendo más fácil la toma de decisiones, análisis de estado y detección de problemas en centros educativos.
 
-SMS es un sistema de gestión basado en una **aplicación web** para centros docentes que agiliza y mejora la administración de estudiantes haciéndola más simple y eficiente.
+####Arquitectura del sistema
 
-###Arquitectura del sistema
+El diseño de la aplicación está basado en microservicios, distribuyendo su funcionamiento en distintos nodos que de forma separada cumplen una función concreta e independiente del resto pero contribuyendo a la lógica total de la aplicación.
 
-El diseño de la aplicación está basado en microservicios, distribuyendo su funcionamiento en distintos nodos que de forma separada cumplen una función concreta e independiente del resto. Cada uno de estos servicios cuenta con sus propios recursos en la nube y pueden escalar de forma independiente tanto como lo necesiten, pueden ser desarrollados en lenguajes diferentes y tener acceso a servicios distintos o comunes dentro de la red de Google.
+ Cada uno de estos servicios cuenta con sus propios recursos en la nube y pueden escalar de forma independiente tanto como lo necesiten, pueden ser desarrollados en lenguajes diferentes y tener acceso a servicios distintos o comunes dentro de la red de Google.
 
 El siguiente esquema refleja el diseño general:
 
 ![](documentacion/img/GAEApproach.jpg)
 
-####Ejecución local
+Aunque SMS está pensado para correr en **Google App Engine** es fácilmente adaptable a una ejecución local en máquinas privadas con algunas modificiones relativamente simples.
 
-Para testear la aplicación es posible ejecutarla al completo en cualquier entorno local, para ello el único requisito previo será haber ejecutado el fichero de requisitos que descarga el SDK de GAE necesario para correr en modo desarrollador algunos de los servicios que la aplicación usa y ejecutar el lanzador **runAll.sh**. En caso de que quiera detenerse la ejecución y volver a lanzarse deberán de matarse los procesos en ejecución del servidor de desarrollo, con ``` kill -9 <process PID> ``  por ejemplo.
+*SMS es un proyecto Open Source que espera estar en producción muy pronto para un conjunto de centros con unas necesidades muy características que son en las que se está enfocando el desarrollo. A pesar de esto la idea es construirlo tan modularizable que sea fácilmente adaptable, extensible y rediseñable para cualquier necesidad específica. *
 
-Si sólo se quiere lanzar la ejeución del BackEnd debe lanzarse el script **runBackEnd-StandAlone.sh**, con el que se lanzan los tres módulos. En este caso la detención del servidor de desarrollo detiene los tres módulos.
 
-##### Ejecución de test
+####¿Cómo contribuir al proyecto?
 
-Los test unitarios se ejecutan con `unittest` y el test de cobertura con `coverage`. Después de ejecutar los tests unitarios, se genera la información de cobertura.
+Si quieres colaborar con el proyecto tan solo tienes que hacer un **fork** del repositorio, realizar cualquier mejora o modificación del código y proponer un **pull-request**.
+Pero antes de nada te aconsejamos que leas el fichero CONTRIBUTING.md donde detallamos mejor los detalles.
 
-```
-sudo apt-get install python-coverage
-cd StudentsManagementSystem/SMS-Back-End/microservicio1/APIDB/test
-python testUnitario.py
-python-coverage run -m unittest discover
-python-coverage report -m
-```
+¿Te animas a participar en el proyecto?
+
+#####Stack Tech
+-------------
+
+A continuación la lista de las principales tecnologías que usamos, por el momento, en el desarrollo:
+
+- [Javascript](https://www.javascript.com/)
+- [AngularJS](https://angularjs.org/)
+- [HTML5](https://www.w3.org/TR/html5/)
+- [UIkit](http://getuikit.com/)
+- [Python](https://www.python.org/)
+- [Flask](http://flask.pocoo.org/)
+- [gRPC](http://www.grpc.io/)
+- [JSON](http://www.json.org/json-es.html)
+- [MySQL](https://www.mysql.com/)
+- [Google Cloud Platform](https://cloud.google.com/)
