@@ -7,3 +7,4 @@ Formato: num commit;fecha del commit;lineas UI;lineas APIG;lineas mSBD;lineas mS
 198;2016-05-24;6271;3227;6031;1030
 207;2016-05-30;6271;3227;6031;27413
 217;2016-06-05;6482;3252;7095;2180
+218;2016-06-05;0;0;0;0
