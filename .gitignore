@@ -1,11 +1,8 @@
 *.pyc
 google_appengine/
 .coverage
-SMS-Back-End/microservicio1/lib/
-SMS-Back-End/microservicio1/APIDB/productionCloudSQLInstanceINFO.py
-
-SMS-Back-End/microservicio2/lib/
-SMS-Back-End/microservicio2/key.json
+SMS-Back-End/sbd/lib/
+SMS-Back-End/sbd/APIDB/productionCloudSQLInstanceINFO.py
 
 SMS-Back-End/sce/lib/
 
