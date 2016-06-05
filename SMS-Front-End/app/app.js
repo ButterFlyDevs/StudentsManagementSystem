@@ -1882,8 +1882,8 @@ routerApp.controller('ControladorCE-asistencia-historico', function($scope){
 
   $scope.hayrespuesta = false;
 
-  gapi.client.helloworld.controles.getResumenes({'idProfesor':'3' }).execute(function(resp){
-    console.log('calling controles.getResumenes with idProfesor = 3');
+  gapi.client.helloworld.controles.getResumenes({'idProfesor': $scope.currentUser.id }).execute(function(resp){
+    console.log('calling controles.getResumenes with idProfesor = '+$scope.currentUser.id);
     console.log(resp);
     $scope.resumenes=resp.resumenes;
     $scope.hayrespuesta = true;
