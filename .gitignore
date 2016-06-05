@@ -1,10 +1,13 @@
 *.pyc
 google_appengine/
 .coverage
+
 SMS-Back-End/sbd/lib/
 SMS-Back-End/sbd/APIDB/productionCloudSQLInstanceINFO.py
+SMS-Back-End/sbd/docs/_build/
 
 SMS-Back-End/sce/lib/
+SMS-Back-End/sce/build/
 
 SMS-Back-End/apigateway/lib/
 SMS-Front-End/anotaciones.md
@@ -12,8 +15,3 @@ SMS-Front-End/anotaciones.md
 _site/
 
 lines.txt
-
-os
-
-re
-SMS-Back-End/sce/build/
