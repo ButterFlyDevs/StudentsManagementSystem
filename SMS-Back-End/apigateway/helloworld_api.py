@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 
 Hello World API implemented using Google Cloud Endpoints.
