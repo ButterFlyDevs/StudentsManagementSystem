@@ -15,3 +15,7 @@ El acceso a este microservicio se realiza través de una Api Rest escrita en Pyt
 
 
 ![](diagrama.png)
+
+
+###### Documentación
+La documentación en formato html de este microservicio se general ejecutando `make html` dentro del directorio docs.

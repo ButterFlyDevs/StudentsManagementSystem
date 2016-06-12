@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+Api Rest del microservicio SCE.
+
+.. note::
+    There are many other directives such as versionadded, versionchanged,
+    rubric, centered, ... See the sphinx documentation for more details.
+    ApiRest construida con Flask
+
+"""
 
 ######################################################
 ## DEFINICIÓN DE LA API REST del MICROSERVICIO SCE  ##
@@ -42,7 +51,7 @@ def doSomething():
 ##   COLECCIÓN Control Asistencia    ##
 #######################################
 
-#Maybe be deprecated
+#Maybe deprecated
 @app.route('/controlesAsistencia', methods=['GET'])
 def  getAllControlesAsistencia():
     '''
@@ -176,9 +185,9 @@ Utiliza la clase Gestor para insertar el alumno. Solamente inserta dos campos: e
 """
 @app.route('/alumnos', methods=['POST'])
 def insetarAlumno():
-    '''
+    """
     curl -X POST -d "idAlumno=1&nombreAlumno=Fernando"  localhost:8003/alumnos
-    '''
+    """
     if v:
         print nombreMicroservicio
         print ' Llamando a /alumnos POST insertarAlumno()'

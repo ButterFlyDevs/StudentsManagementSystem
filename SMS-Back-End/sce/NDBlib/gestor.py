@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-asfdljaslkhfadsjkhfa
-
+Wrapper (envoltorio) de la librería ndb que conecta con Cloud Datastore
 """
 
 from google.appengine.ext.db import Key
 from EstructurasNDB import *
 import datetime
+
+#import logging
 
 #Para activar/desactivar el modo verbose para muestra de mensajes.
 v = 1
@@ -14,31 +15,6 @@ libName='\n ## Gestor NDB ##'
 
 
 def parseBoolean(cadena):
-    """This function does something.
-
-    Args:
-       name (str):  The name to use.
-
-    Kwargs:
-       state (bool): Current state to be in.
-
-    Returns:
-       int.  The return code::
-
-          0 -- Success!
-          1 -- No good.
-          2 -- Try again.
-
-    Raises:
-       AttributeError, KeyError
-
-    A really great idea.  A way you might use me is
-
-    >>> print public_fn_with_googley_docstring(name='foo', state=None)
-    0
-
-    BTW, this always returns 0.  **NEVER** use with :class:`MyPublicClass`.
-    """
     if cadena=='True' or cadena== 1 or cadena == '1' :
         return True
     if cadena=='False' or cadena == 0 or cadena == '0' :
@@ -414,9 +390,29 @@ class Gestor:
 
         return nuevoRCA_clave
 
+    """
+        Métodos referentes al tipo (kind) Alumno
+    """
 
     @classmethod
-    def insertarAlumno(self, idAlumno, nombreAlumno):
+    def insertarAlumno(self, idAlumno, nombreApellidosAlumno):
+        """
+        Inserta un alumno en el datastore.
+
+        :param idAlumno: id del alumno en la base de datos relacional
+        :param nombreApellidosAlumno: nombre y apellidos del alumno
+        :type idAlumno: int
+        :type nombreApellidosAlumno: string
+        :returns: Mensaje de control
+        :rtype: diccionario
+
+        :Ejemplo:
+
+        >>> Gestor.insertarAlumno(231143,'nombreEjemplo')
+        {'status' : 'OK'}
+        >>> Gestor.insertarAlumno(231143,'otroNombre')
+        {'status' : 'FAIL', 'info' : 'Alumno con id 231143 ya existe.'}
+        """
 
         #Info de seguimiento
         if v:
@@ -425,26 +421,115 @@ class Gestor:
             print locals()
             print '\n'
 
-        alumno = Alumno()
-        alumno.idAlumno=int(idAlumno)
-        alumno.nombreAlumno=nombreAlumno
-
         salida = {}
 
-        try:
-            nuevoAlumnoClave = alumno.put()
-            salida['status']='OK'
-        except ValueError:
+        #Comprobamos si existe ya un alumno con ese id.
+        consulta = Alumno.query(Alumno.idAlumno == idAlumno)
+        if (consulta.count() == 1):
             salida['status']='FAIL'
+            salida['info']='Alumno con id '+str(idAlumno)+' ya existe.'
+
+        #Si no existe, lo introducimos:
+        else:
+            alumno = Alumno(idAlumno=int(idAlumno), nombreAlumno=nombreApellidosAlumno)
+
+            try:
+                nuevoAlumnoClave = alumno.put()
+                salida['status']='OK'
+            except ValueError, Argument:
+                salida['status']='FAIL'
+                salida['info']=Argument
+
+            #Info de seguimiento
+            if v:
+                print libName
+                print " Return de insertarAlumno: "+str(nuevoAlumnoClave)+'\n'
+
+        return salida
+
+
+    @classmethod
+    def modificarAlumno(self, idAlumno, nombreApellidosAlumno):
+        """
+        Modifica el nombre de un alumno guardado en el datastore, que previamente
+        debe existir.
+
+        :param idAlumno: id del alumno en la base de datos relacional
+        :param nombreApellidosAlumno: nombre y apellidos del alumno
+        :type idAlumno: int
+        :type nombreApellidosAlumno: string
+        :returns: Mensaje de control
+        :rtype: diccionario
+
+        :Ejemplo:
+
+        >>> Gestor.modificarAlumno(231143,'nombreEjemplo')
+        {'status' : 'OK'}
+        >>> Gestor.modificarAlumno(224,'nombreEjemplo')
+        {'status' : 'FAIL', 'info' : 'Alumno con id 224 no existe.'}
+        """
 
         #Info de seguimiento
         if v:
             print libName
-            print " Return de insertarAlumno: "+str(nuevoAlumnoClave)+'\n'
+            print " Llamada a modificarAlumno con params: "
+            print locals()
+            print '\n'
 
-        salida['id']=nuevoAlumnoClave
+        salida = {}
+
+        #Comprobamos si existe el alumno para modificarlo con el id pasado.
+        consulta = Alumno.query(Alumno.idAlumno == idAlumno)
+        if (consulta.count() == 1):
+            try:
+                alumno = consulta.get()
+                alumno.nombreAlumno = nombreApellidosAlumno
+                alumno.put()
+                salida['status']='OK'
+            except ValueError, Argument:
+                salida['status']='FAIL'
+                salida['info']=Argument
+        else:
+            salida['status']='FAIL'
+            salida['info']='Alumno con id '+str(idAlumno)+' no existe en el sistema'
 
         return salida
+
+    @classmethod
+    def eliminarAlumno(self, idAlumno):
+        """
+        Elimina el estudiante con id idAlumno, en caso de que exista.
+        """
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Llamada a eliminarAlumno con params: "
+            print locals()
+            print '\n'
+
+        #Buscamos al alumno con id idAlumno
+        consulta = Alumno.query(Alumno.idAlumno == idAlumno)
+
+        alumno =  consulta.get()
+
+        if alumno:
+            alumno.key.delete()
+
+        salida = {}
+
+        consulta = Alumno.query(Alumno.idAlumno == idAlumno)
+
+        if (consulta.count() == 0):
+            salida['status']='OK'
+        else:
+            salida['status']='FAIL'
+
+
+        # salida['id']=nuevoAlumnoClave
+
+        return salida
+
 
 
     @classmethod
