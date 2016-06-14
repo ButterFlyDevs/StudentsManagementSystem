@@ -79,36 +79,59 @@ def  getAllControlesAsistencia():
 
     return jsonpickle.encode(listaCAs)
 
-# === Insertar un control de asistencia ===
-
-"""
-Inserta un control de asistencia en el sistema. Compuesto por muchos controles a estudiantes para una asignatura en una clase con un
-profesor en una fecha y hora determinadas.
-
-
-Debería recibir una lista de controles de asistencia sin fecha ni hora porque se la colocará este microservicio (para evitar múltiples problemas)
-Esta lista de controles se envía en formato JSON
-
-Prueba del método:
-curl -X POST  -H 'content-type: application/json' -d @ejemploControlAsistencia.json localhost:8003/controlesAsistencia
-El fichero sigue el estandar JSON, ver pruebaJson.json. Se pueden validar los ficheros en webs como http://jsonlint.com/.
-"""
 @app.route('/controlesAsistencia', methods=['POST'])
 def  insertaControlAsistencia():
+    """
+    Inserta un control de asistencia en el sistema. Compuesto por muchos controles a estudiantes para una asignatura en una clase con un
+    profesor en una fecha y hora determinadas.
 
+
+    Debería recibir una lista de controles de asistencia sin fecha ni hora porque se la colocará este microservicio (para evitar múltiples problemas)
+    Esta lista de controles se envía en formato JSON
+
+    Prueba del método:
+    curl -X POST  -H 'content-type: application/json' -d @ejemploControlAsistencia.json localhost:8003/controlesAsistencia
+    El fichero sigue el estandar JSON, ver ejemploControlAsistencia.json. Se pueden validar los ficheros en webs como http://jsonlint.com/.
+
+    Ejemlpo::
+        {
+        	"microControlesAsistencia": [
+            {
+          	  "asistencia" : 1,
+          	  "retraso": 0,
+              "retraso_tiempo" : 0,
+              "retraso_justificado" : 0,
+              "uniforme" : 1,
+              "id_alumno" : 11
+          	},
+            {
+              "asistencia" : 0,
+          	  "retraso": 1,
+              "retraso_tiempo" : 1,
+              "retraso_justificado" : 1,
+              "uniforme" : 0,
+              "id_alumno" : 15
+          	}
+          ],
+        	"id_profesor" : 22,
+        	"id_clase" : 33,
+        	"id_asignatura" : 44
+        }
+    """
     #Extraemos el JSON de la petición.
     json = request.get_json()
 
     if v:
         print nombreMicroservicio
         print ' Llamando a /controlesAsistencia POST insertaControlAsistencia()'
-        print str(len(json['controles'])) +' controles recibidos\n'
+        print ' '+str(len(json['microControlesAsistencia'])) +' controles recibidos\n'
         print " Controles: "
         print json
+        print '\n'
 
 
     #Llamamos a la función de NDBlib que inserta el conjunto
-    status = Gestor.insertarControlAsistencia(json['controles'])
+    status = Gestor.insertarControlAsistencia(json)
 
     if v:
         print nombreMicroservicio
@@ -124,7 +147,7 @@ def  insertaControlAsistencia():
 Devuelve un control de asitencia completo, es decir, un control realizado por un profesor que
 imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos.
 
-curl -i -X GET localhost:8003/controlAsistencia/4644337115725824
+curl -i -X GET localhost:8003/controlAsistencia/4996180836614144
 """
 
 @app.route('/controlAsistencia/<string:idControlAsistencia>', methods=['GET'])
@@ -142,7 +165,7 @@ def getControlAsistencia(idControlAsistencia):
 # === OBtener Resumen controles de Asistencia ===
 
 """
-curl -d "idProfesor=3" -i -X POST localhost:8003/resumenesControlesAsistenciaEspecificos
+curl -d "idProfesor=22" -i -X POST localhost:8003/resumenesControlesAsistencia
 (Dame todos los controles de asistencia (los resúmenes) realizados por el profesor con idProfesor 4)
 
 
@@ -162,7 +185,7 @@ Los datos a devolver son:
 * idprofesor = messages.StringField(7)
 * nombreProfesor = messages.StringField(8)
 """
-@app.route('/resumenesControlesAsistenciaEspecificos', methods=['POST'])
+@app.route('/resumenesControlesAsistencia', methods=['POST'])
 def  getResumenesControlesAsistenciaConParametros():
 
     if v:

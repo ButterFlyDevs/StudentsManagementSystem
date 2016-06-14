@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Wrapper (envoltorio) de la librería ndb que conecta con Cloud Datastore
+Wrapper (envoltorio) de la librería ndb que conecta con Cloud Datastore y lógica del sistema
 """
 
 from google.appengine.ext.db import Key
@@ -20,24 +20,11 @@ def parseBoolean(cadena):
     if cadena=='False' or cadena == 0 or cadena == '0' :
         return False
 
-
 def boolToInt(boolean):
     if boolean == True:
         return 1
     if boolean == False:
         return 0
-
-class RCA:
-
-    def __init__(self):
-        key = ""
-        fecha = ""
-        idClase = ""
-        nombreClase = ""
-        idAsignatura = ""
-        nombreAsignatura = ""
-        idProfesor = ""
-        nombreProfesor = ""
 
 class Gestor:
 
@@ -55,25 +42,29 @@ class Gestor:
         pruebaDev = prueba_key.get()
         print pruebaDev
 
-
-
-
-    @classmethod
-    def obtenerALLCA(self):
-        '''
-        Devuelve una lista completa con todos los controles de asistencia.
-        '''
-        listaCA = []
-        listaCA = ControlAsistencia.devolver_todo().fetch(100000)
-
-        return listaCA
+    #Métodos relacionados con la petición de controles de asistencia completos o resúmenes.
+    #----------------------------------------------------------------------------------------------------------------#
 
     @classmethod
     def obtenerControlAsistencia(self, id):
-        '''
-        Devuelve un control de asistencia completo realizado, con la lista de todos los alumnos, y los datos de ese
-        control en concreto.
-        '''
+        """
+        Devuelve el control de asistencia completo asociado al id pasado en caso de existir en el DataStore
+
+        :param id: Identificador del control de asistencia en el DataStore
+        :type id: entero
+        :returns: Conjunto de datos que conforman un control de asistencia al completo
+        :rtype: diccionario
+
+        Ejemplo de salida::
+
+            {"nombreAsignatura": "nombre de la asig", "nombreClase": "nombreEjemplo", "idAsignatura": 44, "nombreProfesor": "profesorNuevo",
+             "controles": [{"nombreAlumno": "nombe y Apellidos", "idAlumno": 11, "uniforme": true, "retrasoJustificado": false,
+                            "retraso": 0, "retrasoTiempo": 0, "asistencia": 1},
+                           {"nombreAlumno": "nombre y Apellidos", "idAlumno": 15, "uniforme": false, "retrasoJustificado": true,
+                            "retraso": 1, "retrasoTiempo": 1, "asistencia": 0}],
+              "idProfesor": 22, "idClase": 33, "fechaHora": "14-06-2016 15:58"}
+
+        """
         #Una vez obtenido la clave del resumen vamos a obtener todas los controles que se realizaron en
         #ese control y para ello lo primero que tenemos que recuperar es la lista de las claves de los controles
         #refiriéndonos con control al control que se hace de un estudiante individual.
@@ -81,13 +72,18 @@ class Gestor:
         print 'KEY'
         print id
         #Convertimos el id recibido en una clave procesable por ndb
-        key = ndb.Key('ResumenControlAsistencia', long(id));
+        key = ndb.Key('resumenControlAsistencia', long(id));
         print key
 
-        #Realizamos la consulta
-        query = ResumenControlAsistencia.query(ResumenControlAsistencia.key == key)
+        #Extraemos del DataStore la entidad resumenControlAsistencia por el id que nos pasan.
+        query = resumenControlAsistencia.query(resumenControlAsistencia.key == key)
 
         print '\n PROCESO OBTENCIÓN CONTROL ASISTENCIA '
+
+
+        #Diccionario, objeto principal que vamos a devolver:
+
+        controlAsistencia = {}
 
         #Comprobamos cuantos resultados hemos obtenido.
         #https://cloud.google.com/appengine/docs/python/ndb/queryclass#Query_count
@@ -103,117 +99,112 @@ class Gestor:
             #estudiante en concreto al que llegaremos gracias a que resumen tiene sus claves almacenadas.
 
             #Rescatamos la lista de Controles de Asistencia
-            listaKeysMCA=resumen.lista_idCA
+            listaKeysMCA=resumen.listaMCAs
 
-
-            #Vamos a usar algo parecido a los struct de C para estructurar un objeto que devolver.
-            #http://docs.python.org.ar/tutorial/2/classes.html
-
-            class Control:
-                pass
-            class CA:
-                pass
-
+            #Un objeto Control de Asistencia como el que vamos a devolver tiene una lista de microcontroles (los controles de los estudiantes individuales)
             listaControles = []
 
-            #Recorremos la lista (que contiene las claves de los mcontroles) para rellenar las litas de controles
+            #Recorremos la lista de claves de MCAs y vamos extrayendo con estas claves cada uno de la base de datos.
             for key in listaKeysMCA:
-                query = ControlAsistencia.query(ControlAsistencia.key==key)
+                #Buscamos el microcontrol en la base de datos.
+                query = microControlAsistencia.query(microControlAsistencia.key==key)
                 #mc=mcontrol=microcontrol
                 mc=query.get()
                 print 'microcontrol leido'
                 print mc
-                #Creamos un registro de Control vacío
-                control = Control()
-                #Llenamos los campos del registro con lo que nos interesa
-                control.asistencia=boolToInt(mc.asistencia)
-                control.retraso=mc.retraso
-                control.retrasoJustificado=mc.retraso_justificado
-                control.uniforme=mc.uniforme
-                control.idAlumno=mc.id_alumno
+
+                #Creamos un pequeño diccionario donde guardar los datos leidos.
+                control = {}
+
+                #Llenamos los campos del dict con lo que nos interesa
+                control["asistencia"]=boolToInt(mc.asistencia)
+                control["retraso"]=mc.retraso
+                control["retrasoJustificado"]=mc.retrasoJustificado
+                control["retrasoTiempo"]=mc.retrasoTiempo
+                control["uniforme"]=mc.uniforme
+                control["idAlumno"]=mc.idAlumno
 
                 #Además tb queremos añadir su nombre para que se vea en la interfaz
-                query = Alumno.query(Alumno.idAlumno==int(mc.id_alumno))
+                query = Alumno.query(Alumno.idAlumno==int(mc.idAlumno))
                 alumno = query.get()
-                control.nombreAlumno=alumno.nombreAlumno
+                control["nombreAlumno"]=alumno.nombreAlumno
 
                 listaControles.append(control)
                 print 'Objeto control creado'
-                print control.__dict__
+                print control
 
 
-            #Ahora creamos el objeto ControlAsistencia añadiendo los datos  comunes a todos los mcontrolesAsistencia
-            ca = CA()
-            #La lista
-            ca.controles=listaControles
+            #Añadimos la lista obtenida al diccionario que vamos a devolver:
+            controlAsistencia["controles"]=listaControles
 
-            #Los datos comunes a todos que obtnemos del primer elemento (podría ser de cualquiera)
-            cualquiera = ControlAsistencia.query(ControlAsistencia.key==listaKeysMCA[0]).get()
-            ca.idProfesor = cualquiera.id_profesor
-            ca.idClase = cualquiera.id_clase
-            ca.idAsignatura = cualquiera.id_asignatura
+            #Ademas ahora añadimos los datos comunes al control, como la fecha e ides y nombres de profesor, clase y asignatura.
 
-            #Además queremos añadir a la parte común el nombre de la clase, de la asignatura y del profesor,
-            #ya que son comunes y queremos que se muestren en la UI. Estos datos los tiene la NDB en tablas separadas,
-            #accedemos a los datos y los añadimos.
+            #Los ids
+            controlAsistencia["idProfesor"] = resumen.idProfesor
+            controlAsistencia["idClase"] = resumen.idClase
+            controlAsistencia["idAsignatura"] = resumen.idAsignatura
 
-            #Clase
-            query = Clase.query(Clase.idClase==int(cualquiera.id_clase))
-            clase = query.get()
-            ca.nombreClase=clase.nombreClase
-
-            #Asignatura
-            query = Asignatura.query(Asignatura.idAsignatura==int(cualquiera.id_asignatura))
-            asignatura = query.get()
-            ca.nombreAsignatura=asignatura.nombreAsignatura
+            #Los nombres
 
             #Profesor
-            query = Profesor.query(Profesor.idProfesor==int(cualquiera.id_profesor))
+            query = Profesor.query(Profesor.idProfesor==int(resumen.idProfesor))
             profesor = query.get()
-            ca.nombreProfesor=profesor.nombreProfesor
+            controlAsistencia["nombreProfesor"]=profesor.nombreProfesor
 
-            #Devolvemos la fecha en texto plano ya formateado
-            ca.fechaHora = datetime.datetime.strftime(cualquiera.fecha_hora, "%d-%m-%Y %H:%M")
+            #Clase
+            query = Clase.query(Clase.idClase==int(resumen.idClase))
+            clase = query.get()
+            controlAsistencia["nombreClase"]=clase.nombreClase
+
+            #Asignatura
+            query = Asignatura.query(Asignatura.idAsignatura==int(resumen.idAsignatura))
+            asignatura = query.get()
+            controlAsistencia["nombreAsignatura"]=asignatura.nombreAsignatura
+
+
+            #Añadimos
+            controlAsistencia["fechaHora"] = datetime.datetime.strftime(resumen.fechaHora, "%d-%m-%Y %H:%M")
 
             print 'Finally'
-            print ca.__dict__
+            print controlAsistencia
 
             #Devolvemos el control de asistencia construido
-            return ca
+            return controlAsistencia
 
         else:
             return 'Error not found.'
 
-
-    @classmethod
-    def obtenerResumenesControlAsistencia(self, idProfesor=None, idASignatura=None, idClase=None, fechaHora=None):
+    @classmethod #En el caso de que no se pasara ningún parámetro se buscan todos
+    def obtenerResumenesControlAsistencia(self, idProfesor=None, idAsignatura=None, idClase=None, fechaHoraInicio=None, fechaHoraFin=None):
         """
-        Con todos los parámetros a None esta función puede ser llamada con desde 0 a 4 parámetros.
-        Debe devolver también nombres (DEBE DEVOLVER UN RCA_complejo)
+        Se trata de un buscador de resúmenes de controles de asistencia, a continuación rca, configurable por parámetros.
 
-        Tipo de resumen a devolver.
-        Lo que tiene que devolver el gateway:
-        class ResumenControlAsistencia(messages.Message):
-            key = messages.StringField(1, required=True)
-            fecha = messages.StringField(2)
-            idClase = messages.StringField(3)
-            nombreClase = messages.StringField(4)
-            idAsignatura = messages.StringField(5)
-            nombreAsignatura = messages.StringField(6)
-            idProfesor = messages.StringField(7)
-            nombreProfesor = messages.StringField(8)
+        Cada valor pasado añade una condición a la búsqueda. Si se pasa el parámetro idProfesor se buscarán los
+        rcas asociados a ese profesor, pero si además de añade idAsignatura entonces la busqueda se hace bajo esos dos criterios.
+        La fecha puede ser solo una, usando `fechaHoraInicio` o un intervalo de tiempo usando `fechaHoraInicio` y `fechaHoraFin`.
 
-        class ResumenControlAsistencia(ndb.Model):
+        Ahora mismo solo analiza por el profesor
 
-            lista_idCA = ndb.KeyProperty(repeated=True) # La propiedad repeated hace que el campo sea una lista y pueda tomar varios valores, en lugar de solo unof
-            fecha_hora = ndb.DateTimeProperty()
-            id_profesor = ndb.IntegerProperty()
-            id_clase = ndb.IntegerProperty()
-            id_asignatura = ndb.IntegerProperty()
+        :param idProfesor: identificador del profesor por el que buscar los rcas.
+        :param idAsignatura: identificador de la asignatura por la que buscar los rcas.
+        :param idClase: identificador de la clase por el que buscar los rcas.
+        :param fechaHoraInicio: Fecha y hora exacta por la que se buscan rcas o inicio de un rango de fecha
+        :param fechaHoraFin: Fecha y hora fin del rango con el que opcionalmente se puede buscar
+        :type idProfesor: diccionario
+        :type idAsignatura: entero
+        :type idClase: entero
+        :type fechaHora: datetime
+        :type fechaHora: datetime
+        :returns: Lista de diccionarios donde cada uno es un resumen de un control de asistencia extendido.
+        :rtype: lista de diccionarios
 
-        Los datos que se tienen en la NDB siguen el anterior esquema, pero el APIG necesit más datos. Por ello
-        crearemos un tipo de objeto nuevo que contenga todo lo que necesita y por el que no haya que modificar
-        la definiión de la BD NDB.
+
+        Ejemplo de salida::
+
+            [{"idAsignatura": 44, "idClase": 33, "nombreClase": "mat", "idProfesor": 22, "nombreProfesor": "nombreProfe", "key": 4996180836614144, "fechaHora": "14-06-2016 15:58", "nombreAsignatura": "nombreAsig"},
+             {"idAsignatura": 44, "idClase": 33, "nombreClase": "mat", "idProfesor": 22, "nombreProfesor": "nombreProfe", "key": 5101733952880640, "fechaHora": "14-06-2016 16:07", "nombreAsignatura": "nombreAsig"},
+             {"idAsignatura": 44, "idClase": 33, "nombreClase": "mat", "idProfesor": 22, "nombreProfesor": "nombreProfe", "key": 5840605766746112, "fechaHora": "14-06-2016 15:48", "nombreAsignatura": "nombreAsig"},
+             {"idAsignatura": 44, "idClase": 33, "nombreClase": "mat", "idProfesor": 22, "nombreProfesor": "nombreProfe", "key": 6685030696878080, "fechaHora": "14-06-2016 16:06", "nombreAsignatura": "nombreAsig"}]
 
         """
         if v:
@@ -224,43 +215,51 @@ class Gestor:
         #Creamos una lista de resúmenes que vamos a devoler.
         resumenes = []
 
+        #BUSQUEDA ACTUALMENTE SOLO HABILITADA POR PROFESOR
+
         if (idProfesor!=None):
             #Formamos la query
-            query = ResumenControlAsistencia.query(ResumenControlAsistencia.id_profesor == int(idProfesor))
+            query = resumenControlAsistencia.query(resumenControlAsistencia.idProfesor == int(idProfesor))
             #Ejecutamos la query en NDB, y por cada elemento creamos un objeto RCA y le volcamos los datos.
             for a in query:
-                #Creamos el objeto
-                rca = RCA()
-                #Guardamos el id de la clave
-                rca.key = a.key.id()
-                #Convertimos la fecha en algo legible con el formato que queramos.
-                rca.fecha = datetime.datetime.strftime(a.fecha_hora, "%d-%m-%Y %H:%M")
-                rca.idClase = a.id_clase
-                rca.idAsignatura = a.id_asignatura
-                rca.idProfesor = a.id_profesor
 
-                #Ahora tenemos que añadir los nombre de la clase, asignatura y profesor.
+                #Creamos un diccionario donde guardaremos toda la información sobre el resumen de control de asistencia
+                rca = {}
+                #Guardamos id del resumen
+                rca["key"]=a.key.id()
+                #Convertimos la fecha en algo legible con el formato que queramos
+                rca["fechaHora"]=datetime.datetime.strftime(a.fechaHora, "%d-%m-%Y %H:%M")
+                rca["idClase"] = a.idClase
+                rca["idAsignatura"] = a.idAsignatura
+                rca["idProfesor"] = a.idProfesor
+
+                #Ahora tenemos que añadir los nombre de la clase, asignatura y profesor, porque tienen que verse en la IU.
 
                 #Clase
-                query = Clase.query(Clase.idClase==int(1))
-                clase = query.get()
-                rca.nombreClase=clase.nombreClase
+                query = Clase.query(Clase.idClase==int(a.idClase))
+                if (query.count()==1):
+                    clase = query.get()
+                    rca["nombreClase"]=clase.nombreClase
+                else:
+                    print 'No existe nombre de referencia almacenado para la clase '+str(clase.idClase)
+                    rca["nombreClase"]="Indefinido"
 
                 #Asignatura
-                query = Asignatura.query(Asignatura.idAsignatura==int(1))
+                query = Asignatura.query(Asignatura.idAsignatura==int(a.idAsignatura))
                 asignatura = query.get()
-                rca.nombreAsignatura=asignatura.nombreAsignatura
+                rca["nombreAsignatura"]=asignatura.nombreAsignatura
 
                 #Profesor
-                query = Profesor.query(Profesor.idProfesor==int(1))
+                query = Profesor.query(Profesor.idProfesor==int(a.idProfesor))
                 profesor = query.get()
-                rca.nombreProfesor=profesor.nombreProfesor
+                rca["nombreProfesor"]=profesor.nombreProfesor
 
                 #Con esto queda el objeto preparado para devolverlo al APIG
 
                 #print 'RCA parseado'
                 # Para ver todos los atributos de un objeto con sus valores podemos implementar la función __str__ o usar __dict__
                 # print rca.__dict__
+
 
                 #Lo añadimos a la lista
                 resumenes.append(rca)
@@ -269,44 +268,84 @@ class Gestor:
         if v:
             print libName
             print " Return obtenerResumenesControlAsistencia "
+            """
             for r in resumenes:
                 #print 'KEY'
-                #print r.key
-                print r.__dict__
+                #print r.__str__
+                #print r.__dict__
+            """
 
         #Devolvemos la lista, tenga 0, 1 o n elementos.
         return resumenes
 
-
-    ###
-    #Métodos de la inserccion de un control de asistencia completo.
-    ###
+    #Métodos relacionados con la inserccion de un control de asistencia completo.
+    #----------------------------------------------------------------------------------------------------------------#
 
     @classmethod
-    def insertarControlAsistencia(self, listaAsistencias):
-        '''
-        Inserta en el sistema un control de asistencia (conjunto de ellos) compuesto por al menos un
-        control de asistencia de un estudiante(los llamamos igual).
-        Recibimos una lista con los controles.
-        '''
+    def insertarControlAsistencia(self, controlAsistencia):
+        """
+        Inserta en el sistema un control de asistencia, un conjunto de microControlesAsistencia (que son los controles
+        individuales a los alumnos) más datos comunes a todos ellos dentro del mismo control general.
+
+        Recibimos un json  con todos los microControlesAsistencia realizados en un ControlAsistencia
+
+        Ejemplo de entrada::
+
+            {"microControlesAsistencia": [
+                {
+              	  "asistencia" : 1,
+              	  "retraso": 0,
+                  "retraso_tiempo" : 0,
+                  "retraso_justificado" : 0,
+                  "uniforme" : 1,
+                  "id_alumno" : 11
+              	},
+                {
+                  "asistencia" : 0,
+              	  "retraso": 1,
+                  "retraso_tiempo" : 1,
+                  "retraso_justificado" : 1,
+                  "uniforme" : 0,
+                  "id_alumno" : 15
+              	}
+              ],
+            "id_profesor" : 22,
+            "id_clase" : 33,
+        	"id_asignatura" : 44
+           }
+
+        .. note::
+
+            La fecha no se inserta para evitar dependencias del sistema del usuario y por eso se calcula en el interior de
+            esta función.
+
+
+        """
+
         if v:
             print libName
-            print " Llamada a insertarConjuntoControlAsistencia "
+            print " Llamada a insertarControlAsistencia "
             print locals()
 
         #Creamos una lista donde guardaremos las keys que la base de datos nos devuelva al guardar los controles.
         keys = []
 
         #Establecemos el datetime para usar el mismo en todas las asistencias al guardarlas, cogiéndolo del sistema.
-        fechahora = datetime.datetime.now()
+        fechaHora = datetime.datetime.now()
         if v:
             print 'Datetime usado:'
-            print fechahora
+            print fechaHora
 
-        #Recorremos todos los elementos de la lista pasada
-        for asistencia in listaAsistencias:
-            #Insertarmos una asistencia en el sistema con una función y guardamos su salida en la lista de keys.
-            keys.append(Gestor.insertarControlAsistencia(asistencia, fechahora))
+        #Recorremos todos los elementos de la lista de micro controles de asistencia pasados.
+        for microControlAsistencia in controlAsistencia['microControlesAsistencia']:
+            #Insertamos el microcontrol y guardamos su key en un vector.
+            #Usando el método añadimos el microControlAsistencia con el resto de parámetros globlales a todos los de
+            #este control como son la fechaHora, el idProfesor, idClase e idAsignatura
+            keys.append(Gestor.insertarMicroControlAsistencia(microControlAsistencia,
+                                                              fechaHora,
+                                                              controlAsistencia['idProfesor'],
+                                                              controlAsistencia['idClase'],
+                                                              controlAsistencia['idAsignatura']))
 
         '''
         Una vez que se han introducido las asistencias en la tabla ControlAsistencia tenemos que crear un resumen
@@ -314,54 +353,85 @@ class Gestor:
         los tres últimos parámetros usamos el primer control pasado en la lista.
         '''
 
-        keyResumen=Gestor.insertarResumenControlAsistencia(keys, fechahora, (listaAsistencias[0])['idProfesor'],
-                                                                 (listaAsistencias[0])['idAsignatura'],
-                                                                 (listaAsistencias[0])['idClase']
-                                               )
+        keyResumen=Gestor.insertarResumenControlAsistencia(keys, fechaHora, controlAsistencia['idProfesor'],
+                                                                            controlAsistencia['idAsignatura'],
+                                                                            controlAsistencia['idClase'])
 
         return 'OK'
 
     @classmethod
-    def insertarControlAsistencia(self, control, datetime):
-        '''
-        Inserta una asistencia en la tabla ControlAsistencia del datastore.
-        Devuelve la clave de objeto introducido.
-        '''
+    def insertarMicroControlAsistencia(self, mControlAsistencia, fechaHora, idProfesor, idClase, idAsignatura):
+        """
+        Inserta una entidad microControlAsistencia en la tabla microControlAsistencia del datastore.
+
+        :param mControlAsistencia: diccionario con el conunto de claves : valor que representa un micro control de asistencia
+        :param fechaHora: fecha y hora a la que se registra el micro control
+        :param idProfesor: identificador del profesor que realiza el control
+        :param idClase: identificador de la clase a la que se le realiza el control
+        :param idAsignatura: identificador de la asignatura en la que se está haciendo el control
+        :type mControlAsistencia: diccionario
+        :type fechaHora: datetime
+        :type idProfesor: entero
+        :type idClase: entero
+        :type idAsignatura: entero
+        :returns: La key de la entidad microControlAsistencia introducida en el DataStore
+        :rtype: ndb.key
+
+        """
 
         #Info de seguimiento
         if v:
             print libName
-            print " Llamada a insertarControlAsistencia con params: "
+            print " Llamada a insertarMicroControlAsistencia con params: "
             print locals()
             print '\n'
 
-        #Se crea una instancia del modelo
-        nuevoCA = ControlAsistencia()
-
-        #Se rellena de datos, ajustándolos a los que esperamos.
-        nuevoCA.fecha_hora=datetime #Usamos directamente la fecha y hora que nos pasan.
-        nuevoCA.asistencia=parseBoolean(control['asistencia'])
-        nuevoCA.retraso=int(control['retraso'])
-        #nuevoCA.retraso_tiempo=int(control['retraso_tiempo'])
-        nuevoCA.retraso_justificado=parseBoolean(control['retrasoJustificado'])
-        nuevoCA.uniforme=parseBoolean(control['uniforme'])
-        nuevoCA.id_alumno=int(control['idAlumno'])
-        nuevoCA.id_profesor=int(control['idProfesor'])
-        nuevoCA.id_clase=int(control['idClase'])
-        nuevoCA.id_asignatura=int(control['idAsignatura'])
-
+        #Se crea una instancia del modelo DataStore
+        mca = microControlAsistencia(fechaHora=fechaHora,
+                                     idProfesor=idProfesor,
+                                     idAsignatura=idAsignatura,
+                                     idClase=idClase,
+                                     #El resto de datos vienen en un dict
+                                     idAlumno=mControlAsistencia['idAlumno'],
+                                     asistencia=parseBoolean(mControlAsistencia['asistencia']),
+                                     uniforme=parseBoolean(mControlAsistencia['uniforme']),
+                                     retraso=mControlAsistencia['retraso'],
+                                     retrasoTiempo=mControlAsistencia['retrasoTiempo'],
+                                     retrasoJustificado=parseBoolean(mControlAsistencia['retrasoJustificado'])
+                                    )
         #Se guarda en el data store
-        nuevoCA_clave = nuevoCA.put()
+        claveMca = mca.put()
 
         #Info de seguimiento
         if v:
             print libName
-            print " Return de insertarControlAsistencia: "+str(nuevoCA_clave)+'\n'
+            print " Return de insertarControlAsistencia: "+str(claveMca)+'\n'
 
-        return nuevoCA_clave
+        return claveMca
 
     @classmethod
-    def insertarResumenControlAsistencia(self, listaIdCA, fechaHora,idProfesor,idASignatura,idClase):
+    def insertarResumenControlAsistencia(self, listaMCAs, fechaHora, idProfesor, idAsignatura, idClase):
+
+        """
+        Inserta una entidad resumenControlAsistencia en la tabla resumenControlAsistencia del datastore, que representa
+        el resumen de un control de asistencia realizado, que contiene además de los identificadores de fecha y hora, profesor,
+        clase y asignatura donde se realizó la lista de los microcontroles (los controles de cada alumno).
+
+        :param listaMCAs: lista con las keys de las entidades de tipo microControlAsistencia previamente guardadas en el DataStore
+        :param fechaHora: fecha y hora a la que se registra el micro control
+        :param idProfesor: identificador del profesor que realiza el control
+        :param idClase: identificador de la clase a la que se le realiza el control
+        :param idAsignatura: identificador de la asignatura en la que se está haciendo el control
+        :type listaMCAs: lista
+        :type fechaHora: datetime
+        :type idProfesor: entero
+        :type idClase: entero
+        :type idAsignatura: entero
+        :returns: La key de la entidad resumenControlAsistencia introducida en el DataStore
+        :rtype: ndb.key
+
+        """
+
         #Info de seguimiento
         if v:
             print libName
@@ -369,28 +439,24 @@ class Gestor:
             print locals()
             print '\n'
 
-        #Se crea una instancia del modelo
-        nuevoRCA = ResumenControlAsistencia()
-
-        #Se rellena de datos, ajustándolos a los que esperamos.
-        nuevoRCA.lista_idCA=listaIdCA
-        nuevoRCA.fecha_hora=fechaHora
-        nuevoRCA.id_profesor=idProfesor
-        nuevoRCA.id_clase=idClase
-        nuevoRCA.id_asignatura=idASignatura
-
+        rca = resumenControlAsistencia(listaMCAs=listaMCAs,
+                                       fechaHora=fechaHora,
+                                       idProfesor=idProfesor,
+                                       idAsignatura=idAsignatura,
+                                       idClase=idClase)
 
         #Se guarda en el data store
-        nuevoRCA_clave = nuevoRCA.put()
+        rcaClave = rca.put()
 
         #Info de seguimiento
         if v:
             print libName
-            print " Return de insertarResumenControlAsistencia: "+str(nuevoRCA_clave)+'\n'
+            print " Return de insertarResumenControlAsistencia: "+str(rcaClave)+'\n'
 
-        return nuevoRCA_clave
+        return rcaClave
 
     # Métodos de las entidades de refencia básicas Alumno, Profesor, Clase y Asignatura
+    #----------------------------------------------------------------------------------------------------------------#
 
     @classmethod
     def insertarEntidad(self, tipo, idEntidad, nombreEntidad):

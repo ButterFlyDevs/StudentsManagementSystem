@@ -6,7 +6,7 @@
 micro Servicio Control Estudiantes
 ==================================
 
-Contents:
+Contenido:
 
 .. toctree::
    :maxdepth: 2
