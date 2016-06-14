@@ -98,13 +98,14 @@ def postAlumno():
         #Conformamos la dirección:
         module = modules.get_current_module_name()
         url = "http://%s/" % modules.get_hostname(module="sce")
-        #Añadimos el servicio al que queremos conectarnos.
-        url+="alumnos"
+        #Vamos a realizar el post a la colección entidadesReferencia
+        url+="entidadesReferencia"
 
         #Creamos un diccionario con los datos.
         datos = {
-          "idAlumno": salida['idAlumno'],
-          "nombreAlumno": request.form['nombre']+' '+request.form['apellidos'],
+          'tipo' : 'Alumno',
+          'idEntidad': salida['idAlumno'],
+          'nombreEntidad': request.form['nombre']+' '+request.form['apellidos'],
         }
         form_data = urllib.urlencode(datos)
         result=urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
@@ -312,13 +313,13 @@ def postProfesor():
         #Conformamos la dirección:
         module = modules.get_current_module_name()
         url = "http://%s/" % modules.get_hostname(module="sce")
-        #Añadimos el servicio al que queremos conectarnos.
-        url+="profesores"
+        url+="entidadesReferencia"
 
         #Creamos un diccionario con los datos.
         datos = {
-          "idProfesor": salida['idProfesor'],
-          "nombreProfesor": request.form['nombre']+' '+request.form['apellidos'],
+          'tipo' : 'Profesor',
+          'idEntidad': salida['idProfesor'],
+          'nombreEntidad': request.form['nombre']+' '+request.form['apellidos'],
         }
         form_data = urllib.urlencode(datos)
         result=urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
@@ -467,7 +468,7 @@ def getAsignaturas():
 def postAsignatura():
     '''
     Inserta una nueva asignatura en el sistema.
-    curl -d "nombre=ComputacionZZ" -i -X POST localhost:8002/asignaturas
+    l
     '''
     #Info de seguimiento
     if v:
@@ -489,16 +490,22 @@ def postAsignatura():
         module = modules.get_current_module_name()
         url = "http://%s/" % modules.get_hostname(module="sce")
         #Añadimos el servicio al que queremos conectarnos.
-        url+="asignaturas"
+
+        url+="entidadesReferencia"
 
         #Creamos un diccionario con los datos.
         datos = {
-          "idAsignatura": salida['idAsignatura'],
-          "nombreAsignatura": request.form['nombre'],
+          'tipo' : 'Asignatura',
+          'idEntidad': salida['idAsignatura'],
+          'nombreEntidad': request.form['nombre'],
         }
+
         form_data = urllib.urlencode(datos)
         result=urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
+        print 'result.content'
+        print result.content
         json = jsonpickle.decode(result.content)
+
         if json['status']!='OK':
             salida['status']='SCE ERROR'
 
@@ -612,6 +619,9 @@ def postClase():
     '''
     salida = GestorClases.nuevaClase(request.form['curso'], request.form['grupo'], request.form['nivel'])
 
+    print salida
+    print salida
+
 
     if salida['status'] == 'OK':
 
@@ -621,15 +631,18 @@ def postClase():
         module = modules.get_current_module_name()
         url = "http://%s/" % modules.get_hostname(module="sce")
         #Añadimos el servicio al que queremos conectarnos.
-        url+="clases"
         #Componemos el nombre como un solo string
         nombreClase = request.form['curso']+request.form['grupo']+request.form['nivel']
-        print nombreClase
+
+        url+="entidadesReferencia"
+
         #Creamos un diccionario con los datos.
         datos = {
-          "idClase": salida['idClase'],
-          "nombreClase": nombreClase,
+          'tipo' : 'Clase',
+          'idEntidad': salida['idClase'],
+          'nombreEntidad': nombreClase,
         }
+
         form_data = urllib.urlencode(datos)
         result=urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
         print result.content

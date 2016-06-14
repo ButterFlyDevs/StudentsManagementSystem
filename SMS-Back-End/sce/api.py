@@ -3,9 +3,8 @@
 Api Rest del microservicio SCE.
 
 .. note::
-    There are many other directives such as versionadded, versionchanged,
-    rubric, centered, ... See the sphinx documentation for more details.
-    ApiRest construida con Flask
+    Se trata de una apiRest construida con `Flask <http://flask.pocoo.org/>`_ donde cada función
+    está decorada con una ruta de flask que responde a las peticiones http.
 
 """
 
@@ -91,7 +90,7 @@ Debería recibir una lista de controles de asistencia sin fecha ni hora porque s
 Esta lista de controles se envía en formato JSON
 
 Prueba del método:
-curl -X POST  -H 'content-type: application/json' -d @pruebaJson.json localhost:8003/controlesAsistencia
+curl -X POST  -H 'content-type: application/json' -d @ejemploControlAsistencia.json localhost:8003/controlesAsistencia
 El fichero sigue el estandar JSON, ver pruebaJson.json. Se pueden validar los ficheros en webs como http://jsonlint.com/.
 """
 @app.route('/controlesAsistencia', methods=['POST'])
@@ -109,7 +108,7 @@ def  insertaControlAsistencia():
 
 
     #Llamamos a la función de NDBlib que inserta el conjunto
-    status = Gestor.insertarConjuntoControlAsistencia(json['controles'])
+    status = Gestor.insertarControlAsistencia(json['controles'])
 
     if v:
         print nombreMicroservicio
@@ -173,86 +172,74 @@ def  getResumenesControlesAsistenciaConParametros():
 
     return jsonpickle.encode(Gestor.obtenerResumenesControlAsistencia(idProfesor=request.form['idProfesor']))
 
-############################################################
-##   COLECCIÓNES AUXILIARES relacionadas de referencia    ##
-############################################################
 
-# === Insertar alumno ===
-
-"""
-Función usada para insertar un alumno en la base de datos NDB.
-Utiliza la clase Gestor para insertar el alumno. Solamente inserta dos campos: el id del alumno y su nombre.
-"""
-@app.route('/alumnos', methods=['POST'])
-def insetarAlumno():
+@app.route('/entidadesReferencia', methods=['POST'])
+def insertarEntidad():
     """
-    curl -X POST -d "idAlumno=1&nombreAlumno=Fernando"  localhost:8003/alumnos
+    Inserta una entidad de referencia del tipo pasado en el DataStore.
+
+    Las entidades de referencia son aquellas que son copia (muy resumida) de las almacenadas en el SBD
+    para que cuando se quiera obtener el nombre de una de ellas el SCE no tenga que acceder al SBD, porque tenga una copia el.
+
+    :param tipo: tipo en el que queremos hacer una insercción de una entidad
+    :param idEntidad: id con la que se quiere guardar la entidad en la tabla de su tipo (no es la clave en el datastore)
+    :param nombreEntidad: nombre completo de la entidad
+    :type tipo: string ('Alumno', 'Profesor', 'Clase', 'Asignatura')
+    :type idEntidad: int
+    :type nombreEntidad: string
+    :returns: Mensaje de control
+    :rtype: json del diccionario que devuelve el gestor.
+
+    Ejemplo::
+
+          curl -X POST -d "tipo=Alumno&idEntidad=3242&nombreEntidad=alumnoNuevo"  localhost:8003/entidadesReferencia
+
     """
     if v:
         print nombreMicroservicio
-        print ' Llamando a /alumnos POST insertarAlumno()'
+        print ' Llamando a /entidadesReferencia POST insertarEntidad()'
         print " Request: "
         print request.form
 
 
-    return jsonpickle.encode(Gestor.insertarAlumno(request.form['idAlumno'], request.form['nombreAlumno']))
+    return jsonpickle.encode(Gestor.insertarEntidad(request.form['tipo'], int(request.form['idEntidad']), request.form['nombreEntidad']))
 
-# === Insertar asignatura ===
 
-"""
-Función usada para insertar una asignatura en la base de datos NDB.
-Utiliza la clase Gestor para insertar la asignatura. Solamente inserta dos campos: id de asignatura y su nombre.
-"""
-@app.route('/asignaturas', methods=['POST'])
-def insetarAsignatura():
-    '''
-    curl -X POST -d "idAsignatura=1&nombreAsignatura=Frances"  localhost:8003/asignaturas
-    '''
+#PUT is most-often utilized for **update** capabilities
+# http://www.restapitutorial.com/lessons/httpmethods.html
+@app.route('/entidadesReferencia', methods=['PUT'])
+def modificarEntidad():
+    """
+    Modifica una entidad de las de referencia en el DataStore.
+
+    Las entidades de referencia son aquellas que son copia (muy resumida) de las almacenadas en el SBD
+    para que cuando se quiera obtener el nombre de una de ellas el SCE no tenga que acceder al SBD, porque tenga una copia el.
+
+    :param tipo: tipo en el que queremos hacer una insercción de una entidad
+    :param idEntidad: id con la que se quiere guardar la entidad en la tabla de su tipo (no es la clave en el datastore)
+    :param nombreEntidad: nombre completo de la entidad
+    :type tipo: string ('Alumno', 'Profesor', 'Clase', 'Asignatura')
+    :type idEntidad: int
+    :type nombreEntidad: string
+    :returns: Mensaje de control
+    :rtype: json del diccionario que devuelve el gestor.
+
+    Ejemplo::
+
+          curl -X PUT -d "tipo=Alumno&idEntidad=3242&nombreEntidad=alumnoSuperNuevo"  localhost:8003/entidadesReferencia
+
+    """
+
     if v:
         print nombreMicroservicio
-        print ' Llamando a /asignatura POST insertaAsignatura()'
+        print ' Llamando a /entidadesReferencia PUT modificarEntidad()'
         print " Request: "
         print request.form
 
 
-    return jsonpickle.encode(Gestor.insertarAsignatura(request.form['idAsignatura'], request.form['nombreAsignatura']))
-# === Insertar clase ===
-
-"""
-Función usada para insertar una clase en la base de datos NDB.
-Utiliza la clase Gestor para insertar la clase. Solamente inserta dos campos: id de clase y su nombre.
-"""
-@app.route('/clases', methods=['POST'])
-def insetarClase():
-    '''
-    curl -X POST -d "idClase=1&nombreClase=1AESO"  localhost:8003/clases
-    '''
-    if v:
-        print nombreMicroservicio
-        print ' Llamando a /clase POST insertarClase()'
-        print " Request: "
-        print request.form
+    return jsonpickle.encode(Gestor.modificarEntidad(request.form['tipo'], int(request.form['idEntidad']), request.form['nombreEntidad']))
 
 
-    return jsonpickle.encode(Gestor.insertarClase(request.form['idClase'], request.form['nombreClase']))
-# === Insertar profesor ===
-
-"""
-Función usada para insertar un profesor en la base de datos NDB.
-Utiliza la clase Gestor para insertar el profesor. Solamente inserta dos campos: id de profesor y su nombre.
-"""
-@app.route('/profesores', methods=['POST'])
-def insertarProfesor():
-    '''
-    curl -X POST -d "idProfesor=4&nombreProfesor=Eduardo Ros"  localhost:8003/profesores
-    '''
-    if v:
-        print nombreMicroservicio
-        print ' Llamando a /profesor POST insertarProfesor()'
-        print " Request: "
-        print request.form
-
-    return jsonpickle.encode(Gestor.insertarProfesor(request.form['idProfesor'], request.form['nombreProfesor']))
 
 if __name__ == '__main__':
     app.run(debug=True)

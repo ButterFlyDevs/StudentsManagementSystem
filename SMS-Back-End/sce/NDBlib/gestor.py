@@ -283,7 +283,7 @@ class Gestor:
     ###
 
     @classmethod
-    def insertarConjuntoControlAsistencia(self, listaAsistencias):
+    def insertarControlAsistencia(self, listaAsistencias):
         '''
         Inserta en el sistema un control de asistencia (conjunto de ellos) compuesto por al menos un
         control de asistencia de un estudiante(los llamamos igual).
@@ -390,51 +390,74 @@ class Gestor:
 
         return nuevoRCA_clave
 
-    """
-        Métodos referentes al tipo (kind) Alumno
-    """
+    # Métodos de las entidades de refencia básicas Alumno, Profesor, Clase y Asignatura
 
     @classmethod
-    def insertarAlumno(self, idAlumno, nombreApellidosAlumno):
+    def insertarEntidad(self, tipo, idEntidad, nombreEntidad):
         """
-        Inserta un alumno en el datastore.
+        Inserta una entidad en cualquiera de los "tipos" de nuestro modelo en el datastore.
 
-        :param idAlumno: id del alumno en la base de datos relacional
-        :param nombreApellidosAlumno: nombre y apellidos del alumno
-        :type idAlumno: int
-        :type nombreApellidosAlumno: string
+        :param tipo: tipo en el que queremos hacer una insercción de una entidad
+        :param idEntidad: id con la que se quiere guardar la entidad en la tabla de su tipo (no es la clave en el datastore)
+        :param nombreEntidad: nombre completo de la entidad
+        :type tipo: string ('Alumno', 'Profesor', 'Clase', 'Asignatura')
+        :type idEntidad: int
+        :type nombreEntidad: string
         :returns: Mensaje de control
         :rtype: diccionario
 
         :Ejemplo:
 
-        >>> Gestor.insertarAlumno(231143,'nombreEjemplo')
+        >>> Gestor.insertarEntidad('Alumno', 231143, 'nombreEjemplo')
         {'status' : 'OK'}
-        >>> Gestor.insertarAlumno(231143,'otroNombre')
+        >>> Gestor.insertarEntidad('Alumno', 231143, 'otroNombre')
         {'status' : 'FAIL', 'info' : 'Alumno con id 231143 ya existe.'}
+        >>> Gestor.insertarEntidad('Profesor', 231143, 'nombrePrueba')
+        {'status' : 'OK'}
+
         """
 
         #Info de seguimiento
         if v:
             print libName
-            print " Llamada a insertarAlumno con params: "
+            print " Llamada a insertarEntidad con params: "
             print locals()
             print '\n'
 
         salida = {}
 
-        #Comprobamos si existe ya un alumno con ese id.
-        consulta = Alumno.query(Alumno.idAlumno == idAlumno)
+        #Comprobamos si existe la entidad con ese id en el tipo pasado.
+        consulta = None
+        if (tipo == 'Alumno'):
+            consulta = Alumno.query(Alumno.idAlumno == idEntidad)
+        elif (tipo == 'Profesor'):
+            consulta = Profesor.query(Profesor.idProfesor == idEntidad)
+        elif (tipo == 'Clase'):
+            consulta = Clase.query(Clase.idClase == idEntidad)
+        elif (tipo == 'Asignatura'):
+            consulta = Asignatura.query(Asignatura.idAsignatura == idEntidad)
+
+        #Si existe, salimos informando:
         if (consulta.count() == 1):
             salida['status']='FAIL'
-            salida['info']='Alumno con id '+str(idAlumno)+' ya existe.'
+            salida['info']='Entidad '+tipo+' con id '+str(idEntidad)+' ya existe.'
 
         #Si no existe, lo introducimos:
         else:
-            alumno = Alumno(idAlumno=int(idAlumno), nombreAlumno=nombreApellidosAlumno)
+            #Creamos la entidad dependiendo del tipo
+            entidad = None
+            if (tipo == 'Alumno'):
+                entidad = Alumno(idAlumno=int(idEntidad), nombreAlumno=nombreEntidad)
+            elif (tipo == 'Profesor'):
+                entidad = Profesor(idProfesor=int(idEntidad), nombreProfesor=nombreEntidad)
+            elif (tipo == 'Clase'):
+                entidad = Clase(idClase=int(idEntidad), nombreClase=nombreEntidad)
+            elif (tipo == 'Asignatura'):
+                entidad = Asignatura(idAsignatura=int(idEntidad), nombreAsignatura=nombreEntidad)
 
+            #La insertamos
             try:
-                nuevoAlumnoClave = alumno.put()
+                clave = entidad.put()
                 salida['status']='OK'
             except ValueError, Argument:
                 salida['status']='FAIL'
@@ -443,201 +466,74 @@ class Gestor:
             #Info de seguimiento
             if v:
                 print libName
-                print " Return de insertarAlumno: "+str(nuevoAlumnoClave)+'\n'
+                print " Return de insertarEntidad: "+str(clave)+'\n'
 
         return salida
 
-
     @classmethod
-    def modificarAlumno(self, idAlumno, nombreApellidosAlumno):
+    def modificarEntidad(self, tipo, idEntidad, nombreEntidad):
         """
-        Modifica el nombre de un alumno guardado en el datastore, que previamente
+        Modifica el nombre de una entidad de un tipo guardado en el datastore, que previamente
         debe existir.
 
-        :param idAlumno: id del alumno en la base de datos relacional
-        :param nombreApellidosAlumno: nombre y apellidos del alumno
-        :type idAlumno: int
-        :type nombreApellidosAlumno: string
+        :param tipo: tipo del que queremos hacer la modificación
+        :param idEntidad: id de la entidad (independiente del tipo)
+        :param nombreEntidad: nuevo nombre para la entidad
+        :type tipo: string ('Alumno', 'Profesor', 'Clase', 'Asignatura')
+        :type idEntidad: int
+        :type nombreEntidad: string
         :returns: Mensaje de control
         :rtype: diccionario
 
         :Ejemplo:
 
-        >>> Gestor.modificarAlumno(231143,'nombreEjemplo')
+        >>> Gestor.modificarEntidad('Alumno', 231143,'nombreEjemplo')
         {'status' : 'OK'}
-        >>> Gestor.modificarAlumno(224,'nombreEjemplo')
+        >>> Gestor.modificarEntidad('Alumno', 224,'nombreEjemplo')
         {'status' : 'FAIL', 'info' : 'Alumno con id 224 no existe.'}
         """
 
         #Info de seguimiento
         if v:
             print libName
-            print " Llamada a modificarAlumno con params: "
+            print " Llamada a modificarEntidad con params: "
             print locals()
             print '\n'
 
         salida = {}
 
-        #Comprobamos si existe el alumno para modificarlo con el id pasado.
-        consulta = Alumno.query(Alumno.idAlumno == idAlumno)
+        #Comprobamos si existe la entidad del tipo pasado con el id pasado.
+        consulta = None
+        if (tipo == 'Alumno'):
+            consulta = Alumno.query(Alumno.idAlumno == idEntidad)
+        elif (tipo == 'Profesor'):
+            consulta = Profesor.query(Profesor.idProfesor == idEntidad)
+        elif (tipo == 'Clase'):
+            consulta = Clase.query(Clase.idClase == idEntidad)
+        elif (tipo == 'Asignatura'):
+            consulta = Asignatura.query(Asignatura.idAsignatura == idEntidad)
+
+
         if (consulta.count() == 1):
+            #Extraemos la entidad
+            entidad = consulta.get()
+            #Dependiendo del tipo modificamos
+            if(tipo == 'Alumno'):
+                entidad.nombreAlumno = nombreEntidad
+            if(tipo == 'Profesor'):
+                entidad.nombreProfesor = nombreEntidad
+            if(tipo == 'Clase'):
+                entidad.nombreClase = nombreEntidad
+            if(tipo == 'Asignatura'):
+                entidad.nombreAsignatura = nombreEntidad
             try:
-                alumno = consulta.get()
-                alumno.nombreAlumno = nombreApellidosAlumno
-                alumno.put()
+                entidad.put()
                 salida['status']='OK'
             except ValueError, Argument:
                 salida['status']='FAIL'
                 salida['info']=Argument
         else:
             salida['status']='FAIL'
-            salida['info']='Alumno con id '+str(idAlumno)+' no existe en el sistema'
+            salida['info']='Entidad '+tipo+' con id '+str(idEntidad)+' no existe en el sistema.'
 
         return salida
-
-    @classmethod
-    def eliminarAlumno(self, idAlumno):
-        """
-        Elimina el estudiante con id idAlumno, en caso de que exista.
-        """
-
-        #Info de seguimiento
-        if v:
-            print libName
-            print " Llamada a eliminarAlumno con params: "
-            print locals()
-            print '\n'
-
-        #Buscamos al alumno con id idAlumno
-        consulta = Alumno.query(Alumno.idAlumno == idAlumno)
-
-        alumno =  consulta.get()
-
-        if alumno:
-            alumno.key.delete()
-
-        salida = {}
-
-        consulta = Alumno.query(Alumno.idAlumno == idAlumno)
-
-        if (consulta.count() == 0):
-            salida['status']='OK'
-        else:
-            salida['status']='FAIL'
-
-
-        # salida['id']=nuevoAlumnoClave
-
-        return salida
-
-
-
-    @classmethod
-    def insertarProfesor(self, idProfesor, nombreProfesor):
-
-        #Info de seguimiento
-        if v:
-            print libName
-            print " Llamada a insertarProfesor con params: "
-            print locals()
-            print '\n'
-
-        profesor = Profesor()
-        profesor.idProfesor=int(idProfesor)
-        profesor.nombreProfesor=nombreProfesor
-
-        salida = {}
-
-        try:
-            nuevoProfesorClave = profesor.put()
-            salida['status']='OK'
-        except ValueError:
-            salida['status']='FAIL'
-
-        #Info de seguimiento
-        if v:
-            print libName
-            print " Return de insertarProfesor: "+str(nuevoProfesorClave)+'\n'
-
-        salida['id']=nuevoProfesorClave
-
-        return salida
-
-    @classmethod
-    def insertarClase(self, idClase, nombreClase):
-
-        #Info de seguimiento
-        if v:
-            print libName
-            print " Llamada a insertarClase con params: "
-            print locals()
-            print '\n'
-
-        clase = Clase()
-        clase.idClase=int(idClase)
-        clase.nombreClase=nombreClase
-
-        salida = {}
-
-        try:
-            nuevaClaseClave = clase.put()
-            salida['status']='OK'
-        except ValueError:
-            salida['status']='FAIL'
-
-        #Info de seguimiento
-        if v:
-            print libName
-            print " Return de insertarClase: "+str(nuevaClaseClave)+'\n'
-
-        salida['id']=nuevaClaseClave
-
-        return salida
-
-
-    @classmethod
-    def insertarAsignatura(self, idAsignatura, nombreAsignatura):
-
-        #Info de seguimiento
-        if v:
-            print libName
-            print " Llamada a insertarAsignatura con params: "
-            print locals()
-            print '\n'
-
-        asignatura = Asignatura()
-        asignatura.idAsignatura=int(idAsignatura)
-        asignatura.nombreAsignatura=nombreAsignatura
-
-
-        salida = {}
-
-        try:
-            nuevaAsignaturaClave = asignatura.put()
-            salida['status']='OK'
-        except ValueError:
-            salida['status']='FAIL'
-
-
-        #Info de seguimiento
-        if v:
-            print libName
-            print " Return de insertarAsignatura: "+str(nuevaAsignaturaClave)+'\n'
-
-        salida['id']=nuevaAsignaturaClave
-
-        return salida
-
-
-
-    @classmethod
-    def obtenerNombreProfesores(idProfesor):
-        pass
-
-    @classmethod
-    def obtenerNombreClases(idClase):
-        pass
-
-    @classmethod
-    def obtenerNombreAsignaturas(idAsignatura):
-        pass
