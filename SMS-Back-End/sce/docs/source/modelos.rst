@@ -1,9 +1,7 @@
 Modelos
 =======
 
-vamossssss!!!!!!!!!
-
-.. automodule:: NDBlib.EstructurasNDB
+.. automodule:: NDBlib.ModelosNDB
     :members:
     :undoc-members:
     :show-inheritance:
