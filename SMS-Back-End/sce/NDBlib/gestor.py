@@ -7,6 +7,8 @@ from google.appengine.ext.db import Key
 from ModelosNDB import *
 import datetime
 
+import time
+
 #import logging
 
 #Para activar/desactivar el modo verbose para muestra de mensajes.
@@ -41,7 +43,7 @@ def boolToInt(boolean):
 
 class Gestor:
 
-    #Métodos relacionados con la petición de controles de asistencia completos o resúmenes. Más usados en la UI
+    #Métodos relacionados con la petición de controles de asistencia completos o resúmenes. Más usados en la UI.
     #----------------------------------------------------------------------------------------------------------------#
 
     @classmethod #tested
@@ -131,8 +133,12 @@ class Gestor:
 
                 #Además tb queremos añadir su nombre para que se vea en la interfaz
                 query = Alumno.query(Alumno.idAlumno==int(mc.idAlumno))
-                alumno = query.get()
-                control["nombreAlumno"]=alumno.nombreAlumno
+                if (query.count()==1):
+                    alumno = query.get()
+                    control["nombreAlumno"]=alumno.nombreAlumno
+                else:
+                    print 'No existe nombre de referencia almacenado para el Alumno '+str(mc.idAlumno)
+                    control["nombreAlumno"]="Indefinido"
 
                 listaControles.append(control)
                 print 'Objeto control creado'
@@ -153,18 +159,31 @@ class Gestor:
 
             #Profesor
             query = Profesor.query(Profesor.idProfesor==int(resumen.idProfesor))
-            profesor = query.get()
-            controlAsistencia["nombreProfesor"]=profesor.nombreProfesor
+            if (query.count()==1):
+                profesor = query.get()
+                controlAsistencia["nombreProfesor"]=profesor.nombreProfesor
+            else:
+                print 'No existe nombre de referencia almacenado para el Profesor '+str(resumen.idProfesor)
+                control["nombreProfesor"]="Indefinido"
 
             #Clase
             query = Clase.query(Clase.idClase==int(resumen.idClase))
-            clase = query.get()
-            controlAsistencia["nombreClase"]=clase.nombreClase
+            if (query.count()==1):
+                clase = query.get()
+                controlAsistencia["nombreClase"]=clase.nombreClase
+            else:
+                print 'No existe nombre de referencia almacenado para la clase '+str(resumen.idClase)
+                control["nombreClase"]="Indefinido"
 
             #Asignatura
             query = Asignatura.query(Asignatura.idAsignatura==int(resumen.idAsignatura))
-            asignatura = query.get()
-            controlAsistencia["nombreAsignatura"]=asignatura.nombreAsignatura
+            if (query.count()==1):
+                asignatura = query.get()
+                controlAsistencia["nombreAsignatura"]=asignatura.nombreAsignatura
+            else:
+                print 'No existe nombre de referencia almacenado para la asignatura '+str(resumen.idAsignatura)
+                control["nombreAsignatura"]="Indefinido"
+
 
 
             #Añadimos
@@ -458,16 +477,32 @@ class Gestor:
             listaKeysMCA=resumen.listaMCAs
 
             microControlesAntes= microControlAsistencia.query().count()
-            print len(listaKeysMCA)
+            print 'AQUI'
+            print microControlesAntes
+            #print len(listaKeysMCA)
+            print listaKeysMCA
 
             for key in listaKeysMCA:
                 #Buscamos el microcontrol en la base de datos y lo eliminamos
-                (microControlAsistencia.query(microControlAsistencia.key==key).get()).key.delete()
+                print microControlAsistencia.query(microControlAsistencia.key==key).get()
+                mc = microControlAsistencia.query(microControlAsistencia.key==key).get()
+                print mc.key.delete()
+                #(microControlAsistencia.query(microControlAsistencia.key==key).get()).key.delete()
+                #print 'Después de borrar'
+                #print microControlAsistencia.query(microControlAsistencia.key==key).get()
+
+            time.sleep(1)
+
+            print 'Despues'
+            print microControlAsistencia.query().count()
 
             #Si se han eliminado bien los microControles
             if microControlAsistencia.query().count() == microControlesAntes-len(listaKeysMCA):
                 #Pasamos a eliminar el propio resumen
                 resumen.key.delete()
+
+                #Si no esperamos no funciona porque parece que delete funciona de fomra asyncrona y el código sigue
+                time.sleep(1)
 
                 #Comprobamos que ya no está:
                 query2 = resumenControlAsistencia.query(resumenControlAsistencia.key == key)
@@ -475,13 +510,17 @@ class Gestor:
                     salida['status']='OK'
                 else:
                     salida['status']='FAIL'
+                    salida['info']='Fallo comprobacion eliminacion'
             else:
                 salida['status']='FAIL'
-
+                salida['info']='Fallo al eliminar los microcontroles'
+        else:
+            salida['status']='FAIL'
+            salida['info']='Objeto no encontrado'
 
         return salida
 
-    @classmethod #tested
+    @classmethod #tested #privated
     def insertarMicroControlAsistencia(self, mControlAsistencia, fechaHora, idProfesor, idClase, idAsignatura):
         """
         Inserta una entidad microControlAsistencia en la tabla microControlAsistencia del datastore.
@@ -538,7 +577,7 @@ class Gestor:
 
         return claveMca
 
-    @classmethod #tested
+    @classmethod #tested #privated
     def insertarResumenControlAsistencia(self, listaMCAs, fechaHora, idProfesor, idAsignatura, idClase):
 
         """
@@ -588,7 +627,7 @@ class Gestor:
 
         return rcaClave
 
-    # Métodos de las entidades de refencia básicas Alumno, Profesor, Clase y Asignatura
+    # Métodos de las entidades de refencia básicas Alumno, Profesor, Clase y Asignatura.
     #----------------------------------------------------------------------------------------------------------------#
 
     @classmethod #tested
@@ -658,6 +697,7 @@ class Gestor:
             try:
                 clave = entidad.put()
                 salida['status']='OK'
+
             except ValueError, Argument:
                 salida['status']='FAIL'
                 salida['info']=Argument
@@ -727,6 +767,66 @@ class Gestor:
                 entidad.nombreAsignatura = nombreEntidad
             try:
                 entidad.put()
+                salida['status']='OK'
+            except ValueError, Argument:
+                salida['status']='FAIL'
+                salida['info']=Argument
+        else:
+            salida['status']='FAIL'
+            salida['info']='Entidad '+tipo+' con id '+str(idEntidad)+' no existe en el sistema.'
+
+        return salida
+
+    @classmethod #tested
+    def eliminarEntidad(self, tipo, idEntidad):
+        """
+        Elimina una entidad de referencia un tipo básico de la BD Relacional (Alumno, Profesor,
+        Asignatura, Clase), guardado en el datastore, que previamente debe existir.
+
+        .. note:
+
+            Borrar una referencia al nombre completo de una entidad no borra nada más.
+
+        :param tipo: tipo del que queremos eliminar una entidad
+        :param idEntidad: id de la entidad (independiente del tipo)
+        :type tipo: string ('Alumno', 'Profesor', 'Clase', 'Asignatura')
+        :type idEntidad: int
+        :returns: Mensaje de control
+        :rtype: diccionario
+
+        :Ejemplo:
+
+        >>> Gestor.eliminarEntidad('Alumno', 231143)
+        {'status' : 'OK'}
+        >>> Gestor.eliminarEntidad('Alumno', 224)
+        {'status' : 'FAIL', 'info' : 'Alumno con id 224 no existe.'}
+        """
+
+        #Info de seguimiento
+        if v:
+            print libName
+            print " Llamada a eliminarEntidad con params: "
+            print locals()
+            print '\n'
+
+        salida = {}
+
+        #Comprobamos si existe la entidad del tipo pasado con el id pasado.
+        consulta = None
+        if (tipo == 'Alumno'):
+            consulta = Alumno.query(Alumno.idAlumno == idEntidad)
+        elif (tipo == 'Profesor'):
+            consulta = Profesor.query(Profesor.idProfesor == idEntidad)
+        elif (tipo == 'Clase'):
+            consulta = Clase.query(Clase.idClase == idEntidad)
+        elif (tipo == 'Asignatura'):
+            consulta = Asignatura.query(Asignatura.idAsignatura == idEntidad)
+
+
+        if (consulta.count() == 1):
+            try:
+                #Extraemos la entidad y la borramos.
+                consulta.get().key.delete()
                 salida['status']='OK'
             except ValueError, Argument:
                 salida['status']='FAIL'

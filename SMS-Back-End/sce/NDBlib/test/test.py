@@ -167,8 +167,31 @@ class TestNDBlib(unittest.TestCase):
 
         self.assertEqual(test, True)
 
+    def test_03_deleteEntity(self):
+        """
+        Test de comprobación de eliminación en los cuatro tipos de referencia: Alumno, Profesor, Clase, Asignatura
+        """
 
-    def test_03_insertarMicroControlAsistencia(self):
+        test=True
+
+        #Comprobamos la modificación de una entidad del tipo Alumno (previamente existente)
+        salida = Gestor.insertarEntidad('Alumno', 22488, 'alumnoFantasma')
+        print salida
+        if ( #Si alguno de las condiciones falla, falla el test de entidad y el test de modificación.
+           #La salida es correcta
+           salida['status'] != 'OK'
+           #Que el elemento es accesible por el id y el nombre es el correcto
+           or Alumno.query(Alumno.idAlumno == 22488).get().nombreAlumno != 'alumnoFantasma'
+           ): test = False
+
+        n = Alumno.query().count()
+        salida = Gestor.eliminarEntidad('Alumno', 22488)
+        if Alumno.query(Alumno.idAlumno == 22488).count()!=0: test = False
+        if Alumno.query().count() != n-1: test = False
+
+        self.assertEqual(test, True, salida)
+
+    def test_04_insertarMicroControlAsistencia(self):
         """Comprobamos que la función con el mismo nombre funciona correctamente."""
         test=True
         mca={"asistencia" : 1, "retraso": 0, "retrasoTiempo" : 0, "retrasoJustificado" : 0, "uniforme" : 1, "idAlumno" : 11}
@@ -184,8 +207,7 @@ class TestNDBlib(unittest.TestCase):
             test=False
         self.assertEqual(test, True)
 
-
-    def test_04_insertaResumenControlAsistencia(self):
+    def test_05_insertaResumenControlAsistencia(self):
         """ Comprobamos que un resumen se insertar correctamente. """
         test=True
         #Una lista de claves de supuestos microControlAsistencia
@@ -208,7 +230,7 @@ class TestNDBlib(unittest.TestCase):
         self.assertEqual(test, True)
 
     #Una vez pasados los test anteriores se ejecuta este (que usa las funciones anteriores).
-    def test_05_insertarControlAsistencia(self):
+    def test_06_insertarControlAsistencia(self):
         """
         Comprobación de la introducción de un control de asistencia completo.
         """
@@ -245,7 +267,7 @@ class TestNDBlib(unittest.TestCase):
         self.assertEqual(test, True)
 
     #Tests de obtención (los más usados en la UI)
-    def test_06_obtenerResumenesControlAsistencia(self):
+    def test_07_obtenerResumenesControlAsistencia(self):
         """Comprueba el método con el mismo nombre, con algunas de las combinaciones de atributos pasados"""
         test = True
 
@@ -281,7 +303,7 @@ class TestNDBlib(unittest.TestCase):
 
         self.assertEqual(test, True)
 
-    def test_07_obtenerControlAsistencia(self):
+    def test_08_obtenerControlAsistencia(self):
         test = True
 
         #Insertamos algunas referencias que faltaban
@@ -329,8 +351,7 @@ class TestNDBlib(unittest.TestCase):
 
         self.assertEqual(test, True)
 
-
-    def test_08_eliminarControlAsistencia(self):
+    def test_09_eliminarControlAsistencia(self):
         test = True
 
         #Primero insertamos un control, sabiendo que ese metodo ha sido ya testeado
