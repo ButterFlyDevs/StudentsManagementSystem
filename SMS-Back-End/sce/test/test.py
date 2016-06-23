@@ -194,4 +194,4 @@ class SCE_API_TESTS(unittest.TestCase):
         print 'Tras todos los test'
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.m

@@ -221,12 +221,14 @@ def insertarEntidad():
     """
     Inserta una entidad de referencia del tipo pasado en el DataStore.
 
+    Método **POST** (los datos pueden pasarse como payload).
+
     Las entidades de referencia son aquellas que son copia (muy resumida) de las almacenadas en el SBD
     para que cuando se quiera obtener el nombre de una de ellas el SCE no tenga que acceder al SBD, porque tenga una copia el.
 
-    :param tipo: tipo en el que queremos hacer una insercción de una entidad
-    :param idEntidad: id con la que se quiere guardar la entidad en la tabla de su tipo (no es la clave en el datastore)
-    :param nombreEntidad: nombre completo de la entidad
+    :param tipo: tipo en el que queremos hacer una insercción de una entidad.
+    :param idEntidad: id con la que se quiere guardar la entidad en la tabla de su tipo (no es la clave en el datastore).
+    :param nombreEntidad: nombre completo de la entidad (ejemplo: En caso de profesor sería su nombre completo).
     :type tipo: string ('Alumno', 'Profesor', 'Clase', 'Asignatura')
     :type idEntidad: int
     :type nombreEntidad: string
@@ -235,8 +237,11 @@ def insertarEntidad():
 
     Ejemplo::
 
-          curl -X POST -d "tipo=Alumno&idEntidad=3242&nombreEntidad=alumnoNuevo"  localhost:8003/entidadesReferencia
-
+          >>> curl -X POST -d "tipo=Alumno&idEntidad=3242&nombreEntidad=alumnoNuevo"  localhost:8003/entidadesReferencia
+          {"status": "OK"}
+          >>> res = requests.post('localhost:8003/entidadesReferencia', data={ 'tipo': 'Profesor', 'idEntidad': 3135, 'nombreEntidad': 'nombreProfesor' })
+          >>> jsonpickle.decode(res.text)
+          {"status": "OK"}
     """
     if v:
         print nombreMicroservicio
