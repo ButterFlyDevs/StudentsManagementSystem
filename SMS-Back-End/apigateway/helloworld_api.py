@@ -240,7 +240,7 @@ class salidaLogin(messages.Message):
 
 
 
-from mensajesSCE import *
+from mensajes.mensajesSCE import *
 
 
 #Decorador que establace nombre y versión de la api
@@ -2647,9 +2647,15 @@ class HelloWorldApi(remote.Service):
 
     @endpoints.method(ControlAsistencia, MensajeRespuesta, path='controlesAsistencia', http_method='POST', name='controles.insertarControlAsistencia')
     def insertarControlAsistencia(self, request):
-        '''
-        Permite subir una lista de controles de asistencia.
-        '''
+        """
+        Permite subir un control de asistencia.
+
+        curl -X POST  -H 'content-type: application/json' -d @ejemploControlAsistencia.json localhost:8001/_ah/api/helloworld/v1/controlesAsistencia
+        {
+         "message": "{\"key\": 5136918324969472, \"status\": \"OK\"}"
+        }
+
+        """
         #Info de seguimiento
         if v:
             print nombreMicroservicio
@@ -2677,7 +2683,7 @@ class HelloWorldApi(remote.Service):
             tmpDic['retrasoJustificado'] = a.retrasoJustificado
             tmpDic['retrasoTiempo'] = a.retrasoTiempo
             tmpDic['uniforme'] = a.uniforme
-            tmpDic['idAlumno'] = a.id
+            tmpDic['idAlumno'] = a.idAlumno
 
             #Añadimo este tmpDic a la lista controles del diccionario principal.
             diccionario['microControlesAsistencia'].append(tmpDic)
@@ -2712,36 +2718,14 @@ class HelloWorldApi(remote.Service):
 
         return MensajeRespuesta( message=result.content )
 
-    @endpoints.method(ParametrosPeticionResumenes, ListaResumenesControlesAsistencia, path='controles/resumenes', http_method='GET', name='controles.getResumenes')
+    @endpoints.method(ParametrosPeticionResumenes, ListaResumenesControlesAsistencia, path='resumenesControlesAsistencia', http_method='GET', name='controles.getResumenes')
     def getResumenesControlesAsistenciaConParametros(self, request):
-        '''
+        """
         Devuelve una lista con todos los resumenes de los controles de estudiantes almacenados en el sistema filtrados
         por cualquiera de los campos.
 
-        curl -X GET localhost:8001/_ah/api/helloworld/v1/controles/resumenes?idProfesor=4
-
-
-        class ResumenControlAsistencia(messages.Message):
-            key = messages.StringField(1, required=True)
-            fecha = messages.StringField(2)
-            idClase = messages.StringField(3)
-            nombreClase = messages.StringField(4)
-            idAsignatura = messages.StringField(5)
-            nombreAsignatura = messages.StringField(6)
-            idProfesor = messages.StringField(7)
-            nombreProfesor = messages.StringField(8)
-
-        class ListaResumenControlAsistencia(messages.Message):
-            resumenes = messages.MessageField(ResumenControlAsistencia, 1, repeated=True)
-
-        #Cuando pedimos los resumenes de los controles de asistencia los podemos pedir usando parámetros o sin ellos.
-        class ParametrosPeticionResumen(messages.Message):
-            idProfesor = messages.IntegerField(1)
-            idAsignatura = messages.IntegerField(2)
-            idClase = messages.IntegerField(3)
-            fechaHora = messages.StringFiedl(4)
-
-        '''
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/resumenesControlesAsistencia?idProfesor=4
+        """
         #Info de seguimiento
         if v:
             print nombreMicroservicio
@@ -2752,7 +2736,7 @@ class HelloWorldApi(remote.Service):
 
         #Conformamos la dirección:
         url = "http://%s/" % modules.get_hostname(module="sce")
-        url+="resumenesControlesAsistenciaEspecificos"
+        url+="resumenesControlesAsistencia"
 
 
         #Extraemos los datos pasados a la petición y los empaquetamos en un dict.
@@ -2776,25 +2760,10 @@ class HelloWorldApi(remote.Service):
 
         #Petición al microservicio:
         result = urlfetch.fetch(url=url, payload=urllib.urlencode(datos), method=urlfetch.POST)
+        print result.content
         listaResumenes = jsonpickle.decode(result.content)
         print 'Resultado'
         print listaResumenes
-
-
-        '''
-        class ResumenControlAsistencia(messages.Message):
-            key = messages.StringField(1, required=True)
-            fecha = messages.StringField(2)
-            idClase = messages.StringField(3)
-            nombreClase = messages.StringField(4)
-            idAsignatura = messages.StringField(5)
-            nombreAsignatura = messages.StringField(6)
-            idProfesor = messages.StringField(7)
-            nombreProfesor = messages.StringField(8)
-
-        class ListaResumenControlAsistencia(messages.Message):
-            resumenes = messages.MessageField(ResumenControlAsistencia, 1, repeated=True)
-        '''
 
         resumenesItems= []
 
@@ -2806,7 +2775,7 @@ class HelloWorldApi(remote.Service):
 
 
             resumenesItems.append( ResumenControlAsistencia( key=int(resumen.get('key')),
-                                                             fecha=str(resumen.get('fecha')),
+                                                             fechaHora=str(resumen.get('fechaHora')),
                                                              idClase=int(resumen.get('idClase')),
                                                              nombreClase=formatText(resumen.get('nombreClase')),
                                                              idAsignatura=int(resumen.get('idAsignatura')),
@@ -2820,25 +2789,24 @@ class HelloWorldApi(remote.Service):
         time.sleep(2)
 
 
-        return ListaResumenControlAsistencia(resumenes=resumenesItems)
+        return ListaResumenesControlesAsistencia(resumenes=resumenesItems)
 
 
 
         #return MensajeRespuesta(message="Hola ke ase!")
 
-    #La url hay que mejorarla, no necesita el /getControl (Se identifica con el método)
     @endpoints.method(ID, ControlAsistencia, path='controlesAsistencia', http_method='GET', name='controles.getControl')
     def getControlAsistencia(self, request):
         '''
 
-        curl -X GET localhost:8001/_ah/api/helloworld/v1/controles/getControl?id=4644337115725824
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/controlesAsistencia?id=4644337115725824
 
         Devuelve un control de asistencia completo que se le pide con el id pasado.
         '''
         #Info de seguimiento
         if v:
             print nombreMicroservicio
-            print ' Petición POST a controles.getContol'
+            print ' Petición POST a controles.getControl'
             print ' Request: \n '+str(request)+'\n'
 
 
@@ -2853,15 +2821,25 @@ class HelloWorldApi(remote.Service):
         #Petición al microservicio
         result = urlfetch.fetch(url=url, method=urlfetch.GET)
 
+        #Resultado de la petición:
         print "RESULTADO:"+str(result.status_code)
         print result.content
 
+        #######
+        #Adaptación de la respuesta a los tipos de mensajes
+        #######
 
         #Convertimos el json a un objeto python
         controlAsistencia = jsonpickle.decode(result.content)
 
+
+
         print 'controlAsistencia'
         print controlAsistencia
+
+        print 'Controles:>>'
+        print len(controlAsistencia['microControlesAsistencia'])
+        print controlAsistencia['microControlesAsistencia']
 
         #Convertirmos este objeto python al mensja de rpc para ser enviado.
 
@@ -2869,26 +2847,27 @@ class HelloWorldApi(remote.Service):
 
         #Recorremos todos los elementos de la lista 'controles' del diccionario devuelto por el mservicio sce.
         listaControles = []
-        for mControl in controlAsistencia['controles']:
+        for mControl in controlAsistencia['microControlesAsistencia']:
             #print 'mControl'
             #print mControl
-            listaControles.append(ControlAsistencia( asistencia=int(mControl['asistencia']),
+            listaControles.append(MicroControlAsistencia( asistencia=int(mControl['asistencia']),
                                                      retraso=int(mControl['retraso']),
                                                      retrasoJustificado=int(mControl['retrasoJustificado']),
+                                                     retrasoTiempo=int(mControl['retrasoTiempo']),
                                                      uniforme=int(mControl['uniforme']),
                                                      nombreAlumno=formatText(mControl['nombreAlumno']),
-                                                     id=int(mControl['idAlumno'])
+                                                     idAlumno=int(mControl['idAlumno'])
                                                    ))
 
         #Una vez que tenemos la lista componemos el mensaje final
-        return ListaControlAsistencia( controles=listaControles,
+        return ControlAsistencia( microControlesAsistencia=listaControles,
                                        idProfesor=int(controlAsistencia['idProfesor']),
                                        idClase=int(controlAsistencia['idClase']),
                                        idAsignatura=int(controlAsistencia['idAsignatura']),
                                        nombreClase=formatText(controlAsistencia['nombreClase']),
                                        nombreAsignatura=formatText(controlAsistencia['nombreAsignatura']),
                                        nombreProfesor=formatText(controlAsistencia['nombreProfesor']),
-                                       fecha=controlAsistencia['fechaHora']
+                                       fechaHora=controlAsistencia['fechaHora']
                                      )
 
 

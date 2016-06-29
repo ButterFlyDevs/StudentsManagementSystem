@@ -17,11 +17,15 @@ import unittest
 #Como las respuestas son siempre en json incluimos la librería para decodificarlas y tratarlas.
 import jsonpickle
 
+from termcolor import colored
+
 #Para los sleeps
 import time
 urlBase = 'http://localhost:8001/_ah/api/helloworld/v1'
 import requests
 import json
+
+import datetime
 
 from pprint import pprint
 
@@ -53,7 +57,6 @@ class API_GATEWAY_TESTS(unittest.TestCase):
     """
 
     def test_001_HolaMundo(self):
-        test = True
         url     = urlBase+'/holaMundo'
         #Introducir un alumno es correcto:
         res = requests.get(url)
@@ -62,19 +65,29 @@ class API_GATEWAY_TESTS(unittest.TestCase):
         assert 'Hola mundo! \n' in res['message']
 
 
-    def test_002_insertarControlAsistencia(self):
-
-        mca = {
+    def test_002_ControlesAsistencia(self):
+        test = True
+        mca1 = {
             'asistencia': 1,
             'retraso': 1,
             'retrasoJustificado': 1,
             'retrasoTiempo': 10,
             'uniforme': 1,
-            'id': 3
+            'idAlumno': 3
+            }
+
+        mca2 = {
+            'asistencia': 1,
+            'retraso': 1,
+            'retrasoJustificado': 1,
+            'retrasoTiempo': 10,
+            'uniforme': 1,
+            'idAlumno': 3
             }
 
         lista = []
-        lista.append(mca)
+        lista.append(mca1)
+        lista.append(mca2)
 
         datos={'microControlesAsistencia': lista, 'idProfesor': 22, 'idClase': 254, 'idAsignatura': 2384}
         payload=json.dumps(datos)
@@ -86,24 +99,53 @@ class API_GATEWAY_TESTS(unittest.TestCase):
         #Decodificamos el json que hay dentro del propio json de respuesta del API
         message = jsonpickle.decode(jsonpickle.decode(res.text)['message'])
 
-        print 'RES'
+
+
         #print res['message']
         #message=jsonpickle.decode(res['message'])
-        print message['key']
+        print 'Clave '+ colored(message['key'], 'red')
 
 
         #Ahora con el mismo key vamos a intentar rescatar el Control de Asistencia que acabamos de insertar
-        datos={'id': 4644337115725824}
-        payload=json.dumps(datos)
-        print payload
+        #datos={'id': 4644337115725824}
+        #payload=json.dumps(datos)
+        #print payload
         res2 = requests.get(url, params={'id': message['key']})
-        print 'res2'
-        print res2
-        print res2.url
 
-        assert 'OK' in message['status']
+        datos=jsonpickle.decode(res2.content)
+        print colored('Datos obtenidos ', 'blue')
+        print colored(datos, 'blue')
+        if datos['idAsignatura'] != '2384' or datos['idClase'] != '254' or datos['idProfesor'] != '22' : test = False
+
+        ahora = datetime.datetime.today()
+        dia = datetime.datetime.strftime(ahora, "%d-%m-%Y")
+        hora =  datetime.datetime.strftime(ahora, "%H:%M")
+
+        #Comprobamos que que la fecha que el sistema ha introducido corresponde a la de hoy
+        if dia not in datos['fechaHora']: test = False
+        if hora not in datos['fechaHora']: test = False
 
 
+
+        #Y vamos a comprobar que cuando pedimos todos los resumenes de controles de asistencia obtenemos el nuestro:
+
+        url = urlBase+'/resumenesControlesAsistencia'
+        res = requests.get(url)
+        data = jsonpickle.decode(res.text)
+
+        resumenes=data['resumenes']
+        print colored(len(resumenes), 'red')+' resumenes obtenidos.'
+
+        encontrado = False
+        for a in resumenes:
+            if int(a['key']) == int(message['key']):
+                encontrado = True
+                print colored('Encontrado '+str(message['key'])+' !', 'red')
+                break
+
+        if encontrado != True: test = False
+
+        self.assertEqual(test, True)
 
 if __name__ == '__main__':
     #main()

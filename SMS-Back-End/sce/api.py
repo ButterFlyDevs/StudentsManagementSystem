@@ -74,9 +74,6 @@ def  obtenerResumenesControlesAsistencia():
         print ' Request: '+str(request.form)
 
 
-    if request.form['idProfesor']:
-        print 'YEAH'
-
     #Usamos .get con el uso de None para que en el caso de no exisitir devuelva None
 
     if request.form.get('idProfesor', None) is None:
@@ -183,15 +180,21 @@ def  insertaControlAsistencia():
 def obtenerControlAsistencia(idControlAsistencia):
     """
     Devuelve un control de asitencia completo, es decir, un control realizado por un profesor que
-    imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos.
+    imparte una asignatura concreta en una clase concreta en una fecha y hora a unos alumnos concretos,
+    un conjunto de microControlesAsistencia y los datos relevantes.
 
-    curl -i -X GET localhost:8003/controlAsistencia/4996180836614144
+    curl -i -X GET localhost:8003/controlesAsistencia/6614661952700416
     """
     #Info de seguimiento
     if v:
         print nombreMicroservicio
         print ' Llamando a /controlAsistencia/'+ str(idControlAsistencia) +' GET obtenerControlAsistencia()'
         print locals()
+
+        print '-->Antes de la conversión'
+        print Gestor.obtenerControlAsistencia(idControlAsistencia)
+        print '-->Después de la conversión'
+        print jsonpickle.encode(Gestor.obtenerControlAsistencia(idControlAsistencia))
 
     #Llamamos al gestor y convertimos su respuesta en un objeto json
     return jsonpickle.encode(Gestor.obtenerControlAsistencia(idControlAsistencia))

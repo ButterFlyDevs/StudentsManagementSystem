@@ -158,6 +158,11 @@ class SCE_API_TESTS(unittest.TestCase):
         print res.text
         res = jsonpickle.decode(res.text)
 
+        for r in  res['controles']:
+            print 'Control:'
+            print r
+            print '\n'
+
         #Comprobamos algunos de los datos que esperamos
         if ( #Si alguno de las condiciones falla, falla el test.
            res['idClase'] != 33
@@ -175,7 +180,7 @@ class SCE_API_TESTS(unittest.TestCase):
 
         time.sleep(1)
 
-        self.assertEqual(test, True)
+        self.assertEqual(test, True, 'Fallo en 7up')
 
     def test_05_obtenerResumenesControlesAsistencia(self):
         test = True
@@ -194,4 +199,4 @@ class SCE_API_TESTS(unittest.TestCase):
         print 'Tras todos los test'
 
 if __name__ == '__main__':
-    unittest.m
+    unittest.main()

@@ -338,7 +338,7 @@ class TestNDBlib(unittest.TestCase):
         print ' ##salida insercción ##'
         print salida
         salida2=Gestor.obtenerControlAsistencia(salida['key'])
-        print ' ##salida obtencion ##'
+        print ' ##salida obtencion Control Asistencia ##'
         print salida2
 
         #Algunas comprobaciones

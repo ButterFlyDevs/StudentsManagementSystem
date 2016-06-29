@@ -6,8 +6,12 @@ Wrapper (envoltorio) de la librería **ndb** (que conecta con Cloud Datastore) y
 from google.appengine.ext.db import Key
 from ModelosNDB import *
 import datetime
-
+from termcolor import colored
 import time
+
+from pytz import timezone
+import pytz
+
 
 #import logging
 
@@ -141,12 +145,11 @@ class Gestor:
                     control["nombreAlumno"]="Indefinido"
 
                 listaControles.append(control)
-                print 'Objeto control creado'
-                print control
 
 
             #Añadimos la lista obtenida al diccionario que vamos a devolver:
-            controlAsistencia["controles"]=listaControles
+            controlAsistencia["microControlesAsistencia"]=listaControles
+
 
             #Ademas ahora añadimos los datos comunes al control, como la fecha e ides y nombres de profesor, clase y asignatura.
 
@@ -162,9 +165,11 @@ class Gestor:
             if (query.count()==1):
                 profesor = query.get()
                 controlAsistencia["nombreProfesor"]=profesor.nombreProfesor
+
             else:
                 print 'No existe nombre de referencia almacenado para el Profesor '+str(resumen.idProfesor)
-                control["nombreProfesor"]="Indefinido"
+                controlAsistencia["nombreProfesor"]="Indefinido"
+
 
             #Clase
             query = Clase.query(Clase.idClase==int(resumen.idClase))
@@ -173,7 +178,7 @@ class Gestor:
                 controlAsistencia["nombreClase"]=clase.nombreClase
             else:
                 print 'No existe nombre de referencia almacenado para la clase '+str(resumen.idClase)
-                control["nombreClase"]="Indefinido"
+                controlAsistencia["nombreClase"]="Indefinido"
 
             #Asignatura
             query = Asignatura.query(Asignatura.idAsignatura==int(resumen.idAsignatura))
@@ -182,7 +187,7 @@ class Gestor:
                 controlAsistencia["nombreAsignatura"]=asignatura.nombreAsignatura
             else:
                 print 'No existe nombre de referencia almacenado para la asignatura '+str(resumen.idAsignatura)
-                control["nombreAsignatura"]="Indefinido"
+                controlAsistencia["nombreAsignatura"]="Indefinido"
 
 
 
@@ -193,6 +198,7 @@ class Gestor:
             #print controlAsistencia
 
             #Devolvemos el control de asistencia construido
+            #print colored(controlAsistencia, 'green')
             return controlAsistencia
 
         else:
@@ -276,6 +282,8 @@ class Gestor:
 
         #Los guaramos todos en una lista
         listaResumenes = query.fetch()
+
+        print listaResumenes
 
         #Los recorremos todos para añadirles a cada uno los nombres de las entidades básicas que tienen para que se muestren
         #bien para el usuario en la Interfaz de Usuario
@@ -408,18 +416,26 @@ class Gestor:
         keys = []
 
         #Establecemos el datetime para usar el mismo en todas las asistencias al guardarlas, cogiéndolo del sistema.
-        fechaHora = datetime.datetime.now()
+        base =  datetime.datetime.now()
+        fechaHora = datetime.datetime.now(pytz.timezone("Europe/Madrid"))
+
+        #fechaHora = fechaHora.strftime('%Y-%m-%d %H:%M:%S')
+
+        fechaHora3 =datetime.datetime(fechaHora.year, fechaHora.month, fechaHora.day, fechaHora.hour, fechaHora.minute, fechaHora.second)
+        #print fechaHora3
+
         if v:
             print 'Datetime usado:'
-            print fechaHora
+            print colored(fechaHora3, 'red')
 
         #Recorremos todos los elementos de la lista de micro controles de asistencia pasados.
         for microControlAsistencia in controlAsistencia['microControlesAsistencia']:
             #Insertamos el microcontrol y guardamos su key en un vector.
             #Usando el método añadimos el microControlAsistencia con el resto de parámetros globlales a todos los de
-            #este control como son la fechaHora, el idProfesor, idClase e idAsignatura
+            #este control como son la fechaHora, el idProfesor, idClase e idAsignatura (se añade a todos para que tengan esos
+            #datos y las búsquedas puedan ser óptimas)
             keys.append(Gestor.insertarMicroControlAsistencia(microControlAsistencia,
-                                                              fechaHora,
+                                                              fechaHora3,
                                                               controlAsistencia['idProfesor'],
                                                               controlAsistencia['idClase'],
                                                               controlAsistencia['idAsignatura']))
@@ -433,7 +449,7 @@ class Gestor:
         los tres últimos parámetros usamos el primer control pasado en la lista.
         '''
 
-        keyResumen=Gestor.insertarResumenControlAsistencia(keys, fechaHora, controlAsistencia['idProfesor'],
+        keyResumen=Gestor.insertarResumenControlAsistencia(keys, fechaHora3, controlAsistencia['idProfesor'],
                                                                             controlAsistencia['idAsignatura'],
                                                                             controlAsistencia['idClase'])
 
