@@ -14,40 +14,71 @@ from Asignatura import *
 from Clase import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
+from termcolor import colored
 
 #Para activar/desactivar el modo verbose para muestra de mensajes.
 v = 1
 apiName='\n## API DB ##\n'
 
 class GestorAlumnos:
+
     """
     Clase manejadora de la entidad Alumno de la base de datos que ofrece una interfaz de gestión que simplifica y abstrae el uso.
     Ofrece gestión de la entidad y obtención de información de relación con el resto de entidades del modelo de la BD.
     """
 
-    @classmethod
-    def nuevoAlumno(self,nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL', imagen='NULL'):
-        """
-        Introduce un nuevo alumno en la base de datos.
-        El único argumento que se necesita como mínimo es el nombre.
+    ## Métodos propios ##
 
-        El resto de parámetros pueden pasarse o no. En caso de hacerlo no es necesario que se haga en orden, especificando
-        el parámetro que estamos pasando. Esta es una característica de python.
-        Así la llamada: GestorAlumnos.nuevoAlumno('Maria')
-        realizaría la query: INSERT INTO Alumno VALUES(NULL,'Maria',NULL,NULL,NULL,NULL,NULL,NULL,NULL);
-        y la llamada: GestorAlumnos.nuevoAlumno('Maria', apellidos='Fernández García')
-        realizaría la query:
-        INSERT INTO Alumno VALUES(NULL,'Maria','Fernández García',NULL,NULL,NULL,NULL,NULL,NULL);
+    @classmethod
+    def nuevoAlumno(self,nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fechaNacimiento='NULL', telefono='NULL', urlImagen='NULL'):
+        """
+        Intruduce un nuevo alumno en la base de datos.
+
+        :param nombre: Nombre del alumno, incluso si es compuesto, único parámetro **obligatorio**.
+        :type nombre: String
+        :param apellidos: Apellidos de alumnos, separados por un espacio.
+        :type apellidos: String
+        :param dni: Documento Nacional de Identidad, en caso de que lo tenga.
+        :type dni: Entero
+        :param direccion: Dirección de la residencia del estudiante.
+        :type direccion: String
+        :param localidad: Localida de residencia.
+        :type localidad: String
+        :param provincia: Provincia donde se encuentra la localidad.
+        :type provincia: String
+        :param fechaNacimiento: Fecha de nacimiento del alumno.
+        :type fechaNacimiento: Date con formato (dd-mm-aaaa)
+        :param telefono: Número de teléfono del alumno.
+        :type telefono: Entero
+        :param urlImagen: URL a una imagen para el perfil del alumno.
+        :type urlImagen: URL
+        :returns: Mensaje con estado de la acción e id en caso de haberse creado correctamente.
+        :rtype: diccionario
+
+        Ejemplo de salida::
+
+            ...
+            {'status': 'OK', 'idAlumno': '3'}
+            ...
+            {'status': 'Elemento duplicado'}
         """
 
         print '\n\n ### calling nuevoAlumno() ### \n\n'
-        print locals()
+        print colored(locals(), 'red')
 
+        """
+        #Recorremos el diccionario que representa los parámetros de la función, y añadimos a los parámetros presentes las comillas
+        for key, value in locals().iteritems():
+            if value != 'NULL' and key != 'self':
+                print value
+        """
 
+        locals()['nombre']='PerroFlauta'
 
-        db = dbParams.conecta(); #La conexión está clara.
-        #query="INSERT INTO Alumno values("+"'"+nombre+"', "+ "'"+dni+"');"
+        print colored(locals()['nombre'], 'blue')
+        print colored(nombre)
 
+        db = dbParams.conecta() #Conecta a la BD
 
         #Añadimos al principio y al final una comilla simple a todos los elementos que no sean NULL(si lo son no queremos ponerle dos '' )
         nombre='\''+nombre+'\''
@@ -60,24 +91,24 @@ class GestorAlumnos:
             localidad='\''+localidad+'\''
         if(provincia!='NULL'):
             provincia='\''+provincia+'\''
-        if(fecha_nacimiento!='NULL'):
-            fecha_nacimiento='\''+fecha_nacimiento+'\''
+        if(fechaNacimiento!='NULL'):
+            fechaNacimiento='\''+fechaNacimiento+'\''
         if(telefono!='NULL'):
             telefono='\''+telefono+'\''
-        if(imagen!='NULL'):
-            imagen='\''+imagen+'\''
+        if(urlImagen!='NULL'):
+            urlImagen='\''+urlImagen+'\''
 
-        '''
+        """
         Como en la base de datos existe un valor id para el alumno que se autoincrementa no podemos introducir los datos así:
         query="INSERT INTO Alumno VALUES("+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nac+","+telefono+");"
         hay que especificar los campos sin este id, así:
         query='INSERT INTO Alumno (nombre, apellidos, ...) VALUES (...)
         o pasar simplemente NULL.
-        '''
+        """
 
         #NULL por el campo id que es primary key y que se autoincrementa automat por la definición de la tabla Alumno en la BD. (ver DBCreator_v0_1.sql)
 
-        query='INSERT INTO Alumno VALUES(NULL'+','+nombre+','+apellidos+','+dni+','+direccion+','+localidad+','+provincia+','+fecha_nacimiento+','+telefono+','+imagen+');'
+        query='INSERT INTO Alumno VALUES(NULL'+','+nombre+','+apellidos+','+dni+','+direccion+','+localidad+','+provincia+','+fechaNacimiento+','+telefono+','+urlImagen+');'
         #query2='INSERT INTO Alumno VALUES(NULL'+','+nombre+','+apellidos+','+dni+');'
 
 
@@ -91,14 +122,13 @@ class GestorAlumnos:
         salida =''
         idAlumno=''
 
-        import MySQLdb
         try:
 
             salida = cursor.execute(query);
             idAlumno = cursor.lastrowid
 
             #idAlumno=cursor.execute('SELECT LAST_INSERT_ID();')
-        except MySQLdb.Error, e:
+        except dbParams.MySQLdb.Error, e:
             # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -118,77 +148,47 @@ class GestorAlumnos:
             print "salida MySQL: "+str(salida)
             print "salida idAlumno:"+str(idAlumno)
 
-        dic={'status':salida, 'idAlumno':str(idAlumno)}
+        dic={}
 
 
         if salida==1:
-            dic['status']= 'OK'
-            #return 'OK'
-        if salida==1062:
-            dic['status']= 'Elemento duplicado'
-            #return 'Elemento duplicado'
-
-        #Devolvemos el diccionario
-        print dic
-        return dic
+            return {'status': 'OK', 'idAlumno': str(idAlumno)}
+        elif salida==1062:
+            return {'status': 'Elemento duplicado'}
+        else:
+            return {'status': 'desconocido'}
 
     @classmethod
-    def getAlumnos(self):
-        '''
-        Devuelve una lista de todos los alumnos almacenados en la base de datos simplificada, solo con los
-        campos id, nombre y apellidos.
-        '''
+    def getAlumnos(self, idAlumno=None):
+        """
+        Devuelve alumnos de la base de datos.
+
+        :param idAlumno: Identificador del alumno (en la base de datos), *no es su DNI*, es **opcional**.
+        :type idAlumno: Entero
+        :returns: En caso de no pasar id devuelve todos los alumnos de la base de datos de forma muy resumida (lista
+            de diccionarios), solo *nombre*,
+            *apellidos* e *identificador* de la bd, pero si se pasa id entonces se devuelve toda la información de ese alumno
+            que se tenga almacenada (como un diccionario).
+        :rtype: lista de diccionarios o diccionario.
+
+        Ejemplo de salida::
+
+            >>> GestorAlumnosSQL.nuevoAlumno(nombre='Juan')
+            {'status': 'OK', 'idAlumno': '1'}
+            >>> GestorAlumnosSQl.getAlumnos(idAlumno=1)
+            {'apellidos': None, 'urlImagen': None, 'provincia': None, 'telefono': None,
+             'localidad': None, 'nombre': u'Juan', 'fechaNacimiento': None, 'dni': None,
+             'idAlumno': 1L, 'direccion': None}
+        """
+
 
         db = dbParams.conecta()
-
-        #db = dbParams.conecta()
         cursor = db.cursor()
 
-        #Sacando los acentos...........
-        mysql_query="SET NAMES 'utf8'"
-        cursor.execute(mysql_query)
-        #-----------------------------#
-
-        query="select * from Alumno"
-        cursor.execute(query)
-        row = cursor.fetchone()
-
-        lista = []
-
-        while row is not None:
-            alumno = Alumno()
-            #print "LISTA SUPER CHACHI"
-
-            alumno.id=row[0]
-            alumno.nombre=row[1]
-            alumno.apellidos=row[2]
-            lista.append(alumno)
-            #print row[0], row[1]
-            row = cursor.fetchone()
-            #print 'Nombre alumno: '+alumno.nombre
-
-        cursor.close()
-        db.close()
-
-        return lista
-
-
-    @classmethod
-    def getAlumno(self, idAlumno):
-        """
-        Recupera ``TODA`` la información de un alumno en concreto a través de su id.
-
-        Argumentos:
-            idAlumno: identificador unívoco del alumno en la tabla
-
-        """
-        db = dbParams.conecta(); #La conexión está clara.
-        cursor = db.cursor()
-        idAlumno='\''+idAlumno+'\''
-        query='select * from Alumno where id_alumno='+idAlumno+';'
-        if v:
-            print 'Query in GestorAlumnosSQL.getAlumno()'
-            print query
+        if idAlumno != None:
+            query='select * from Alumno where idAlumno='+idAlumno+';'
+        else:
+            query="select nombre, apellidos, idAlumno from Alumno"
 
         try:
             salida = cursor.execute(query);
@@ -202,29 +202,26 @@ class GestorAlumnos:
             except IndexError:
                 print "MySQL Error: %s" % str(e)
 
+        if idAlumno != None: #Se busca uno en concreto
+            if salida == 1:
+                ret = {'idAlumno': row[0], 'nombre': row[1], 'apellidos': row[2], 'dni': row[3],
+                       'direccion': row[4], 'localidad': row[5], 'provincia': row[6],
+                       'fechaNacimiento': row[7], 'telefono': row[8], 'urlImagen': row[9]}
+            if salida == 0:
+                ret = 'Elemento no encontrado'
+        else: #Se quieren todos
+            lista = [] #Creamos una lista
+            while row is not None:
+                #Añadimos un dict a la lista con los datos básicos del alumno.
+                lista.append({'nombre': row[0], 'apellidos': row[1], 'idAlumno': row[2]})
+                row = cursor.fetchone() #Recuperamos el siguiente
+
+            ret = lista
+
         cursor.close()
         db.close()
 
-        if salida==1:
-            #Como se trata de toda la información al completo usaremos todos los campos de la clase alumno.
-            #La api del mservicio envia estos datos en JSON sin comprobar nada
-            alm = Alumno()
-            alm.id=row[0]
-            alm.nombre=row[1]
-            alm.apellidos=row[2]
-            alm.dni=row[3]
-            alm.direccion=row[4]
-            alm.localidad=row[5]
-            alm.provincia=row[6]
-            alm.fecha_nacimiento=row[7]
-            alm.telefono=row[8]
-            alm.urlImagen = row[9]
-
-            print 'Nombre alumno: '+dbParams.formatOutputText(alm.nombre)
-
-            return alm
-        if salida==0:
-            return 'Elemento no encontrado'
+        return ret
 
     @classmethod
     def modAlumno(self, idAlumno, campoACambiar, nuevoValor):
@@ -237,7 +234,7 @@ class GestorAlumnos:
         db = dbParams.conecta(); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idAlumno='\''+idAlumno+'\''
-        query="UPDATE Alumno SET "+campoACambiar+"="+nuevoValor+" WHERE id_alumno="+idAlumno+";"
+        query="UPDATE Alumno SET "+campoACambiar+"="+nuevoValor+" WHERE idAlumno="+idAlumno+";"
 
 
 
@@ -249,7 +246,7 @@ class GestorAlumnos:
         '''
         try:
             salida = cursor.execute(query);
-        except MySQLdb.Error, e:
+        except dbParams.MySQLdb.Error, e:
             # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -271,87 +268,12 @@ class GestorAlumnos:
             return 'Elemento no encontrado'
 
     @classmethod
-    def modAlumnoCompleto(self, idAlumno, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL',  imagen='NULL'):
-        '''
-        Modifica todos los atributos de un alumno dado su id al mismo tiempo.
-        '''
-
-        #Info de seguimiento
-        if v:
-            print apiName
-            print "Llamada a modAlumnoCompleto"
-            print '\n'
-            print locals()
-
-        db = dbParams.conecta();
-        query="UPDATE Alumno SET"
-        query=query+" nombre= "+'\''+nombre+'\''
-        query=query+" , apellidos= "+'\''+apellidos+'\''
-        if dni=='NULL':
-            query=query+" , dni=NULL "
-        else:
-            query=query+" , dni= "+'\''+dni+'\''
-        query=query+" , direccion= "+'\''+direccion+'\''
-        query=query+" , localidad= "+'\''+localidad+'\''
-        query=query+" , provincia= "+'\''+provincia+'\''
-
-        if fecha_nacimiento=='NULL':
-            query=query+" , fecha_nacimiento=NULL "
-        else:
-            query=query+" , fecha_nacimiento= "+'\''+fecha_nacimiento+'\''
-
-
-        query=query+" , telefono= "+'\''+telefono+'\''
-        query=query+" , url_imagen= "+'\''+imagen+'\''
-
-        #Codificamos el id porque es el único que no viene codificado desde la api para que no de problema al concatenar con la sentencia SQL
-        query=query+" WHERE id_alumno="+dbParams.formatOutputText(idAlumno)+";"
-
-        if v:
-            print apiName
-            print '\n'+query
-
-        cursor = db.cursor()
-        #Sacando los acentos...........
-        mysql_query="SET NAMES 'utf8'"
-        cursor.execute(mysql_query)
-        #-----------------------------#
-        salida =''
-
-        try:
-            salida = cursor.execute(query);
-        except MySQLdb.Error, e:
-            # Get data from database
-            try:
-                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-                print "Error number: "+str(e.args[0])
-                salida=e.args[0]
-            except IndexError:
-                print "MySQL Error: %s" % str(e)
-
-        if v:
-            print "Salida MySQL: "+str(salida)
-
-        #Efectuamos los cambios
-        db.commit()
-        cursor.close()
-        db.close()
-
-        if salida==1:
-            return 'OK'
-        elif salida==1062:
-            return 'Elemento duplicado'
-        elif salida==0:
-            return 'Sin cambios realizados'
-
-
-    @classmethod
     def delAlumno(self, idAlumno):
         #print "Intentado eliminar alumno con dni "+str(dniAlumno)
         db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
         idAlumno='\''+idAlumno+'\''
-        query='delete from Alumno WHERE id_alumno='+idAlumno+';'
+        query='delete from Alumno WHERE idAlumno='+idAlumno+';'
         salida =''
         try:
             salida = cursor.execute(query);
@@ -411,6 +333,8 @@ class GestorAlumnos:
         if salida==0:
             return 'Elemento no encontrado'
 
+    ## Métodos de relaciones con otros ##
+
     @classmethod
     def getProfesores(self, idAlumno):
         """
@@ -429,9 +353,9 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        #query='SELECT id_profesor, nombre, apellidos from Profesor where id_profesor in ( select id_profesor from Imparte where id_asignatura in (select id_asignatura from Matricula where id_alumno='+idAlumno+') and id_clase in  (select id_clase from Matricula where id_alumno='+idAlumno+'))'
+        #query='SELECT id_profesor, nombre, apellidos from Profesor where id_profesor in ( select id_profesor from Imparte where id_asignatura in (select id_asignatura from Matricula where idAlumno='+idAlumno+') and id_clase in  (select id_clase from Matricula where idAlumno='+idAlumno+'))'
 
-        query='SELECT nombre, apellidos, id_profesor FROM Profesor WHERE id_profesor IN (SELECT id_profesor FROM Imparte, Matricula WHERE Imparte.id_asociacion=Matricula.id_asociacion and Matricula.id_alumno='+idAlumno+');'
+        query='SELECT nombre, apellidos, id_profesor FROM Profesor WHERE id_profesor IN (SELECT id_profesor FROM Imparte, Matricula WHERE Imparte.id_asociacion=Matricula.id_asociacion and Matricula.idAlumno='+idAlumno+');'
 
         if v:
             print query
@@ -481,11 +405,11 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='select * from Asignatura where id in (select id_asignatura from Matricula where id_alumno='+idAlumno+')'
+        query='select * from Asignatura where id in (select id_asignatura from Matricula where idAlumno='+idAlumno+')'
 
-        query='SELECT * FROM Asignatura WHERE id_asignatura IN (SELECT id_asignatura FROM Asocia WHERE id_asociacion IN (SELECT id_asociacion FROM Matricula WHERE id_alumno='+idAlumno+'));'
+        query='SELECT * FROM Asignatura WHERE id_asignatura IN (SELECT id_asignatura FROM Asocia WHERE id_asociacion IN (SELECT id_asociacion FROM Matricula WHERE idAlumno='+idAlumno+'));'
 
-        #select * from Matricula, Asignatura where Matricula.id_asignatura=Asignatura.id and id_alumno=4;
+        #select * from Matricula, Asignatura where Matricula.id_asignatura=Asignatura.id and idAlumno=4;
 
         try:
             salida = cursor.execute(query);
@@ -530,7 +454,7 @@ class GestorAlumnos:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT * FROM Clase WHERE id_clase IN (SELECT id_clase FROM Asocia WHERE id_asociacion IN (SELECT id_asociacion FROM Matricula WHERE id_alumno='+idAlumno+'));'
+        query='SELECT * FROM Clase WHERE id_clase IN (SELECT id_clase FROM Asocia WHERE id_asociacion IN (SELECT id_asociacion FROM Matricula WHERE idAlumno='+idAlumno+'));'
 
         try:
             salida = cursor.execute(query);

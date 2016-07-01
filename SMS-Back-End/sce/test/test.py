@@ -158,7 +158,7 @@ class SCE_API_TESTS(unittest.TestCase):
         print res.text
         res = jsonpickle.decode(res.text)
 
-        for r in  res['controles']:
+        for r in  res['microControlesAsistencia']:
             print 'Control:'
             print r
             print '\n'
@@ -166,12 +166,18 @@ class SCE_API_TESTS(unittest.TestCase):
         #Comprobamos algunos de los datos que esperamos
         if ( #Si alguno de las condiciones falla, falla el test.
            res['idClase'] != 33
-           or len(res['controles']) != 2
-           or (res['controles'][0])['asistencia'] != 1
+           or len(res['microControlesAsistencia']) != 2
+           or (res['microControlesAsistencia'][0])['asistencia'] != 1
            or res['idAsignatura'] != 44
            ): test = False
 
         time.sleep(1)
+
+        #Comprobamos antes de eliminarlo que se pueden recuperar los resúmenes bien.
+        url2 = urlBase+'/resumenesControlesAsistencia'
+        if (len(jsonpickle.decode(requests.post(url2, data={ 'idProfesor': '22'}).text)) != 1): test = False #Existe
+        if (len(jsonpickle.decode(requests.post(url2, data={ 'idProfesor': '3726'}).text)) != 0): test = False #No existe
+
         #3. Probamos que se puede eliminar bien
         res = requests.delete(url+'/'+str(key))
         res = jsonpickle.decode(res.text)
@@ -179,14 +185,6 @@ class SCE_API_TESTS(unittest.TestCase):
         if (res['status'] != 'OK'): test = False
 
         time.sleep(1)
-
-        self.assertEqual(test, True, 'Fallo en 7up')
-
-    def test_05_obtenerResumenesControlesAsistencia(self):
-        test = True
-        url     = urlBase+'/resumenesControlesAsistencia'
-        if (len(jsonpickle.decode(requests.post(url, data={ 'idProfesor': '22'}).text)) != 1): test = False #Existe
-        if (len(jsonpickle.decode(requests.post(url, data={ 'idProfesor': '3726'}).text)) != 0): test = False #No existe
 
         self.assertEqual(test, True)
 

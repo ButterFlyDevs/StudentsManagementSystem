@@ -46,10 +46,7 @@ class GestorAsignaturas:
 
 
         cursor = db.cursor()
-        #Sacando los acentos...........
-        mysql_query="SET NAMES 'utf8'"
-        cursor.execute(mysql_query)
-        #-----------------------------#
+
         salida =''
         '''
         Como la ejecución de esta consulta (query) puede producir excepciones como por ejemplo que el Asignatura con clave
@@ -59,7 +56,7 @@ class GestorAsignaturas:
         try:
             salida = cursor.execute(query);
             idAsignatura = cursor.lastrowid
-        except MySQLdb.Error, e:
+        except dbParams.MySQLdb.Error, e:
             # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -86,60 +83,21 @@ class GestorAsignaturas:
         return dic
 
     @classmethod
-    def getAsignaturas(self):
+    def getAsignaturas(self,idAsignatura=None):
         db = dbParams.conecta()
         cursor = db.cursor()
 
-        #Sacando los acentos...........
-        mysql_query="SET NAMES 'utf8'"
-        cursor.execute(mysql_query)
-        #-----------------------------#
+        if idAsignatura != None: #Buscamos una asignatura en concreto
+            query="select * from Asignatura where idAsignatura='"+idAsignatura+"';"
+        else: #Queremos todas las asignaturas
+            query="select * from Asignatura"
 
-        query="select * from Asignatura"
-        if v:
-            print '\n'+query
-        cursor.execute(query)
-        row = cursor.fetchone()
-
-        lista = []
-
-        while row is not None:
-            asignatura = Asignatura()
-            #print "LISTA SUPER CHACHI"
-
-            asignatura.id=row[0]
-            asignatura.nombre=row[1]
-
-
-            lista.append(asignatura)
-            #print row[0], row[1]
-            row = cursor.fetchone()
-
-        cursor.close()
-        db.close()
-
-        return lista
-
-        #Una de las opciones es convertirlo en un objeto y devolverlo
-
-    @classmethod
-    def getAsignatura(self, idAsignatura):
-        """
-        Recupera TODA la información de un Asignatura en concreto a través de la clave primaria, su id.
-        """
-        db = dbParams.conecta(); #La conexión está clara.
-        cursor = db.cursor()
-        query="select * from Asignatura where id_asignatura='"+idAsignatura+"';"
         if v:
             print '\n'+query
         try:
-            #Sacando los acentos...........
-            mysql_query="SET NAMES 'utf8'"
-            cursor.execute(mysql_query)
-            #-----------------------------#
             salida = cursor.execute(query);
             row = cursor.fetchone()
-        except MySQLdb.Error, e:
+        except dbParams.MySQLdb.Error, e:
             # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -148,20 +106,24 @@ class GestorAsignaturas:
             except IndexError:
                 print "MySQL Error: %s" % str(e)
 
+        if idAsignatura != None: #Se busca uno en concreto
+            if salida == 1:
+                #Creamos un objeto de tipo dict con toda la información delp rofesor extraida de la row de la consulta.
+                ret = {'id': row[0], 'nombre': row[1]}
+            if salida == 0:
+                ret = 'Elemento no encontrado'
+        else: #Se quieren todos
+            asignaturas = [] #Creamos una lista
+            while row is not None:
+                #Añadimos a la lista un dict con los datos que queremos de la asignatura
+                asignaturas.append({'id': row[0], 'nombre': row[1]})
+                row = cursor.fetchone()
+            ret = asignaturas
+
         cursor.close()
         db.close()
 
-        if salida==1:
-            #Como se trata de toda la información al completo usaremos todos los campos de la clase Asignatura.
-            #La api del mservicio envia estos datos en JSON sin comprobar nada
-            asignatura = Asignatura()
-            asignatura.id=row[0]
-            asignatura.nombre=row[1]
-
-
-            return asignatura
-        if salida==0:
-            return 'Elemento no encontrado'
+        return ret
 
     @classmethod
     def modAsignatura(self, idAsignatura, campoACambiar, nuevoValor):
@@ -174,7 +136,7 @@ class GestorAsignaturas:
         db = dbParams.conecta(); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idAsignatura='\''+idAsignatura+'\''
-        query="UPDATE Asignatura SET "+campoACambiar+"="+nuevoValor+" WHERE id_asignatura="+idAsignatura+";"
+        query="UPDATE Asignatura SET "+campoACambiar+"="+nuevoValor+" WHERE idAsignatura="+idAsignatura+";"
         if v:
             print '\n'+query
 
@@ -186,7 +148,7 @@ class GestorAsignaturas:
         '''
         try:
             salida = cursor.execute(query);
-        except MySQLdb.Error, e:
+        except dbParams.MySQLdb.Error, e:
             # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -208,66 +170,16 @@ class GestorAsignaturas:
             return 'Elemento no encontrado'
 
     @classmethod
-    def modAsignaturaCompleta(self, idAsignatura, nombre):
-        '''
-        Modifica todos los atributos de una asignatura dado su id al mismo tiempo.
-        '''
-
-        #Info de seguimiento
-        if v:
-            print apiName
-            print "Llamada a modAsignaturaCompleta"
-            print '\n'
-
-        db = dbParams.conecta();
-        query="UPDATE Asignatura SET"
-        query=query+" nombre= "+'\''+nombre+'\''
-        query=query+" WHERE id_asignatura="+idAsignatura+";"
-
-        if v:
-            print apiName
-            print query.encode('utf-8')
-
-        cursor = db.cursor()
-        salida =''
-
-        try:
-            salida = cursor.execute(query);
-        except MySQLdb.Error, e:
-            # Get data from database
-            try:
-                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-                print "Error number: "+str(e.args[0])
-                salida=e.args[0]
-            except IndexError:
-                print "MySQL Error: %s" % str(e)
-
-        if v:
-            print "Salida MySQL: "+str(salida)
-
-        #Efectuamos los cambios
-        db.commit()
-        cursor.close()
-        db.close()
-
-        if salida==1:
-            return 'OK'
-        elif salida==1062:
-            return 'Elemento duplicado'
-        elif salida==0:
-            return 'Sin cambios realizados'
-
-    @classmethod
     def delAsignatura(self, idAsignatura):
         if v:
             print "Intentado eliminar asignatura con id "+str(idAsignatura)
         db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Asignatura where id_asignatura='"+idAsignatura+"';"
+        query="delete from Asignatura where idAsignatura='"+idAsignatura+"';"
         salida =''
         try:
             salida = cursor.execute(query);
-        except MySQLdb.Error, e:
+        except dbParams.MySQLdb.Error, e:
             # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -295,7 +207,7 @@ class GestorAsignaturas:
         try:
             salida = cursor.execute(query);
             row = cursor.fetchone()
-        except MySQLdb.Error, e:
+        except dbParams.MySQLdb.Error, e:
             # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -333,8 +245,8 @@ class GestorAsignaturas:
         cursor.execute(mysql_query)
         #-----------------------------#
         idAsignatura='\''+idAsignatura+'\''
-        query='select id_clase, curso, grupo, nivel from Clase where id_clase in (select id_clase from Asocia where id_asignatura='+idAsignatura+')'
-        #query='select id_profesor, nombre, apellidos from Profesor where id_profesor in (select id_asignatura from Imparte where id_asignatura='+idAsignatura+');'
+        query='select id_clase, curso, grupo, nivel from Clase where id_clase in (select id_clase from Asocia where idAsignatura='+idAsignatura+')'
+        #query='select id_profesor, nombre, apellidos from Profesor where id_profesor in (select idAsignatura from Imparte where idAsignatura='+idAsignatura+');'
         if v:
             print '\n'+query
         cursor.execute(query)
@@ -373,8 +285,8 @@ class GestorAsignaturas:
         cursor.execute(mysql_query)
         #-----------------------------#
         idAsignatura='\''+idAsignatura+'\''
-        #query='select distinct id_profesor from Imparte where id_asignatura='+idAsignatura+';'
-        query='SELECT id_profesor, nombre, apellidos from Profesor where id_profesor in (select id_profesor from Imparte where id_asociacion IN ( select id_asociacion from Asocia where id_asignatura='+idAsignatura+'));'
+        #query='select distinct id_profesor from Imparte where idAsignatura='+idAsignatura+';'
+        query='SELECT id_profesor, nombre, apellidos from Profesor where id_profesor in (select id_profesor from Imparte where id_asociacion IN ( select id_asociacion from Asocia where idAsignatura='+idAsignatura+'));'
 
         #query='SELECT id_profesor, nombre, apellidos from Profesor where id_profesor IN (select id_profesor from Imparte where id_asociacion = (select id_asociacion from Asocia where id_clase='+idClase+'))';
         if v:
@@ -415,9 +327,9 @@ class GestorAsignaturas:
         Con el distinct evitamos que si un alumno por casualidad esta matriculado en lengua de primero
         y lengua de segundo porque así se permite se contabilice como dos alumnos en el recuento, lo que sería un error.
         '''
-        #query='select id_alumno, nombre, apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asignatura ='+idAsignatura+' )'
+        #query='select id_alumno, nombre, apellidos from Alumno where id_alumno in (select id_alumno from Matricula where idAsignatura ='+idAsignatura+' )'
 
-        query='SELECT id_alumno, nombre, apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asociacion IN ( select id_asociacion from Asocia where id_asignatura='+idAsignatura+'));'
+        query='SELECT id_alumno, nombre, apellidos from Alumno where id_alumno in (select id_alumno from Matricula where id_asociacion IN ( select id_asociacion from Asocia where idAsignatura='+idAsignatura+'));'
 
         if v:
             print '\n'+query

@@ -15,11 +15,12 @@ from GestorProfesoresSQL import GestorProfesores
 from GestorAsignaturasSQL import GestorAsignaturas
 from GestorClasesSQL import GestorClases
 from GestorAsociacionesSQL import GestorAsociaciones
-from GestorImparteSQL import GestorImparte
+from GestorImpartesSQL import GestorImpartes
 from GestorMatriculasSQL import GestorMatriculas
+from GestorEntidades import GestorEntidades
 #import aprovisionadorDBconInterfaz
 #Las clases para la realización de los test debe heredar de unittest.TestCase
-
+from termcolor import colored
 ########################################################
 ###  sobre ENTIDADES(tablas) y RELACIONES(tablas)    ###
 ########################################################
@@ -28,61 +29,48 @@ from GestorMatriculasSQL import GestorMatriculas
 
 class TestEntidadAlumno(unittest.TestCase):
     '''
-    Testing sobre la entidad Alumno de la BD
+    Testing de GestorAlumnosSQL
     '''
+
+    def setUp(self):
+        #Esta configuración se realiza antes de cada test.
+        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento, para cada test.
+        os.system('mysql -u root -p\'root\' < ../DBCreatorv1.sql')
 
     #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
     #La ejecución de los test se hace por orden alfabético, algo a tener en cuenta cuando queremos hacer ciertas acciones.
     def test_01_IserccionAlumno(self):
-
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-
-        testA=testB=testC=False;
-
+        test = True
         #1. Insertamos un alumno en la base de datos y comprobamos que la salida es 'OK'
-        if GestorAlumnos.nuevoAlumno('Juan') == 'OK':
-            testA=True
-        else:
-            print "error A"
-
+        if GestorAlumnos.nuevoAlumno(nombre='Juan', apellidos='Fernández')['status'] != 'OK':
+            test = False
         #2. Comprobamos que insertar un alumno con un dni que ya existe en la base de datos da error por elemento duplicado.
-        GestorAlumnos.nuevoAlumno('Pedro', apellidos='Garcia', dni='3333')
-        if GestorAlumnos.nuevoAlumno('Maria', dni='3333') == 'Elemento duplicado':
-            testB=True
-        else:
-            print "error B"
+        if GestorAlumnos.nuevoAlumno(nombre='Pedro', apellidos='Garcia', dni='3333')['status']!= 'OK':
+            test = False
+        if GestorAlumnos.nuevoAlumno(nombre='Maria', dni='3333')['status'] != 'Elemento duplicado':
+            test = False
 
-        #3. Comprobamos que un alumno con el mismo nombre y apellidos no puede introducirse si ya existe.
-        '''
-        Si se puede.
-        if GestorAlumnos.nuevoAlumno('Pedro', apellidos='Martinez') == 'OK' and GestorAlumnos.nuevoAlumno('Pedro', apellidos='Garcia') == 'Elemento duplicado':
-            testC=True
-        else:
-            print "error C"
-        '''
+        self.assertEqual(test, True)
 
-        self.assertEqual(testA and testB, True)
-
+    #"""
     def test_02_LecturaAlumnos(self):
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        GestorAlumnos.nuevoAlumno('Juan')
-        GestorAlumnos.nuevoAlumno('Andrés')
-        #Comprobamos que son dos los alumnos que devuelve el método getAlumnos()
-        self.assertEqual(len(GestorAlumnos.getAlumnos()),2)
+        test = True
+        GestorAlumnos.nuevoAlumno(nombre='Andrés') #Insertamos un alumno
+        GestorAlumnos.nuevoAlumno(nombre='Julián') #Insertamos otro
+        lista=GestorAlumnos.getAlumnos()
+        print lista
+        if len(lista)!= 2 \
+            or lista[0]['nombre'] != u'Andrés' \
+            or lista[1]['nombre'] != u'Julián': test = False
 
-    def test_03_LecturaAlumno(self):
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        GestorAlumnos.nuevoAlumno('Juan')
-        #Usamos NotEqual para comprobar que la salida es distinta de "Elemento no encontrado".
-        self.assertNotEqual(GestorAlumnos.getAlumno('1'),'Elemento no encontrado')
+        alumno = GestorAlumnos.getAlumnos(idAlumno='1')
+        print colored (alumno, 'green')
+        if alumno['nombre'] != u'Andrés': test = False
 
-    def test_04_ModificacionAlumno(self):
+        self.assertTrue(test)
+
+    def test_03_ModificacionAlumno(self):
         '''Comprobación de como cualquier atributo de un alumno puede modificarse'''
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         testA=testB=testC=False;
         #Creamos un alumno con nombre Juan.
         GestorAlumnos.nuevoAlumno('Juan')
@@ -105,42 +93,21 @@ class TestEntidadAlumno(unittest.TestCase):
         #Comprobamos que el nombre ha sido cambiado.
         self.assertEqual(testA , True)
 
-    def test_05_ModificacionAlumnoCompleto(self):
-        '''Comprobación de como puede modificarse un alumno al completo'''
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        testA=testB=False;
-        #Creamos un alumno con nombre Juan.
-        GestorAlumnos.nuevoAlumno('Juan')
-
-        #modificamos los parámetros mínimos, los que pide la función:
-        if GestorAlumnos.modAlumnoCompleto('1','Enrique') == 'OK':
-            testA=True
-
-        #modificamos todo el alumno;
-        if GestorAlumnos.modAlumnoCompleto('1', 'Edu', 'Armilla Camp', '2627251', 'C/Lucero', 'Grana', 'Grana', '1988-28-04', '273826165') == 'OK':
-            testB=True
-
-
-        #Comprobamos que el nombre ha sido cambiado.
-        self.assertEqual(testA and testB, True)
-
-    def test_06_EliminacionAlumno(self):
+    def test_04_EliminacionAlumno(self):
         '''Eliminamos el alumno de la base de datos y comprobamos el mensaje devuelto'''
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         GestorAlumnos.nuevoAlumno('Juan')
         #Si el alumno se elimina y no se encuentra después está bien.
-        if GestorAlumnos.delAlumno('1') == 'OK' and GestorAlumnos.getAlumno('1') == 'Elemento no encontrado':
-            testA=True
+        if GestorAlumnos.delAlumno('1') == 'OK' \
+            and GestorAlumnos.getAlumnos(idAlumno='1') == 'Elemento no encontrado' \
+            and len(GestorAlumnos.getAlumnos()) == 0:
+                testA=True
         else:
             testA=False
 
         self.assertEqual(testA,True)
 
-
-    def test_07_NumeroAlumnos(self):
+    def test_05_NumeroAlumnos(self):
         '''Comprueba que se obtiene de forma correcta el número de alumnos en la BD.'''
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         #Comprobamos que no existan.
         cero=GestorAlumnos.getNumAlumnos()
         for x in range(0, 3):
@@ -156,159 +123,112 @@ class TestEntidadAlumno(unittest.TestCase):
 
         self.assertEqual(resultado,True)
 
+
 class TestEntidadProfesor(unittest.TestCase):
 
-    #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
+    def setUp(self):
+        os.system('mysql -u root -p\'root\' < ../DBCreatorv1.sql')
+
     def test_11_IserccionProfesor(self):
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        #Comprobamos que el método que inserta un nuevo alumno devuelve el mensaje de confirmación esperado.
-
+        test = True
         #1. Insertamos un alumno en la base de datos y comprobamos que la salida es 'OK'
-        if GestorProfesores.nuevoProfesor('Juan', '222') == 'OK':
-            testA=True
-            print 'true'
-        else:
-            testA=False
-            print 'false'
-
+        if GestorProfesores.nuevoProfesor(nombre='nombre', apellidos='apellidos')['status'] != 'OK': test = False
         #2. Comprobamos que insertar un alumno con un dni que ya existe en la base de datos da error por elemento duplicado.
-        GestorProfesores.nuevoProfesor('Pedro', '3333', apellidos='Garcia', )
-        if GestorProfesores.nuevoProfesor('Maria', '3333') == 'Elemento duplicado':
-            testB=True
-
-        else:
-            testB=False
-
-
-        #3. Comprobamos que un alumno con el mismo nombre y apellidos no puede introducirse si ya existe.
-        if GestorProfesores.nuevoProfesor('Pedro', '1212', apellidos='Martinez') == 'OK' and GestorProfesores.nuevoProfesor('Pedro', '8989', apellidos='Garcia') == 'Elemento duplicado':
-            testC=True
-        else:
-            testC=False
-
-        self.assertEqual(testA and testB and testC, True)
+        GestorProfesores.nuevoProfesor(nombre='Pedro', dni='3333', apellidos='Garcia', )
+        if GestorProfesores.nuevoProfesor(nombre='Maria', dni='3333')['status'] != 'Elemento duplicado': test = False
+        self.assertTrue(test)
 
     def test_12_LecturaProfesores(self):
-        'Comprobamos que getProfesores devuelve el número correncto de elementos'
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        GestorProfesores.nuevoProfesor('Juan', '24242')
-        GestorProfesores.nuevoProfesor('Andrés', '2878' )
-        #Comprobamos que son dos los alumnos que devuelve el método getAlumnos()
-        self.assertEqual(len(GestorProfesores.getProfesores()),2)
+        'Comprobamos que getProfesores devuelve el número correcto de elementos'
+        test = True
+        antes=len(GestorProfesores.getProfesores())
+        GestorProfesores.nuevoProfesor(nombre='Juan', dni='24242')
+        GestorProfesores.nuevoProfesor(nombre='Andrés', dni='2878' )
+        lista=GestorProfesores.getProfesores()
+        if len(lista)!= 2 \
+            or antes != 0 \
+            or lista[0]['nombre'] != u'Juan' \
+            or lista[1]['nombre'] != u'Andrés': test = False
+        profesor = GestorProfesores.getProfesores(idProfesor='1')
+        if profesor == 'Elemento no encontrado' \
+        or profesor['nombre'] != u'Juan' \
+        or profesor['dni'] != 24242:
+            test = False
+        self.assertTrue(test)
 
-
-    def test_13_LecturaProfesor(self):
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        GestorProfesores.nuevoProfesor('Juan', '2422')
-        self.assertNotEqual(GestorProfesores.getProfesor('2422'),'Elemento no encontrado')
-
-
-
-    def test_14_ModificacionProfesor(self):
+    def test_13_ModificacionProfesor(self):
         '''Comprobación de como cualquier atributo de un profesor puede modificarse'''
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        testA=testB=testC=False;
+        test=True
         #Creamos un alumno con nombre Juan.
-        GestorProfesores.nuevoProfesor('Juan', '222')
+        GestorProfesores.nuevoProfesor(nombre='Juan', dni='222')
         #modificamos el nombre del profesor creado:
-        if GestorProfesores.modProfesor('222','nombre','Enrique') == 'OK':
-            testA=True
-            print "yah"
-        else:
-            print 'fuck'
-
-        #Cambiamos el dni
-        GestorProfesores.nuevoProfesor('Pedro','1212')
-        if GestorProfesores.modProfesor('1212', 'dni', '1414') == 'OK':
-            testB=True
-
-        #Cambiamos el dni de un profesor por uno que ya existe en la base de datos.
-        GestorProfesores.nuevoProfesor('Luis', '1010')
-        GestorProfesores.nuevoProfesor('Carlos', '1111')
-        #Debe decirnos que ya existe uno con ese campo por tanto estaría duplicado y aborta.
-        if GestorProfesores.modProfesor('1010', 'dni', '1111') == 'Elemento duplicado':
-            testC=True #El error se da.
-
-        #Comprobamos que el nombre ha sido cambiado.
-        self.assertEqual(testA and testB and testC, True)
-
-
-    def test_15_EliminacionProfesor(self):
-        '''Eliminamos el profesor de la base de datos y comprobamos el mensaje devuelto'''
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        GestorProfesores.nuevoProfesor('Luis', '1010')
-        #Si el alumno se elimina y no se encuentra después está bien.
-        if GestorProfesores.delProfesor('1010') == 'OK' and GestorProfesores.delProfesor('1') == 'Elemento no encontrado':
-            testA=True
-        else:
+        if GestorProfesores.modProfesor(idProfesor='1', campoACambiar='Nombre', nuevoValor='Enrique') != 'OK':
             testA=False
+        #Cambiamos el dni
+        if GestorProfesores.modProfesor(idProfesor='1', campoACambiar='dni', nuevoValor='1414') != 'OK':
+            testB=False
+        #Cambiamos el dni de un profesor por uno que ya existe en la base de datos.
+        GestorProfesores.nuevoProfesor(nombre='Luis', dni='1010')
+        #Debe decirnos que ya existe uno con ese campo por tanto estaría duplicado.
+        if GestorProfesores.modProfesor(idProfesor='1', campoACambiar='dni', nuevoValor='1414') != 'Elemento duplicado':
+            testC=False
+        #Comprobamos que el nombre ha sido cambiado.
+        self.assertTrue(test)
 
-        self.assertEqual(testA,True)
+    def test_14_EliminacionProfesor(self):
+        '''Eliminamos el profesor de la base de datos y comprobamos el mensaje devuelto'''
+        test = True
+        GestorProfesores.nuevoProfesor(nombre='Luis')
+        #Si el alumno se elimina y no se encuentra después está bien.
+        if GestorProfesores.delProfesor(idProfesor='1') != 'OK' and GestorProfesores.delProfesor(idProfesor='1') != 'Elemento no encontrado':
+            test = False
+        self.assertTrue(test)
 
-
-    def test_16_NumeroProfesores(self):
+    def test_15_NumeroProfesores(self):
         '''Comprueba que se obtiene de forma correcta el número de profesores en la BD.'''
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         #Comprobamos que no existan.
-        resultado=False
+        test=False
         cero=GestorProfesores.getNumProfesores()
-        print cero
         for x in range(0, 3):
-            GestorProfesores.nuevoProfesor(str(x), str(x))
+            GestorProfesores.nuevoProfesor(nombre=str(x))
         tres=GestorProfesores.getNumProfesores()
-        GestorProfesores.delProfesor('0')
-
+        GestorProfesores.delProfesor(idProfesor='1')
         dos=GestorProfesores.getNumProfesores();
-
         if cero==0 and tres==3 and dos==2:
-            resultado=True
-
-        self.assertEqual(resultado,True)
+            test=True
+        self.assertTrue(test)
 
 class TestEntidadAsignatura(unittest.TestCase):
 
+    def setUp(self):
+        os.system('mysql -u root -p\'root\' < ../DBCreatorv1.sql')
+
     #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
     def test_21_IserccionAsignatura(self):
-        '''Comprueba que nuevaAsignatura funciona correctamente'''
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-
+        """Comprueba que nuevaAsignatura funciona correctamente"""
+        test = True
         #1. Insertamos una asignatura en la base de datos y comprobamos que la salida es 'OK'
-        if GestorAsignaturas.nuevaAsignatura('Metodología de la ciencia') == 'OK':
-            testA=True
-        else:
-            testA=False
-
+        if GestorAsignaturas.nuevaAsignatura(nombre='Metodología de la ciencia')['status'] != 'OK': test = False
         #2. Comprobamos que insertar una asignatura con un nombre que ya existe en la base de datos da error por elemento duplicado.
-        if GestorAsignaturas.nuevaAsignatura('Metodología de la ciencia') == 'Elemento duplicado':
-            testB=True
-        else:
-            testB=False
+        if GestorAsignaturas.nuevaAsignatura(nombre='Metodología de la ciencia')['status'] != 'Elemento duplicado': test = False
+        self.assertTrue(test)
 
-        self.assertEqual(testA and testB, True)
 
     def test_22_LecturaAsignaturas(self):
-        '''Comprobamos que getAsignaturas devuelve el número correncto de elementos'''
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        GestorAsignaturas.nuevaAsignatura('Metodología de la ciencia')
-        GestorAsignaturas.nuevaAsignatura('Matemática aplicada')
-        #Comprobamos que son dos los alumnos que devuelve el método getAlumnos()
-        self.assertEqual(len(GestorAsignaturas.getAsignaturas()),2)
+        """Comprobamos que getAsignaturas devuelve el número correncto de elementos"""
+        test = True
+        GestorAsignaturas.nuevaAsignatura(nombre='ásigA')
+        GestorAsignaturas.nuevaAsignatura(nombre='ásigB')
+        asignaturas = GestorAsignaturas.getAsignaturas()
+        if len(asignaturas) != 2: test = False
+        if asignaturas[0]['nombre'] != u'ásigA' or asignaturas[1]['nombre'] != u'ásigB': test = False
+        asigA = GestorAsignaturas.getAsignaturas(idAsignatura='1')
+        if asigA['nombre'] != u'ásigA': test = False
+        self.assertTrue(test)
 
-    def test_23_LecturaAsignatura(self):
-        '''Comprobación de la extracción de los datos de una asignatura concreta'''
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
-        GestorAsignaturas.nuevaAsignatura('Matemática aplicada')
-        self.assertNotEqual(GestorAsignaturas.getAsignatura('1'),'Elemento no encontrado')
 
-    def test_24_ModificacionAsignatura(self):
+    def test_23_ModificacionAsignatura(self):
         '''Comprobación de como cualquier atributo de un asignatura puede modificarse'''
-        #Nos aseguramos de que la base de datos se encuentra en estado CERO creándola en el momento.
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         testA=testB=testC=False;
 
         #Creamos una asignatura.
@@ -332,9 +252,9 @@ class TestEntidadAsignatura(unittest.TestCase):
         #Comprobamos que el nombre ha sido cambiado.
         self.assertEqual(testA and testB and testC, True)
 
-    def test_25_EliminacionAsignatura(self):
+
+    def test_24_EliminacionAsignatura(self):
         '''Eliminamos una asignatura de la base de datos y comprobamos el mensaje devuelto'''
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         GestorAsignaturas.nuevaAsignatura('fis')
         #Si la asig se elimina y no se encuentra después está bien.
         if GestorAsignaturas.delAsignatura('1') == 'OK' and GestorAsignaturas.delAsignatura('1') == 'Elemento no encontrado':
@@ -344,9 +264,8 @@ class TestEntidadAsignatura(unittest.TestCase):
 
         self.assertEqual(testA,True)
 
-    def test_26_NumeroAsignaturas(self):
+    def test_25_NumeroAsignaturas(self):
         '''Comprueba que se obtiene de forma correcta el número de asignaturas en la BD.'''
-        os.system('mysql -u root -p\'root\' < ../DBCreator_v0_1.sql')
         #Comprobamos que no existan.
         resultado=False
         cero=GestorAsignaturas.getNumAsignaturas()
@@ -363,6 +282,48 @@ class TestEntidadAsignatura(unittest.TestCase):
 
         self.assertEqual(resultado,True)
 
+class TestGestorEntidades(unittest.TestCase):
+
+    def setUp(self):
+        os.system('mysql -u root -p\'root\' < ../DBCreatorv1.sql')
+
+    def test_31_putEntidades(self):
+        test = True
+        if GestorEntidades.putEntidad(tipo='Alumno', datos={'nombre': 'súperNombre'})['status'] != 'OK' or \
+        GestorEntidades.putEntidad(tipo='Profesor', datos={'nombre': 'súperNombre'})['status'] != 'OK' or \
+        GestorEntidades.putEntidad(tipo='Asignatura', datos={'nombre': 'Francés'})['status'] != 'OK' or \
+        GestorEntidades.putEntidad(tipo='Clase', datos={'curso': '1', 'grupo': 'B', 'nivel': 'ESO'})['status'] != 'OK' or \
+        GestorEntidades.putEntidad(tipo='Desconocido', datos={'prueba': 'hola'})['status'] != 'Tipo no reconocido':
+            test = False
+
+    def test_32_getEntidades(self):
+        test = True
+
+        GestorEntidades.putEntidad(tipo='Alumno', datos={'nombre': 'nombrecito'})
+
+        if GestorEntidades.getEntidades(tipo='Alumno')[0]['nombre'] != u'nombrecito' \
+            and len(GestorEntidades.getEntidades(tipo='Alumno')) != 1: test = False #Que la lista y el tam is Ok
+        if GestorEntidades.getEntidades(tipo='Alumno', idEntidad='1')['nombre'] != u'nombrecito': test = False
+
+        GestorEntidades.putEntidad(tipo='Profesor', datos={'nombre': 'profesor'})
+        if GestorEntidades.getEntidades(tipo='Profesor')[0]['nombre'] != u'profesor' \
+            and len(GestorEntidades.getEntidades(tipo='Profesor')) != 1: test = False #Que la lista y el tam is Ok
+        if GestorEntidades.getEntidades(tipo='Profesor', idEntidad='1')['nombre'] != u'profesor': test = False
+
+        GestorEntidades.putEntidad(tipo='Clase', datos={'curso': '1'})
+        if GestorEntidades.getEntidades(tipo='Clase')[0]['curso'] != 1 \
+            and len(GestorEntidades.getEntidades(tipo='Clase')) != 1: test = False #Que la lista y el tam is Ok
+        if GestorEntidades.getEntidades(tipo='Clase', idEntidad='1')['curso'] != 1: test = False
+
+        GestorEntidades.putEntidad(tipo='Asignatura', datos={'nombre': 'asignatura'})
+        if GestorEntidades.getEntidades(tipo='Asignatura')[0]['nombre'] != u'asignatura' \
+            and len(GestorEntidades.getEntidades(tipo='Asignatura')) != 1: test = False #Que la lista y el tam is Ok
+        if GestorEntidades.getEntidades(tipo='Asignatura', idEntidad='1')['nombre'] != u'asignatura': test = False
+
+        self.assertTrue(test)
+
+
+"""
 class TestEntidadClase(unittest.TestCase):
 
     def test_31_IserccionClase(self):
@@ -619,13 +580,13 @@ class TestRelacionImparte(unittest.TestCase):
         GestorProfesores.nuevoProfesor('Juan', '222')
 
         #Creamos una entidad en la tabla Imparte. id_clase=1, id_asignatura=1 y dni=222
-        if GestorImparte.nuevoImparte('1','1','222') == 'OK':
+        if GestorImpartes.nuevoImparte('1','1','222') == 'OK':
             testA=True
         else:
             testA=False
 
         #Creamos una entidad de la tabla Imparte con algún elemento que no existe en Asocia.
-        if GestorImparte.nuevoImparte('1','1','333') == 'Alguno de los elementos no existe':
+        if GestorImpartes.nuevoImparte('1','1','333') == 'Alguno de los elementos no existe':
             testB=True
         else:
             testB=False
@@ -645,9 +606,9 @@ class TestRelacionImparte(unittest.TestCase):
         GestorProfesores.nuevoProfesor('Juan', '222')
 
         #Creamos la entidad en la tabla Imparte
-        GestorImparte.nuevoImparte('1','1','222')
+        GestorImpartes.nuevoImparte('1','1','222')
 
-        uno = len(GestorImparte.getImpartes())
+        uno = len(GestorImpartes.getImpartes())
 
         print cero
         print uno
@@ -667,10 +628,10 @@ class TestRelacionImparte(unittest.TestCase):
         GestorAsignaturas.nuevaAsignatura('frances')
         GestorAsociaciones.nuevaAsociacion('1','1')
         GestorProfesores.nuevoProfesor('Juan', '222')
-        GestorImparte.nuevoImparte('1','1','222')
+        GestorImpartes.nuevoImparte('1','1','222')
 
         #La tupla 1, 1, 222 existe y la 1, 1 ,333 no existe.
-        if GestorImparte.getImparte('1','1','222') != 'Elemento no encontrado' and GestorImparte.getImparte('1','1','333') == 'Elemento no encontrado':
+        if GestorImpartes.getImparte('1','1','222') != 'Elemento no encontrado' and GestorImpartes.getImparte('1','1','333') == 'Elemento no encontrado':
             test=True
         else:
             test=False
@@ -687,16 +648,16 @@ class TestRelacionImparte(unittest.TestCase):
         GestorAsociaciones.nuevaAsociacion('1','1')
         GestorProfesores.nuevoProfesor('Juan', '222')
         GestorProfesores.nuevoProfesor('Antonio', '333')
-        GestorImparte.nuevoImparte('1','1','222')
+        GestorImpartes.nuevoImparte('1','1','222')
 
         testA=testB=testC=False;
 
         #Modificamos la tupla imparte para que a esa asociacion (clase-asignatura) le imparta otro profesor.
-        if GestorImparte.modImparte('1','1','222', 'id_profesor', '333') == 'OK':
+        if GestorImpartes.modImparte('1','1','222', 'id_profesor', '333') == 'OK':
             testA=True
 
         #Intenamos realizar otra modificación sobre una tupla que no existe
-        if GestorImparte.modImparte('1','1','222', 'id_asignatura', '6') == 'Elemento no encontrado':
+        if GestorImpartes.modImparte('1','1','222', 'id_asignatura', '6') == 'Elemento no encontrado':
             testB=True
 
         #Comprobamos que el nombre ha sido cambiado.
@@ -711,9 +672,9 @@ class TestRelacionImparte(unittest.TestCase):
         GestorAsignaturas.nuevaAsignatura('frances')
         GestorAsociaciones.nuevaAsociacion('1','1')
         GestorProfesores.nuevoProfesor('Juan', '222')
-        GestorImparte.nuevoImparte('1','1','222')
+        GestorImpartes.nuevoImparte('1','1','222')
 
-        if GestorImparte.delImparte('1','1','222') == 'OK' and GestorImparte.delImparte('2','2','333') == 'Elemento no encontrado':
+        if GestorImpartes.delImparte('1','1','222') == 'OK' and GestorImpartes.delImparte('2','2','333') == 'Elemento no encontrado':
             test = True
         else:
             test = False
@@ -748,7 +709,7 @@ class TestRelacionMatricula(unittest.TestCase):
             testA=False
 
         #Creamos una entidad de la tabla Imparte con algún elemento que no existe, en este caso la asignatura con id 333.
-        if GestorImparte.nuevoImparte('1','1','333') == 'Alguno de los elementos no existe':
+        if GestorImpartes.nuevoImparte('1','1','333') == 'Alguno de los elementos no existe':
             testB=True
         else:
             testB=False
@@ -1003,6 +964,7 @@ class Test_RELACIONES_CON_OTROS_RelacionAsocia(unittest.TestCase):
             if sizeA==0 and sizeB==2 and sizeC==1:
                 salida=True
             self.assertEqual(salida,True)
+"""
 
 
 

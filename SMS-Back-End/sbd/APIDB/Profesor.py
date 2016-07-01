@@ -12,7 +12,7 @@ class Profesor:
         self.direccion = ""
         self.localidad = ""
         self.provincia = ""
-        self.fecha_nacimiento = ""
+        self.fechaNacimiento = ""
         self.telefono = ""
 
 

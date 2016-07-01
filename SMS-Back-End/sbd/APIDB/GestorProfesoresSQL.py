@@ -7,13 +7,14 @@ Last mod: Feb 2016
 
 import MySQLdb
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
-from Profesor import *
+#from Profesor import *
 from Alumno import *
 from Asignatura import *
 from Clase import *
 from Asociacion import *
 #Uso de variables generales par la conexión a la BD.
 import dbParams
+from termcolor import colored
 
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
@@ -28,8 +29,10 @@ class GestorProfesores:
     Manejador de Profesors de la base de datos.
     """
 
+    ## Métodos propios ##
+
     @classmethod
-    def nuevoProfesor(self, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fecha_nacimiento='NULL', telefono='NULL'):
+    def nuevoProfesor(self, nombre, apellidos='NULL', dni='NULL', direccion='NULL', localidad='NULL', provincia='NULL', fechaNacimiento='NULL', telefono='NULL'):
         '''
         Introduce un nuevo elemento Profesor en la base de datos.
         Necesita como mínimo un nombre y un dni
@@ -40,7 +43,7 @@ class GestorProfesores:
             print ' Calling '+ str(locals()['self'])
             print ' '+str(locals())
 
-        db = dbParams.conecta(); #La conexión está clara.
+        db = dbParams.conecta()
 
         nombre='\''+nombre+'\''
         if(apellidos!='NULL'):
@@ -52,12 +55,12 @@ class GestorProfesores:
             localidad='\''+localidad+'\''
         if(provincia!='NULL'):
             provincia='\''+provincia+'\''
-        if(fecha_nacimiento!='NULL'):
-            fecha_nacimiento='\''+fecha_nacimiento+'\''
+        if(fechaNacimiento!='NULL'):
+            fechaNacimiento='\''+fechaNacimiento+'\''
         if(telefono!='NULL'):
             telefono='\''+telefono+'\''
 
-        query="INSERT INTO Profesor VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fecha_nacimiento+","+telefono+");"
+        query="INSERT INTO Profesor VALUES(NULL,"+nombre+","+apellidos+","+dni+","+direccion+","+localidad+","+provincia+","+fechaNacimiento+","+telefono+");"
 
         if v:
             print ' '+query+'\n'
@@ -72,7 +75,7 @@ class GestorProfesores:
         try:
             salida = cursor.execute(query)
             idProfesor = cursor.lastrowid
-        except MySQLdb.Error, e:
+        except dbParams.MySQLdb.Error, e:
             # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -92,65 +95,28 @@ class GestorProfesores:
 
         if salida==1:
             dic['status']= 'OK'
-            #return 'OK'
         if salida==1062:
             dic['status']= 'Elemento duplicado'
 
         return dic
 
     @classmethod
-    def getProfesores(self):
-        '''Devuelve una lista simplificada de todos los profesores registrados en el sistema, con los campos nombre,
-        apellidos y dni.'''
+    def getProfesores(self, idProfesor=None):
+        """
+        Devuelve una lista de todos los alumnos almacenados en la base de datos simplificada, solo con los
+        campos id, nombre y apellidos.
+
+        Si no se pasa parámetro, se devuelven todos (info simplificada), si se pasa el parámetro id, se devuelve uno solo (con toda
+        su información)
+        """
 
         db = dbParams.conecta()
         cursor = db.cursor()
 
-        #Sacando los acentos...........
-        mysql_query="SET NAMES 'utf8'"
-        cursor.execute(mysql_query)
-        #-----------------------------#
-
-        query="select nombre, apellidos, id_profesor from Profesor"
-
-        if v:
-            print apiName
-            print "getProfesores()"
-            print "query: "+query
-
-        cursor.execute(query)
-        row = cursor.fetchone()
-
-        lista = []
-
-        while row is not None:
-            print row
-            profesor = Profesor()
-
-            profesor.nombre=row[0]
-            profesor.apellidos=row[1]
-            profesor.id=row[2]
-
-            lista.append(profesor)
-            #print row[0], row[1]
-            row = cursor.fetchone()
-
-        cursor.close()
-        db.close()
-
-        return lista
-
-    @classmethod
-    def getProfesor(self, idProfesor):
-        """
-        Recupera TODA la información de un Profesor en concreto a través de la clave primaria, su DNI.
-        """
-        db = dbParams.conecta(); #La conexión está clara.
-        cursor = db.cursor()
-        query="select * from Profesor where id_profesor='"+idProfesor+"';"
-
-        if v:
-            print '\n'+query
+        if idProfesor != None: #Buscamos al profesor concreto
+            query='select * from Profesor where idProfesor='+idProfesor+';'
+        else: #Queremos informacióń resumida de todos ellos
+            query="select nombre, apellidos, idProfesor from Profesor"
 
         try:
             salida = cursor.execute(query);
@@ -164,27 +130,26 @@ class GestorProfesores:
             except IndexError:
                 print "MySQL Error: %s" % str(e)
 
+        if idProfesor != None: #Se busca uno en concreto
+            if salida == 1:
+                #Creamos un objeto de tipo dict con toda la información delp rofesor extraida de la row de la consulta.
+                ret = {'id': row[0], 'nombre': row[1], 'apellidos': row[2], 'dni': row[3],
+                            'direccion': row[4], 'localidad': row[5], 'provincia': row[6],
+                            'fechaNacimiento': row[7], 'telefono': row[8] }
+            if salida == 0:
+                ret = 'Elemento no encontrado'
+        else: #Se quieren todos
+            profesores = [] #Creamos una lista
+            while row is not None:
+                #Añadimos a la lista un dict con los datos que queremos del profesor
+                profesores.append({'nombre': row[0], 'apellidos': row[1], 'id': row[2]})
+                row = cursor.fetchone()
+            ret = profesores
+
         cursor.close()
         db.close()
 
-        if salida==1:
-            #Como se trata de toda la información al completo usaremos todos los campos de la clase Profesor.
-            #La api del mservicio envia estos datos en JSON sin comprobar nada
-            profesor = Profesor()
-            profesor.id = row[0]
-            profesor.nombre=row[1]
-            profesor.apellidos=row[2]
-            profesor.dni=row[3]
-            profesor.direccion=row[4];
-            profesor.localidad=row[5];
-            profesor.provincia=row[6];
-            profesor.fecha_nacimiento=row[7];
-            profesor.telefono=row[8];
-
-
-            return profesor
-        if salida==0:
-            return 'Elemento no encontrado'
+        return ret
 
     @classmethod
     def modProfesor(self, idProfesor, campoACambiar, nuevoValor):
@@ -197,7 +162,7 @@ class GestorProfesores:
         db = dbParams.conecta(); #La conexión está clara.
         nuevoValor='\''+nuevoValor+'\''
         idProfesor='\''+idProfesor+'\''
-        query="UPDATE Profesor SET "+campoACambiar+"="+nuevoValor+" WHERE id_profesor="+idProfesor+";"
+        query="UPDATE Profesor SET "+campoACambiar+"="+nuevoValor+" WHERE idProfesor="+idProfesor+";"
         if v:
             print '\n'+query;
 
@@ -263,7 +228,7 @@ class GestorProfesores:
 
 
         query=query+" , telefono= "+'\''+telefono+'\''
-        query=query+" WHERE id_profesor="+idProfesor+";"
+        query=query+" WHERE idProfesor="+idProfesor+";"
 
         if v:
             print apiName
@@ -298,13 +263,12 @@ class GestorProfesores:
         elif salida==0:
             return 'Sin cambios realizados'
 
-
     @classmethod
     def delProfesor(self, idProfesor):
         #print "Intentado eliminar profesor con dni "+str(dniProfesor)
         db = dbParams.conecta(); #La conexión está clara.
         cursor = db.cursor()
-        query="delete from Profesor where id_profesor='"+idProfesor+"';"
+        query="delete from Profesor where idProfesor='"+idProfesor+"';"
         if v:
             print '\n'+query
         salida =''
@@ -366,6 +330,9 @@ class GestorProfesores:
         if salida==0:
             return 'Elemento no encontrado'
 
+
+    ## Métodos de relaciones con otros ##
+
     @classmethod
     def getAlumnos(self, idProfesor):
         """
@@ -385,7 +352,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT nombre, apellidos, id_alumno FROM Alumno WHERE id_alumno IN (SELECT id_alumno FROM Imparte, Matricula WHERE Imparte.id_asociacion=Matricula.id_asociacion AND Imparte.id_profesor='+idProfesor+');'
+        query='SELECT nombre, apellidos, id_alumno FROM Alumno WHERE id_alumno IN (SELECT id_alumno FROM Imparte, Matricula WHERE Imparte.id_asociacion=Matricula.id_asociacion AND Imparte.idProfesor='+idProfesor+');'
 
 
         try:
@@ -430,7 +397,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT * FROM Asignatura WHERE id_asignatura IN (SELECT id_asignatura FROM Asocia WHERE id_asociacion IN (SELECT id_asociacion FROM Imparte WHERE id_profesor='+idProfesor+'));'
+        query='SELECT * FROM Asignatura WHERE id_asignatura IN (SELECT id_asignatura FROM Asocia WHERE id_asociacion IN (SELECT id_asociacion FROM Imparte WHERE idProfesor='+idProfesor+'));'
 
         if v:
             print query
@@ -478,7 +445,7 @@ class GestorProfesores:
         cursor.execute(mysql_query)
         #-----------------------------#
         #Hacemos un JOIN de las tablas que relacionan alumnos con asociaciones y estas con profesores para luego sacar sólo las de cierto identificador e alumno.
-        query='SELECT * FROM Clase WHERE id_clase IN (SELECT id_clase FROM Asocia where id_asociacion IN(SELECT id_asociacion FROM Imparte WHERE id_profesor='+idProfesor+'));'
+        query='SELECT * FROM Clase WHERE id_clase IN (SELECT id_clase FROM Asocia where id_asociacion IN(SELECT id_asociacion FROM Imparte WHERE idProfesor='+idProfesor+'));'
 
 
         try:
