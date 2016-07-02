@@ -1,7 +1,7 @@
 /**
-  Fichero de creación de la base de datos de SMM--
+  Fichero de creación de la base de datos de SMM
   Uso:
-    > mysql -u root -p'root' < DBCreator.sql
+    > mysql -u root -p'root' < DBCreator1.sql
   Ejecutado en el mismo directorio que este fichero.
 
   Versión 0.1
@@ -18,7 +18,7 @@ USE sms;
 
 /*Creación de la tabla Alumno, con todos los atributos de esta entidad.
 No usamos el DNI como clave primaria porque hasta los 14 años no es obligatorio
-tener este documento, por eso usaremos un id entero autoincrementable.
+tener este documento, por eso usaremos un id entero AUTO_INCREMENTable.
 Además usamos UNIQUE para establecer que no puedan existir elementos duplicados por ese valor
 en la tabla. Así aunque no podrán existir dos alumnos que tengan exactamente el mismo nombre y apellidos
 o el mismo DNI en caso de tenerlo.
@@ -31,6 +31,7 @@ CREATE TABLE Alumno(
   direccion CHAR(100),
   localidad CHAR(50),
   provincia CHAR(50),
+  #MySQL retrieves and displays DATE values in 'YYYY-MM-DD' format
   fechaNacimiento DATE,
   telefono CHAR(50),
   urlImagen CHAR (200),
@@ -54,6 +55,7 @@ CREATE TABLE Profesor(
   direccion CHAR(100),
   localidad CHAR(50),
   provincia CHAR(50),
+  #MySQL retrieves and displays DATE values in 'YYYY-MM-DD' format
   fechaNacimiento DATE,
   telefono CHAR(50),
   PRIMARY KEY (idProfesor),
@@ -82,9 +84,9 @@ CREATE TABLE Clase(
 
 #Creacion de la tabla para los Grupos
 #Un grupo es la asociación de una asignatura y un curso, por ejemplo: 1ºESO-Francés que identifica perfectamente un grupo de alumnos.
-CREATE TABLE Asocia(
+CREATE TABLE Asociacion(
 
- id_asociacion INT NOT NULL AUTO_INCREMENT,
+ idAsociacion INT NOT NULL AUTO_INCREMENT,
  idClase INT ,
  idAsignatura INT,
 
@@ -93,57 +95,59 @@ CREATE TABLE Asocia(
  FOREIGN KEY (idAsignatura) REFERENCES Asignatura(idAsignatura),
 
  #Especificamos la formación de la clave primaria en esta tabla.
- PRIMARY KEY (id_asociacion),
+ PRIMARY KEY (idAsociacion),
  UNIQUE (idClase, idAsignatura) #Para que no puedan repetirse
 );
 
 CREATE TABLE Imparte(
 
-  id_imparte INT NOT NULL AUTO_INCREMENT,
+  idImparte INT NOT NULL AUTO_INCREMENT,
   #Añadimos la referencia de la entidad Asignatura
-  id_asociacion INT,
+  idAsociacion INT,
   #Necesitamos una referncia del profesor:
-  id_profesor INT,
+  idProfesor INT,
 
   #Especificamos que se trata de claves foráneas.
-  FOREIGN KEY (id_asociacion) REFERENCES Asocia(id_asociacion),
+  FOREIGN KEY (idAsociacion) REFERENCES Asociacion(idAsociacion),
 #  FOREIGN KEY (idAsignatura) REFERENCES Asignatura(idAsignatura),
-  FOREIGN KEY (id_profesor) REFERENCES Profesor(id_profesor),
+  FOREIGN KEY (idProfesor) REFERENCES Profesor(idProfesor),
 
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (id_imparte),
+  PRIMARY KEY (idImparte),
 
-  #Especificamos que la formación id_asociacion, id_profesor) com par no pueda repetirse:
-  UNIQUE (id_asociacion, id_profesor)
+  #Especificamos que la formación idAsociacion, idProfesor) como par no pueda repetirse:
+  UNIQUE (idAsociacion, idProfesor)
 
 );
 
 CREATE TABLE Matricula(
 
-  id_matricula INT NOT NULL AUTO_INCREMENT,
-  id_alumno INT,
-  id_asociacion INT,
+  idMatricula INT NOT NULL AUTO_INCREMENT,
+  idAlumno INT,
+  idAsociacion INT,
 
 
 
   #Especificamos que se trata de claves foráneas.
-  FOREIGN KEY (id_asociacion) REFERENCES Asocia(id_asociacion),
-  FOREIGN KEY (id_alumno) REFERENCES Alumno(id_alumno),
+  FOREIGN KEY (idAsociacion) REFERENCES Asociacion(idAsociacion),
+  FOREIGN KEY (idAlumno) REFERENCES Alumno(idAlumno),
 
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (id_matricula)
+  PRIMARY KEY (idMatricula),
+  #Un alumno no puede estar dos veces matriuclado a la misma asociacion
+  UNIQUE (idAlumno, idAsociacion)
 
 );
 
 CREATE TABLE Credenciales(
 
-  id_credenciales INT NOT NULL AUTO_INCREMENT,
-  id_usuario INT,
+  idCredenciales INT NOT NULL AUTO_INCREMENT,
+  idUsuario INT,
   nombre CHAR(100),
   username CHAR(100),
   password VARBINARY(150) NOT NULL,
   rol CHAR(50),
-  PRIMARY KEY (id_credenciales),
+  PRIMARY KEY (idCredenciales),
   #Para que no pueda haber dos usuario con el mismo nombre
   UNIQUE (username)
 );

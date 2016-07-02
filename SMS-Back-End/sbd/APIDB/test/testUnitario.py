@@ -26,7 +26,7 @@ from termcolor import colored
 ########################################################
 
 ### ENTIDADES, como Alumno, Profesor... ###
-
+"""
 class TestEntidadAlumno(unittest.TestCase):
     '''
     Testing de GestorAlumnosSQL
@@ -52,7 +52,7 @@ class TestEntidadAlumno(unittest.TestCase):
 
         self.assertEqual(test, True)
 
-    #"""
+
     def test_02_LecturaAlumnos(self):
         test = True
         GestorAlumnos.nuevoAlumno(nombre='Andrés') #Insertamos un alumno
@@ -122,8 +122,8 @@ class TestEntidadAlumno(unittest.TestCase):
             resultado=True
 
         self.assertEqual(resultado,True)
-
-
+"""
+"""
 class TestEntidadProfesor(unittest.TestCase):
 
     def setUp(self):
@@ -205,7 +205,7 @@ class TestEntidadAsignatura(unittest.TestCase):
 
     #Los métodos, por convención empiezan por la palabra test, representando que métodos componen el test.
     def test_21_IserccionAsignatura(self):
-        """Comprueba que nuevaAsignatura funciona correctamente"""
+        #Comprueba que nuevaAsignatura funciona correctamente
         test = True
         #1. Insertamos una asignatura en la base de datos y comprobamos que la salida es 'OK'
         if GestorAsignaturas.nuevaAsignatura(nombre='Metodología de la ciencia')['status'] != 'OK': test = False
@@ -215,7 +215,7 @@ class TestEntidadAsignatura(unittest.TestCase):
 
 
     def test_22_LecturaAsignaturas(self):
-        """Comprobamos que getAsignaturas devuelve el número correncto de elementos"""
+        #Comprobamos que getAsignaturas devuelve el número correncto de elementos
         test = True
         GestorAsignaturas.nuevaAsignatura(nombre='ásigA')
         GestorAsignaturas.nuevaAsignatura(nombre='ásigB')
@@ -281,7 +281,7 @@ class TestEntidadAsignatura(unittest.TestCase):
             resultado=True
 
         self.assertEqual(resultado,True)
-
+"""
 class TestGestorEntidades(unittest.TestCase):
 
     def setUp(self):
@@ -295,6 +295,29 @@ class TestGestorEntidades(unittest.TestCase):
         GestorEntidades.putEntidad(tipo='Clase', datos={'curso': '1', 'grupo': 'B', 'nivel': 'ESO'})['status'] != 'OK' or \
         GestorEntidades.putEntidad(tipo='Desconocido', datos={'prueba': 'hola'})['status'] != 'Tipo no reconocido':
             test = False
+
+        #Testeando la asociación de una asignatura a una clase, y sus errores
+        if GestorEntidades.putEntidad(tipo='Asociacion', datos={'idClase': '1', 'idAsignatura': '1'})['status'] != 'OK': test = False
+        #No se puede realizar la misma asociación si ya existe
+        if GestorEntidades.putEntidad(tipo='Asociacion', datos={'idClase': '1', 'idAsignatura': '1'})['status'] != 'Elemento duplicado': test = False
+        #No se puede realizar una relación con elementos que no existan
+        if GestorEntidades.putEntidad(tipo='Asociacion', datos={'idClase': '2', 'idAsignatura': '1'})['status'] != 'Alguno de los elementos no existe': test = False
+        if GestorEntidades.putEntidad(tipo='Asociacion', datos={'idClase': '1', 'idAsignatura': '2'})['status'] != 'Alguno de los elementos no existe': test = False
+
+        #Testeando la relación Imparte entre una asociacion y un profesor
+        if GestorEntidades.putEntidad(tipo='Imparte', datos={'idAsociacion': '1', 'idProfesor': '1'})['status'] != 'OK': test = False
+        if GestorEntidades.putEntidad(tipo='Imparte', datos={'idAsociacion': '1', 'idProfesor': '1'})['status'] != 'Elemento duplicado': test = False
+        if GestorEntidades.putEntidad(tipo='Imparte', datos={'idAsociacion': '1', 'idProfesor': '2'})['status'] != 'Alguno de los elementos no existe': test = False
+        if GestorEntidades.putEntidad(tipo='Imparte', datos={'idAsociacion': '2', 'idProfesor': '1'})['status'] != 'Alguno de los elementos no existe': test = False
+
+        #Testeando la relación Matricula entre una asociacion y un alumno
+        if GestorEntidades.putEntidad(tipo='Matricula', datos={'idAlumno': '1', 'idAsociacion': '1'})['status'] != 'OK': test = False
+        if GestorEntidades.putEntidad(tipo='Matricula', datos={'idAlumno': '1', 'idAsociacion': '1'})['status'] != 'Elemento duplicado': test = False
+        if GestorEntidades.putEntidad(tipo='Matricula', datos={'idAlumno': '2', 'idAsociacion': '1'})['status'] != 'Alguno de los elementos no existe': test = False
+        if GestorEntidades.putEntidad(tipo='Matricula', datos={'idAlumno': '1', 'idAsociacion': '2'})['status'] != 'Alguno de los elementos no existe': test = False
+
+
+        self.assertTrue(test)
 
     def test_32_getEntidades(self):
         test = True
@@ -321,6 +344,131 @@ class TestGestorEntidades(unittest.TestCase):
         if GestorEntidades.getEntidades(tipo='Asignatura', idEntidad='1')['nombre'] != u'asignatura': test = False
 
         self.assertTrue(test)
+
+    def test_33_getEntidadesRelacionadas(self):
+
+        test = True
+
+        #Insertamos una entidad de cada tipo
+        GestorEntidades.putEntidad(tipo='Alumno', datos={'nombre': 'alumnoA'})
+        GestorEntidades.putEntidad(tipo='Profesor', datos={'nombre': 'profesorA'})
+        GestorEntidades.putEntidad(tipo='Asignatura', datos={'nombre': 'asignaturaA'})
+        GestorEntidades.putEntidad(tipo='Clase', datos={'curso': '1', 'grupo': 'B', 'nivel': 'ESO'})
+
+        #Las relacionamos entre ellas ...
+        GestorEntidades.putEntidad(tipo='Asociacion', datos={'idClase': '1', 'idAsignatura': '1'})
+        GestorEntidades.putEntidad(tipo='Imparte', datos={'idAsociacion': '1', 'idProfesor': '1'})
+        GestorEntidades.putEntidad(tipo='Matricula', datos={'idAlumno': '1', 'idAsociacion': '1'})
+
+        # ... para probar los métodos de relación:
+
+        #Pedimos todos los profesores que imparten clase al alumno con id = 1
+        listaProfesores = GestorEntidades.getEntidadesRelacionadas(tipoBase='Alumno', idEntidad='1', tipoBusqueda='Profesor')
+        if len(listaProfesores) != 1 or listaProfesores[0]['nombre'] != 'profesorA': test = False
+
+        #Pedimos todos las clases en la que está matriculado el alumno con id = 1
+        listaClases = GestorEntidades.getEntidadesRelacionadas(tipoBase='Alumno', idEntidad='1', tipoBusqueda='Clase')
+        if len(listaClases) != 1 or listaClases[0]['nivel'] != 'ESO': test = False
+
+        #Pedimos todos las asignaturas en la que está matriculado el alumno con id = 1
+        listaAsignaturas = GestorEntidades.getEntidadesRelacionadas(tipoBase='Alumno', idEntidad='1', tipoBusqueda='Asignatura')
+        if len(listaAsignaturas) != 1 or listaAsignaturas[0]['nombre'] != 'asignaturaA': test = False
+
+
+
+        #Pedimos todos las clases en la que imparte clase el profesor con id = 1
+        listaClases = GestorEntidades.getEntidadesRelacionadas(tipoBase='Profesor', idEntidad='1', tipoBusqueda='Clase')
+        if len(listaClases) != 1 or listaClases[0]['nivel'] != 'ESO': test = False
+
+        #Pedimos todos las asisnaturas que imparte clase el profesor con id = 1
+        listaAsignaturas = GestorEntidades.getEntidadesRelacionadas(tipoBase='Profesor', idEntidad='1', tipoBusqueda='Asignatura')
+        if len(listaAsignaturas) != 1 or listaAsignaturas[0]['nombre'] != 'asignaturaA': test = False
+
+        #Pedimos todos los alumnos a los que imparte clase el profesor con id = 1
+        listaAlumnos = GestorEntidades.getEntidadesRelacionadas(tipoBase='Profesor', idEntidad='1', tipoBusqueda='Alumno')
+        if len(listaAlumnos) != 1 or listaAlumnos[0]['nombre'] != 'alumnoA': test = False
+
+
+
+        #Pedimos todos los alumnos matriculados en la clase con id = 1
+        listaAlumnos = GestorEntidades.getEntidadesRelacionadas(tipoBase='Clase', idEntidad='1', tipoBusqueda='Alumno')
+        if len(listaAlumnos) != 1 or listaAlumnos[0]['nombre'] != 'alumnoA': test = False
+
+        #Pedimos todos las asignaturas que se imparten en la clase con id = 1
+        listaAsignaturas = GestorEntidades.getEntidadesRelacionadas(tipoBase='Clase', idEntidad='1', tipoBusqueda='Asignatura')
+        if len(listaAsignaturas) != 1 or listaAsignaturas[0]['nombre'] != 'asignaturaA': test = False
+
+        #Pedimos todos los profesores que imparten en la clase con id = 1
+        listaProfesores = GestorEntidades.getEntidadesRelacionadas(tipoBase='Clase', idEntidad='1', tipoBusqueda='Profesor')
+        if len(listaProfesores) != 1 or listaProfesores[0]['nombre'] != 'profesorA': test = False
+
+
+
+        #Pedimos todos los alumnos matriculados en la asignatura con id = 1
+        listaAlumnos = GestorEntidades.getEntidadesRelacionadas(tipoBase='Asignatura', idEntidad='1', tipoBusqueda='Alumno')
+        if len(listaAlumnos) != 1 or listaAlumnos[0]['nombre'] != 'alumnoA': test = False
+
+        #Pedimos todos los profesores que imparten la asignatura con id = 1
+        listaProfesores = GestorEntidades.getEntidadesRelacionadas(tipoBase='Asignatura', idEntidad='1', tipoBusqueda='Profesor')
+        if len(listaProfesores) != 1 or listaProfesores[0]['nombre'] != 'profesorA': test = False
+
+        #Pedimos todos las clases en las que se imparte la asignatura con id = 1
+        listaClases = GestorEntidades.getEntidadesRelacionadas(tipoBase='Asignatura', idEntidad='1', tipoBusqueda='Clase')
+        if len(listaClases) != 1 or listaClases[0]['nivel'] != 'ESO': test = False
+
+        self.assertTrue(test)
+
+    def test_34_modEntidades(self):
+        test = True
+
+        GestorEntidades.putEntidad(tipo='Alumno', datos={'nombre': 'nombrecito'})
+        #Modificamos nombre
+        if GestorEntidades.modEntidad(tipo='Alumno', idEntidad='1', campoACambiar='nombre', nuevoValor='nuevoNombre')['status'] != 'OK': test = False
+        if GestorEntidades.getEntidades(tipo='Alumno', idEntidad='1')['nombre'] != 'nuevoNombre': test = False
+        #Modificamos dni
+        if GestorEntidades.modEntidad(tipo='Alumno', idEntidad='1', campoACambiar='dni', nuevoValor='11111111')['status'] != 'OK': test = False
+        if GestorEntidades.getEntidades(tipo='Alumno', idEntidad='1')['dni'] != 11111111: test = False
+        #Modificamos fechaNacimiento
+        if GestorEntidades.modEntidad(tipo='Alumno', idEntidad='1', campoACambiar='fechaNacimiento', nuevoValor='1988-10-29')['status'] != 'OK': test = False
+        if str(GestorEntidades.getEntidades(tipo='Alumno', idEntidad='1')['fechaNacimiento']) != '1988-10-29': test = False
+        #Que no se puede modificar un elemento que no existe
+        if GestorEntidades.modEntidad(tipo='Alumno', idEntidad='5', campoACambiar='nombre', nuevoValor='A')['status'] != 'Elemento no encontrado': test = False
+        #Que no se puede modificar un alumno y ponerle el mismo dni que otro
+        GestorEntidades.putEntidad(tipo='Alumno', datos={'nombre': 'alumnoPrueba'})
+        if GestorEntidades.modEntidad(tipo='Alumno', idEntidad='2', campoACambiar='dni', nuevoValor='11111111')['status'] != 'Elemento duplicado': test = False
+
+        GestorEntidades.putEntidad(tipo='Profesor', datos={'nombre': 'nombrecito'})
+        if GestorEntidades.modEntidad(tipo='Profesor', idEntidad='1', campoACambiar='nombre', nuevoValor='nuevoNombre')['status'] != 'OK': test = False
+        if GestorEntidades.getEntidades(tipo='Profesor', idEntidad='1')['nombre'] != 'nuevoNombre': test = False
+
+        GestorEntidades.putEntidad(tipo='Asignatura', datos={'nombre': 'nombrecito'})
+        if GestorEntidades.modEntidad(tipo='Asignatura', idEntidad='1', campoACambiar='nombre', nuevoValor='nuevoNombre')['status'] != 'OK': test = False
+        if GestorEntidades.getEntidades(tipo='Asignatura', idEntidad='1')['nombre'] != 'nuevoNombre': test = False
+
+        GestorEntidades.putEntidad(tipo='Clase', datos={'curso': '1'})
+        if GestorEntidades.modEntidad(tipo='Clase', idEntidad='1', campoACambiar='curso', nuevoValor='2')['status'] != 'OK': test = False
+        if GestorEntidades.getEntidades(tipo='Clase', idEntidad='1')['curso'] != 2: test = False
+
+        self.assertTrue(test)
+
+    def test_35_delEntidades_numEntidades(self):
+        test = True
+
+        GestorEntidades.putEntidad(tipo='Alumno', datos={'nombre': 'alumnoPrueba'})
+        if GestorEntidades.delEntidad(tipo='Alumno', idEntidad='1')['status'] != 'OK': test = False
+        if len(GestorEntidades.getEntidades(tipo='Alumno')) != 0: test = False
+        if GestorEntidades.getNumEntidades(tipo='Alumno') != 0: test =False
+
+        GestorEntidades.putEntidad(tipo='Profesor', datos={'nombre': 'prof'})
+        GestorEntidades.putEntidad(tipo='Profesor', datos={'nombre': 'prof2'})
+        if GestorEntidades.delEntidad(tipo='Profesor', idEntidad='1')['status'] != 'OK': test = False
+        if len(GestorEntidades.getEntidades(tipo='Profesor')) != 1: test = False
+        if GestorEntidades.getNumEntidades(tipo='Profesor') != 1: test =False
+
+        self.assertTrue(test)
+
+
+
 
 
 """
