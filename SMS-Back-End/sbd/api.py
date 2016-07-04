@@ -5,7 +5,7 @@
 #####################################################
 
 
-from flask import Flask
+from flask import Flask, request
 from flask import abort
 from flask import request
 import jsonpickle
@@ -19,9 +19,13 @@ from APIDB.GestorImpartesSQL import GestorImpartes
 from APIDB.GestorAsociacionesSQL import GestorAsociaciones
 from APIDB.GestorCredencialesSQL import GestorCredenciales
 
+from APIDB.GestorEntidades import GestorEntidades
+
 from google.appengine.api import modules
 from google.appengine.api import urlfetch
 import urllib
+import json
+from termcolor import colored
 
 app = Flask(__name__)
 
@@ -33,13 +37,78 @@ nombreMicroservicio = '\n ## Microservicio BD ##'
 #   COLECCIÓN ALUMNOS      #
 ############################
 
-@app.route('/alumnos',methods=['GET'])
-def getAlumnos():
+@app.route('/test',methods=['GET'])
+def test():
     '''
     Devuelve una lista de todos los estudiantes.
-    curl -i -X GET localhost:8002/alumnos
+    curl -i -X GET localhost:8002/test
     '''
-    return jsonpickle.encode(GestorAlumnos.getAlumnos())
+    return 'testOK'
+
+
+@app.route('/entidades', methods=['POST'])
+def putEntidad():
+    """
+    Inserta una entidad en el sistema, debido a que puede introducir cualquier tipo de entidad, se acepta la siguient lista
+    de parámetros:
+
+    tipo: string con el tipo de entidad que se quiere introducir en el sistema.
+    datos: json con todos los parámetros
+    """
+
+    #Decodificamos el json aun diccionario de python
+    data = json.loads(request.form.get('datos'))
+    #Pasamostodos los elementos a utf-8 (por los acentos)
+    for key, value in data.iteritems():
+        data[key] = value.encode('utf-8')
+
+    #Codificamos la respuesta (dict) del gestor en un json para que lo devuelva este método
+    #Pasamos el diccionario (el json decodificado)
+    return json.dumps(GestorEntidades.putEntidad(tipo=request.form.get('tipo'), datos=data))
+
+
+@app.route('/entidades', methods=['GET'])
+def getEntidades():
+    """
+    curl -i -X GET localhost:8002/entidades/prueba
+    geting
+    """
+    print 'calling getEntidades'
+    #print colored('ENTDADES', 'green')
+    #print colored(request.form.get('tipo'), 'green')
+
+    print colored(request.args['tipo'], 'green')
+
+    if 'idEntidad' in request.args and 'tipo' in request.args:
+        """
+        print 'HAY DATOS'
+        print colored(request.args['tipo'], 'green')
+        print colored(request.args['idEntidad'], 'green')
+        """
+        #return GestorEntidades.getEntidades(tipo='Alumno', idEntidad='1')
+
+        #Devolvemos los datos en json (transformando el diccionario que nos devuelve el gestor)
+        return json.dumps(GestorEntidades.getEntidades(tipo=request.args['tipo'], idEntidad=request.args['idEntidad']))
+    else:
+        return json.dumps(GestorEntidades.getEntidades(tipo=request.args['tipo']))
+        #return GestorEntidades.getEntidades(tipo=request.args['tipo'], idEntidad=request.args['idEntidad'])
+
+
+    """
+    if request.args['datos'] != None:
+        print colored('HAY DATOS', 'red')
+    else:
+        print colored('NO HAY DATOS', 'red')
+    """
+
+    #return json.dumps(GestorEntidades.putEntidad(tipo=request.args['tipo'], datos=json.loads(request.args['datos'])))
+    return 'HELLO'
+
+
+@app.route('/controlesAsistencia/<int:idControlAsistencia>', methods=['GET']) #tested
+def obtenerControlAsistencia(idControlAsistencia):
+    print idControlAsistencia
+
 
 @app.route('/alumnos',methods=['PUT'])
 def putAlumnos():

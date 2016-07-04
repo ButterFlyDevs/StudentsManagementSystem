@@ -465,11 +465,40 @@ class TestGestorEntidades(unittest.TestCase):
         if len(GestorEntidades.getEntidades(tipo='Profesor')) != 1: test = False
         if GestorEntidades.getNumEntidades(tipo='Profesor') != 1: test =False
 
+        #Insertamos una entidad de cada tipo
+        GestorEntidades.putEntidad(tipo='Alumno', datos={'nombre': 'alumnoA'})
+        GestorEntidades.putEntidad(tipo='Profesor', datos={'nombre': 'profesorA'})
+        GestorEntidades.putEntidad(tipo='Asignatura', datos={'nombre': 'asignaturaA'})
+        GestorEntidades.putEntidad(tipo='Clase', datos={'curso': '1', 'grupo': 'B', 'nivel': 'ESO'})
+
+        #Las relacionamos entre ellas ...
+        if GestorEntidades.putEntidad(tipo='Asociacion', datos={'idClase': '1', 'idAsignatura': '1'})['status'] != 'OK' : test = False
+        if GestorEntidades.putEntidad(tipo='Imparte', datos={'idAsociacion': '1', 'idProfesor': '3'})['status'] != 'OK' : test = False
+        if GestorEntidades.putEntidad(tipo='Matricula', datos={'idAlumno': '2', 'idAsociacion': '1'})['status'] != 'OK' : test = False
+
+        if GestorEntidades.getNumEntidades(tipo='Asociacion') != 1: test =False
+        if GestorEntidades.getNumEntidades(tipo='Imparte') != 1: test =False
+        if GestorEntidades.getNumEntidades(tipo='Matricula') != 1: test =False
+
+
+        #Si a la asocaicion hay matriculados alumnos y/o la dan profesores tiene dependencias que hace que no se pueda eliminar
+        if GestorEntidades.delEntidad(tipo='Asociacion', idEntidad='1')['status'] != 'El elemento que pretentde eliminar tiene dependencias': test = False
+
+        if GestorEntidades.delEntidad(tipo='Matricula', idEntidad='1')['status'] != 'OK': test = False
+        if GestorEntidades.delEntidad(tipo='Matricula', idEntidad='1')['status'] != 'Elemento no encontrado': test = False
+
+        if GestorEntidades.delEntidad(tipo='Imparte', idEntidad='1')['status'] != 'OK': test = FAlse
+        if GestorEntidades.delEntidad(tipo='Imparte', idEntidad='1')['status'] != 'Elemento no encontrado': test = False
+
+        #Una vez eliminadas las dependencias si se puede eliminar la asociación
+        if GestorEntidades.delEntidad(tipo='Asociacion', idEntidad='1')['status'] != 'OK': test = False
+        if GestorEntidades.delEntidad(tipo='Asociacion', idEntidad='1')['status'] != 'Elemento no encontrado': test = False
+
+        if GestorEntidades.getNumEntidades(tipo='Asociacion') != 0: test =False
+        if GestorEntidades.getNumEntidades(tipo='Imparte') != 0: test =False
+        if GestorEntidades.getNumEntidades(tipo='Matricula') != 0: test =False
+
         self.assertTrue(test)
-
-
-
-
 
 """
 class TestEntidadClase(unittest.TestCase):

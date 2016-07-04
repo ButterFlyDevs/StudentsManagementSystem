@@ -10,6 +10,12 @@ Prueba de unión de métodos de entidades.
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 
+#Habría que modificar esta función para que detectase que al ser un alumno deben de ser nombre tales que estos o los otros
+#para que no puedar realizar la insercción de un alumno y se pase como parámetro el nombre así: 'nombra': 'Juan', NO EXISTE
+#un atributo llamado nombra y no puede devolver OK, de ninguna manera.
+
+#PREGUNTAR PSICOBYTE !!!!
+
 def extraer(dicc, field):
     dato = dicc.get(field, 'NULL')
     if dato == 'NULL':
@@ -77,8 +83,11 @@ class GestorEntidades:
             query = 'INSERT INTO Matricula (idMatricula, idAlumno, idAsociacion) VALUES (NULL' + ',' \
             + extraer(datos, 'idAlumno') + ',' + extraer(datos, 'idAsociacion') + ');'
 
+        elif tipo == None:
+            return {'status': 'FAIL', 'info': 'Necesario pasar tipo'}
+
         else:
-            return {'status': 'Tipo no reconocido'}
+            return {'status': 'FAIL', 'info': 'Tipo no reconocido'}
 
         if v:
             print query
@@ -318,7 +327,7 @@ class GestorEntidades:
         salida =''
         try:
             salida = cursor.execute(query);
-        except MySQLdb.Error, e:
+        except dbParams.MySQLdb.Error, e:
             # Get data from database
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -336,10 +345,12 @@ class GestorEntidades:
         cursor.close()
         db.close()
 
-        if salida==1:
+        if salida == 1:
             return {'status': 'OK'}
-        if salida==0:
+        if salida == 0:
             return {'status': 'Elemento no encontrado'}
+        if salida == 1451:
+            return {'status': 'El elemento que pretentde eliminar tiene dependencias'}
 
     @classmethod
     def getNumEntidades(self, tipo):

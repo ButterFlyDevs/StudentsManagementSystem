@@ -32,7 +32,6 @@ class SCE_API_TESTS(unittest.TestCase):
         pass
 
     def testPruebaEstado(self):
-        import requests
         res = requests.get(urlBase+'/prueba')
         assert 'SCE MicroService is RUNING!\n' in res
 

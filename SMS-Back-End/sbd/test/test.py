@@ -19,100 +19,74 @@ import unittest
 
 #Importamos la propia api, que es 'app' en el fichero 'main.py'
 import sys, os
-sys.path.insert(0,os.pardir)
-from main import app
-
+import requests
 import jsonpickle
 
-class MyTest(unittest.TestCase):
+import json
+from termcolor import colored
+import time
+
+urlBase = 'http://localhost:8002'
+
+class SBD_API_TEST(unittest.TestCase):
+
 
     def setUp(self):
-        app.config['TESTING'] = True
-        self.app = app.test_client()
+        os.system('mysql -u root -p\'root\' < ../APIDB/DBCreatorv1.sql')
 
-    def test_getAlumnos(self):
-        respuesta = self.app.get('/alumnos')
-        #La respuesta es un tipo de dato response_objet, alias de la clase flask.Response, más info en http://flask.pocoo.org/docs/0.10/api/#flask.Response
-        jsonData = jsonpickle.decode(respuesta.data)
-        print len(jsonData)
+    def test_00_PruebaAPI(self):
+        url = urlBase+'/test'
+        respuesta = requests.get(url)
+        self.assertTrue( ('testOK' in str(respuesta.text)) )
 
-        self.assertTrue(('dni' in str(respuesta.data)) or ('[]' in str(respuesta.data)))
+
+    def test_01_postEntidades(self):
+        test = True
+        url = urlBase+'/entidades'
+
+        #Entidades normales
+        if json.loads(requests.post(url, data={'tipo': 'Alumno', 'datos': json.dumps({'nombre': 'Juan Antonio'}) } ).text)['status'] != 'OK': test = False
+        #Llamamos a la función haciendo que falten algunos parámetros para ver que no se realiza con éxito.
+        if json.loads(requests.post(url, data={'datos': json.dumps({'nombra': 'Juan Antonio'}) } ).text)['status'] != 'FAIL': test = False
+        if json.loads(requests.post(url, data={'tipo': 'Profesor', 'datos': json.dumps({'nombre': 'Juan Antonio'}) } ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, data={'tipo': 'Asignatura', 'datos': json.dumps({'nombre': 'asig'}) } ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, data={'tipo': 'Clase', 'datos': json.dumps({'curso': '1', 'grupo': 'A', 'nivel': 'ESO'}) } ).text)['status'] != 'OK': test = False
+
+        #Entidades de relación
+        if json.loads(requests.post(url, data={'tipo': 'Asociacion', 'datos': json.dumps({'idClase': '1', 'idAsignatura': '1'}) } ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, data={'tipo': 'Asociacion', 'datos': json.dumps({'idClase': '1', 'idAsignatura': '1'}) } ).text)['status'] != 'Elemento duplicado': test = False
+        if json.loads(requests.post(url, data={'tipo': 'Asociacion', 'datos': json.dumps({'idClase': '1', 'idAsignatura': '15'}) } ).text)['status'] != 'Alguno de los elementos no existe': test = False
+        if json.loads(requests.post(url, data={'tipo': 'Imparte', 'datos': json.dumps({'idAsociacion': '1', 'idProfesor': '1'}) } ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, data={'tipo': 'Imparte', 'datos': json.dumps({'idAsociacion': '1', 'idProfesor': '1'}) } ).text)['status'] != 'Elemento duplicado': test = False
+        if json.loads(requests.post(url, data={'tipo': 'Matricula', 'datos': json.dumps({'idAlumno': '1', 'idAsociacion': '1'}) } ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, data={'tipo': 'Matricula', 'datos': json.dumps({'idAlumno': '1', 'idAsociacion': '1'}) } ).text)['status'] != 'Elemento duplicado': test = False
+
+        self.assertTrue(test)
+    
+    def test_02_getEntidades(self):
+        test = True
+        url = urlBase+'/entidades'
+
+        #Introducimos un elemento
+        if json.loads(requests.post(url, data={'tipo': 'Alumno', 'datos': json.dumps({'nombre': 'María'}) } ).text)['status'] != 'OK': test = False
+
+        #if json.loads(requests.post(url, data={'tipo': 'Alumno', 'datos': json.dumps({'nombre': 'Maria'}) } ).text)['status'] != 'OK': test = False
+        """
+        if json.loads(requests.post(url, data={'tipo': 'Alumno', 'datos': json.dumps({'nombre': 'alumno2'}) } ).text)['status'] != 'OK': test = False
+
+        #Extraemos un alumno en concreto
+        data = requests.get(url, params={'tipo': 'Alumno', 'idEntidad': '1' })
+        #Decompactamos el json con loads, ya que la API devuelve JSONs
+        if json.loads(data.text)['nombre'] != u'alumno1': test = False
+
+        #Extraemos la lista de todos
+        data = requests.get(url, params={'tipo': 'Alumno'})
+        print data.text
+        #Decompactamos el json con loads, ya que la API devuelve JSONs
+        if json.loads(data.text)[1]['nombre'] != u'alumno2': test = False
+        """
+        self.assertTrue(test)
 
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
-
-
-
-
-
-    #Inicio del esqueleto principal de tests en Flask
-    '''
-    def setUp(self):
-        self.db_fd, inicio.app.config['DATABASE'] = tempfile.mkstemp()
-        inicio.app.config['TESTING'] = True
-        self.app = inicio.app.test_client()
-
-    def tearDown(self):
-        os.close(self.db_fd)
-        os.unlink(inicio.app.config['DATABASE'])
-    '''
-    #Aqui acaba el esqueleto principal
-
-    """
-    Tests correspondientes a objetos Alumno
-    """
-    '''
-    #Comprobamos que la petición GET de /alumnos es correcta
-    def test_alumnos_get(self):
-        respuesta = self.app.get('/alumnos')
-        self.assertTrue(('dni' in str(respuesta.data)) or ('[]' in str(respuesta.data)))
-
-
-
-    #Comprobamos que la petición GET de /alumnos/argumentos es correcta
-    def test_alumnos_get_with_arg(self, dni='11223344A'):
-        respuesta = self.app.get('/alumnos/'+dni)
-        self.assertTrue('11223344A' in str(respuesta.data))
-
-
-    #Comprobamos que la petición PUT de /alumnos es correcta
-    def test_alumnos_put(self):
-        respuesta = self.app.put('/alumnos')
-        self.assertTrue('puting' in str(respuesta.data))
-
-    #Comprobamos que la petición DELETE de /alumnos es correcta
-    def test_alumnos_delete(self):
-        respuesta = self.app.delete('/alumnos')
-        self.assertTrue('deleting' in str(respuesta.data))
-
-    #Comprobamos que la petición DELETE de /alumnos/argumentos es correcta
-    def test_alumnos_delete_with_arg(self):
-        respuesta = self.app.delete('/alumnos/11223344A')
-        self.assertTrue('Elemento eliminado' in str(respuesta.data))
-
-
-    #Comprobamos que la petición POST de /alumnos es correcta
-    def test_alumnos_post(self):
-        posibles_errores=[404, 400]
-        respuesta1 = self.app.post('/alumnos&nombre=Juan&dni=45601218Z&direccion=Calle+arabl&localidad=Jerez+de+la+frontera&provincia=Granada&fecha_nac=1988-2-6&telefono=677164459')
-        respuesta2 =
-        respuesta3 =
-        self.assertTrue('OK' in str(respuesta.data) or respuesta.status_code in posibles_errores)  #agnadir lo que queda de elementos
-        if 'OK' in str(respuesta.data):
-            test_alumnos_get_with_arg('45601218Z')
-    '''
-
-
-    '''
-    #Ver si la página carga correctamente
-    def test_home_status_code(self):
-        # sends HTTP GET request to the application
-        # on the specified path
-        result = self.app.get('/')
-        # assert the status code of the response
-        self.assertEqual(result.status_code, 200)
-    '''

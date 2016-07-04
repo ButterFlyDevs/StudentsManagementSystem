@@ -85,15 +85,12 @@ CREATE TABLE Clase(
 #Creacion de la tabla para los Grupos
 #Un grupo es la asociación de una asignatura y un curso, por ejemplo: 1ºESO-Francés que identifica perfectamente un grupo de alumnos.
 CREATE TABLE Asociacion(
-
  idAsociacion INT NOT NULL AUTO_INCREMENT,
- idClase INT ,
+ idClase INT,
  idAsignatura INT,
-
  #Especificamos que se trata de claves foráneas (claves primarias de otras tablas)
  FOREIGN KEY (idClase) REFERENCES Clase(idClase),
  FOREIGN KEY (idAsignatura) REFERENCES Asignatura(idAsignatura),
-
  #Especificamos la formación de la clave primaria en esta tabla.
  PRIMARY KEY (idAsociacion),
  UNIQUE (idClase, idAsignatura) #Para que no puedan repetirse
@@ -106,15 +103,11 @@ CREATE TABLE Imparte(
   idAsociacion INT,
   #Necesitamos una referncia del profesor:
   idProfesor INT,
-
   #Especificamos que se trata de claves foráneas.
   FOREIGN KEY (idAsociacion) REFERENCES Asociacion(idAsociacion),
-#  FOREIGN KEY (idAsignatura) REFERENCES Asignatura(idAsignatura),
   FOREIGN KEY (idProfesor) REFERENCES Profesor(idProfesor),
-
   #Establecemos la clave primaria compuesta.
   PRIMARY KEY (idImparte),
-
   #Especificamos que la formación idAsociacion, idProfesor) como par no pueda repetirse:
   UNIQUE (idAsociacion, idProfesor)
 
@@ -125,13 +118,9 @@ CREATE TABLE Matricula(
   idMatricula INT NOT NULL AUTO_INCREMENT,
   idAlumno INT,
   idAsociacion INT,
-
-
-
   #Especificamos que se trata de claves foráneas.
   FOREIGN KEY (idAsociacion) REFERENCES Asociacion(idAsociacion),
   FOREIGN KEY (idAlumno) REFERENCES Alumno(idAlumno),
-
   #Establecemos la clave primaria compuesta.
   PRIMARY KEY (idMatricula),
   #Un alumno no puede estar dos veces matriuclado a la misma asociacion
