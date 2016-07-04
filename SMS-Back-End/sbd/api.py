@@ -52,57 +52,52 @@ def putEntidad():
     Inserta una entidad en el sistema, debido a que puede introducir cualquier tipo de entidad, se acepta la siguient lista
     de parámetros:
 
-    tipo: string con el tipo de entidad que se quiere introducir en el sistema.
-    datos: json con todos los parámetros
+    parámetros: json con los datos:
+        tipo: string con el tipo de entidad que se quiere introducir en el sistema.
+        datos: json con todos los parámetros
+
+    devuelve: un json con el estado
+
+    Ejemplo de uso:
+    curl -H "Content-Type: application/json" -X POST -d '{"tipo": "Alumno", "datos": {"nombre": "María"} }' localhost:8002/entidades
+    #En caso de usar un fichero
+    curl -H "Content-Type: application/json" -X POST -d @datosEntidad.json localhost:8002/entidades
+
     """
 
-    #Decodificamos el json aun diccionario de python
-    data = json.loads(request.form.get('datos'))
-    #Pasamostodos los elementos a utf-8 (por los acentos)
-    for key, value in data.iteritems():
-        data[key] = value.encode('utf-8')
+    #Extraemos el json de la petición
+    data = request.get_json()
 
-    #Codificamos la respuesta (dict) del gestor en un json para que lo devuelva este método
-    #Pasamos el diccionario (el json decodificado)
-    return json.dumps(GestorEntidades.putEntidad(tipo=request.form.get('tipo'), datos=data))
+    #Extraemos los datos de la entidad y pasamos todos los elementos a utf-8
+    datos = data.get('datos', None)
+    if datos != None:
+        for key, value in datos.iteritems():
+            datos[key] = value.encode('utf-8')
+
+    tipo = data.get('tipo', None)
+        
+    #Realizamos la petición al gestor y devolvemos la respuesta transformada a json.
+    return json.dumps(GestorEntidades.putEntidad(tipo=tipo, datos=datos))
 
 
-@app.route('/entidades', methods=['GET'])
-def getEntidades():
+@app.route('/entidades/<string:tipo>', methods=['GET']) #Si pedimos todas las entidades de un tipo
+@app.route('/entidades/<string:tipo>/<int:idEntidad>', methods=['GET']) #Si pedimos una entidad concreta de un tipo
+def getEntidades(tipo, idEntidad=None):
     """
     curl -i -X GET localhost:8002/entidades/prueba
+
+    curl  -i -X  localhost:8002/entidades/Alumno
+    curl  -i -X  localhost:8002/entidades/Alumno/1
     geting
     """
-    print 'calling getEntidades'
-    #print colored('ENTDADES', 'green')
-    #print colored(request.form.get('tipo'), 'green')
 
-    print colored(request.args['tipo'], 'green')
-
-    if 'idEntidad' in request.args and 'tipo' in request.args:
-        """
-        print 'HAY DATOS'
-        print colored(request.args['tipo'], 'green')
-        print colored(request.args['idEntidad'], 'green')
-        """
-        #return GestorEntidades.getEntidades(tipo='Alumno', idEntidad='1')
-
+    if idEntidad != None: #Nos piden todos los datos de una entidad concreta de un tipo concreto.
         #Devolvemos los datos en json (transformando el diccionario que nos devuelve el gestor)
-        return json.dumps(GestorEntidades.getEntidades(tipo=request.args['tipo'], idEntidad=request.args['idEntidad']))
-    else:
-        return json.dumps(GestorEntidades.getEntidades(tipo=request.args['tipo']))
+        return json.dumps(GestorEntidades.getEntidades(tipo=str(tipo), idEntidad=str(idEntidad)))
+    else: #Nos piden todas las entidades de un tipo (info resumida)
+        return json.dumps(GestorEntidades.getEntidades(tipo=str(tipo)))
         #return GestorEntidades.getEntidades(tipo=request.args['tipo'], idEntidad=request.args['idEntidad'])
 
-
-    """
-    if request.args['datos'] != None:
-        print colored('HAY DATOS', 'red')
-    else:
-        print colored('NO HAY DATOS', 'red')
-    """
-
-    #return json.dumps(GestorEntidades.putEntidad(tipo=request.args['tipo'], datos=json.loads(request.args['datos'])))
-    return 'HELLO'
 
 
 @app.route('/controlesAsistencia/<int:idControlAsistencia>', methods=['GET']) #tested

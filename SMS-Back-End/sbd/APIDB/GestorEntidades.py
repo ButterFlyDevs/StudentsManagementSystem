@@ -126,9 +126,9 @@ class GestorEntidades:
             dic['status']= 'OK'
             #return 'OK'
         if salida==1062:
-            dic['status']= 'Elemento duplicado'
+            dic={'status': 'FAIL', 'info': 'Elemento duplicado.'}
         if salida==1452:
-            dic['status']= 'Alguno de los elementos no existe'
+            dic={'status': 'FAIL', 'info': 'Alguno de los elementos no existe.'}            
 
         return dic
 
