@@ -17,6 +17,8 @@ import unittest
 #Como las respuestas son siempre en json incluimos la librería para decodificarlas y tratarlas.
 import jsonpickle
 
+import sys, os
+
 from termcolor import colored
 
 #Para los sleeps
@@ -42,6 +44,9 @@ en este caso como usamos RPC usamos el descubridor de servicios y llamamos direc
 
 class API_GATEWAY_TESTS(unittest.TestCase):
 
+    def setUp(self):
+        os.system('mysql -u root -p\'root\' < ../sbd/APIDB/DBCreatorv1.sql', )
+
     """
     def setUp(self):
         print 'Configuración inicial.'
@@ -56,7 +61,7 @@ class API_GATEWAY_TESTS(unittest.TestCase):
         #pprint(self.service)
     """
 
-    def test_001_HolaMundo(self):
+    def test_000_HolaMundo(self):
         url     = urlBase+'/holaMundo'
         #Introducir un alumno es correcto:
         res = requests.get(url)
@@ -64,7 +69,98 @@ class API_GATEWAY_TESTS(unittest.TestCase):
         print res
         assert 'Hola mundo! \n' in res['message']
 
+    def test_001_putEntidades(self):
+        url = urlBase + '/entidades'
+        test = True
+        if json.loads(requests.post(url, json={'tipo': 'Alumno', 'datos': {'nombre': 'Juan Antonio'}} ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, json={'tipo': 'Profesor', 'datos': {'nombre': 'Juan Antonio'}} ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, json={'tipo': 'Asignatura', 'datos': {'nombre': 'asig'}} ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, json={'tipo': 'Clase', 'datos': {'curso': '1', 'grupo': 'A', 'nivel': 'ESO'}} ).text)['status'] != 'OK': test = False
 
+        self.assertTrue(test)
+
+    def test_002_getEntidades(self):
+        url = urlBase + '/entidades'
+        test = True
+
+        if json.loads(requests.post(url, json={'tipo': 'Alumno', 'datos': {'nombre': 'María'}} ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, json={'tipo': 'Profesor', 'datos': {'nombre': 'Juan Antonio'}} ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, json={'tipo': 'Asignatura', 'datos': {'nombre': 'asig'}} ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, json={'tipo': 'Clase', 'datos': {'curso': '1', 'grupo': 'A', 'nivel': 'ESO'}} ).text)['status'] != 'OK': test = False
+
+        data = json.loads(requests.get(url+'/Alumno/1').text)
+        if data['nombre'] != u'María': test = False
+
+        data = json.loads(requests.get(url+'/Alumno').text)
+        if data['entidades'][0]['nombre'] != u'María': test = False
+
+        data = json.loads(requests.get(url+'/Clase').text)
+        if data['entidades'][0]['curso'] != '1' or data['entidades'][0]['nivel'] != 'ESO': test = False
+
+        data = json.loads(requests.get(url+'/Asignatura').text)
+        if data['entidades'][0]['nombre'] != u'asig': test = False
+
+        self.assertTrue(test)
+
+    def test_003_modEntidades(self):
+        url = urlBase+'/entidades'
+        test = True
+
+        if json.loads(requests.post(url, json={'tipo': 'Alumno', 'datos': {'nombre': 'María'}} ).text)['status'] != 'OK': test = False
+        if json.loads(requests.put(url, json={'tipo': 'Alumno', 'idEntidad': '1', 'campoACambiar': 'nombre', 'nuevoValor': 'Eduárdo'}).text)['status'] != 'OK': test = False
+        if json.loads(requests.put(url, json={'tipo': 'Alumno', 'idEntidad': '1', 'campoACambiar': 'nombre', 'nuevoValor': 'Eduárdo'}).text)['status'] != 'FAIL': test = False
+
+        self.assertTrue(test)
+
+
+    def test_004_delEntidad(self):
+        url = urlBase+'/entidades'
+        test = True
+
+        if json.loads(requests.post(url, json={'tipo': 'Alumno', 'datos': {'nombre': 'María'}} ).text)['status'] != 'OK': test = False
+        data = json.loads(requests.get(url+'/Alumno').text)
+        if len(data) != 1: test = False
+        #Lo eliminamos
+        if json.loads(requests.delete(url+'/Alumno/1').text)['status'] != 'OK': test = False
+
+        data = json.loads(requests.get(url+'/Alumno').text)
+        if len(data) != 0: test = False
+
+
+        self.assertTrue(test)
+
+    def test_005_getEntidadesRelacionadas(self):
+        url = urlBase + '/entidades'
+        test = True
+
+        if json.loads(requests.post(url, json={'tipo': 'Profesor', 'datos': {'nombre': 'Juan Antonio'}} ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, json={'tipo': 'Alumno', 'datos': {'nombre': 'Juan Antonio'}} ).text)['status'] != 'OK': test = False
+
+        if json.loads(requests.post(url, json={'tipo': 'Asignatura', 'datos': {'nombre': 'asig'}} ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, json={'tipo': 'Clase', 'datos': {'curso': '1', 'grupo': 'A', 'nivel': 'ESO'}} ).text)['status'] != 'OK': test = False
+
+        #Asociamos ambas entidades:
+        if json.loads(requests.post(url, json={'tipo': 'Asociacion', 'datos': {'idClase': '1', 'idAsignatura': '1'} } ).text)['status'] != 'OK': test = False
+
+        if json.loads(requests.post(url, json={'tipo': 'Imparte', 'datos': {'idAsociacion': '1', 'idProfesor': '1'} } ).text)['status'] != 'OK': test = False
+        if json.loads(requests.post(url, json={'tipo': 'Matricula', 'datos': {'idAlumno': '1', 'idAsociacion': '1'} } ).text)['status'] != 'OK': test = False
+
+        profesores = json.loads(requests.get(url+'/Asignatura/1/Profesor').text)
+        print profesores
+        if len(profesores) != 1: test != False
+        if profesores['entidades'][0]['nombre'] != 'Juan Antonio': False  #Porque el endpoint devuelve una lista entidades
+
+        profesores = json.loads(requests.get(url+'/Alumno/1/Profesor').text)
+        if len(profesores) != 1: test != False
+        if profesores['entidades'][0]['nombre'] != 'Juan Antonio': False #Porque el endpoint devuelve una lista entidades
+
+
+        self.assertTrue(test)
+
+
+
+
+    """
     def test_002_ControlesAsistencia(self):
         test = True
         mca1 = {
@@ -146,6 +242,8 @@ class API_GATEWAY_TESTS(unittest.TestCase):
         if encontrado != True: test = False
 
         self.assertEqual(test, True)
+
+    """
 
 if __name__ == '__main__':
     #main()

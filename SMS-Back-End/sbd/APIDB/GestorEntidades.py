@@ -21,7 +21,9 @@ def extraer(dicc, field):
     if dato == 'NULL':
         return dato
     else:
-        return '\''+dato+'\''
+        #Devolvemos todos los datos como string para que formen parte de la query, que es una string y para que si
+        #fueran enteros se pudieran concatenar.
+        return '\''+str(dato)+'\''
 
 from termcolor import colored
 
@@ -126,9 +128,9 @@ class GestorEntidades:
             dic['status']= 'OK'
             #return 'OK'
         if salida==1062:
-            dic={'status': 'FAIL', 'info': 'Elemento duplicado.'}
+            dic={'status': 'FAIL', 'info': 'Elemento duplicado'}
         if salida==1452:
-            dic={'status': 'FAIL', 'info': 'Alguno de los elementos no existe.'}            
+            dic={'status': 'FAIL', 'info': 'Alguno de los elementos no existe'}
 
         return dic
 
@@ -249,19 +251,24 @@ class GestorEntidades:
         :returns: Diccionario con estado de la ejecución e informe de errores en caso de que existan.
         :rtype: diccionario
         """
+
+        if v:
+            print apiName
+            print 'Calling modEntidad() with params:'
+            print colored (locals(), 'blue')
         db = dbParams.conecta();
 
-        #Entrecomillamos los valores
+        #Entrecomillamos los valores convirtiendo a string para poder concatenar con las comillas para la consulta de mySQL
         nuevoValor='\''+nuevoValor+'\''
-        idEntidad='\''+idEntidad+'\''
-
+        idEntidad='\''+str(idEntidad)+'\''
         idTipo = 'id'+tipo
+
 
         query='UPDATE ' + tipo + ' SET ' + campoACambiar + ' = ' + nuevoValor + ' WHERE ' + idTipo + ' = ' + idEntidad + ';'
         #Ejemplo: UPDATE Alumno SET nombre='nuevoNombre' WHERE idAlumno = '1';
 
         if v:
-            print '\n'+query;
+            print query.encode('utf-8')
 
         cursor = db.cursor()
         salida =''
@@ -285,12 +292,14 @@ class GestorEntidades:
         cursor.close()
         db.close()
 
-        if salida==1:
-            return {'status': 'OK'}
-        elif salida==1062:
-            return {'status': 'Elemento duplicado'}
-        elif salida==0:
-            return {'status': 'Elemento no encontrado'}
+        if salida == 1:
+            return {'status': 'OK', 'mysqlCODE': 1}
+        elif salida == 1062:
+            return {'status': 'FAIL', 'info': 'Elemento duplicado',  'mysqlCODE': 1062}
+        elif salida == 0:
+            return {'status': 'FAIL',
+                    'info': 'No se ha producido ninguna modificacion. Puede que no se haya detectado modificaciones o que el elemento no exista.',
+                    'mysqlCODE': 0}
 
     @classmethod
     def delEntidad(self, tipo, idEntidad):
@@ -399,6 +408,8 @@ class GestorEntidades:
 
         Toda la información de las entidades se devuelve en su versión resumida.
         """
+
+        print locals()
 
         db = dbParams.conecta()
         cursor = db.cursor()
