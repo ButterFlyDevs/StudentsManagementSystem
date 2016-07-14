@@ -62,80 +62,83 @@ input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgb
 
 </style>
 
+<div class="uk-cover-background uk-height-viewport">
+	<video class="uk-cover-object "  autoplay loop muted controls>
+			<source src="images/intro.mp4" type="video/mp4">
+	</video>
+ <div class="uk-position-cover ">
 
+	 <div class="uk-vertical-align uk-text-center uk-height-1-1">
+	             <div class="uk-vertical-align-middle" style="width: 250px;">
+
+	                 <img class="uk-margin-bottom" width="140" height="120" src="images/sms.png" alt="">
+
+									 <form  name="loginForm" ng-controller="LoginController" ng-submit="login(credentials)" novalidate >
+
+	 																	<div class="uk-form-icon">
+	 																		 <i class="uk-icon-user"></i>
+	 																		 <input type="text" name="username" placeholder="Usuario" ng-model="credentials.username">
+	 																	</div>
+
+	 																	<br>
+
+	 																	<div class="uk-form-icon">
+	 																		 <i class="uk-icon-lock"></i>
+	 																		 <input type="password" name="password" placeholder="Contraseña" ng-model="credentials.password">
+	 																	</div>
+
+
+	 																	<div class="uk-grid">
+
+	 																	<div class="uk-width-1-2">
+	 																	 <small>¿Has olvidado la contraseña?</small>
+	 																	</div>
+
+	 																	<div class="uk-width-1-2">
+	 																		<button type="submit"  class="uk-button">Entrar</button>
+	 																	</div>
+
+	 																	</div>
+
+	 								</form>
+
+	             </div>
+	         </div>
+
+
+	</div>
+
+
+</div>
+
+	<!--
 	<link type="text/css" rel="stylesheet" href="app/css/components/notify.gradient.css" />
 	<script type="text/javascript" src="app/js/components/notify.js"></script>
 
-  <div style="background-color:red" class=" uk-container-center">
-  <div class="uk-cover " style="height: 400px;">
 
-      <!--Insertamos el video-->
+  <div class="uk-cover " style="height: 600px;">
+
       <video class="uk-cover-object "  autoplay loop muted controls>
-          <!--<source src="promo.mp4" type="video/mp4">-->
-					<!--Si no se dispone de promo.mp4 activar la siguiente linea-->
-					<source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4?test1" type="video/mp4">
+
+					<source src="images/intro.mp4" type="video/mp4">
       </video>
 
 
-        <!--Todo el contenido que va por encima del video -->
-        <div class=" uk-container uk-position-cover  uk-vertical-align" >
-              <div class="uk-vertical-align-middle">
-                <div class="uk-grid">
 
-                  <div class="uk-width-1-2 ">
-                      <img  src="logo.svg" width="281" height="217" title="UIkit" alt="UIkit">
-                      <!--Botón que abre un menú que pide la confirmación de la eliminación del alumno -->
-                      <!--<button class="uk-button" data-uk-modal="{target:'#modal', center:true}">Open</button>-->
-                  </div>
-                  <!--
-                  <div class="uk-width-1-3">
-                    <div class="login">
-                    	<h1>Login</h1>
-                        <form method="post">
-                        	<input type="text" name="u" placeholder="Username" required="required" />
-                            <input type="password" name="p" placeholder="Password" required="required" />
-                            <button type="submit" class="btn btn-primary btn-block btn-large">Let me in.</button>
-                        </form>
-                    </div>
-                  </div>
-                -->
+        <div class="uk-position-cover  uk-vertical-align" >
 
-                  <div class="uk-width-1-2 ">
-                    <form name="loginForm" ng-controller="LoginController" ng-submit="login(credentials)" novalidate>
-
-                                      <div class="uk-form-icon">
-                                         <i class="uk-icon-user"></i>
-                                         <input type="text" name="username" placeholder="Usuario" ng-model="credentials.username">
-                                      </div>
-
-                                      <br>
-
-                                      <div class="uk-form-icon">
-                                         <i class="uk-icon-lock"></i>
-                                         <input type="text" name="password" placeholder="Contraseña" ng-model="credentials.password">
-                                      </div>
+            <img  src="images/logo.gif" width="150" height="200" title="UIkit" alt="UIkit">
+						<img  src="images/logo.gif" width="150" height="200" title="UIkit" alt="UIkit">
 
 
-                                      <div class="uk-grid">
+						<div class="uk-grid">
+							<div class="uk-width-1-2">
+							</div>
+							<div class="uk-width-1-2">
+								<img  src="images/logo.gif" width="150" height="200" title="UIkit" alt="UIkit">
+							</div>
+						</div>
 
-                                      <div class="uk-width-1-2">
-                                       <small>¿Has olvidado la contraseña?</small>
-                                      </div>
-
-                                      <div class="uk-width-1-2">
-                                        <button type="submit"  class="uk-button">Entrar</button>
-                                      </div>
-
-                                      </div>
-
-                    </form>
-                  </div>
-
-                </div>
-
-              </div>
         </div>
-
   </div>
-
-</div><!--fin div inicial>
+-->

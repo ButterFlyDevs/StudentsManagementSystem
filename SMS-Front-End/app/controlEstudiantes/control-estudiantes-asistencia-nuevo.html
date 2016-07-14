@@ -1,23 +1,78 @@
 <!-- partial-home-list.html -->
 
-<h3><strong>Controles de Asistencia</strong></h3>
+<div class="uk-container" style="background-color: #ffffff; color: #888888;">
+  <h3>Nuevo Control de Asistencia</h3>
+
+  <ul class="uk-breadcrumb">
+      <li><a href="">Home</a></li>
+      <li><a href="">Control Estudiantes</a></li>
+      <li><span>Asistencia</span></li>
+      <li class="uk-active"><span>Nuevo</span></li>
+  </ul>
+</div>
 
 <!-- Nuevo -->
 
-<ul class="uk-tab" data-uk-tab>
-    <li> <a ui-sref="control-estudiantes.asistencia-inicio">Inicio</a></li>
-    <li> <a ui-sref="control-estudiantes.asistencia-historico">Historico</a></li>
-    <li class="uk-active"><a ui-sref="control-estudiantes.asistencia-nuevo">Nuevo</a></li>
-    <li class="uk-disabled"> <a href="">Otros</a></li>
-</ul>
-
-
 <div class="uk-container-center">
 
-<div class="uk-margin-top uk-margin-bottom">
+<div style="background-color: #eeeeee" class="uk-margin-top uk-margin-bottom">
+  <hr class="uk-article-divider">
+  <p>Seleccione el grupo al que quiere realizar el control.</p>
+
+<div class="uk-panel uk-panel-box uk-width-1-2 uk-container-center uk-margin-top">
+
+  <div class="uk-grid">
+
+    <div class="uk-width-1-4">
+          <h4 class="tm-article-subtitle">Asignatura</h4>
+        <ul class="uk-list uk-list-striped ">
+            <li><a>Lengua</a></li>
+            <li>Matemáticas</li>
+            <li>Inglés</li>
+        </ul>
+    </div>
+    <div class="uk-width-1-4">
+        <h4 class="tm-article-subtitle">Curso</h4>
+        <ul class="uk-list uk-list-striped ">
+            <li>1º</li>
+            <li>2º</li>
+            <li>3º</li>
+        </ul>
+    </div>
+    <div class="uk-width-1-4">
+        <h4 class="tm-article-subtitle">Grupo</h4>
+        <ul class="uk-list uk-list-striped ">
+            <li>A</li>
+            <li>B</li>
+            <li>C</li>
+            <li>D</li>
+        </ul>
+    </div>
+    <div class="uk-width-1-4">
+        <h4 class="tm-article-subtitle">Nivel</h4>
+        <ul class="uk-list uk-list-striped ">
+            <li>ESO</li>
+            <li>Bachiller</li>
+            <li>Primaria</li>
+        </ul>
+    </div>
+
+  </div>
+</div>
+<div class="uk-panel uk-panel-box uk-width-1-2 uk-container-center uk-margin-top">
+  <h5 style="display: inline;"><strong>Lengua 1º ESO Bachillerato<strong></h5>
+  <div class="uk-align-right">
+   <button class="uk-button uk-button-success" type="button">Success</button>
+ </div>
+</div>
+
+
+
 
   <br>
-  Para realizar un control de asitencia primero eliga el grupo que desea.
+  <br>
+
+
 
   <ul class="uk-list uk-list-striped" >
     <!--Creamos un elemento de la lista por cada elemento asociación de la lista asociaciones -->
@@ -29,15 +84,7 @@
   </ul>
 
 
-
-
-
-
-
-
 </div>
-
-
 
 
 </div>

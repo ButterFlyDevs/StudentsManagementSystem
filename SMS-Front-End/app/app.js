@@ -310,7 +310,7 @@ routerApp.controller('ApplicationController', function ($scope, $location, USER_
     $scope.currentUser = user;
 
     //Tras la autenticación del usuario y su seteo como usuario actual llevamos a la ventana principal.
-    $location.path("/home");
+    $location.path("/home/main");
 
     $scope.$apply();
 

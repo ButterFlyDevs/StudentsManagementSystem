@@ -40,13 +40,29 @@ de la vista y se usan).
 
 
        //Configura la URL principal
-       .state('#',{
+       .state('home',{
          url:'/home',
          templateUrl:'main.html',
          data: {
            authorizedRoles: [USER_ROLES.admin]
          }
        })
+       .state('home.main',{
+         url:'/main',
+         templateUrl:'inicio.html',
+         data: {
+           authorizedRoles: [USER_ROLES.admin]
+         }
+       })
+       .state('home.nuevoControlAsistencia',{
+         url:'/nuevoControlAsistencia',
+         templateUrl: 'controlEstudiantes/control-estudiantes-asistencia-nuevo.html',
+         controller: 'ControladorCE-asistencia-nuevo',
+         data: {
+           authorizedRoles: [USER_ROLES.admin]
+         }
+       })
+
 
         /*Definición de VISTAS ANIDADAS, dentro de una vista general que es la de estudiantes se incrustan
         a su derecha todas las subsecciones distintas. Así estudiantes.html define la plantilla general y dentro de
