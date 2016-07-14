@@ -22,7 +22,7 @@ import requests
 #Para los sleeps
 import time
 urlBase = 'http://localhost:8003'
-
+from termcolor import colored
 """
 Métodos usados para testear el servicio de control de estudiantes
 """
@@ -142,10 +142,10 @@ class SCE_API_TESTS(unittest.TestCase):
                 "idAsignatura" : 44
                }
 
-        #1. Lo enviamos para que se guarde
+        #1. Lo enviamos para que se guarde con el método post a la url
         res = requests.post(url, json=payload)
         res = jsonpickle.decode(res.text)
-        print res
+        print colored(res, 'red')
         if (res['status'] != 'OK'): test = False
         key = res['key']
         time.sleep(1)

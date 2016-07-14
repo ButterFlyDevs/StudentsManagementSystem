@@ -82,7 +82,7 @@ class HelloWorldApi(remote.Service):
         Función de prueba de exposición.
         curl -X GET localhost:8001/_ah/api/helloworld/v1/prueba22
         """
-        return MensajeRespuesta(message='Hola mundo! \n')
+        return mensajesSBD.MensajeRespuesta(message='Hola mundo! \n')
 
     ##################################################################
     ###   métodos microServicio Base de Datos       mSBD           ###
@@ -161,9 +161,9 @@ class HelloWorldApi(remote.Service):
         print idEntidad
 
         if idEntidad != None:
-            return StatusID(status=response['status'], id=int(idEntidad))
+            return mensajesSBD.StatusID(status=response['status'], id=int(idEntidad))
         else:
-            return StatusID(status=response['status'])
+            return mensajesSBD.StatusID(status=response['status'])
 
     #Por no haber forma de hacer que funcionen las rutas .../Alumno para la lista completa y ../Alumno/2 para los datos del
     #alumno con id 2 se hacen dos métodos separados.
@@ -210,7 +210,7 @@ class HelloWorldApi(remote.Service):
         el sistema tiene.
         """
         for ent in response:
-            entidad = DatosEntidadGenerica()
+            entidad = mensajesSBD.DatosEntidadGenerica()
             entidad.nombre = ent.get('nombre', None)
             entidad.apellidos = ent.get('apellidos', None)
             entidad.dni = ent.get('dni', None)
@@ -225,7 +225,7 @@ class HelloWorldApi(remote.Service):
             entidad.nivel = ent.get('nivel', None)
 
             lista.append(entidad)
-        return ListaEntidades(entidades=lista)
+        return mensajesSBD.ListaEntidades(entidades=lista)
 
     @endpoints.method( mensajesSBD.ID_RESOURCE,  mensajesSBD.DatosEntidadGenerica ,http_method='GET',path='entidades/{tipo}/{idEntidad}',name='entidades.getEntidad')
     def getEntidad(self, request):
@@ -261,7 +261,7 @@ class HelloWorldApi(remote.Service):
         el sistema tiene.
         """
         if request.idEntidad:
-            entidad = DatosEntidadGenerica()
+            entidad = mensajesSBD.DatosEntidadGenerica()
             entidad.nombre = response.get('nombre', None)
             entidad.apellidos = response.get('apellidos', None)
             entidad.dni = response.get('dni', None)
@@ -300,7 +300,7 @@ class HelloWorldApi(remote.Service):
         result = json.loads(result.content)
 
 
-        return StatusID(status=result['status'])
+        return mensajesSBD.StatusID(status=result['status'])
 
     @endpoints.method( mensajesSBD.ID_RESOURCE,  mensajesSBD.StatusID ,http_method='DELETE',path='entidades/{tipo}/{idEntidad}',name='entidades.delEntidad')
     def delEntidad(self, request):
@@ -322,7 +322,7 @@ class HelloWorldApi(remote.Service):
         result = urlfetch.fetch(url=url, method=urlfetch.DELETE)
         result = json.loads(result.content)
 
-        return StatusID(status=result['status'])
+        return mensajesSBD.StatusID(status=result['status'])
 
     @endpoints.method( mensajesSBD.Recursosv2,  mensajesSBD.ListaEntidades, http_method='GET', path='entidades/{tipoBase}/{idEntidad}/{tipoBusqueda}', name='entidades.getEntidadesRelacionadas')
     def getEntidadesRelacionadas(self, request):
@@ -355,7 +355,7 @@ class HelloWorldApi(remote.Service):
         el sistema tiene.
         """
         for ent in result:
-            entidad = DatosEntidadGenerica()
+            entidad = mensajesSBD.DatosEntidadGenerica()
             entidad.nombre = ent.get('nombre', None)
             entidad.apellidos = ent.get('apellidos', None)
             entidad.dni = ent.get('dni', None)
@@ -370,7 +370,7 @@ class HelloWorldApi(remote.Service):
             entidad.nivel = ent.get('nivel', None)
 
             lista.append(entidad)
-        return ListaEntidades(entidades=lista)
+        return mensajesSBD.ListaEntidades(entidades=lista)
 
     @endpoints.method(mensajesSBD.AlumnoCompletoConImagen,  mensajesSBD.StatusID, path='alumnos/insertarAlumno2', http_method='POST', name='alumnos.insertarAlumno2')
     def insertar_alumno2(self, request):
@@ -460,7 +460,7 @@ class HelloWorldApi(remote.Service):
                 #json2 = jsonpickle.decode(resultadoModificacion.content)
                 #salida = json2['status']
 
-        return StatusID(status=salida, id=int(json['idAlumno']))
+        return mensajesSBD.StatusID(status=salida, id=int(json['idAlumno']))
 
     #### possibly deprecated ####
     @endpoints.method( mensajesSBD.AlumnoCompleto,  mensajesSBD.MensajeRespuesta, path='alumnos/insertarAlumno', http_method='POST', name='alumnos.insertarAlumno')
@@ -581,6 +581,280 @@ class HelloWorldApi(remote.Service):
 
 
         return mensajeSalida
+
+
+
+    ##############################################
+    #   métodos de CONTROL DE ESTUDIANTES        #
+    #               mServicio SCE                #
+    ##############################################
+
+
+    #@endpoints.method(message_types.VoidMessage, ListaResumenControlAsistencia )
+    #def getAllResumenesControlAsistencia(self, request):
+
+
+
+
+
+
+    #La url hay que mejorarla no necesita el /insertarControl (se identifica con el método)
+    @endpoints.method(mensajesSCE.ControlAsistencia, mensajesSBD.StatusID, path='controlesAsistencia', http_method='POST', name='controles.insertarControlAsistencia')
+    def insertarControlAsistencia(self, request):
+        '''
+        Permite subir una lista de controles de asistencia.
+
+        curl -H "Content-Type: application/json" -X POST -d @ejemploControlAsistencia.json  localhost:8001/_ah/api/helloworld/v1/controlesAsistencia
+
+        Recibe un control de asistencia completo en formato json, ver ejemploControlAsistencia.json para ver ejemplo.
+
+        '''
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Petición POST a controles.insertarControl'
+            print ' Request: \n '
+            print colored(request, 'blue')
+            print ' Request-CONTROLES: \n '+str(request.microControlesAsistencia)+'\n'
+
+
+        #Parseo de los datos en formato message de RPC a JSON enviable a los microservicios a través del urlfetch (seguro que hay una forma mas bonita de hacerlo)
+
+        #Creamos un diciconario con una lista dentro llamada controles.
+        diccionario = { 'microControlesAsistencia': []}
+        """
+        Recorremos los micro controles de asistencia que recibimos de la petición.
+        """
+        for mca in request.microControlesAsistencia:
+            #Creamos un diccionario por cada elemento dentro de controles, que es de tipo ControlAsistencia
+            tmpDic = {}
+            #Extraemos los datos y los insertarmos en el dic
+            tmpDic['asistencia'] = mca.asistencia
+            tmpDic['retraso'] = mca.retraso
+            #tmpDic['retrasoTiempo'] = mca.retrasoTiempo
+            tmpDic['retrasoJustificado'] = mca.retrasoJustificado
+            tmpDic['retrasoTiempo'] = mca.retrasoTiempo
+            tmpDic['uniforme'] = mca.uniforme
+            tmpDic['idAlumno'] = mca.idAlumno
+
+            print colored(tmpDic, 'red')
+
+            #Añadimo este tmpDic mca la lista controles del diccionario principal.
+            diccionario['microControlesAsistencia'].append(tmpDic)
+
+
+        #Los tres restantes vienen por la PARTE COMÚN (no en los controles)
+        diccionario['idProfesor'] = request.idProfesor
+        diccionario['idClase'] = request.idClase
+        diccionario['idAsignatura'] = request.idAsignatura
+        #A partir de este momento se incrustan en cada control
+
+
+        print colored(diccionario, 'blue')
+
+        #Usamos la librería json para terminar de darle formato y listo para usar.
+        jsonData = json.dumps(diccionario)
+        #Fin del proceso de conversión.
+
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        #Añadimos el metodo al que queremos conectarnos.
+        url+="controlesAsistencia"
+
+        #Petición al microservicio, pasándole como payload los datos recibidos aquí en el endpoint
+        result = urlfetch.fetch(url=url, payload=jsonData, method=urlfetch.POST, headers = {"Content-Type": "application/json"})
+
+        print ' Status code from microservice response: '+str(result.status_code)
+
+        resultJson = jsonpickle.decode(result.content)
+
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+        #print ' Respuesta de controles.insertarControl '+str(result)
+
+        return mensajesSBD.StatusID( status=resultJson['status'] )
+
+
+
+
+    @endpoints.method(mensajesSCE.ParametrosPeticionResumenes, mensajesSCE.ListaResumenesControlesAsistencia, path='resumenesControlesAsistencia', http_method='GET', name='controles.getResumenes')
+    def getResumenesControlesAsistenciaConParametros(self, request):
+        '''
+        Devuelve una lista con todos los resumenes de los controles de estudiantes almacenados en el sistema filtrados
+        por cualquiera de los campos.
+
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/resumenesControlesAsistencia?idProfesor=4
+
+
+        class ResumenControlAsistencia(messages.Message):
+            key = messages.StringField(1, required=True)
+            fecha = messages.StringField(2)
+            idClase = messages.StringField(3)
+            nombreClase = messages.StringField(4)
+            idAsignatura = messages.StringField(5)
+            nombreAsignatura = messages.StringField(6)
+            idProfesor = messages.StringField(7)
+            nombreProfesor = messages.StringField(8)
+
+        class ListaResumenControlAsistencia(messages.Message):
+            resumenes = messages.MessageField(ResumenControlAsistencia, 1, repeated=True)
+
+        #Cuando pedimos los resumenes de los controles de asistencia los podemos pedir usando parámetros o sin ellos.
+        class ParametrosPeticionResumen(messages.Message):
+            idProfesor = messages.IntegerField(1)
+            idAsignatura = messages.IntegerField(2)
+            idClase = messages.IntegerField(3)
+            fechaHora = messages.StringFiedl(4)
+
+        '''
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Petición POST a controles.getResumenes'
+            print ' Request: \n '+str(request)+'\n'
+
+
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        url+="resumenesControlesAsistencia"
+
+
+        #Extraemos los datos pasados a la petición y los empaquetamos en un dict.
+
+        #Creamos un diccionario
+        datos = {}
+
+        #Si viene por parámetro el id del profesor lo añadimos al diccionario
+        if request.idProfesor != None:
+            datos['idProfesor']=request.idProfesor
+        #Hacemos lo mismo con el resto:
+        if request.idAsignatura != None:
+            datos['idAsignatura']=request.idAsignatura
+        if request.idClase != None:
+            datos['idClase']=request.idClase
+        if request.fechaHora != None:
+            datos['fechaHora']=request.fechaHora
+
+        #Vemos como queda datos
+        print datos
+
+        #Petición al microservicio:
+        result = urlfetch.fetch(url=url, payload=urllib.urlencode(datos), method=urlfetch.POST)
+        listaResumenes = jsonpickle.decode(result.content)
+        print 'Resultado'
+        print colored(listaResumenes, 'red')
+
+
+        resumenesItems= []
+
+        for resumen in listaResumenes:
+            print 'RESUMEN'
+            print resumen
+            print 'nombreClase'
+            print resumen.get('nombreClase')
+
+
+            resumenesItems.append( mensajesSCE.ResumenControlAsistencia( key=int(resumen.get('key')),
+                                                             fechaHora=str(resumen.get('fechaHora')),
+                                                             idClase=int(resumen.get('idClase')),
+                                                             nombreClase=formatText(resumen.get('nombreClase')),
+                                                             idAsignatura=int(resumen.get('idAsignatura')),
+                                                             nombreAsignatura=formatText(resumen.get('nombreAsignatura')),
+                                                             idProfesor=int(resumen.get('idProfesor')),
+                                                             nombreProfesor=formatText(resumen.get('nombreProfesor'))
+                                                           ))
+
+        # Pequeño delay para pruebas con el css
+        import time
+        time.sleep(2)
+
+
+        return mensajesSCE.ListaResumenesControlesAsistencia(resumenes=resumenesItems)
+
+
+
+        #return MensajeRespuesta(message="Hola ke ase!")
+
+
+    #Modificarlo para que pueda llamarse con la url de forma correcta.
+    #La url hay que mejorarla, no necesita el /getControl (Se identifica con el método)
+    @endpoints.method(mensajesSBD.ID, mensajesSCE.ControlAsistencia, path='controlesAsistencia', http_method='GET', name='controles.getControl')
+    def getControlAsistencia(self, request):
+        '''
+
+        curl -X GET localhost:8001/_ah/api/helloworld/v1/controlesAsistencia?id=4644337115725824
+
+        Devuelve un control de asistencia completo que se le pide con el id pasado.
+        '''
+        #Info de seguimiento
+        if v:
+            print nombreMicroservicio
+            print ' Petición POST a controles.getContol'
+            print ' Request: \n '+str(request)+'\n'
+
+
+
+        #Conformamos la dirección:
+        url = "http://%s/" % modules.get_hostname(module="sce")
+        url+="controlesAsistencia/"+request.id
+
+        if v:
+            print "Llamando a: "+str(url)
+
+        #Petición al microservicio
+        result = urlfetch.fetch(url=url, method=urlfetch.GET)
+
+        print "RESULTADO:"+str(result.status_code)
+
+        if str(result.status_code) == '404':
+            raise endpoints.NotFoundException('Control de Asistencia con ID %s no existe en el sistema.' % (request.id))
+
+        #Convertimos el json a un objeto python
+        controlAsistencia = jsonpickle.decode(result.content)
+
+        print 'controlAsistencia'
+        print controlAsistencia
+
+        #Convertirmos este objeto python al mensja de rpc para ser enviado.
+
+        resumenesItems= []
+
+        #Recorremos todos los elementos de la lista 'controles' del diccionario devuelto por el mservicio sce.
+        listaControles = []
+        for mControl in controlAsistencia['microControlesAsistencia']:
+            #print 'mControl'
+            #print mControl
+            listaControles.append(mensajesSCE.MicroControlAsistencia(
+                                                     asistencia=int(mControl['asistencia']),
+                                                     retraso=int(mControl['retraso']),
+                                                     retrasoTiempo=int(mControl['retrasoTiempo']),
+                                                     retrasoJustificado=int(mControl['retrasoJustificado']),
+                                                     uniforme=int(mControl['uniforme']),
+                                                     nombreAlumno=formatText(mControl['nombreAlumno']),
+                                                     idAlumno=int(mControl['idAlumno'])
+                                                   ))
+
+        #Una vez que tenemos la lista componemos el mensaje final
+        return mensajesSCE.ControlAsistencia(
+                                       microControlesAsistencia=listaControles,
+                                       idProfesor=int(controlAsistencia['idProfesor']),
+                                       idClase=int(controlAsistencia['idClase']),
+                                       idAsignatura=int(controlAsistencia['idAsignatura']),
+                                       nombreClase=formatText(controlAsistencia['nombreClase']),
+                                       nombreAsignatura=formatText(controlAsistencia['nombreAsignatura']),
+                                       nombreProfesor=formatText(controlAsistencia['nombreProfesor']),
+                                       fechaHora=controlAsistencia['fechaHora']
+                                     )
+
+    @endpoints.method(mensajesSBD.ID, mensajesSBD.StatusID, path='controlesAsistencia', http_method='DELETE', name='controles.delControl')
+    def delControlAsistencia(self, request):
+        """
+        Elimina un control de asistencia pasado como
+        """
+        pass
 
     ##############################################
     #   Manejo de imágenes                       #

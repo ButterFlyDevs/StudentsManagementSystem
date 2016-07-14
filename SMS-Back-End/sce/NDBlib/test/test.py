@@ -19,8 +19,10 @@ sys.path.insert(1, '../../../../google_appengine')
 if 'google' in sys.modules:
     del sys.modules['google']
 
-from google.appengine.ext import ndb
-from google.appengine.ext import testbed
+from google.appengine.ext import ndb  # pragma: no cover
+from google.appengine.ext import testbed # pragma: no cover
+
+from termcolor import colored
 
 #Importamos la librería que vamos a testear:
 from gestor import *
@@ -41,7 +43,7 @@ class TestNDBlib(unittest.TestCase):
         # using ndb.get_context().set_cache_policy(False)
         ndb.get_context().clear_cache()
 
-    def test_01_insertEntitiy(self):
+    def test_01_insertEntity(self):
         """
         Test de comprobación de insercción en los tipos básicos de referencia: Alumno, Profesor, Clase, Asignatura
         """
@@ -339,7 +341,7 @@ class TestNDBlib(unittest.TestCase):
         print salida
         salida2=Gestor.obtenerControlAsistencia(salida['key'])
         print ' ##salida obtencion Control Asistencia ##'
-        print salida2
+        print colored(salida2, 'red')
 
         #Algunas comprobaciones
         if salida2 == None:
@@ -347,7 +349,7 @@ class TestNDBlib(unittest.TestCase):
 
 
         if salida2['idProfesor']!=22: test = False
-        if (salida2['controles'][0])['idAlumno'] != 11 or (salida2['controles'][0])['nombreAlumno'] != 'alumno X': test = False
+        if (salida2['microControlesAsistencia'][0])['idAlumno'] != 11 or (salida2['microControlesAsistencia'][0])['nombreAlumno'] != 'alumno X': test = False
 
         self.assertEqual(test, True)
 

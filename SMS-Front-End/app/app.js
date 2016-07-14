@@ -155,6 +155,7 @@ routerApp.factory('AuthService', function ($rootScope, $http, Session, AUTH_EVEN
 
 
 
+      /*
       gapi.client.helloworld.login.loginUser({'username': credentials.username, 'password': credentials.password}).execute(function(resp){
           console.log('Respuesta del servidor');
           console.log(resp);
@@ -177,6 +178,17 @@ routerApp.factory('AuthService', function ($rootScope, $http, Session, AUTH_EVEN
           }
 
       });
+      */
+      var sesionUsuario = {
+        id : '1',
+        user :{
+          name: 'Juan Antonio',
+          id: '1212',
+          role: 'admin'
+        },
+      };
+
+      resolve(sesionUsuario);
 
 
     //  resolve("Success!");
