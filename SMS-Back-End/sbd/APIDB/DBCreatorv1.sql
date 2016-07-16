@@ -58,6 +58,7 @@ CREATE TABLE Profesor(
   #MySQL retrieves and displays DATE values in 'YYYY-MM-DD' format
   fechaNacimiento DATE,
   telefono CHAR(50),
+  urlImagen CHAR (200),
   PRIMARY KEY (idProfesor),
   UNIQUE (dni)
 );

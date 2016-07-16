@@ -92,12 +92,17 @@ class HelloWorldApi(remote.Service):
 
     @endpoints.method( mensajesSBD.Entidad,  mensajesSBD.StatusID, path='entidades', http_method='POST', name='entidades.insertarEntidad')
     def insertarEntidad(self, request):
-
         """
+        Inserta una nueva entidad en la base de datos del sistema, a través del SBD.
+
         curl -i -d "tipo=CienciasExperimentales" -X POST -G localhost:8001/_ah/api/helloworld/v1/entidades
         curl -H "Content-Type: application/json" -X POST -d '{"tipo": "Alumno", "datos": {"nombre": "María"} }'  localhost:8001/_ah/api/helloworld/v1/entidades
         curl -H "Content-Type: application/json" -X POST -d '{"tipo": "Alumno", "datos": {"nombre": "María", "apellidos": "Luzán"} }'  localhost:8001/_ah/api/helloworld/v1/entidades
         """
+
+
+        #Future: debería comprobar el nombre de los parámetros y si alguno está mal escrito devolver un mensaje de fallo
+        #y algún tipo de mensaje donde explique esto.
 
         if v:
             print nombreMicroservicio
@@ -158,10 +163,13 @@ class HelloWorldApi(remote.Service):
         print colored(response, 'green')
 
         idEntidad=response.get('idEntidad', None)
-        print idEntidad
 
+
+        idEntidad=response.get('idEntidad', None)
+        print idEntidad
+        #Si se ha realizado una insercción donde algún microservicio devuelva idEntidad esta se devuelve.
         if idEntidad != None:
-            return mensajesSBD.StatusID(status=response['status'], id=int(idEntidad))
+            return mensajesSBD.StatusID(status=response['status'], idEntidad=int(idEntidad))
         else:
             return mensajesSBD.StatusID(status=response['status'])
 
@@ -374,93 +382,17 @@ class HelloWorldApi(remote.Service):
 
     @endpoints.method(mensajesSBD.AlumnoCompletoConImagen,  mensajesSBD.StatusID, path='alumnos/insertarAlumno2', http_method='POST', name='alumnos.insertarAlumno2')
     def insertar_alumno2(self, request):
-        """
 
-        Función que inserta un alumno en el sistema con o sin imagen.
 
-        Ejemplo de llamada SIN imagen:
-        curl -i -d "nombre=Juan&apellidos=Fernandez&dni=45301218&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno2
+        #Pero antes ponemos el nombre de forma correcta, usando el id del alumno y la extensión de la imagen
+        nombreImagen = 'alumnos/imagenes_perfil/' + str(999) + '.jpg'
 
-        Ejmplo de llamada CON imagen:
+        print colored(request.imagen, 'blue')
+        urlImagenAlumno = ManejadorImagenes.CreateFile(nombreImagen, request.imagen)
 
-        curl -d "nombre=Juan&apellidos=Fernandez&dni=45301218&direccion=Calle&localidad=Jerezfrontera&provincia=Granada&fecha_nacimiento=1988-2-6&telefono=699164459" --data-urlencode 'imagen='"$( base64 profile.jpg)"''  -X POST -G localhost:8001/_ah/api/helloworld/v1/alumnos/insertarAlumno2
-        """
+        print urlImagenAlumno
 
-        if v:
-            print nombreMicroservicio
-            print "Petición POST a alumnos.insertarAlumno2"
-            print "Contenido de la petición:"
-            print request
-            print '\n'
-
-        #Construimos un diccionario con los datos del alumno recibidos en la petición.
-        datos = {
-          "nombre": formatTextInput(request.nombre),
-          "apellidos": formatTextInput(request.apellidos),
-          "dni": request.dni,
-          "direccion": formatTextInput(request.direccion),
-          "localidad": formatTextInput(request.localidad),
-          "provincia": formatTextInput(request.provincia),
-          "fecha_nacimiento": request.fecha_nacimiento,
-          "telefono": request.telefono
-        }
-
-        #Sea con imagen o sin imagen insertamos al alumno en el sistema:
-        #Conformamos la dirección:
-        url = "http://%s/" % modules.get_hostname(module=sbd)
-        #Añadimos el servicio al que queremos conectarnos.
-        url+="alumnos"
-
-        #Codificamos los datos.
-        form_data = urllib.urlencode(datos)
-        #Realizamos la petición al servicio con los datos codificados al microservicio apropiado.
-        result = urlfetch.fetch(url=url, payload=form_data, method=urlfetch.POST)
-        if v:
-            print nombreMicroservicio
-            print "Resultado de la petición: "
-            print result.content
-            print "Código de estado: "
-            print result.status_code
-            print '\n\n'
-
-        #Analizamos la respuesta y si todo ha ido bien habremos recibido algo así: {'idAlumno': '42', 'status': 'OK'}
-        json = jsonpickle.decode(result.content)
-
-        #Definimos el mensaje de salida:
-        salida = ''
-
-        if json['status'] == 'OK':
-            #Es que el alumno se ha guardado con éxito, entonces procedemos a guardar su imagen
-
-            #Si se detecta que no se ha enviado información en el campo imagen, es que no se está enviando una imagen:
-            if request.imagen == None:
-                print 'Petición a insertarAlumno2 SIN imagen en el request.\n'
-                salida = json['status']
-
-            else:
-                print 'Petición a insertarAlumno2 CON imagen en el request.\n'
-
-                #Pero antes ponemos el nombre de forma correcta, usando el id del alumno y la extensión de la imagen
-                nombreImagen = 'alumnos/imagenes_perfil/' + json['idAlumno'] + '.jpg'
-
-                urlImagenAlumno = ManejadorImagenes.CreateFile(nombreImagen, request.imagen)
-
-                #Una vez guardada la imagen pasamos a setear el campo imagen del alumno en cuestión.
-                url2 = "http://%s/" % modules.get_hostname(module=sbd)
-                url2+="alumnos/"+json['idAlumno']
-
-                #Añadimos la imagen a los datos:
-                datos['imagen'] = urlImagenAlumno;
-
-                resultadoModificacion = urlfetch.fetch(url=url2, payload=urllib.urlencode(datos), method=urlfetch.POST)
-
-                print 'Resultado Modificacion'
-                print str(resultadoModificacion.content)
-                salida = resultadoModificacion.content
-                #json2 = jsonpickle.decode(resultadoModificacion.content)
-                #salida = json2['status']
-
-        return mensajesSBD.StatusID(status=salida, id=int(json['idAlumno']))
+        return mensajesSBD.StatusID(status='test', idEntidad=999)
 
     #### possibly deprecated ####
     @endpoints.method( mensajesSBD.AlumnoCompleto,  mensajesSBD.MensajeRespuesta, path='alumnos/insertarAlumno', http_method='POST', name='alumnos.insertarAlumno')
@@ -862,10 +794,13 @@ class HelloWorldApi(remote.Service):
 
     @endpoints.method(mensajesSBD.Imagen, mensajesSBD.MensajeRespuesta, path='imagenes/subirImagen', http_method='POST', name='imagenes.subirImagen')
     def subirImagen(self, request):
+        """
+        Introduce una imagen en el sistema.
+        tipo
+        idEntidad
+        imagen
 
-        print 'Nombre recibido:\n'
-        print request.name
-
+        """
 
         # curl -d "nombre=JuanAntonio" -i -X POST -G localhost:8001/_ah/api/helloworld/v1/imagenes/subirImagen
 
@@ -877,21 +812,21 @@ class HelloWorldApi(remote.Service):
 
         print "\n ##### IMAGEN RECIBIDA EN API ENDPOINTS: #####\n"
         print '\nImagen en CRUDO: \n'
-        print str(request.image)
+        #print str(request.imagen)
 
-        import binascii
-        stringBase64 = binascii.b2a_base64(request.image)
+        #import binascii
+        #stringBase64 = binascii.b2a_base64(request.imagen)
         print '\nImagen pasada a de Base64 a string: \n'
-        print stringBase64
+        #print stringBase64
 
         #print request.image.decode(encoding='UTF-8')
 
 
         print 'URL \n'
-        url = ManejadorImagenes.CreateFile(request.name, request.image)
+        url = ManejadorImagenes.CreateFile(request.tipo+'/'+request.idEntidad, request.imagen)
         print url
 
-        return MensajeRespuesta( message=str(url) )
+        return mensajesSBD.MensajeRespuesta( message=str(url) )
 
     @endpoints.method(mensajesSBD.URL, mensajesSBD.MensajeRespuesta, path='imagenes/eliminarImagen', http_method='POST', name='imagenes.eliminarImagen')
     def eliminarImagen(self, request):

@@ -13,6 +13,7 @@ class ManejadorImagenes:
 
     @classmethod
     def CreateFile(self, nombre, datos):
+        datos = str(datos)
         my_default_retry_params = gcs.RetryParams(initial_delay=0.2, max_delay=5.0, backoff_factor=2, max_retry_period=15)
         gcs.set_default_retry_params(my_default_retry_params)
 
