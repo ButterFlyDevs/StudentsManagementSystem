@@ -224,6 +224,8 @@ def insertarEntidad():
     """
     Inserta una entidad de referencia del tipo pasado en el DataStore.
 
+    Recibe un JSON
+
     Método **POST** (los datos pueden pasarse como payload).
 
     Las entidades de referencia son aquellas que son copia (muy resumida) de las almacenadas en el SBD
@@ -241,19 +243,25 @@ def insertarEntidad():
     Ejemplo::
 
           >>> curl -X POST -d "tipo=Alumno&idEntidad=3242&nombreEntidad=alumnoNuevo"  localhost:8003/entidadesReferencia
-          {"status": "OK"}
+          {'status': 'OK', 'idEntidad': '5'}
           >>> res = requests.post('localhost:8003/entidadesReferencia', data={ 'tipo': 'Profesor', 'idEntidad': 3135, 'nombreEntidad': 'nombreProfesor' })
           >>> jsonpickle.decode(res.text)
-          {"status": "OK"}
+          {'status': 'OK', 'idEntidad': '5'}
     """
+
     if v:
         print nombreMicroservicio
         print ' Llamando a /entidadesReferencia POST insertarEntidad()'
         print " Request: "
         print request.form
 
+    data = request.get_json()
+    print data
 
-    return jsonpickle.encode(Gestor.insertarEntidad(request.form['tipo'], int(request.form['idEntidad']), request.form['nombreEntidad']))
+    return jsonpickle.encode(Gestor.insertarEntidad(data['tipo'], int(data['idEntidad']), data['nombreEntidad']))
+
+    #return 'Hello'
+
 
 #PUT is most-often utilized for **update** capabilities
 # http://www.restapitutorial.com/lessons/httpmethods.html

@@ -5,10 +5,9 @@
 """
 
 
-from Asignatura import *
-from Clase import *
-from Profesor import *
-from Alumno import *
+
+#from Profesor import *
+
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 
@@ -17,6 +16,7 @@ v=1
 apiName='\n ## API DB ##'
 
 
+#Eliminar el uso de esta clase
 class Credenciales:
 
     def __init__(self):
@@ -32,6 +32,7 @@ class GestorCredenciales:
     Manejador de Credenciales de la base de datos.
     """
 
+    ##Maybe deprecated
     @classmethod
     def getCredenciales(self):
 
@@ -76,6 +77,29 @@ class GestorCredenciales:
         return lista
 
 
+
+    Continuar con este fichero, terminando de documentarlo, añadir los métodos que faltan
+    y testearlo para poder acceder al sistema con las pass de los profesores y que puedan cambiarlas.
+
+    Ir pensando en un sistema de alertas y como almacenarlo:
+
+        1. Tipos de alertas:
+
+            Cuando la contraseña por defecto no haya sido modificada
+            Cuando no se tenga imagen de perfil
+            Cuando falten campos por rellenar
+            Cuando algunos de sus alumnos no tengan foto
+
+    Posiblemente sea necesario un nuevo microservicio encargado de las alertas...
+
+
+
+    Modificar el SCE para que además del nombre (Debe llamarse nombreCompleto) se añada también la url de la imagen
+    de los elementos Alumno y Profesor y probar toda la conexión con la UI.
+
+
+ Habria que eliminar el nombre de aquí... para que lo queremos si cualdo se autentifique se cargarán los datos del usuario para
+ que se muestren en la interfaz.
     @classmethod
     def postCredenciales(self, idUsuario, nombre, username, password, rol):
         '''
@@ -92,11 +116,11 @@ class GestorCredenciales:
 
 
         #Añadimos al principio y al final una comilla simple a todos los elementos.
-        idUsuario='\''+idUsuario+'\''
-        username='\''+username+'\''
-        password='\''+password+'\''
-        nombre='\''+nombre+'\''
-        rol='\''+rol+'\''
+        idUsuario='\''+str(idUsuario)+'\''
+        username='\''+str(username)+'\''
+        password='\''+str(password)+'\''
+        nombre='\''+str(nombre)+'\''
+        rol='\''+str(rol)+'\''
 
         query='INSERT INTO Credenciales VALUES(NULL'+','+idUsuario+','+nombre+','+username+',AES_ENCRYPT('+password+',"CLAVESECRETA"),'+rol+');'
 
@@ -127,11 +151,17 @@ class GestorCredenciales:
         cursor.close()
         db.close()
 
+
+        #La salida debería ser un diccionario
         if salida==1:
             return 'OK'
         if salida==1062:
             return 'Elemento duplicado'
 
+
+    #Add a method putCredenciales
+
+    #Add a method delCredenciales
 
     @classmethod
     def comprobarUsuario(self, username, password):
