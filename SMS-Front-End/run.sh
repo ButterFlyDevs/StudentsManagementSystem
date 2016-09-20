@@ -11,5 +11,4 @@ echo -e "\033[36m  Ya puede acceder desde su navegador en  (http://localhost:808
 
 echo -e "\033[32m \n  ¡Gracias por contribuir! \n\n \033[0m"
 
-
 python google_appengine/dev_appserver.py SMS-Front-End/

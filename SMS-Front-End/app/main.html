@@ -1,206 +1,189 @@
 <!-- main.html
-Plantilla (página) principal de la aplicación.
+Plantilla (página) principal de la aplicación, home view.
 -->
-
-<div class="uk-grid uk-grid-collapse">
-  <div class="uk-width" style="background-color: #293846; color: #888888; width: 15%;">
-
-    LOGO
-
-    Juan XXIII
-    Sisteamsdlfkjsadf
-    asf
-
-    asdf
-    asfd
-
-    asignaturas-modificacionasf
-
-    asdf
-  <br>
-  <br>
-  <br>
-  <br>
-
-    <!-- Menú de navegación lateral normal -->
-    <ul class="uk-nav uk-nav-side uk-nav-parent-icon " data-uk-nav>
-
-         <li class="uk-active"><a ui-sref="home.main">Inicio</a></li>
-
-         <li><a href="#">Organización</a></li>
-
-
-         <li class="uk-nav-header">Control Estudiantes</li>
-
-         <!-- Anidamiento -->
-         <li class="uk-parent">
-           <!-- Título principal del anidamiento -->
-             <a href="#">Control Estudiantes</a>
-
-             <ul class="uk-nav-sub">
-
-                 <li><a href="#">Asistencia</a>
-                     <ul>
-                         <li><a ui-sref="home.nuevoControlAsistencia"><strong>Nuevo</strong></a></li>
-                         <li><a href="#">Historico</a></li>
-                         <li><a href="#">Análisis</a></li>
-                     </ul>
-                 </li>
-
-                 <li class="uk-nav-sub">
-                    <a href="#">Disciplina</a>
-                    <ul class="uk-nav-sub">
-                        <li><a href="#">A</a></li>
-                        <li><a href="#">B</a></li>
-                    </ul>
-                 </li>
-
-             </ul>
-
-         </li>
-
-         <li class="uk-parent">
-             <a href="#">Parent</a>
-             <ul class="uk-nav-sub">
-                 <li><a href="#">Sub item</a></li>
-                 <li><a href="#">Sub item</a></li>
-             </ul>
-         </li>
-     </ul>
-
-
-  </div>
-
-  <div class="uk-width" style="background-color: #ffffff; width: 85%;">
-
-    <!-- AQUÍ ES DONDE EMPIEZA A ANIDARSE EL CONTENIDO DE LAS VISTAS GRACIAS A ui-sref ============================== -->
-
-    <!-- Hemos quitado esta parte para que sean las vistas anidadas internas las que decidan que margen dejar dentro.
-    <div class="uk-container uk-margin-large-top uk-margin-large-bottom" ui-view>
-    </div>-->
-
-    <div class="uk-container" style="background-color: #f3f3f4; color: #888888;">
-
-        <div class="uk-margin-top uk-margin-bottom">
-
-          <div class="uk-grid">
-
-            <div class="uk-width-3-10">
-
-              <div class="uk-grid uk-grid-small">
-                <div class="uk-width-1-4">
-                  <img class="uk-border-circle" src="data:image/png;base64,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" alt=""  height="50" width="50">
-                </div>
-                <div class="uk-width-3-4">
-                  <p style="display: inline;">Eduardo Martinez Gomez</p>
-                </br>
-                  <i class="uk-icon-user"></i> Perfil  <i class="uk-icon-sign-out uk-margin-left"></i> Salir
-                </div>
-              </div>
-
+<html lang="en" ng-app="StarterApp">
+  <head>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.css">
+  </head>
+  <body layout="row" ng-controller="AppCtrl">
+    <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+      <md-toolbar class="md-tall md-hue-2">
+        <span flex></span>
+        <div layout="column" class="md-toolbar-tools-bottom inset">
+          <user-avatar></user-avatar>
+          <span></span>
+          <div>Firstname Lastname</div>
+          <div>email@domainname.com</div>
+        </div>
+      </md-toolbar>
+      <md-list>
+      <md-item ng-repeat="item in menu">
+        <a>
+          <md-item-content md-ink-ripple layout="row" layout-align="start center">
+            <div class="inset">
+              <ng-md-icon icon="{{item.icon}}"></ng-md-icon>
             </div>
-
-            <div class="uk-width-7-10">
-
-              <div class="uk-align-right">
-                  <i class="uk-icon-envelope uk-icon-small"></i>  <i class="uk-icon-bell uk-icon-small"></i>
-              </div>
-
+            <div class="inset">{{item.title}}
             </div>
-
-          </div>
-
-
+          </md-item-content>
+        </a>
+      </md-item>
+      <md-divider></md-divider>
+      <md-subheader>Management</md-subheader>
+      <md-item ng-repeat="item in admin">
+        <a>
+          <md-item-content md-ink-ripple layout="row" layout-align="start center">
+            <div class="inset">
+              <ng-md-icon icon="{{item.icon}}"></ng-md-icon>
+            </div>
+            <div class="inset">{{item.title}}
+            </div>
+          </md-item-content>
+        </a>
+      </md-item>
+    </md-list>
+    </md-sidenav>
+    <div layout="column" class="relative" layout-fill role="main">
+      <md-button class="md-fab md-fab-bottom-right" aria-label="Add" ng-click="showAdd($event)">
+        <ng-md-icon icon="add"></ng-md-icon>
+      </md-button>
+      <md-toolbar ng-show="!showSearch">
+        <div class="md-toolbar-tools">
+          <md-button ng-click="toggleSidenav('left')" hide-gt-md aria-label="Menu">
+            <ng-md-icon icon="menu"></ng-md-icon>
+          </md-button>
+          <h3>
+            Dashboard
+          </h3>
+          <span flex></span>
+          <md-button aria-label="Search" ng-click="showSearch = !showSearch">
+            <ng-md-icon icon="search"></ng-md-icon>
+          </md-button>
+          <md-button aria-label="Open Settings" ng-click="showListBottomSheet($event)">
+            <ng-md-icon icon="more_vert"></ng-md-icon>
+          </md-button>
+        </div>
+        <md-tabs md-stretch-tabs class="md-primary" md-selected="data.selectedIndex">
+          <md-tab id="tab1" aria-controls="tab1-content">
+            Latest
+          </md-tab>
+          <md-tab id="tab2" aria-controls="tab2-content">
+            Favorites
+          </md-tab>
+        </md-tabs>
+      </md-toolbar>
+      <md-toolbar class="md-hue-1" ng-show="showSearch">
+        <div class="md-toolbar-tools">
+          <md-button ng-click="showSearch = !showSearch" aria-label="Back">
+            <ng-md-icon icon="arrow_back"></ng-md-icon>
+          </md-button>
+          <h3 flex="10">
+            Back
+          </h3>
+          <md-input-container md-theme="input" flex>
+            <label>&nbsp;</label>
+            <input ng-model="search.who" placeholder="enter search">
+          </md-input-container>
+          <md-button aria-label="Search" ng-click="showSearch = !showSearch">
+            <ng-md-icon icon="search"></ng-md-icon>
+          </md-button>
+          <md-button aria-label="Open Settings" ng-click="showListBottomSheet($event)">
+            <ng-md-icon icon="more_vert"></ng-md-icon>
+          </md-button>
         </div>
 
+      </md-toolbar>
+      <md-content flex md-scroll-y>
+        <ui-view layout="column" layout-fill layout-padding>
+          <div class="inset" hide-sm></div>
+            <ng-switch on="data.selectedIndex" class="tabpanel-container">
+              <div role="tabpanel"
+                   id="tab1-content"
+                   aria-labelledby="tab1"
+                   ng-switch-when="0"
+                   md-swipe-left="next()"
+                   md-swipe-right="previous()"
+                   layout="row" layout-align="center center">
+                  <md-card flex-gt-sm="90" flex-gt-md="80">
+                    <md-card-content>
+                      <h2>Activity</h2>
+                      <md-list>
+                        <md-item ng-repeat="item in activity | filter:search">
+                          <md-item-content>
+                            <div class="md-tile-left inset" hide-sm>
+                                <user-avatar></user-avatar>
+                            </div>
+                            <div class="md-tile-content">
+                              <h3>{{item.what}}</h3>
+                              <h4>{{item.who}}</h4>
+                              <p>
+                                {{item.notes}}
+                              </p>
+                            </div>
+                          </md-item-content>
+                          <md-divider md-inset hide-sm ng-if="!$last"></md-divider>
+                          <md-divider hide-gt-sm ng-if="!$last"></md-divider>
+                        </md-item>
+                        <md-divider></md-divider>
+                        <md-item layout class="inset">
+                            <md-button layout layout-align="start center" flex class="md-primary">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg> More
+                            </md-button>
+                        </md-item>
+                      </md-list>
+                    </md-card-content>
+                  </md-card>
+              </div>
+              <div role="tabpanel"
+                   id="tab2-content"
+                   aria-labelledby="tab2"
+                   ng-switch-when="1"
+                   md-swipe-left="next()"
+                   md-swipe-right="previous()"
+                   layout="row" layout-align="center center">
+                  <md-card flex-gt-sm="90" flex-gt-md="80">
+                    <md-card-content>
+                      <h2>Favorites</h2>
+                      <md-list>
+                        <md-item ng-repeat="item in activity | filter:search | orderBy:'-what'">
+                          <md-item-content>
+                            <div class="md-tile-left inset" hide-sm>
+                                <user-avatar></user-avatar>
+                            </div>
+                            <div class="md-tile-content">
+                              <h3>{{item.what}}</h3>
+                              <h4>{{item.who}}</h4>
+                              <p>
+                                {{item.notes}}
+                              </p>
+                            </div>
+                          </md-item-content>
+                          <md-divider md-inset hide-sm ng-if="!$last"></md-divider>
+                          <md-divider hide-gt-sm ng-if="!$last"></md-divider>
+                        </md-item>
+                        <md-divider></md-divider>
+                        <md-item layout class="inset">
+                            <md-button layout layout-align="start center" flex class="md-primary">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg> More
+                            </md-button>
+                        </md-item>
+                      </md-list>
+                    </md-card-content>
+                  </md-card>
+              </div>
+
+          </ng-switch>
+
+        </ui-view>
+      </md-content>
     </div>
+    <!-- Angular Material Dependencies -->
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-animate.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular-aria.min.js"></script>
 
+    <script src="//ajax.googleapis.com/ajax/libs/angular_material/0.8.3/angular-material.min.js"></script>
 
-    <!-- ANIDAMIENTO -->
-    <div ui-view>
-
-    </div>
-
-
-  </div>
-</div>
-
-
- <!-- Menú de navegación lateral contraido -->
- <div  id="offcanvas" class="uk-offcanvas">
-     <div ng-controller="LoginController" class="uk-offcanvas-bar">
-         <ul class="uk-nav uk-nav-offcanvas">
-
-
-           <li><a ui-sref="estudiantes.main">Estudiantes</a></li>
-
-           <li><a ui-sref="profesores.main">Profesores</a></li>
-
-           <li><a ui-sref="asignaturas.main">Asignaturas</a></li>
-
-           <li><a ui-sref="clases.main">Docencia</a></li>
-
-           <li><a ui-sref="control-estudiantes.main"><strong>Control Estudiantes</strong></a></li>
-
-           <li><a ui-sref="about">Otros</a></li>
-
-           <!--Añadimos una división -->
-           <li class="uk-nav-divider"></li>
-
-           <!--El nombre del usuario actual -->
-           <li> <a ui-sref="profile"><i class="uk-icon-user"></i>    {{ currentUser.name }}</a></li>
-
-           <!--El botón para cerrar sesión -->
-           <li> <a ui-sref="login" ng-click="logout()"><i class="uk-icon-sign-out"></i>    Salir</a> </li>
-
-            <!--
-
-             <li class="uk-active">
-                 <a href="layouts_frontpage.html">Frontpage</a>
-             </li>
-             <li>
-                 <a href="layouts_portfolio.html">Portfolio</a>
-             </li>
-             <li>
-                 <a href="layouts_blog.html">Blog</a>
-             </li>
-             <li>
-                 <a href="layouts_documentation.html">Documentation</a>
-             </li>
-             <li>
-                 <a href="layouts_contact.html">Contact</a>
-             </li>
-             <li>
-                 <a href="layouts_login.html">Login</a>
-             </li>
-           -->
-         </ul>
-     </div>
- </div>
-
-
-
-<!-- Footer general
-
-Si ponemos uk-position-bottom forzaremos que se vaya a la parte inferior.
--->
-<div class="tm-background tm-footer ">
-    <div class="uk-container uk-container-center uk-text-center ">
-
-        <!-- Menú que había antes
-        <ul class="uk-subnav uk-subnav-line uk-flex-center">
-            <li><a href="http://github.com/uikit/uikit">GitHub</a></li>
-            <li><a href="http://github.com/uikit/uikit/issues">Issues</a></li>
-            <li><a href="http://github.com/uikit/uikit/blob/master/CHANGELOG.md">Changelog</a></li>
-            <li><a href="https://twitter.com/getuikit">Twitter</a></li>
-        </ul>
-        -->
-
-        <div class="uk-panel " >
-              <p><a href="https://github.com/ButterFlyDevs">ButterFlyDevs</a> - Granada @ 2016</a>
-              <p style="color: orange;"><span class="uk-badge uk-badge-danger">IMPORTANTE</span> PRE-ALPHA VERSION</p>
-              <div ng-if="currentUser">Welcome, {{ currentUser.name }}</div>
-        </div>
-
-    </div>
-</div>
+    <script src="//cdn.jsdelivr.net/angular-material-icons/0.4.0/angular-material-icons.min.js"></script>
+  </body>
+</html>
