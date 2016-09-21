@@ -10,6 +10,8 @@ Prueba de unión de métodos de entidades.
 #Uso de variables generales par la conexión a la BD.
 import dbParams
 
+from flask import abort
+
 #Habría que modificar esta función para que detectase que al ser un alumno deben de ser nombre tales que estos o los otros
 #para que no puedar realizar la insercción de un alumno y se pase como parámetro el nombre así: 'nombra': 'Juan', NO EXISTE
 #un atributo llamado nombra y no puede devolver OK, de ninguna manera.
@@ -38,61 +40,122 @@ class GestorEntidades:
     """
     Gestor de entidades de la base de datos, que abstrae el funcionamiento de MySQL
     """
+
     @classmethod
-    def putEntidad(self, tipo, datos):
+    def putEntidad(self, kind, data):
         """
         Introduce una entidad en el sistema, puede ser de siete tipos: Asignatura, Clase, Profesor, Alumno,
         Asociacion, Imparte o Matricula.
         """
         if v:
-            print apiName
-            print 'Calling nuevaEntidad() with params:'
             print colored (locals(), 'blue')
 
-            db = dbParams.conecta() #La conexión está clara.
+        db = dbParams.conecta()
 
-        ## Preparamos la consulta según el tipo ##
+        accepted_kinds = ['student', 'teacher', 'subject', 'class']
+
+        if kind in accepted_kinds:
+
+            query = 'insert into ' + str(kind) + ' (' + str(kind) + 'Id, '
+
+            for key, value in data.iteritems():
+                query += str(key) + ', '
+
+            # Falta por añadir los keys de los controlFields
+
+            query = query [:-2]
+            query += ') values (NULL, '
+
+            for key, value in data.iteritems():
+                query += '\'' + str(value) + '\', '
+
+            # Falta por añadir los values de los controlFields
+
+            query = query[:-2]
+            query += ');'
+
+            print colored(query, 'red')
+
+        # Kind does not recognized. Debería ser otro valor de error, de petición mal formada.
+        else:
+            abort(404)
+
+
+        """
+        ## Preparamos la consulta según el kind ##
 
         ## ENTIDADES base ##
+        query = ""
 
-        if tipo == 'Alumno': #Si es de tipo Alumno
+        if kind == 'Alumno': #Si es de kind Alumno
             query = 'INSERT INTO Alumno (idAlumno, nombre, apellidos, dni, direccion, localidad, provincia, fechaNacimiento, telefono, urlImagen) VALUES (NULL' + \
             ',' + extraer(datos, 'nombre') + ',' + extraer(datos, 'apellidos') + ',' + extraer(datos, 'dni') + ',' + extraer(datos, 'direccion') + ',' + \
             extraer(datos, 'localidad') + ',' + extraer(datos, 'provincia') + ',' + extraer(datos, 'fechaNacimiento') + ',' + extraer(datos, 'telefono') + \
             ',' + extraer(datos, 'urlImagen') + ');'
-        elif tipo == 'Profesor': #Si es de tipo Profesor
+
+            accepted_kinds=['student', 'teacher', 'subject', 'class']
+
+        elif kind == 'student':
+
+            query = 'insert into ' + str(kind) + ' (' + str(kind) + 'Id, '
+
+            for key, value in datos.iteritems():
+                query += str(key) + ', '
+
+            # Falta por añadir los keys de los controlFields
+
+            query = query [:-2]
+            query += ') values (NULL, '
+
+            for key, value in datos.iteritems():
+                query += '\'' + str(value) + '\', '
+
+            # Falta por añadir los values de los controlFields
+
+            query = query[:-2]
+            query += ');'
+
+            print colored(query, 'red')
+
+
+
+        elif kind == 'Profesor': #Si es de kind Profesor
             query = 'INSERT INTO Profesor (idProfesor, nombre, apellidos, dni, direccion, localidad, provincia, fechaNacimiento, telefono) VALUES (NULL' + \
             ',' + extraer(datos, 'nombre') + ',' + extraer(datos, 'apellidos') + ',' + extraer(datos, 'dni') + ',' + extraer(datos, 'direccion') + ',' + \
             extraer(datos, 'localidad') + ',' + extraer(datos, 'provincia') + ',' + extraer(datos, 'fechaNacimiento') + ',' + extraer(datos, 'telefono') + ');'
-        elif tipo == 'Asignatura': #Si es de tipo Asignatura
+
+        elif kind == 'Asignatura': #Si es de kind Asignatura
             query = 'INSERT INTO Asignatura (idAsignatura, nombre) VALUES (NULL' + ',' \
             + extraer(datos, 'nombre') + ');'
-        elif tipo == 'Clase': #Si es de tipo Clase
+        elif kind == 'Clase': #Si es de kind Clase
             query = 'INSERT INTO Clase (idClase, curso, grupo, nivel) VALUES (NULL' + ',' \
             + extraer(datos, 'curso') + ',' + extraer(datos, 'grupo') + ',' + extraer(datos, 'nivel') + ');'
 
-        ## ENTIDADES de tipo RELACIÓN ##
+        ## ENTIDADES de kind RELACIÓN ##
 
-        elif tipo == 'Asociacion': #Si el tipo es Asociacion
+        elif kind == 'Asociacion': #Si el kind es Asociacion
             query = 'INSERT INTO Asociacion (idAsociacion, idClase, idAsignatura) VALUES (NULL' + ',' \
             + extraer(datos, 'idClase') + ',' + extraer(datos, 'idAsignatura') + ');'
 
-        elif tipo == 'Imparte': #Si el tipo es Imparte
+        elif kind == 'Imparte': #Si el kind es Imparte
             query = 'INSERT INTO Imparte (idImparte, idAsociacion, idProfesor) VALUES (NULL' + ',' \
             + extraer(datos, 'idAsociacion') + ',' + extraer(datos, 'idProfesor') + ');'
 
-        elif tipo == 'Matricula': #Si el tipo es Matricula
+        elif kind == 'Matricula': #Si el kind es Matricula
             query = 'INSERT INTO Matricula (idMatricula, idAlumno, idAsociacion) VALUES (NULL' + ',' \
             + extraer(datos, 'idAlumno') + ',' + extraer(datos, 'idAsociacion') + ');'
 
-        elif tipo == None:
-            return {'status': 'FAIL', 'info': 'Necesario pasar tipo'}
+        elif kind == None:
+            return {'status': 'FAIL', 'info': 'Necesario pasar kind'}
 
         else:
             return {'status': 'FAIL', 'info': 'Tipo no reconocido'}
 
+        """
+        """
         if v:
             print query
+        """
 
 
         cursor = db.cursor()

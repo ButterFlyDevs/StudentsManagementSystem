@@ -77,7 +77,7 @@ class GestorCredenciales:
         return lista
 
 
-
+    """
     Continuar con este fichero, terminando de documentarlo, añadir los métodos que faltan
     y testearlo para poder acceder al sistema con las pass de los profesores y que puedan cambiarlas.
 
@@ -98,8 +98,9 @@ class GestorCredenciales:
     de los elementos Alumno y Profesor y probar toda la conexión con la UI.
 
 
- Habria que eliminar el nombre de aquí... para que lo queremos si cualdo se autentifique se cargarán los datos del usuario para
- que se muestren en la interfaz.
+    Habria que eliminar el nombre de aquí... para que lo queremos si cualdo se autentifique se cargarán los datos del usuario para
+    que se muestren en la interfaz.
+    """
     @classmethod
     def postCredenciales(self, idUsuario, nombre, username, password, rol):
         '''

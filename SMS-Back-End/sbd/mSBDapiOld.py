@@ -28,9 +28,7 @@ nombreMicroservicio = '\n ## Microservicio BD ##'
 @app.route('/test',methods=['GET'])
 def test():
     """
-    Test resource.
-
-    Example of use:
+    Devuelve una lista de todos los estudiantes.
     curl -i -X GET localhost:8002/test
     """
     return 'OK'
@@ -39,8 +37,8 @@ def test():
 #   COLECCIÓN ENTIDADES    #
 ############################
 
-@app.route('/entities', methods=['POST'])
-def putEntity():
+@app.route('/entidades', methods=['POST'])
+def putEntidad():
     """
     Inserta una entidad en el sistema, debido a que puede introducir cualquier tipo de entidad, se acepta la siguient lista
     de parámetros:
@@ -57,10 +55,7 @@ def putEntity():
         'idEntidad': '<id de la entidad en caso de ser creada>'
     }
 
-    Return:
-        The entity created in the database.
-
-    Example of use:
+    Ejemplo de uso:
     curl -H "Content-Type: application/json" -X POST -d '{"tipo": "Alumno", "datos": {"nombre": "María"} }' localhost:8002/entidades
     #En caso de usar un fichero
     curl -H "Content-Type: application/json" -X POST -d @datosEntidad.json localhost:8002/entidades
@@ -74,26 +69,19 @@ def putEntity():
     #Extraemos el json de la petición
     data = request.get_json()
 
-    print colored('mSDBapi.putEntity', 'green')
-    print colored(data, 'green')
-
-
     #Extraemos los datos de la entidad y pasamos todos los elementos a utf-8
     datos = data.get('datos', None)
     if datos != None:
         for key, value in datos.iteritems():
+            print type(value)
             if type(value) is not int:
                 datos[key] = value.encode('utf-8')
 
-    print datos
     tipo = data.get('tipo', None)
 
 
-    #Llamamos a la librería para guardar los datos y recuperamos la respuesta.
-    salidaGestor = GestorEntidades.putEntidad(kind=tipo, data=datos)
-
-    print salidaGestor
-    """
+    #Llamamos a la librería para guarar los datos y recuperamos la respuesta.
+    salidaGestor = GestorEntidades.putEntidad(tipo=tipo, datos=datos)
 
     salida = salidaGestor
     print colored(salidaGestor, 'green')
@@ -158,8 +146,6 @@ def putEntity():
     #return json.dumps(salidaGestor)
     print colored(salida, 'green')
     return json.dumps(salida)
-    """
-    return 'ok'
 
 @app.route('/entidades/<string:tipo>', methods=['GET']) #Si pedimos todas las entidades de un tipo
 @app.route('/entidades/<string:tipo>/<int:idEntidad>', methods=['GET']) #Si pedimos una entidad concreta de un tipo

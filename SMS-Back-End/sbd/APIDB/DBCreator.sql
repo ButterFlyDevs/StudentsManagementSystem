@@ -1,16 +1,15 @@
 /**
-  Fichero de creación de la base de datos de SMM
-  Uso:
-    > mysql -u root -p'root' < DBCreator1.sql
-  Ejecutado en el mismo directorio que este fichero.
+  Structure file creation of msDB Data Base.
 
-  Versión 0.1
+  Example of use:
+    > mysql -u root -p'root' < DBCreator.sql
 **/
 
-#Borra la versión existente de la base de datos
+
+# First is removed the previous version of the database, if it exists.
 DROP DATABASE IF EXISTS sms;
 
-#Creamos la base de datos.
+# Is created the database.
 CREATE DATABASE sms;
 
 #Entramos en su contexto
@@ -41,6 +40,45 @@ CREATE TABLE Alumno(
   #UNIQUE (nombre, apellidos), #puede que sea mejor quitarlo; González: Es mejor quitarlo. Es posible que dos alumnos se llamen igual.
   UNIQUE (dni)
 );
+
+
+
+
+CREATE TABLE student(
+
+  studentId INT NOT NULL AUTO_INCREMENT,
+
+  name CHAR(50),
+  surname CHAR(100),
+  dni INT,
+  address CHAR(100),
+  locality CHAR(50),
+  province CHAR(50),
+  birthdate DATE, #MySQL retrieves and displays DATE values in 'YYYY-MM-DD' format
+  phone CHAR(50),
+  profileImageUrl CHAR (200),
+
+  #Metadata parameters
+
+  createdBy INT,
+  createdAt DATE,
+
+  modifyBy INT,
+  modifyAt DATE,
+
+  deletedBy INT,
+  deletedAt DATE,
+
+  deleted BOOL,
+
+
+
+  PRIMARY KEY (studentId),
+  UNIQUE (dni)
+);
+
+
+
 
 
 /*Creación de la tabla Profesor, con todos los atributos de esta entidad.

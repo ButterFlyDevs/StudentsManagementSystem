@@ -16,3 +16,8 @@ La instalación del gestor MySQL se realiza dentro del proceso de instalación d
 Una vez instaladas todas los requisitos, el fichero <code>aprovisionador/aprovisionadorDatosEjemplo.sh</code> provee al sistema de datos de ejemplo, incluido el SBD haciendo uso antes del fichero <code>DBCreatorv1.sql</code> que crea la estructura de la base de datos **sms** antes de usar el microservicio APIGateway y sus métodos para introducir conteido al sistema. Este servicio hace uso a su vez de SBD que es quien realmente introduce los datos en la instancia de MySQL.
 
 > Si el sistema falla puede que el demonio de mysql este parado, para activarlo solo hay que ejecutar <code>sudo /etc/init.d/mysql start </code>
+
+
+Documentation:
+
+All docs is in docs folder.
