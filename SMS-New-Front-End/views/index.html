@@ -30,14 +30,25 @@
     <script src="../vendor/angular-animate/angular-animate.min.js"></script>
     <script src="../vendor/angular-aria/angular-aria.min.js"></script>
 
+    <script src="../vendor/angular-material-data-table/dist/md-data-table.min.js"></script>
+    <link rel='stylesheet prefetch' href="../vendor/angular-material-data-table/dist/md-data-table.min.css">
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.js"></script>
 
 
 
     <!-- All list of modules -->
-    <script src="../js/teaching/teachers/teachers.module.js"></script>
-    <script src="../js/teaching/teaching.module.js"></script>
     <script src="../js/main/main.module.js"></script>
+
+    <script src="../js/teaching/teachers/teachers.module.js"></script>
+    <script src="../js/teaching/teachers/teachersList.js"></script>
+    <script src="../js/teaching/teachers/teachersProfile.js"></script>
+
+
+
+
+
 
 
 </head>
@@ -98,13 +109,14 @@
 
                 </md-list-item>
 
-                <md-list-item ng-show="section.expand" ng-repeat="action in section.actions"
-                              ng-click="toast(action.link)">
+                <md-list-item ng-show="section.expand" ng-repeat="action in section.actions" ui-sref="{{action.link}}">
 
                     <md-icon>{{ action.icon }}</md-icon>
                     <p class="md-body-2">{{ action.name }}</p>
                     <span flex></span>
                     <md-icon>chevron_right</md-icon>
+
+
                 </md-list-item>
         </md-content>
 

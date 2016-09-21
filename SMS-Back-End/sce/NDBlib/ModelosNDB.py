@@ -6,7 +6,7 @@ uso de los `tipos NDB <https://cloud.google.com/appengine/docs/python/ndb/entity
 Existen dos grupos de modelos.
 
 
-    * Modelos de referencia:
+    * Modelos de datos:
 
         Aquellos modelos que "modelan" los datos de la base de datos, en este caso los controles de asistencia, que tratados como una
         sola entidad en la IU aquí por motivos de eficiencia se modelan como dos entidades, microControlAsistencia (control sobre
@@ -16,7 +16,7 @@ Existen dos grupos de modelos.
         * **microControlAsistencia**
         * **resumenControlAsistencia**
 
-    * Modelos de datos:
+    * Modelos de referencia:
 
         Modelos que sirven de referencia a los nombres de estas entidades en la base de datos relacional (que es quien llama a grabarlos y
         modificarlos aquí) y que se usan declarados de forma independiente para ahorrar espacio (evitando duplicidad) y eficacia (evitando
