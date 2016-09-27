@@ -138,6 +138,7 @@ class entitiesManager:
     def get(cls, kind, entity_id=None):
         """
         Return entities from the database, all info about one or a summary list of all of a specific kind.
+
         :param kind: Type of data, student, teacher, class, etc.
         :param entity_id: Entity id that we want retrieve. Can be None, in this case we want all entities of this kind.
         :return: A dict with all info about one or a list with dicts.

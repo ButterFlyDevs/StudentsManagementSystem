@@ -4,20 +4,30 @@
 ![PythonVersion](https://img.shields.io/badge/python-2.7-blue.svg)
 ![coverage](https://img.shields.io/badge/coverage-30%25-orange.svg)
 
-**micro Servicio Base de Datos** ofrece la base de datos relacional general de la aplicación.
-El acceso a este servicio se realiza mediante una interfaz REST.
-
-
-Para poder ejecutar este servicio en un entorno local necesitaremos una instancia de **mySQL** instalada. En [Google Cloud Platform](https://cloud.google.com/) este servicio corre conectado al servicio [CloudSQL](https://cloud.google.com/sql/) que ofrece una base de datos SQL a la que para conectarnos usamos la librería de python [MySQLdb](http://mysql-python.sourceforge.net/MySQLdb-1.2.2) y que simulamos en local con una instancia normal de mySQL.
-La instalación del gestor MySQL se realiza dentro del proceso de instalación de requisitos inicial cuando ejecutamos **requirements_bash.sh** (situado en la raíz del proyecto).
+**Data Base micro Service** provide the relational data base that the app needs. The access to this service
+is offer through an APIRest and all data is transmitted in JSON. 
 
 ![](sbd.png)
 
-Una vez instaladas todas los requisitos, el fichero <code>aprovisionador/aprovisionadorDatosEjemplo.sh</code> provee al sistema de datos de ejemplo, incluido el SBD haciendo uso antes del fichero <code>DBCreatorv1.sql</code> que crea la estructura de la base de datos **sms** antes de usar el microservicio APIGateway y sus métodos para introducir conteido al sistema. Este servicio hace uso a su vez de SBD que es quien realmente introduce los datos en la instancia de MySQL.
+######Requirements
 
-> Si el sistema falla puede que el demonio de mysql este parado, para activarlo solo hay que ejecutar <code>sudo /etc/init.d/mysql start </code>
+To run this service we need have installed mysql-server engine. This service is thinking to run in Google Cloud Platform,
+in [CloudSQL](https://cloud.google.com/sql/) where we only need create the service and connect it 
+with our program in the same way that in local. 
+This process is similar an in the both cases we only need use [MySQLdb](http://mysql-python.sourceforge.net/MySQLdb-1.2.2) 
+python library
+To install MySQL engine we can use the script `mysql_install.sh` in this folder (it's only necesary out of GCP).
+
+Beside this you need execute `requirements.txt` to provide to machine which run this code all libraries that python needs.
+
+######Run
+
+Finally you can running the api executing the script `run.sh` in this folder.
+
+If you want, you can provide that data to service executing the provisioner `provisioner.sh`.
 
 
-Documentation:
+######Documentation:
 
-All docs is in docs folder.
+This microservice is documented with Sphinx, before you read the doc you need generated it, running `make html` 
+inside docs folder and then open *index.html* in `build/html` in the same folder, all doc is web based.

@@ -14,7 +14,6 @@ import urllib
 import urllib2
 
 import datetime
-from time import mktime
 
 import json
 from termcolor import colored
@@ -22,38 +21,43 @@ from termcolor import colored
 
 app = Flask(__name__)
 
-#Activar modo verbose
-v=1
+# Activating verbose mode
+v = 1
 
-# Activar conexion con SCE
-c=0
+# Activating scms connection.
+c = 0
 
-nombreMicroservicio = '\n ## Microservicio BD ##'
+microservice_name = '\n ## dbms Data Base mService ##'
 
 
 class MyEncoder(json.JSONEncoder):
+    """
+    Class to provide a personal way to adapt specific objects to json
+    when the default isn't enough for us.
+    """
 
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
-            #Also obj.isoformat()
+            #Also obj.isoformat(), is some places people prefer this.
             return obj.ctime()
-
-
 
         return json.JSONEncoder.default(self, obj)
 
 
 def process_response(response):
     """
-    Function to build a response
+    Function to build a response with sense.
     :param self:
     :param response:
     :return:
+
+    MySQL error standard codes that is processed.
+        1452: Cannot add or update a child row: a foreign key constraint fails
+        1054: unknown column
+        1062: Duplicate entry
+        1065: Query was empty
+
     """
-
-    # Codes: 1054: unknown column
-    # 1065 r [1065]: Query was empty
-
 
     print locals()
 
@@ -80,9 +84,11 @@ def process_response(response):
         abort(500)
 
 #####################################################
-#  DEFINICIÓN DE LA API REST del MICROSERVICIO SBD  #
+#  Definition of Data Base micro Service REST API   #
 #####################################################
 
+
+# Test method.
 @app.route('/test',methods=['GET'])
 def test():
     """
@@ -96,7 +102,6 @@ def test():
 #################################
 #   Resources about entities    #
 #################################
-
 
 @app.route('/entities/<string:kind>', methods=['POST'])
 def put_entity(kind):

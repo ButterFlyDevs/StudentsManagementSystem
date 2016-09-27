@@ -1,7 +1,7 @@
-GestorAlumnosSQL
+Entities Manager
 ================
 
-.. automodule:: APIDB.GestorAlumnosSQL
+.. automodule:: dbapi.entitiesManager
     :members:
     :undoc-members:
     :show-inheritance:
