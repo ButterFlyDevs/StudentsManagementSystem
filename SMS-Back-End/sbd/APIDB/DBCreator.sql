@@ -22,151 +22,192 @@ Además usamos UNIQUE para establecer que no puedan existir elementos duplicados
 en la tabla. Así aunque no podrán existir dos alumnos que tengan exactamente el mismo nombre y apellidos
 o el mismo DNI en caso de tenerlo.
 */
-CREATE TABLE Alumno(
-  idAlumno INT NOT NULL AUTO_INCREMENT,
-  nombre CHAR(50),
-  apellidos CHAR(100),
-  dni INT,
-  direccion CHAR(100),
-  localidad CHAR(50),
-  provincia CHAR(50),
-  #MySQL retrieves and displays DATE values in 'YYYY-MM-DD' format
-  fechaNacimiento DATE,
-  telefono CHAR(50),
-  urlImagen CHAR (200),
+CREATE TABLE student (
 
-  PRIMARY KEY (idAlumno),
+  studentId       INT NOT NULL AUTO_INCREMENT,
 
-  #UNIQUE (nombre, apellidos), #puede que sea mejor quitarlo; González: Es mejor quitarlo. Es posible que dos alumnos se llamen igual.
-  UNIQUE (dni)
-);
-
-
-
-
-CREATE TABLE student(
-
-  studentId INT NOT NULL AUTO_INCREMENT,
-
-  name CHAR(50),
-  surname CHAR(100),
-  dni INT,
-  address CHAR(100),
-  locality CHAR(50),
-  province CHAR(50),
-  birthdate DATE, #MySQL retrieves and displays DATE values in 'YYYY-MM-DD' format
-  phone CHAR(50),
-  profileImageUrl CHAR (200),
+  name            CHAR(50),
+  surname         CHAR(100),
+  dni             INT,
+  address         CHAR(100),
+  locality        CHAR(50),
+  province        CHAR(50),
+  birthdate       DATE, #MySQL retrieves and displays DATE values in 'YYYY-MM-DD' format
+  phone           CHAR(50),
+  profileImageUrl CHAR(200),
 
   #Metadata parameters
-
-  createdBy INT,
-  createdAt DATE,
-
-  modifyBy INT,
-  modifyAt DATE,
-
-  deletedBy INT,
-  deletedAt DATE,
-
-  deleted BOOL,
-
-
+  createdBy       INT,
+  createdAt       DATETIME,
+  modifiedBy      INT,
+  modifiedAt      DATETIME,
+  deletedBy       INT,
+  deletedAt       DATETIME,
+  deleted         BOOL,
 
   PRIMARY KEY (studentId),
   UNIQUE (dni)
 );
 
-
-
-
-
 /*Creación de la tabla Profesor, con todos los atributos de esta entidad.
 En este caso si existe el dni para todos y puede usarse como pk, además no
 permitiremos que existan dos personas con el mismo nombre y apellidos.
 */
-CREATE TABLE Profesor(
-  idProfesor INT NOT NULL AUTO_INCREMENT,
-  nombre CHAR(50),
-  apellidos CHAR(100),
-  dni INT,
-  direccion CHAR(100),
-  localidad CHAR(50),
-  provincia CHAR(50),
-  #MySQL retrieves and displays DATE values in 'YYYY-MM-DD' format
-  fechaNacimiento DATE,
-  telefono CHAR(50),
-  urlImagen CHAR (200),
-  PRIMARY KEY (idProfesor),
+
+CREATE TABLE teacher (
+
+  teacherId       INT NOT NULL AUTO_INCREMENT,
+
+  name            CHAR(50),
+  surname         CHAR(100),
+  dni             INT,
+  address         CHAR(100),
+  locality        CHAR(50),
+  province        CHAR(50),
+  birthdate       DATE, #MySQL retrieves and displays DATE values in 'YYYY-MM-DD' format
+  phone           CHAR(50),
+  profileImageUrl CHAR(200),
+
+  #Metadata parameters
+  createdBy       INT,
+  createdAt       DATETIME,
+  modifiedBy      INT,
+  modifiedAt      DATETIME,
+  deletedBy       INT,
+  deletedAt       DATETIME,
+  deleted         BOOL,
+
+  PRIMARY KEY (teacherId),
   UNIQUE (dni)
 );
 
 #Creación de la tabla Asignatura, con todos los atributos de esta entidad.
-CREATE TABLE Asignatura(
-  idAsignatura INT NOT NULL AUTO_INCREMENT,
-  nombre CHAR(100),
-  PRIMARY KEY (idAsignatura),
-  UNIQUE (nombre) #No se entiende que haya dos asignaturas con el mismo nombre exacto, por eso no se permite.
+CREATE TABLE subject (
+
+  subjectId   INT NOT NULL AUTO_INCREMENT,
+
+  name        CHAR(100),
+  description CHAR(255),
+
+  #Metadata parameters
+  createdBy   INT,
+  createdAt   DATETIME,
+  modifiedBy  INT,
+  modifiedAt  DATETIME,
+  deletedBy   INT,
+  deletedAt   DATETIME,
+  deleted     BOOL,
+
+  PRIMARY KEY (subjectId),
+  UNIQUE (name) #No se entiende que haya dos asignaturas con el mismo nombre exacto, por eso no se permite.
 );
 
 #Creación de la tabla Clase, ejemplo
-CREATE TABLE Clase(
-  idClase INT NOT NULL AUTO_INCREMENT,
-  curso INT(1),
-  grupo CHAR(1),
-  nivel CHAR(20),
+CREATE TABLE class (
+
+  classId    INT NOT NULL AUTO_INCREMENT,
+
+  course     INT(1),
+  word       CHAR(1),
+  level      CHAR(20),
+
+  #Metadata parameters
+  createdBy  INT,
+  createdAt  DATETIME,
+  modifiedBy INT,
+  modifiedAt DATETIME,
+  deletedBy  INT,
+  deletedAt  DATETIME,
+  deleted    BOOL,
+
   #La clave primaria la forman los tres campos que juntos no pueden ser repetidos. (Sólo puede existir una entidad con ellos)
-  PRIMARY KEY (idClase),
+  PRIMARY KEY (classId),
   #Hacemos que los tres campos sean UNIQUE para que no pueda exisir una clase con los mismos datos que otra
-  UNIQUE (curso, grupo, nivel)
+  UNIQUE (course, word, level)
 );
 
 #Creacion de la tabla para los Grupos
 #Un grupo es la asociación de una asignatura y un curso, por ejemplo: 1ºESO-Francés que identifica perfectamente un grupo de alumnos.
-CREATE TABLE Asociacion(
- idAsociacion INT NOT NULL AUTO_INCREMENT,
- idClase INT,
- idAsignatura INT,
- #Especificamos que se trata de claves foráneas (claves primarias de otras tablas)
- FOREIGN KEY (idClase) REFERENCES Clase(idClase),
- FOREIGN KEY (idAsignatura) REFERENCES Asignatura(idAsignatura),
- #Especificamos la formación de la clave primaria en esta tabla.
- PRIMARY KEY (idAsociacion),
- UNIQUE (idClase, idAsignatura) #Para que no puedan repetirse
+CREATE TABLE association (
+
+  associationId INT NOT NULL AUTO_INCREMENT,
+
+  classId       INT,
+  subjectId     INT,
+
+  #Metadata parameters
+  createdBy     INT,
+  createdAt     DATETIME,
+  modifiedBy    INT,
+  modifiedAt    DATETIME,
+  deletedBy     INT,
+  deletedAt     DATETIME,
+  deleted       BOOL,
+
+  #Especificamos que se trata de claves foráneas (claves primarias de otras tablas)
+  FOREIGN KEY (subjectId) REFERENCES subject (subjectId),
+  FOREIGN KEY (classId) REFERENCES class (classId),
+
+  PRIMARY KEY (associationId),
+  UNIQUE (subjectId, classId)
 );
 
-CREATE TABLE Imparte(
 
-  idImparte INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE impart (
+
+  impartId      INT NOT NULL AUTO_INCREMENT,
   #Añadimos la referencia de la entidad Asignatura
-  idAsociacion INT,
+  associationId INT,
   #Necesitamos una referncia del profesor:
-  idProfesor INT,
+  teacherId     INT,
+
+  #Metadata parameters
+  createdBy     INT,
+  createdAt     DATETIME,
+  modifiedBy    INT,
+  modifiedAt    DATETIME,
+  deletedBy     INT,
+  deletedAt     DATETIME,
+  deleted       BOOL,
+
   #Especificamos que se trata de claves foráneas.
-  FOREIGN KEY (idAsociacion) REFERENCES Asociacion(idAsociacion),
-  FOREIGN KEY (idProfesor) REFERENCES Profesor(idProfesor),
+  FOREIGN KEY (associationId) REFERENCES association (associationId),
+  FOREIGN KEY (teacherId) REFERENCES teacher (teacherId),
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (idImparte),
+  PRIMARY KEY (impartId),
   #Especificamos que la formación idAsociacion, idProfesor) como par no pueda repetirse:
-  UNIQUE (idAsociacion, idProfesor)
+  UNIQUE (associationId, teacherId)
 
 );
 
-CREATE TABLE Matricula(
 
-  idMatricula INT NOT NULL AUTO_INCREMENT,
-  idAlumno INT,
-  idAsociacion INT,
+CREATE TABLE enrollment (
+
+  enrollmentId  INT NOT NULL AUTO_INCREMENT,
+
+  studentId     INT,
+  associationId INT,
+
+  #Metadata parameters
+  createdBy     INT,
+  createdAt     DATETIME,
+  modifiedBy    INT,
+  modifiedAt    DATETIME,
+  deletedBy     INT,
+  deletedAt     DATETIME,
+  deleted       BOOL,
+
   #Especificamos que se trata de claves foráneas.
-  FOREIGN KEY (idAsociacion) REFERENCES Asociacion(idAsociacion),
-  FOREIGN KEY (idAlumno) REFERENCES Alumno(idAlumno),
+  FOREIGN KEY (associationId) REFERENCES association (associationId),
+  FOREIGN KEY (studentId) REFERENCES student (studentId),
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (idMatricula),
+  PRIMARY KEY (enrollmentId),
   #Un alumno no puede estar dos veces matriuclado a la misma asociacion
-  UNIQUE (idAlumno, idAsociacion)
+  UNIQUE (studentId, associationId)
 
 );
 
+/*
 CREATE TABLE Credenciales(
 
   idCredenciales INT NOT NULL AUTO_INCREMENT,
@@ -179,3 +220,4 @@ CREATE TABLE Credenciales(
   #Para que no pueda haber dos usuario con el mismo nombre
   UNIQUE (username)
 );
+*/

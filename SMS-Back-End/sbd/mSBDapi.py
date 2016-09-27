@@ -5,24 +5,82 @@ from flask import abort
 from flask import request
 import jsonpickle
 
-from APIDB.GestorEntidades import GestorEntidades
+from APIDB.entitiesManager import entitiesManager
 from APIDB.GestorCredencialesSQL import GestorCredenciales
 
 from google.appengine.api import modules
 from google.appengine.api import urlfetch
 import urllib
 import urllib2
+
+import datetime
+from time import mktime
+
 import json
 from termcolor import colored
+
 
 app = Flask(__name__)
 
 #Activar modo verbose
 v=1
+
+# Activar conexion con SCE
+c=0
+
 nombreMicroservicio = '\n ## Microservicio BD ##'
 
+
+class MyEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            #Also obj.isoformat()
+            return obj.ctime()
+
+
+
+        return json.JSONEncoder.default(self, obj)
+
+
+def process_response(response):
+    """
+    Function to build a response
+    :param self:
+    :param response:
+    :return:
+    """
+
+    # Codes: 1054: unknown column
+    # 1065 r [1065]: Query was empty
+
+
+    print locals()
+
+    if response['status'] == 1:
+        return json.dumps(response['data'], cls=MyEncoder)
+
+    # The element that it searched doesn't exists.
+    elif response['status'] == -1 or response['status'] == 1452 or response['status'] == 1054 or response['status'] == 1065:
+        abort(404) # Is returned standard "Not found" error.
+
+    # 1062 is a error code directly from MySQL driver.
+    elif response['status'] == 1062:
+
+        # 409 Conflict because the item already exists in database and the user can't create another
+        # resource with the same values.
+        abort(409)
+
+    # Bad request, some of keys are incorrect or fault. # 1054 is when a value isn't a column in database
+    elif response['status'] is 1054 or  response['status'] is 1146:
+        abort(400)
+
+    else:
+        # Another problem that we don't have identified.
+        abort(500)
+
 #####################################################
-## DEFINICIÓN DE LA API REST del MICROSERVICIO SBD ##
+#  DEFINICIÓN DE LA API REST del MICROSERVICIO SBD  #
 #####################################################
 
 @app.route('/test',methods=['GET'])
@@ -35,181 +93,176 @@ def test():
     """
     return 'OK'
 
-############################
-#   COLECCIÓN ENTIDADES    #
-############################
+#################################
+#   Resources about entities    #
+#################################
 
-@app.route('/entities', methods=['POST'])
-def putEntity():
+
+@app.route('/entities/<string:kind>', methods=['POST'])
+def put_entity(kind):
     """
-    Inserta una entidad en el sistema, debido a que puede introducir cualquier tipo de entidad, se acepta la siguient lista
-    de parámetros:
+    Insert a entity in the database, with a special input format:
 
-    parámetros: json con los datos:
-        tipo: string con el tipo de entidad que se quiere introducir en el sistema.
-        datos: json con todos los parámetros
+    Input:
 
-    devuelve: un json con el estado, con el formato:
-    {
-        'status': '<estado de la ejecución (OK, FAIL)>',
-        'info': '<información extra en caso de ser necesaria',
-        'mySqlCode': '<codigo de estado de mysql, en caso de que se tenga.'
-        'idEntidad': '<id de la entidad en caso de ser creada>'
-    }
-
-    Return:
-        The entity created in the database.
-
-    Example of use:
-    curl -H "Content-Type: application/json" -X POST -d '{"tipo": "Alumno", "datos": {"nombre": "María"} }' localhost:8002/entidades
-    #En caso de usar un fichero
-    curl -H "Content-Type: application/json" -X POST -d @datosEntidad.json localhost:8002/entidades
-
-    """
-
-    #Definimos un diccionario para la salida, puede contener info la creación de la entidad, de las credenciales en caso de ser
-    #un profesor y de la creación de la entidad de referencia en el mSCE.
-    salida = {}
-
-    #Extraemos el json de la petición
-    data = request.get_json()
-
-    print colored('mSDBapi.putEntity', 'green')
-    print colored(data, 'green')
-
-
-    #Extraemos los datos de la entidad y pasamos todos los elementos a utf-8
-    datos = data.get('datos', None)
-    if datos != None:
-        for key, value in datos.iteritems():
-            if type(value) is not int:
-                datos[key] = value.encode('utf-8')
-
-    print datos
-    tipo = data.get('tipo', None)
-
-
-    #Llamamos a la librería para guardar los datos y recuperamos la respuesta.
-    salidaGestor = GestorEntidades.putEntidad(kind=tipo, data=datos)
-
-    print salidaGestor
-    """
-
-    salida = salidaGestor
-    print colored(salidaGestor, 'green')
-
-    #Si la salida del gestor es correcta llamaremos al mSCE para añadir un elemento de referencia:
-    if salidaGestor['status'] == 'OK':
-        print colored('Entidad creada con Exito en SBD, enviando datos al SCE', 'red')
-        url = "http://%s/" % modules.get_hostname(module="sce")
-        url+="entidadesReferencia"
-
-        #Creamos un diccionario con los datos.
-        dicDatos = {
-          'tipo' : tipo,
-          #Usamos el id de la entidad que nos devuelve el gestor.
-          'idEntidad': salidaGestor['idEntidad'],
+        Json payload:
+        {
+          kind: string, kind of entity that is wanted inserted in the database.
+          data: dict, with pairs: key (name of value in database), value (value to save in this key in database)
         }
 
-        #Dependiendo del tipo de entidad que recibamos componemos el nombre de la entidad de una manera u otra
-        if tipo == 'Alumno' or tipo == 'Profesor':
-            dicDatos['nombreEntidad'] = datos['nombre']+' '+datos['apellidos']
+    Json return:
 
-        if tipo == 'Clase':
-            dicDatos['nombreEntidad'] = str(datos['curso'])+' '+str(datos['grupo'])+' '+datos['nivel']
+    Return:
+        A json with the entire entity which is saved in database (with all extra control values) or error status code.
 
-        if tipo == 'Asignatura':
-            dicDatos['nombreEntidad'] = datos['nombre']
+    Example of use:
+        curl -H "Content-Type: application/json" -X POST -d '{"kind": "teacher", "data": {"name": "María"} }' localhost:8080/entities
+        curl -H "Content-Type: application/json" -X POST -d '{"kind": "class", "data": {"course": 1, "word": "B", "level": "ESO"} }' localhost:8080/entities
 
+    Example of return:
+        {"createdBy": 1, "course": 5, "createdAt": "Thu Sep 22 16:09:36 2016", "word": "B", "level": "Primary", "classId": 19}
 
-        print colored(dicDatos, 'green')
+    If we want to use a file instead of:
+        curl -H "Content-Type: application/json" -X POST -d @entityData.json localhost:8002/entidades
 
-        print colored(url,'green')
-        req = urllib2.Request(url, json.dumps(dicDatos), {'Content-Type': 'application/json'})
-        print colored(req, 'green')
-        f = urllib2.urlopen(req)
-        response = json.loads(f.read())
-        print colored(response, 'green')
-        f.close()
-
-        if response['status'] != 'OK':
-            salida['status'] = 'FAIL'
-            salida['info'] = 'SCE subcall fail'
-
-        print colored(response, 'green')
-
-
-    #En caso de que la entidad introducida sea un profesor se cargarán lascredenciales por defecto en el sistema.
-    if tipo == 'Profesor':
-        print ' Profesor creado con éxito. Creando sus credenciales de acceso al sistema.'
-        #Creamos las credenciales del usuario en la tabla credenciales usando el id del usuario que devuelve nuevoProfesor
-        #Por defecto el alias y el password de un profesor en el sistemas serán su dni
-        #salida Creacion CredencialespostProfesor
-        salidaCC=GestorCredenciales.postCredenciales(salidaGestor['idEntidad'], dicDatos['nombreEntidad'], datos['dni'], datos['dni'], 'admin')
-        if salidaCC != 'OK':
-            salida['status'] = 'FAIL'
-            salida['info']='SBD credential creation fail'
-
-
-    ######
-
-
-    #Realizamos la petición al gestor y devolvemos la respuesta transformada a json.
-    #return json.dumps(salidaGestor)
-    print colored(salida, 'green')
-    return json.dumps(salida)
-    """
-    return 'ok'
-
-@app.route('/entidades/<string:tipo>', methods=['GET']) #Si pedimos todas las entidades de un tipo
-@app.route('/entidades/<string:tipo>/<int:idEntidad>', methods=['GET']) #Si pedimos una entidad concreta de un tipo
-def getEntidades(tipo, idEntidad=None):
-    """
-    curl -i -X GET localhost:8002/entidades/prueba
-
-    curl  -i -X GET localhost:8002/entidades/Alumno
-    curl  -i -X GET  localhost:8002/entidades/Alumno/1
-    geting
     """
 
-    if idEntidad != None: #Nos piden todos los datos de una entidad concreta de un tipo concreto.
-        #Devolvemos los datos en json (transformando el diccionario que nos devuelve el gestor)
-        return json.dumps(GestorEntidades.getEntidades(tipo=str(tipo), idEntidad=str(idEntidad)))
-    else: #Nos piden todas las entidades de un tipo (info resumida)
-        return json.dumps(GestorEntidades.getEntidades(tipo=str(tipo)))
-        #return GestorEntidades.getEntidades(tipo=request.args['tipo'], idEntidad=request.args['idEntidad'])
+    raw_data = request.get_json()
 
-@app.route('/entidades', methods=['PUT'])
-def modEndidad():
+    print colored('mSDBapi.putEntity', 'green')
+    print colored(raw_data, 'green')
+
+    data = raw_data.get('data', None)
+
+    if data is None:
+        abort(400)
+
+    if data is not None:
+        for key, value in data.iteritems():
+            if type(value) is not int:
+                data[key] = value.encode('utf-8')
+
+    # When are really saved data in database
+    response = entitiesManager.put(kind, data)
+
+    if c:
+        salida = salidaGestor
+        print colored(salidaGestor, 'green')
+
+        #Si la salida del gestor es correcta llamaremos al mSCE para añadir un elemento de referencia:
+        if salidaGestor['status'] == 'OK':
+            print colored('Entidad creada con Exito en SBD, enviando datos al SCE', 'red')
+            url = "http://%s/" % modules.get_hostname(module="sce")
+            url+="entidadesReferencia"
+
+            #Creamos un diccionario con los datos.
+            dicDatos = {
+              'tipo' : tipo,
+              #Usamos el id de la entidad que nos devuelve el gestor.
+              'idEntidad': salidaGestor['idEntidad'],
+            }
+
+            #Dependiendo del tipo de entidad que recibamos componemos el nombre de la entidad de una manera u otra
+            if tipo == 'Alumno' or tipo == 'Profesor':
+                dicDatos['nombreEntidad'] = datos['nombre']+' '+datos['apellidos']
+
+            if tipo == 'Clase':
+                dicDatos['nombreEntidad'] = str(datos['curso'])+' '+str(datos['grupo'])+' '+datos['nivel']
+
+            if tipo == 'Asignatura':
+                dicDatos['nombreEntidad'] = datos['nombre']
+
+
+            print colored(dicDatos, 'green')
+
+            print colored(url,'green')
+            req = urllib2.Request(url, json.dumps(dicDatos), {'Content-Type': 'application/json'})
+            print colored(req, 'green')
+            f = urllib2.urlopen(req)
+            response = json.loads(f.read())
+            print colored(response, 'green')
+            f.close()
+
+            if response['status'] != 'OK':
+                salida['status'] = 'FAIL'
+                salida['info'] = 'SCE subcall fail'
+
+            print colored(response, 'green')
+
+
+        #En caso de que la entidad introducida sea un profesor se cargarán lascredenciales por defecto en el sistema.
+        if tipo == 'Profesor':
+            print ' Profesor creado con éxito. Creando sus credenciales de acceso al sistema.'
+            #Creamos las credenciales del usuario en la tabla credenciales usando el id del usuario que devuelve nuevoProfesor
+            #Por defecto el alias y el password de un profesor en el sistemas serán su dni
+            #salida Creacion CredencialespostProfesor
+            salidaCC=GestorCredenciales.postCredenciales(salidaGestor['idEntidad'], dicDatos['nombreEntidad'], datos['dni'], datos['dni'], 'admin')
+            if salidaCC != 'OK':
+                salida['status'] = 'FAIL'
+                salida['info']='SBD credential creation fail'
+
+
+        ######
+
+
+        #Realizamos la petición al gestor y devolvemos la respuesta transformada a json.
+        #return json.dumps(salidaGestor)
+        print colored(salida, 'green')
+        return json.dumps(salida)
+
+    return process_response(response)
+
+
+@app.route('/entities/<string:kind>', methods=['GET']) #Si pedimos todas las entidades de un tipo
+@app.route('/entities/<string:kind>/<int:entity_id>', methods=['GET']) #Si pedimos una entidad concreta de un tipo
+def get_entities(kind, entity_id=None):
+    """
+    curl  -i -X GET localhost:8002/entities/student
+    curl  -i -X GET  localhost:8002/entities/student/1
+    """
+    return process_response(entitiesManager.get(kind, entity_id))
+
+
+@app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
+def update_entities(kind, entity_id):
     """
     curl -H "Content-Type: application/json" -X PUT -d '{"tipo": "Alumno", "idEntidad": "1", "campoACambiar": "nombre", "nuevoValor": "Lucía" }' localhost:8002/entidades
     """
-    data = request.get_json()
-    print colored(data, 'red')
+
+    raw_data = request.get_json()
+
+    print colored('mSDBapi.update_entities', 'green')
+    print colored(raw_data, 'green')
+
+    data = raw_data.get('data', None)
+
+    if data is None:
+        abort(400)
+
+    if data is not None:
+        for key, value in data.iteritems():
+            if type(value) is not int:
+                data[key] = value.encode('utf-8')
+
+    return process_response(entitiesManager.update(kind, entity_id, data))
 
 
-    #HERe
-    #Tras esto deberíamos llamar al servicio de SCE para enviar los datos simples al SCE para actualizar las entidades
-    ###
-    ### Cuando se modifica el nombre o la imagen de una entidada alumno hay que llamar al servicio SCE para que actualice
-    ### los datos rápidos en la NDB para que los controles de asistencia tengan los datos actualizados.
-
-
-    return json.dumps(GestorEntidades.modEntidad(tipo=data.get('tipo', None), idEntidad=data.get('idEntidad', None), campoACambiar=data.get('campoACambiar', None), nuevoValor=data.get('nuevoValor', None)))
-
-@app.route('/entidades/<string:tipo>/<int:idEntidad>', methods=['DELETE'])
-def delEntidad(tipo, idEntidad):
+@app.route('/entities/<string:kind>/<int:entity_id>', methods=['DELETE'])
+def delete_entity(kind, entity_id):
     """
-    curl  -i -X  DELETE localhost:8002/entidades/Alumno/1
+    curl  -i -X  DELETE localhost:8002/entities/subject/1
     """
-    return json.dumps(GestorEntidades.delEntidad(tipo=str(tipo), idEntidad=str(idEntidad)))
+    return process_response(entitiesManager.delete(kind, entity_id))
 
-@app.route('/entidades/<string:tipoBase>/<int:idEntidad>/<string:tipoBusqueda>', methods=['GET'])
-def getEntidadesRelacionadas(tipoBase, idEntidad, tipoBusqueda):
+
+@app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>', methods=['GET'])
+def get_related_entities(kind, entity_id, related_kind):
     """
-    curl -i -X GET localhost:8002/entidades/Alumno/1/Profesor
+    curl -i -X GET localhost:8080/entities/student/1/teacher
     """
-    return json.dumps(GestorEntidades.getEntidadesRelacionadas(tipoBase=str(tipoBase), idEntidad=str(idEntidad), tipoBusqueda=str(tipoBusqueda)))
+    return process_response(entitiesManager.get_related(kind, entity_id, related_kind))
+
 
 ##########################
 # COLECCIÓN CREDENCIALES #

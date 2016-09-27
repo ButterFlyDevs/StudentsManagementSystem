@@ -9,8 +9,10 @@ import unittest
 import sys, os
 sys.path.insert(0,os.pardir)
 
-from GestorEntidades import GestorEntidades
+from entitiesManager import entitiesManager
 from termcolor import colored
+
+import datetime
 
 ########################################################
 ###  sobre ENTIDADES(tablas) y RELACIONES(tablas)    ###
@@ -18,22 +20,58 @@ from termcolor import colored
 
 ### ENTIDADES, como Alumno, Profesor... ###
 
-#Las clases para la realización de los test debe heredar de unittest.TestCase
-class TestGestorEntidades(unittest.TestCase):
+class entitiesManagerTester(unittest.TestCase):
 
     def setUp(self):
-        os.system('mysql -u root -p\'root\' < ../DBCreatorv1.sql')
+        os.system('mysql -u root -p\'root\' < ../DBCreator.sql')
 
-    def test_31_putEntidades(self):
+    def test_01_insert(self):
+
+        # To execute only this test: python test.py entitiesManagerTester.test_01_insert
+
         test = True
-        if GestorEntidades.putEntidad(tipo='Alumno', datos={'nombre': 'súperNombre'})['status'] != 'OK' or \
-        GestorEntidades.putEntidad(tipo='Profesor', datos={'nombre': 'súperNombre'})['status'] != 'OK' or \
-        GestorEntidades.putEntidad(tipo='Asignatura', datos={'nombre': 'Francés'})['status'] != 'OK' or \
-        GestorEntidades.putEntidad(tipo='Clase', datos={'curso': '1', 'grupo': 'B', 'nivel': 'ESO'})['status'] != 'OK' or \
-        GestorEntidades.putEntidad(tipo='Desconocido', datos={'prueba': 'hola'})['status'] != 'FAIL':
-            test = False
 
 
+        # We define a block with entity tests:
+        tests = [
+            {'kind': 'student',
+             'data': {'name': u'súperNombre'}
+            },
+            {'kind': 'student',
+             'data': {'name': u'Juan'}
+            },
+            {'kind': 'teacher',
+             'data': {'name': u'súperNombre'}
+            },
+            {'kind': 'subject',
+             'data': {'name': u'Francés'}
+            },
+            {'kind': 'class',
+             'data': {'course': 1, 'word': u'B', 'level': u'ESO'}
+            }
+        ]
+
+        for item in tests:
+
+            entity = entitiesManager.insert(kind=item['kind'], data=item['data'])
+            print colored(entity, 'yellow')
+
+            # Particular attributes.
+            for key, value in item['data'].iteritems():
+                #print type(entity.get(key))
+                #print type(value)
+                if entity.get(key) != value: # entity.get(key) is unicode but value is string.
+                    test = False
+
+            # Control attributes.
+            if entity.get('createdAt', None).date() != datetime.datetime.now().date():
+                test = False
+
+
+        #test = Fale
+
+
+        """
         #Testeando la asociación de una asignatura a una clase, y sus errores
         if GestorEntidades.putEntidad(tipo='Asociacion', datos={'idClase': '1', 'idAsignatura': '1'})['status'] != 'OK': test = False
         #No se puede realizar la misma asociación si ya existe
@@ -65,8 +103,11 @@ class TestGestorEntidades(unittest.TestCase):
         if GestorEntidades.putEntidad(tipo='Matricula', datos={'idAlumno': '1', 'idAsociacion': '2'})['status'] != 'FAIL': test = False
 
 
+        """
         self.assertTrue(test)
 
+
+    """
     def test_32_getEntidades(self):
         test = True
 
@@ -247,7 +288,7 @@ class TestGestorEntidades(unittest.TestCase):
         if GestorEntidades.getNumEntidades(tipo='Matricula') != 0: test =False
 
         self.assertTrue(test)
-
+    """
 
 if __name__ == '__main__':
     unittest.main()

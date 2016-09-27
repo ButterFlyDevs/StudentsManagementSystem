@@ -7,7 +7,7 @@ usan todas los subficheros de la API para conectarse con la base de datos.
 '''
 
 #Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
-import MySQLdb
+import MySQLdb, MySQLdb.cursors
 
 import os
 
@@ -26,10 +26,9 @@ import productionCloudSQLInstanceINFO as psqlinfo
 def conecta():
 
     if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
-        return MySQLdb.connect(unix_socket='/cloudsql/' + psqlinfo._INSTANCE_NAME, db=db, user='root', charset='utf8')
+        return MySQLdb.connect(unix_socket='/cloudsql/' + psqlinfo._INSTANCE_NAME, db=db, user='root', charset='utf8', cursorclass=MySQLdb.cursors.DictCursor)
     else:
-        return MySQLdb.connect(host, user, password, db, charset='utf8');
-
+        return MySQLdb.connect(host, user, password, db, charset='utf8', cursorclass=MySQLdb.cursors.DictCursor);
 
 #Seteando el chartset a utf-8 en la conexión nos ahorramos de tener que establecer esto en cada conexión.
 
