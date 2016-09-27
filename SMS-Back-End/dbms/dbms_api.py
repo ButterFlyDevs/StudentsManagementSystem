@@ -5,8 +5,8 @@ from flask import abort
 from flask import request
 import jsonpickle
 
-from APIDB.entitiesManager import entitiesManager
-from APIDB.GestorCredencialesSQL import GestorCredenciales
+from dbapi.entitiesManager import entitiesManager
+from dbapi.GestorCredencialesSQL import GestorCredenciales
 
 from google.appengine.api import modules
 from google.appengine.api import urlfetch
