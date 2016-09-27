@@ -97,7 +97,7 @@ def test():
     Example of use:
     curl -i -X GET localhost:8002/test
     """
-    return 'OK'
+    return json.dumps({'status: ': 'ok'})
 
 #################################
 #   Resources about entities    #
@@ -122,8 +122,8 @@ def put_entity(kind):
         A json with the entire entity which is saved in database (with all extra control values) or error status code.
 
     Example of use:
-        curl -H "Content-Type: application/json" -X POST -d '{"kind": "teacher", "data": {"name": "María"} }' localhost:8080/entities
-        curl -H "Content-Type: application/json" -X POST -d '{"kind": "class", "data": {"course": 1, "word": "B", "level": "ESO"} }' localhost:8080/entities
+        curl -H "Content-Type: application/json" -X POST -d '{ "data": {"name": "María"} }' localhost:8080/entities/student
+        curl -H "Content-Type: application/json" -X POST -d '{"data": {"course": 1, "word": "B", "level": "ESO"} }' localhost:8080/entities/class
 
     Example of return:
         {"createdBy": 1, "course": 5, "createdAt": "Thu Sep 22 16:09:36 2016", "word": "B", "level": "Primary", "classId": 19}
@@ -232,7 +232,7 @@ def get_entities(kind, entity_id=None):
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
 def update_entities(kind, entity_id):
     """
-    curl -H "Content-Type: application/json" -X PUT -d '{"tipo": "Alumno", "idEntidad": "1", "campoACambiar": "nombre", "nuevoValor": "Lucía" }' localhost:8002/entidades
+    curl -H "Content-Type: application/json" -X PUT -d '{ "data": {"name": "NombreModificado"} }' localhost:8002/entities/teacher/1
     """
 
     raw_data = request.get_json()

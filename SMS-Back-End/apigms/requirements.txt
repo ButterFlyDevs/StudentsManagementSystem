@@ -8,4 +8,10 @@
 
 #Instalamos el cliente de python de Cloud Storage de GAE
 GoogleAppEngineCloudStorageClient
+Flask==0.10
+Flask-Testing>=0.4.1
+unittest2>=0.5
 jsonpickle
+termcolor
+
+

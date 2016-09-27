@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #Fichero de arranque del backend al completo api gateway y el resto de microservicios.
 #Ejecución:  . SMS-Back-End/run.sh  estando en la carpeta raíz del proyecto.
 
@@ -17,8 +18,5 @@ echo -e "\033[32m \n  ¡Gracias por contribuir! \n\n \033[0m"
 
 #Ejecución del comando que levanta el dev_appserver
 
-google_appengine/dev_appserver.py \
---port=8001 --admin_port=8082 \
-SMS-Back-End/apigateway/apigateway.yaml \
-SMS-Back-End/sbd/sbd.yaml \
-SMS-Back-End/sce/sce.yaml
+../google_appengine/dev_appserver.py \
+--port=8001 --admin_port=8082 apigms/apigms.yaml dbms/dbms.yaml sce/sce.yaml

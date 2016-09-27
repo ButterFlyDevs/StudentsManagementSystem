@@ -6,14 +6,11 @@ SMS-Back-End/dbms/dbapi/productionCloudSQLInstanceINFO.py
 SMS-Back-End/dbms/docs/build/
 
 SMS-Back-End/sce/lib/
-SMS-Back-End/sce/build/
 SMS-Back-End/sce/docs/build
 
-SMS-Back-End/apigateway/lib/
-SMS-Back-End/apigateway/docs/
+SMS-Back-End/apigms/lib/
+SMS-Back-End/apigms/docs/build/
 
-
-SMS-Back-End/apigateway/lib/
 SMS-Front-End/anotaciones.md
 
 _site/
