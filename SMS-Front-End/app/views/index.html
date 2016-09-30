@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+
+<!--Based in:
+
+http://flatlogic.github.io/angular-material-dashboard/#/table
+http://codepen.io/ajatix/pen/vNpwYB
+
+-->
+
 <html>
 <head>
     <meta charset="UTF-8">
@@ -63,7 +71,7 @@
 
 <body>
 
-<div ng-app="main" ng-controller="AppCtrl">
+<div ng-app="main" ng-controller="AppCtrl" layout="row" layout-fill ng-cloak>
 
 
 
@@ -132,7 +140,7 @@
     </md-sidenav>
 
 
-    <section layout="column" layout-align="center stretch" >
+    <section layout="column" flex >
 
 
 
@@ -141,9 +149,9 @@
         <section flex style="background-color: #323232" >
 
 
-            <div toolbar="row">
+            <div >
             <!-- Superior menu/toolbar -->
-            <md-toolbar role="row">
+            <md-toolbar >
                 <div class="md-toolbar-tools">
 
                     <!--This icon is disabled when the use see the complete view with left floating menu-->
