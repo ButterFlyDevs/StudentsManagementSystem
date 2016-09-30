@@ -1,0 +1,187 @@
+<div flex ng-controller="teachersProfileController as vm">
+
+
+    <div layout="row" layout-align="center" ng-cloak>
+        <div flex="90" layout-padding>
+            <div  layout="row" layout-align="space-between start">
+                <md-button class="md-primary md-raised"
+                           ng-click="go('/users')">
+                    <md-icon md-font-icon="fa fa-arrow-circle-left"></md-icon>
+                    Atras
+                </md-button>
+            </div>
+            <md-card layout="column" layout-margin layout-padding>
+
+
+                <!-- We can see the layout like a row -->
+                <div layout="row" flex flex="70" layout-align="center">
+
+                    <!-- First column, with a image inside. -->
+                    <div flex="40" layout="column" layout-margin layout layout-align="center center">
+                        <div ng-switch="vm.user.img || '_undefined_'">
+                                        <img ng-switch-when="_undefined_" class="img-profile-big" src="{{ vm.defaultAvatar }}">
+                                        <img ng-switch-default class="img-profile-big"  src="{{ vm.user.img }}">
+                                    </div>
+
+                        <div layout="row">
+                            <md-button class="md-primary md-fab md-mini" aria-label="Update photo">
+                                <md-icon md-font-icon="fa fa-refresh"></md-icon>
+                            </md-button>
+
+                            <md-button class="md-primary md-fab md-mini" aria-label="Remove photo">
+                                <md-icon md-font-icon="fa fa-remove"></md-icon>
+                            </md-button>
+                        </div>
+
+                    </div>
+
+                    <!-- Second column, with user data inside. -->
+                    <div flex="60" layout="column">
+                        <form name="userForm">
+                            <div layout layout-sm="column">
+                                <md-input-container flex>
+                                    <label layout="">Nombre</label>
+                                    <input ng-model="vm.user.name" required>
+                                </md-input-container>
+                                <md-input-container flex>
+                                    <label layout="">Apellidos</label>
+                                    <input ng-model="vm.user.surname" required>
+                                </md-input-container>
+                            </div>
+
+                            <div layout layout-sm="column">
+                                <md-input-container flex="50">
+                                    <label layout="">Residencia</label>
+                                    <input ng-model="vm.user.city" required>
+                                </md-input-container>
+                            </div>
+
+                            <div layout layout-sm="column">
+                                <md-input-container flex>
+                                    <label layout="">Email</label>
+                                    <input ng-model="vm.user.email" type="email" disabled>
+                                </md-input-container>
+                                <md-input-container flex>
+                                    <label layout="">{{ _("Role") }}</label>
+                                    <input ng-model="vm.actualRole" disabled>
+                                </md-input-container>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+                <!-- A line divisor -->
+                <md-divider layout-margin></md-divider>
+
+                <!-- Projects management section -->
+                <div layout="column">
+
+                    <div class="margin-top-medium">
+                        <span flex class="md-headline" layout-margin>Projects related</span>
+                    </div>
+
+                    <div ng-if="vm.userProjects.length != 0">
+
+                        <!-- Button to add new project to user. -->
+                        <div access='admin' layout="row">
+                            <md-button class="md-primary md-raised" ng-click="vm.addProject()">
+                                <md-icon md-font-icon="fa-plus"></md-icon>
+                                {{ _("Add to Project") }}</md-button>
+                        </div>
+
+
+                        <!--Table with all projects related to the user -->
+                        <md-table-container>
+                            <table md-table>
+                                <thead md-head>
+                                <tr md-row>
+
+                                    <th md-column><span>{{ _("Project") }}</span></th>
+                                    <th md-column><span>{{ _("Project Manager") }}</span></th>
+                                    <th access='admin' md-column></th>
+                                </tr>
+                                </thead>
+                                <tbody md-body>
+                                <!-- Where we iterate through user projects list -->
+                                <tr md-row ng-repeat="item in vm.userProjects">
+
+                                    <!-- ng-click="go('/project/'+item.idProject)" -->
+
+
+                                    <!-- Project name -->
+                                    <td md-cell>
+                                        <span>{{ item.projectName }}</span>
+                                    </td>
+
+                                    <!-- User rol in project -->
+                                    <td access='admin' md-cell>
+                                        <md-checkbox ng-checked="item.rolIn == 'pm' " ng-click="vm.changeRole(item)"></md-checkbox>
+
+                                    </td>
+
+                                    <td access='pm,dev' md-cell>
+                                        <md-icon ng-hide="item.rolIn != 'pm' " md-font-icon="fa fa-check"></md-icon>
+                                    </td>
+
+                                    <!-- Project del button -->
+                                    <td access='admin' md-cell>
+                                        <md-button ng-click="vm.delRelation($index)"
+                                                   class="md-fab md-mini md-danger">
+                                            <!--Using http://fontawesome.io/icons/ (fa) and the name of icon selected with "fa-" after-->
+                                            <md-icon md-font-icon="fa fa-trash"></md-icon>
+                                        </md-button>
+                                    </td>
+
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </md-table-container>
+                    </div>
+
+
+                    <div ng-if="vm.userProjects.length == 0">
+
+                        <span> {{ _("This user isn't in a project yet.") }} </span>
+
+                        <!-- Button to add new project to user. -->
+                        <div access='admin' layout="row" layout-align="center" layout-margin>
+                            <md-button class="md-primary md-raised" ng-click="vm.addProject()">
+                                <md-icon md-font-icon="fa-plus"></md-icon>
+                                {{ _("Add to Project") }}</md-button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="margin-top-large">
+                    <!-- Action buttons-->
+                    <div class="md-actions" layout="row" layout-align="end center">
+
+                        <!-- Button to save user changes -->
+                        <md-button class="md-primary md-raised"
+                                   ng-click="vm.saveChanges()">
+                            <md-icon md-font-icon="fa fa-save"></md-icon>
+                            {{ _("Save Changes") }}
+                        </md-button>
+
+                        <!-- Button that delete user, with confirmation message before -->
+                        <md-button class="md-warn md-raised" ng-click="vm.showConfirm(1, vm.user._id)">
+                            <md-icon md-font-icon="fa fa-trash"></md-icon>
+                            {{ _("Delete") }}
+                        </md-button>
+
+
+                    </div>
+
+                </div>
+
+
+            </md-card>
+
+        </div>
+    </div>
+
+</div>

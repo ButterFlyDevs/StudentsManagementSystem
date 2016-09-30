@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Angular Material Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--
+    <link rel='stylesheet prefetch' href='https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.css'>
+    <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
+    -->
+
+    <!--https://google.github.io/material-design-icons/ -->
+    <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <!--<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/angular_material/0.11.2/angular-material.min.js'></script>
+    -->
+
+    <link rel='stylesheet prefetch' href="../vendor/angular-material/angular-material.min.css">
+
+
+
+
+    <script src="../vendor/angular/angular.min.js"></script>
+    <script src="../vendor/angular-material/angular-material.min.js"></script>
+    <script src="../vendor/angular-animate/angular-animate.min.js"></script>
+    <script src="../vendor/angular-aria/angular-aria.min.js"></script>
+    <script src="../vendor/angular-resource/angular-resource.min.js"></script>
+
+
+    <script src="../vendor/angular-material-data-table/dist/md-data-table.min.js"></script>
+    <link rel='stylesheet prefetch' href="../vendor/angular-material-data-table/dist/md-data-table.min.css">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.js"></script>
+
+
+
+    <!-- All list of modules -->
+    <script src="../js/main/main.module.js"></script>
+
+
+    <script src="../js/teaching/teachers/teachers.service.js"></script>
+
+    <script src="../js/teaching/teachers/teachers.module.js"></script>
+
+    <script src="../js/teaching/teachers/teachers.service2.js"></script>
+
+    <script src="../js/teaching/teachers/teachersList.js"></script>
+    <script src="../js/teaching/teachers/teachersProfile.js"></script>
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+<div ng-app="main" ng-controller="AppCtrl">
+
+
+
+    <!-- Definition of lateral menu in responsive mode -->
+    <!--
+    md-whiteframe-8dp Set the shadow below an object to give an impression of elevation.
+
+    $mdMedia is a Service
+      gt-md is min-width 1919px
+      is used to evaluate whether a given media query is true or false given the current device's screen / window size.
+      The media query will be re-evaluated on resize, allowing you to register a watch.
+
+      Sidebar opens when md-is-locked-open expression becomes thruthy
+    -->
+
+    <!-- https://material.angularjs.org/latest/api/directive/mdSidenav
+     md-is-locked-open="$mdMedia('gt-md')"
+    -->
+    <md-sidenav flex="20" class="md-sidenav-left md-whiteframe-8dp" role="sidenav" md-component-id="left"
+                md-is-locked-open="$mdMedia('gt-sm')">
+
+        <!--
+        <div ng-if="$mdMedia('sm')"><p>content for mobile</p></div>
+        <div ng-if="$mdMedia('gt-sm')"><p>content for other devices</p></div>
+        -->
+
+        <!-- Inside components of menu is defined -->
+        <md-toolbar class="md-tall md-hue-2" layout-align="end end">
+
+            <div class="md-toolbar-tools" layout>
+
+                <md-icon md-24>{{ data.user.icon }} </md-icon>
+
+                <div layout="column" layout-padding>
+                    <span class="md-body-2">{{ data.user.name }}</span>
+                </div>
+
+            </div>
+        </md-toolbar>
+
+        <md-content role="navigation">
+            <md-list ng-repeat="section in data.sidenav.sections">
+                <md-list-item ng-click="section.expand = !section.expand">
+                    <p class="md-subheader md-primary">{{ section.name }}</p>
+
+                    <span flex></span>
+
+                    <md-icon class="md-primary md-icon-button">
+                        {{ section.expand ? 'arrow_drop_up' : 'arrow_drop_down'}}</md-icon>
+
+
+                </md-list-item>
+
+                <md-list-item ng-show="section.expand" ng-repeat="action in section.actions" ui-sref="{{action.link}}">
+
+                    <md-icon>{{ action.icon }}</md-icon>
+                    <p class="md-body-2">{{ action.name }}</p>
+                    <span flex></span>
+                    <md-icon>chevron_right</md-icon>
+
+
+                </md-list-item>
+        </md-content>
+
+
+    </md-sidenav>
+
+
+    <section layout="column" layout-align="center stretch" >
+
+
+
+
+
+        <section flex style="background-color: #323232" >
+
+
+            <div toolbar="row">
+            <!-- Superior menu/toolbar -->
+            <md-toolbar role="row">
+                <div class="md-toolbar-tools">
+
+                    <!--This icon is disabled when the use see the complete view with left floating menu-->
+                    <md-button class="md-icon-button" ng-click="toggleSidenav('left')" hide-gt-sm aria-label="Menu">
+                        <md-icon>menu</md-icon>
+                    </md-button>
+
+                    <h4 class="md-title">{{ data.title }}</h4>
+
+                    <span flex></span>
+
+                    <md-button class="md-icon-button" ng-repeat="button in data.toolbar.buttons" aria-label="{{ button.name }}" ng-click="toast(button.link)">
+                        <md-icon>{{ button.icon }}</md-icon>
+                    </md-button>
+
+                    <!-- The las icon have a own menu -->
+                    <md-menu md-position-mode="target-right target" ng-repeat="menu in data.toolbar.menus">
+
+                        <md-button class="md-icon-button" aria-label="{{ menu.name }}" ng-click="$mdOpenMenu($event)">
+                            <md-icon>{{ menu.icon }}</md-icon>
+                        </md-button>
+
+                        <md-menu-content width={{ menu.width }}>
+
+                            <md-subheader>{{ menu.name }}</md-subheader>
+
+                            <md-menu-item ng-repeat="action in menu.actions">
+                                <md-button layout-fill md-ink-ripple ng-click="toast(action.message)">
+                                    <md-icon md-class="{{ action.error ? 'md-warn' : 'md-primary'}}" md-menu-align-target>
+                                        {{ action.completed ? 'done' : 'hourglass_empty'}}</md-icon>
+                                    {{ action.name }}
+                                </md-button>
+                            </md-menu-item>
+
+                        </md-menu-content>
+
+                    </md-menu>
+
+
+                </div>
+            </md-toolbar>
+
+            </div>
+
+
+            <!--
+             <div layout="row">
+                    <md-toolbar role="toolbar">
+                <div class="md-toolbar-tools">
+                    <span class="md-caption">Home/Docencia/Profesores</span>
+                </div>
+            </md-toolbar>
+            </div>
+            -->
+
+        </section>
+
+
+
+
+
+        <div layout="column" layout-align="center stretch" style="background-color: #ffeae0; min-height: 92vh;" >
+
+                <!--Place when we will have the nested views, we will inject our code. -->
+                <div ui-view></div>
+
+
+        </div>
+
+
+</section>
+
+
+
+
+
+
+
+
+</div>
+
+
+</body>
+</html>
+
+
+

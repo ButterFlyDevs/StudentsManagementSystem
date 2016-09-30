@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask
-from flask import request
+from flask import Flask, jsonify, request
 from google.appengine.api import modules
 import urllib2
 from termcolor import colored
@@ -53,6 +52,7 @@ def put_entity(kind):
 @app.route('/entities/<string:kind>', methods=['GET'])
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['GET'])
 def get_entities(kind, entity_id=None):
+    # curl -i -X GET localhost:8080/entities/teacher
 
     url = "http://%s/" % modules.get_hostname(module='dbms')
     url += 'entities/' + str(kind)
@@ -67,7 +67,8 @@ def get_entities(kind, entity_id=None):
     response = f.read()
     f.close()
 
-    return response
+    #return response
+    return jsonify({'teacher': 'Tom'})
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])

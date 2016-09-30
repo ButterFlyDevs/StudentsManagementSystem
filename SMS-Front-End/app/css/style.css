@@ -1,0 +1,13 @@
+body {
+  overflow: hidden;
+  background-color: #EEEEEE;
+}
+
+md-whiteframe {
+  background: #fff;
+}
+
+#content {
+  padding: 24px;
+}
+

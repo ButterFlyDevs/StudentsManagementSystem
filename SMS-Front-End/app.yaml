@@ -10,20 +10,16 @@ handlers:
 - url: /app
   static_dir: app
 
-
-
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
 
-- url: /rest/.*
-  script: main.APP
-
 - url: (.*)/
   #Define la pagina principal que se sirve
-  static_files: app\1/index.html
+  static_files: app\1/views/index.html
   upload: app
 
 - url: (.*)
   static_files: app\1
   upload: app
+
