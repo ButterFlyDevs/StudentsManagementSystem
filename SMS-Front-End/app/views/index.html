@@ -18,7 +18,10 @@ http://codepen.io/ajatix/pen/vNpwYB
     <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
     -->
 
-    <!--https://google.github.io/material-design-icons/ -->
+    <!--We use angular material official library:
+        https://google.github.io/material-design-icons/
+        https://design.google.com/icons/
+    -->
     <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
     <link rel="stylesheet" href="../css/style.css">
 
@@ -90,7 +93,7 @@ http://codepen.io/ajatix/pen/vNpwYB
     <!-- https://material.angularjs.org/latest/api/directive/mdSidenav
      md-is-locked-open="$mdMedia('gt-md')"
     -->
-    <md-sidenav flex="20" class="md-sidenav-left md-whiteframe-8dp" role="sidenav" md-component-id="left"
+    <md-sidenav flex="20" class="md-sidenav-left md-whiteframe-8dp"  md-component-id="left"
                 md-is-locked-open="$mdMedia('gt-sm')">
 
         <!--
@@ -212,14 +215,14 @@ http://codepen.io/ajatix/pen/vNpwYB
 
 
 
-
-        <div layout="column" layout-align="center stretch" style="background-color: #ffeae0; min-height: 92vh;" >
+        <!--We use md-content instead of div to make scrollable the content -->
+        <md-content layout="column" layout-padding  style="background-color: #f8f8ff; min-height: 92vh;" >
 
                 <!--Place when we will have the nested views, we will inject our code. -->
                 <div ui-view></div>
 
 
-        </div>
+        </md-content>
 
 
 </section>

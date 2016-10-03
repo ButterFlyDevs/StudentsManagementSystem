@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request
-from flask import abort
+from flask import Flask, request, jsonify, Response
+from flask import abort, make_response
 from flask import request
 import jsonpickle
+
+import logging
 
 from dbapi.entitiesManager import entitiesManager
 from dbapi.GestorCredencialesSQL import GestorCredenciales
@@ -20,6 +22,11 @@ from termcolor import colored
 
 
 app = Flask(__name__)
+
+#file_handler = logging.FileHandler('app.log', 'rw')
+#app.logger.addHandler(file_handler)
+#app.logger.setLevel(logging.INFO)
+
 
 # Activating verbose mode
 v = 1
@@ -62,7 +69,19 @@ def process_response(response):
     print locals()
 
     if response['status'] == 1:
-        return json.dumps(response['data'], cls=MyEncoder)
+        # return json.dumps(response['data'], cls=MyEncoder)
+        #app.logger.info('informing')
+
+        res = Response(json.dumps(response['data'], cls=MyEncoder), mimetype='application/json')
+
+        rews = make_response(res)
+
+        rews.headers['Access-Control-Allow-Origin'] = "*"
+
+        return rews
+
+
+
 
     # The element that it searched doesn't exists.
     elif response['status'] == -1 or response['status'] == 1452 or response['status'] == 1054 or response['status'] == 1065:

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
+import json
 from google.appengine.api import modules
 import urllib2
 from termcolor import colored
@@ -67,8 +68,17 @@ def get_entities(kind, entity_id=None):
     response = f.read()
     f.close()
 
+    result = {
+        'list': response,
+        'total': len(response)
+    }
+
+
+    return jsonify(result)
+
+    #return Response(json.dumps(list), mimetype='application/json')
+    #return  jsonify(r)
     #return response
-    return jsonify({'teacher': 'Tom'})
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])

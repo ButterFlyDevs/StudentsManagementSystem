@@ -6,7 +6,7 @@
             <div  layout="row" layout-align="space-between start">
                 <md-button class="md-primary md-raised"
                            ng-click="go('/users')">
-                    <md-icon md-font-icon="fa fa-arrow-circle-left"></md-icon>
+                    <md-icon>keyboard_arrow_left</md-icon>
                     Atras
                 </md-button>
             </div>
@@ -25,11 +25,11 @@
 
                         <div layout="row">
                             <md-button class="md-primary md-fab md-mini" aria-label="Update photo">
-                                <md-icon md-font-icon="fa fa-refresh"></md-icon>
+                                <md-icon>replay</md-icon>
                             </md-button>
 
                             <md-button class="md-primary md-fab md-mini" aria-label="Remove photo">
-                                <md-icon md-font-icon="fa fa-remove"></md-icon>
+                                <md-icon>delete</md-icon>
                             </md-button>
                         </div>
 
@@ -41,7 +41,7 @@
                             <div layout layout-sm="column">
                                 <md-input-container flex>
                                     <label layout="">Nombre</label>
-                                    <input ng-model="vm.user.name" required>
+                                    <input ng-model="vm.teacher.name" required>
                                 </md-input-container>
                                 <md-input-container flex>
                                     <label layout="">Apellidos</label>
@@ -80,6 +80,21 @@
                     <div class="margin-top-medium">
                         <span flex class="md-headline" layout-margin>Projects related</span>
                     </div>
+
+
+                    {{ vm.teacher.asignaturas }}
+
+                    <!-- Section with three columns -->
+
+
+                    <div layout="column">
+                      <!-- A line divisor -->
+
+                        <md-divider layout-margin></md-divider>
+
+                    </div>
+
+
 
                     <div ng-if="vm.userProjects.length != 0">
 
@@ -141,9 +156,10 @@
                     </div>
 
 
+                    <!-- If the teacher hasn't any association doing still -->
                     <div ng-if="vm.userProjects.length == 0">
 
-                        <span> {{ _("This user isn't in a project yet.") }} </span>
+                        <span> {{ _("This teacher hasn't work yet.") }} </span>
 
                         <!-- Button to add new project to user. -->
                         <div access='admin' layout="row" layout-align="center" layout-margin>
@@ -163,14 +179,14 @@
                         <!-- Button to save user changes -->
                         <md-button class="md-primary md-raised"
                                    ng-click="vm.saveChanges()">
-                            <md-icon md-font-icon="fa fa-save"></md-icon>
-                            {{ _("Save Changes") }}
+                            <md-icon>save</md-icon>
+                            Guardar
                         </md-button>
 
                         <!-- Button that delete user, with confirmation message before -->
                         <md-button class="md-warn md-raised" ng-click="vm.showConfirm(1, vm.user._id)">
-                            <md-icon md-font-icon="fa fa-trash"></md-icon>
-                            {{ _("Delete") }}
+                            <md-icon>delete</md-icon>
+                            Eliminar
                         </md-button>
 
 

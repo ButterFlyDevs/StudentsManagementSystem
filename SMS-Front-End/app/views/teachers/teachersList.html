@@ -1,8 +1,14 @@
-<h1>This is a teachers list</h1>
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
 <div flex ng-controller="teachersListController as vm">
 
-    this: {{vm.text}}
+
+
+    <h1 class="md-display-1">Profesores</h1>
+    <p class="md-body-1">Todos los profesores del sistema.</p>
+
+    <!--this: {{vm.text}}-->
+    {{ vm.users }}
+
 
 <!-- table wrapper -->
                 <md-card style="background-color: #FFFFFF;>
