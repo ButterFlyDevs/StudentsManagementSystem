@@ -19,3 +19,12 @@ md-whiteframe {
       vertical-align: middle;
       width: 180px;
 }
+
+.img-profile {
+  border-radius: 30px;
+  border: 1px solid #ddd;
+  display: inline-block;
+  margin: 4px 16px;
+  vertical-align: middle;
+  width: 48px;
+}

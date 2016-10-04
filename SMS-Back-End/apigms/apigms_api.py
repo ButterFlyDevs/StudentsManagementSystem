@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, make_response
 import json
 from google.appengine.api import modules
 import urllib2
@@ -66,15 +66,22 @@ def get_entities(kind, entity_id=None):
     req = urllib2.Request(url)
     f = urllib2.urlopen(req)
     response = f.read()
+
+    print type(response)
+    response = json.dumps(response)
+    print type(response)
+
     f.close()
 
-    result = {
-        'list': response,
-        'total': len(response)
-    }
+    """
+    res = Response(json.dumps(response), mimetype='application/json')
 
+    rews = make_response(res)
 
-    return jsonify(result)
+    rews.headers['Access-Control-Allow-Origin'] = "*"
+    """
+
+    return response
 
     #return Response(json.dumps(list), mimetype='application/json')
     #return  jsonify(r)

@@ -6,9 +6,6 @@
     <h1 class="md-display-1">Profesores</h1>
     <p class="md-body-1">Todos los profesores del sistema.</p>
 
-    <!--this: {{vm.text}}-->
-    {{ vm.teacherList }}
-
 
 <!-- table wrapper -->
                 <md-card style="background-color: #FFFFFF;>
@@ -39,11 +36,8 @@
                         <table md-table md-progress="vm.promise">
                             <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
                             <tr md-row>
+                                <th md-column md-order-by="name"><span>Nombre</span></th>
                                 <th md-column></th>
-                                <th md-column md-order-by="name"><span>{{ _("User") }}</span></th>
-                                <th md-column></th> <!-- space to profile image -->
-                                <th md-column><span>{{ _("Last login") }}</span></th>
-                                <th md-column><span>{{ _("Log count") }}</span></th>
                                 <th md-column></th>
                             </tr>
                             </thead>
@@ -51,13 +45,6 @@
                             <!-- Where we iterate through items list -->
                             <tr md-row ng-repeat="item in vm.teachersList">
 
-
-                                <!-- Edit button -->
-                                <td md-cell>
-                                    <md-button ng-click="go('/users/'+item._id)" class="md-fab md-mini md-primary">
-                                        <md-icon md-font-icon="fa fa-pencil"></md-icon>
-                                    </md-button>
-                                </td>
 
                                 <!-- User identification -->
 
@@ -80,22 +67,11 @@
                                     </div>
                                 </td>
 
-                                <!-- User last login -->
-                                <td md-cell>
-                                    <span>{{ item.last_login_at.substring(0,10) }}</span>
-                                </td>
 
-                                <!-- User login count -->
+                                 <!-- Edit button -->
                                 <td md-cell>
-                                    <span>{{ item.login_count }}</span>
-                                </td>
-
-                                <!-- User del button -->
-                                <td md-cell>
-                                    <md-button ng-click="vm.showConfirm(0, item._id)"
-                                               class="md-fab md-mini md-danger">
-                                        <!--Using http://fontawesome.io/icons/ (fa) and the name of icon selected with "fa-" after-->
-                                        <md-icon md-font-icon="fa fa-trash"></md-icon>
+                                    <md-button ng-click="go('/users/'+item._id)" class="md-fab md-mini md-primary">
+                                        <md-icon>forward</md-icon>
                                     </md-button>
                                 </td>
 

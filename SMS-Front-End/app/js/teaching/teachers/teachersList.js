@@ -1,10 +1,12 @@
 
 
 angular.module('teachers')
-    .controller('teachersListController',function($scope, Post){
+    .controller('teachersListController',function($scope, TeachersService){
 
             var vm = this;
             vm.text='hi';
+
+            vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
 
             activate();
 
@@ -12,12 +14,8 @@ angular.module('teachers')
             function activate() {
                 console.log('Activating teachersListController controller.')
 
-                var teacherList = Post.query({}, function(){
-                    console.log(teacherList)
-                })
-
-                var singleTeacher = Post.get({id: 2}, function(){
-                    console.log(singleTeacher)
+                vm.teachersList = TeachersService.query({}, function(){
+                    console.log(vm.teachersList)
                 })
 
             }
