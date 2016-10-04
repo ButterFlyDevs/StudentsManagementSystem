@@ -1,8 +1,19 @@
-var CalculatorService = angular.module('CalculatorService', [])
-    .config(function(){
-        console.log('Activating CalculatorService.');
+angular.module('teachers')
+    .factory("Post",
+        function($resource) {
 
-      })
-    .service('Calculator', function () {
-        this.square = function (a) { return a*a};
-    });
+         return $resource('http://localhost:8002/entities/teacher/'+ ':id', {
+            id: '@_id'
+        });
+
+        /* Default behaviour:
+
+            { 'get':    {method:'GET'},
+            'save':   {method:'POST'},
+            'query':  {method:'GET', isArray:true},
+            'remove': {method:'DELETE'},
+            'delete': {method:'DELETE'} };
+
+         */
+
+});
