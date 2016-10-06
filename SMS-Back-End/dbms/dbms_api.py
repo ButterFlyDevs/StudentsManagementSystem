@@ -122,6 +122,7 @@ def test():
 #   Resources about entities    #
 #################################
 
+
 @app.route('/entities/<string:kind>', methods=['POST'])
 def put_entity(kind):
     """
@@ -141,8 +142,8 @@ def put_entity(kind):
         A json with the entire entity which is saved in database (with all extra control values) or error status code.
 
     Example of use:
-        curl -H "Content-Type: application/json" -X POST -d '{ "data": {"name": "María"} }' localhost:8080/entities/student
-        curl -H "Content-Type: application/json" -X POST -d '{"data": {"course": 1, "word": "B", "level": "ESO"} }' localhost:8080/entities/class
+        curl -H "Content-Type: application/json" -X POST -d '{ "data": {"name": "María"} }' localhost:8002/entities/student
+        curl -H "Content-Type: application/json" -X POST -d '{"data": {"course": 1, "word": "B", "level": "ESO"} }' localhost:8002/entities/class
 
     Example of return:
         {"createdBy": 1, "course": 5, "createdAt": "Thu Sep 22 16:09:36 2016", "word": "B", "level": "Primary", "classId": 19}
