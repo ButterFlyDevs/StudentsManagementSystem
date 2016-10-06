@@ -5,12 +5,18 @@
         <div flex="90" layout-padding>
             <div  layout="row" layout-align="space-between start">
                 <md-button class="md-primary md-raised"
-                           ng-click="go('/users')">
+                           ui-sref="teachers">
                     <md-icon>keyboard_arrow_left</md-icon>
                     Atras
                 </md-button>
             </div>
-            <md-card layout="column" layout-margin layout-padding>
+
+
+            <div ng-if="vm.teacher == null">
+                Oups! Parece que este profesor no existe.
+            </div>
+
+            <md-card ng-if="vm.teacher != null" layout="column" layout-margin layout-padding>
 
 
                 <!-- We can see the layout like a row -->
@@ -72,17 +78,15 @@
                 </div>
 
                 <!-- A line divisor -->
-                <md-divider layout-margin></md-divider>
+                <!-- <md-divider layout-margin></md-divider> -->
 
-                <!-- Projects management section -->
+                <!-- Academic related user info section -->
                 <div layout="column">
 
                     <div class="margin-top-medium">
-                        <span flex class="md-headline" layout-margin>Projects related</span>
+                        <span flex class="md-headline" layout-margin>Docencia</span>
                     </div>
 
-
-                    {{ vm.teacher.asignaturas }}
 
                     <!-- Section with three columns -->
 
@@ -92,85 +96,83 @@
 
                         <md-divider layout-margin></md-divider>
 
+
+                    <div class="margin-top-medium">
+                        <span flex class="md-title" layout-margin>Asignaturas</span>
                     </div>
 
+                        <!-- If the teacher have a subjects -->
+                        <div ng-if="vm.teacherSubjects.length != 0">
 
+                            <md-list>
 
-                    <div ng-if="vm.userProjects.length != 0">
+                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherSubjects" ng-click="null">
+                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ item.name }}</h3>
+                                        <h4>OtraCosa</h4>
+                                        <p>OtrasCosaMas</p>
+                                    </div>
+                                </md-list-item>
 
-                        <!-- Button to add new project to user. -->
-                        <div access='admin' layout="row">
-                            <md-button class="md-primary md-raised" ng-click="vm.addProject()">
-                                <md-icon md-font-icon="fa-plus"></md-icon>
-                                {{ _("Add to Project") }}</md-button>
+                            </md-list>
+
+                        </div>
+
+                        <!-- If the teacher hasn't any association doing still -->
+                        <div ng-if="vm.teacherSubjects.length == 0">
+                            <span>Este profesor aún no imparte ninguna asignatura. </span>
                         </div>
 
 
-                        <!--Table with all projects related to the user -->
-                        <md-table-container>
-                            <table md-table>
-                                <thead md-head>
-                                <tr md-row>
-
-                                    <th md-column><span>{{ _("Project") }}</span></th>
-                                    <th md-column><span>{{ _("Project Manager") }}</span></th>
-                                    <th access='admin' md-column></th>
-                                </tr>
-                                </thead>
-                                <tbody md-body>
-                                <!-- Where we iterate through user projects list -->
-                                <tr md-row ng-repeat="item in vm.userProjects">
-
-                                    <!-- ng-click="go('/project/'+item.idProject)" -->
-
-
-                                    <!-- Project name -->
-                                    <td md-cell>
-                                        <span>{{ item.projectName }}</span>
-                                    </td>
-
-                                    <!-- User rol in project -->
-                                    <td access='admin' md-cell>
-                                        <md-checkbox ng-checked="item.rolIn == 'pm' " ng-click="vm.changeRole(item)"></md-checkbox>
-
-                                    </td>
-
-                                    <td access='pm,dev' md-cell>
-                                        <md-icon ng-hide="item.rolIn != 'pm' " md-font-icon="fa fa-check"></md-icon>
-                                    </td>
-
-                                    <!-- Project del button -->
-                                    <td access='admin' md-cell>
-                                        <md-button ng-click="vm.delRelation($index)"
-                                                   class="md-fab md-mini md-danger">
-                                            <!--Using http://fontawesome.io/icons/ (fa) and the name of icon selected with "fa-" after-->
-                                            <md-icon md-font-icon="fa fa-trash"></md-icon>
-                                        </md-button>
-                                    </td>
-
-
-                                </tr>
-                                </tbody>
-                            </table>
-                        </md-table-container>
+                    <div class="margin-top-medium">
+                        <span flex class="md-title" layout-margin>Grupos</span>
                     </div>
 
+                        <!-- If the teacher have a classes -->
+                        <div ng-if="vm.teacherClasses.length != 0">
 
-                    <!-- If the teacher hasn't any association doing still -->
-                    <div ng-if="vm.userProjects.length == 0">
+                            <md-list>
 
-                        <span> {{ _("This teacher hasn't work yet.") }} </span>
+                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherClasses" ng-click="null">
+                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ item.course }} º {{ item.word }} {{ item.level}}</h3>
+                                    </div>
+                                </md-list-item>
 
-                        <!-- Button to add new project to user. -->
-                        <div access='admin' layout="row" layout-align="center" layout-margin>
-                            <md-button class="md-primary md-raised" ng-click="vm.addProject()">
-                                <md-icon md-font-icon="fa-plus"></md-icon>
-                                {{ _("Add to Project") }}</md-button>
+                            </md-list>
+
                         </div>
 
+                        <!-- If the teacher hasn't any association doing still -->
+                        <div ng-if="vm.teacherClasses.length == 0">
+                            <span>Este profesor aún no da clase en ningún grupo. </span>
+                        </div>
+
+
+                    <div class="margin-top-medium">
+                        <span flex class="md-title" layout-margin>Estudiantes</span>
                     </div>
+
+
+
+
+                    </div>
+
+
 
                 </div>
+
+                <!-- Button to add new project to user. -->
+                        <div access='admin' layout="row">
+                            <md-button class="md-primary md-raised" ng-click="vm.addRelation()"">
+                                <md-icon>add</md-icon>
+                                Añadir docencia</md-button>
+                        </div>
+
+
+                <md-divider layout-margin></md-divider>
 
                 <div class="margin-top-large">
                     <!-- Action buttons-->
@@ -193,6 +195,7 @@
                     </div>
 
                 </div>
+
 
 
             </md-card>

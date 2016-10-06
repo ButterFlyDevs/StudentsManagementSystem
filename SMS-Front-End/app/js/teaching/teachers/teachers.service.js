@@ -2,9 +2,20 @@ angular.module('teachers')
     .factory("TeachersService",
         function($resource) {
 
-         return $resource('http://localhost:8001/entities/teacher/'+ ':id', {
-            id: '@_id'
-        });
+         var restPath = 'http://localhost:8001/entities/teacher/';
+
+         return $resource(restPath + ':id', {id: '@_id'}, {
+             'getSubjects': {
+                 method: 'GET',
+                 url: restPath + ':id' + '/subject',
+                 isArray: true
+             },
+             'getClasses': {
+                 method: 'GET',
+                 url: restPath + ':id' + '/class',
+                 isArray: true
+             }
+             });
 
         /* Default behaviour:
 
@@ -27,4 +38,4 @@ angular.module('teachers')
 
          */
 
-});
+        });

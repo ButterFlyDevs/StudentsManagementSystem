@@ -13,6 +13,8 @@ SMS-Back-End/apigms/docs/build/
 
 SMS-Front-End/app/vendor/
 
+.idea/
+
 _site/
 
 lines.txt

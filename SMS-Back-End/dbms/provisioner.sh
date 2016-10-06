@@ -2,9 +2,9 @@
 
 # Provides a way to insert content to database automatically to ApiRest testing.
 
-PORT=8080
+PORT=8001
 
-mysql -u root -p'root' < APIDB/DBCreator.sql
+mysql -u root -p'root' < dbapi/DBCreator.sql
 
 
 # It inserted three teachers

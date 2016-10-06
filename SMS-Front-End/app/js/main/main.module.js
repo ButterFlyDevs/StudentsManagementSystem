@@ -7,7 +7,7 @@
 //teaching -> Teaching module
 
 
-angular.module('main', ['ngMaterial', 'ui.router', 'teachers', 'ngResource']);
+angular.module('main', ['ngMaterial', 'ui.router', 'teachers', 'subjects', 'ngResource']);
 
 
 
@@ -18,8 +18,8 @@ angular.module('main').config(function($stateProvider, $urlRouterProvider){
     $stateProvider
 
         .state('home', { url: '/home', templateUrl: 'app/views/home.html'})
-        .state('teachers', { url: '/teachers', templateUrl: 'app/views/teachers/teachersList.html'})
-        .state('teachersProfile', {url: '/teachers/:teacherId', templateUrl: 'app/views/teachers/teachersProfile.html'})
+        .state('teachers', { url: '/teachers', templateUrl: 'app/views/teaching/teachers/teachersList.html'})
+        .state('teachersProfile', {url: '/teachers/:teacherId', templateUrl: 'app/views/teaching/teachers/teachersProfile.html'})
 
   })
 

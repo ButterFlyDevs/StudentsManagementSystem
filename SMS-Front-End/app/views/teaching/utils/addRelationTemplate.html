@@ -1,0 +1,63 @@
+<md-dialog ng-cloak>
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>
+                <md-icon>add</md-icon>
+                Añadir docencia</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="vm.closeDialog()">
+                <md-icon>close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content>
+        <div class="md-dialog-content">
+
+        <md-input-container class="md-block" flex-gt-sm>
+            <label>Asignatura</label>
+            <md-select ng-model="vm.subjectSelected" >
+              <md-option ng-click="vm.subjectIsSelected(item.subjectId)" ng-repeat="item in vm.subjectsList" value="{{item.name}}">
+                {{item.name}}
+              </md-option>
+            </md-select>
+        </md-input-container>
+
+        {{ vm.classSelected }}
+        <md-input-container class="md-block" flex-gt-sm>
+            <label>Grupo</label>
+            <md-select ng-model="vm.classSelected">
+              <md-option ng-repeat="item in vm.classesLists" value="{{item.leve}}">
+                {{item.course}}
+                {{item.word}}
+                {{item.level}}
+              </md-option>
+            </md-select>
+        </md-input-container>
+
+
+        </div>
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+        <span flex></span>
+        <md-button class="" ng-click="vm.closeDialog()">
+            Cancelar
+        </md-button>
+
+
+        <!-- Add button, with all conditions -->
+
+        <md-button ng-if="vm.projects.length != 0 && vm.projects.length != vm.userProjects.length"
+                   class="md-primary md-raised" ng-click="vm.accept()"
+                   style="margin-right:20px;"> Añadir</md-button>
+
+        <!-- When there aren't projects in the system yet or the user is in all projects and needs a rest :) -->
+        <md-button ng-if="vm.projects.length == 0 || vm.projects.length == vm.userProjects.length" ng-disabled="true"
+                   class="md-primary md-raised"
+                   style="margin-right:20px;"> Añadir</md-button>
+
+
+    </md-dialog-actions>
+</md-dialog>
