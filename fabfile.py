@@ -1,44 +1,83 @@
-from fabric import *
+from fabric.api import run
+from fabric.api import local # to run local comands
+from fabric.colors import red
 
-#Fihcero fabric. Se definen todos los métodos que se usarán con fabric
-#
-#   Uso en terminal: fab <orden>
-#
-#
-#
+##########################
+#  FABRIC Fabfile.
+# This is the file to configure Fabric Python Library to admin tasks
 
-#Definir la info del servidor
-def info_servidor():
-    run ('uname -s')
+# Use:
+# fab <commands>
 
-#Se cierra todo proceso que esté corriendo  con Python (nos interesa por que google appengine corre con él)
-def pararTodo():
-    run ('kill -9 $(pidof python)')
+# How to know the commands? :
+# fab -l
 
-def lanzarTodo():
-    run ('./run')
-def lanzarServicioBD():
-    run ('google_appengine/dev_appserver.py --port=8001 --admin_port=8082 SMS-Back-End/microservicio1/microservicio1.yaml')
-def lanzarServicioControlEstdiantes():
-    run ('google_appengine/dev_appserver.py --port=8001 --admin_port=8082 SMS-Back-End/microservicio1/microservicio2.yaml')
+##########################
 
-def instalarDependenciasServicioBD():
-    run ('sudo pip install -r SMS-Back-End/microservicio1/requirements.txt')
-def instalarDependenciasServicioControlEstudiantes():
-    run ('sudo pip install -r SMS-Back-End/microservicio2/requirements.txt')
-def instalarTodasDependencias():
-    run ('sudo ')
-     run ('sudo pip install -r SMS-Back-End/microservicio1/requirements.txt')
-     run ('sudo pip install -r SMS-Back-End/microservicio2/requirements.txt')
+SMS_Back_End_default_port = '8001' # api gateway microservice default port
+SMS_Back_End_default_admin_port = '8083'
 
-def obtenerLineasProyecto():
-    run('echo \"Para contar las lineas del proyecto\"')
-    wc -l `find SMS-Front-End``find SMS-Back-End`
-def subirGAE():
-    run ('google_appengine/appcfg.py -A studentsmanagementsystem-1124 update sms/')
-def actualizarProyecto():
-    run ('git pull')
-def borrarProyecto():
-    run ('rm -rf ./*')
-def test_APIBD():
-    run ('python SMS-Back-End/microservicio1/APIDB/testUnitario.py')
+SMS_Front_End_default_port = '8080'  # Web default port
+SMS_Front_End_default_admin_port = '8082'
+
+
+def run_back_end():
+    """
+    Running SMS Back-End
+    """
+    print (red('### Running SMS Back-End in localhost in background. ###'))
+    print (red('Please look at the list below to know the microservices ports.'))
+    print (red('Note that default is apigms microservice.'))
+
+    local('google_appengine/dev_appserver.py '
+          ' --port=' + SMS_Back_End_default_port +
+          ' --admin_port=' + SMS_Back_End_default_admin_port +
+          ' SMS-Back-End/apigms/apigms.yaml '
+          'SMS-Back-End/dbms/dbms.yaml '
+          'SMS-Back-End/sce/sce.yaml &')
+
+    print (red('Thanks for your contribution!'))
+
+
+def run_front_end():
+    """
+    Running SMS Front-End
+    """
+    print (red('### Running SMS Front-End in localhost in background. ###'))
+    print (red('Please look at the list below to know the microservice ports.'))
+
+    local('google_appengine/dev_appserver.py '
+          ' --port=' + SMS_Front_End_default_port +
+          ' --admin_port=' + SMS_Front_End_default_admin_port +
+          ' SMS-Front-End/app.yaml &')
+
+    print (red('Thanks for your contribution!'))
+
+
+def run_mysql():
+    print (red('### Running MySQL daemon. ###'))
+    local('sudo /etc/init.d/mysql start')
+
+
+def data_provision():
+    print (red('### Provisioning example data to system. ###'))
+    pass
+
+
+def run_all():
+    """
+    Run entire project, included MySQL daemon, SMS Front-End dev_server and Back-End dev_server.
+    """
+    run_mysql()  # Run database engine
+    run_back_end()  # Run all microservices in Back End
+    run_front_end()  # Run Front End
+    data_provision()  # Fill the system with example data.
+
+
+def kill_all():
+    """
+    Kill all processes that is related with google dev servers.
+    """
+    print (red("Kill all processes that are related with google dev server."))
+    local("kill -9 $(ps -aux | grep google | awk '{ print $2 }' | head -n -1)")
+
