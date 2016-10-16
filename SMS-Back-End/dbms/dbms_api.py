@@ -45,8 +45,9 @@ class MyEncoder(json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
-            #Also obj.isoformat(), is some places people prefer this.
-            return obj.ctime()
+            # We can select between two formats, is some places people prefer iso.
+            return obj.ctime()  # Example: Sun Oct 16 08:23:29 2016
+            # return obj.isoformat()  # Example: '2016-10-16T08:23:02
 
         return json.JSONEncoder.default(self, obj)
 
@@ -60,13 +61,12 @@ def process_response(response):
 
     MySQL error standard codes that is processed.
         1452: Cannot add or update a child row: a foreign key constraint fails
-        1054: unknown column
+        1054 unknown column, is when a value isn't a column in database
         1062: Duplicate entry
         1065: Query was empty
+        1146: Table x doesn't exist.
 
     """
-
-    print locals()
 
     if response['status'] == 1:
         # return json.dumps(response['data'], cls=MyEncoder)
@@ -80,11 +80,8 @@ def process_response(response):
 
         return rews
 
-
-
-
     # The element that it searched doesn't exists.
-    elif response['status'] == -1 or response['status'] == 1452 or response['status'] == 1054 or response['status'] == 1065:
+    elif response['status'] in [-1, 1452, 1054, 1065, 1146]:
         abort(404) # Is returned standard "Not found" error.
 
     # 1062 is a error code directly from MySQL driver.
@@ -93,10 +90,6 @@ def process_response(response):
         # 409 Conflict because the item already exists in database and the user can't create another
         # resource with the same values.
         abort(409)
-
-    # Bad request, some of keys are incorrect or fault. # 1054 is when a value isn't a column in database
-    elif response['status'] is 1054 or  response['status'] is 1146:
-        abort(400)
 
     else:
         # Another problem that we don't have identified.
@@ -116,7 +109,8 @@ def test():
     Example of use:
     curl -i -X GET localhost:8002/test
     """
-    return json.dumps({'status: ': 'ok'})
+    return json.dumps({'dbms_api_test_status': 'ok'})
+
 
 #################################
 #   Resources about entities    #
@@ -243,10 +237,16 @@ def put_entity(kind):
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['GET']) #Si pedimos una entidad concreta de un tipo
 def get_entities(kind, entity_id=None):
     """
-    curl  -i -X GET localhost:8002/entities/student
-    curl  -i -X GET  localhost:8002/entities/student/1
+    Retrieve info about entities, a list of all of them with all info or specific params or all data from one.
+
+    Example of use:
+
+    curl  -i -X GET localhost:8002/entities/student  -> All items of student list with all data
+    curl  -i -X GET localhost:8002/entities/student?params=name  -> Only params sent from all students
+    curl  -i -X GET  localhost:8002/entities/student/1  -> All data from student with id = 1
     """
-    return process_response(entitiesManager.get(kind, entity_id))
+
+    return process_response(entitiesManager.get(kind, entity_id, request.args.get('params', None)))
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])

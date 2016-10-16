@@ -16,6 +16,8 @@ import dbParams
 import datetime
 from termcolor import colored
 
+import pytz
+
 # Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
 apiName = '\n## API DB ##\n'
@@ -61,8 +63,13 @@ class entitiesManager:
         db = dbParams.conecta()
         return_dic = {}
 
+        now = datetime.datetime.utcnow()
+        tz = pytz.timezone('Europe/Madrid')
+        tzoffset = tz.utcoffset(now)
+        mynow = now+tzoffset
+
         control_fields = {'createdBy': 1,
-                          'createdAt': datetime.datetime.now(),
+                          'createdAt': mynow,
                           'deleted': 0}
 
         query = 'insert into ' + str(kind) + ' (' + str(kind) + 'Id, '
@@ -118,7 +125,7 @@ class entitiesManager:
 
             if cursor.execute(retrieve_query) == 1: # If query obtain one element.
                 row = cursor.fetchone()
-                # None values are not necesary.
+                # None values are not necessary.
                 row = dict((k, v) for k, v in row.iteritems() if v)
 
                 print colored(row, 'magenta')
@@ -135,12 +142,13 @@ class entitiesManager:
         return return_dic
 
     @classmethod
-    def get(cls, kind, entity_id=None):
+    def get(cls, kind, entity_id=None, params=None):
         """
         Return entities from the database, all info about one or a summary list of all of a specific kind.
 
         :param kind: Type of data, student, teacher, class, etc.
         :param entity_id: Entity id that we want retrieve. Can be None, in this case we want all entities of this kind.
+        :param params: When we want retrieve a list with specific data from entities we pass here.
         :return: A dict with all info about one or a list with dicts.
         """
 
@@ -157,24 +165,24 @@ class entitiesManager:
         # and whe don't want all info, only the most relevant, name and id.
         if entity_id is None:
 
-            query += str(kind) + 'Id, '
 
-            # Depending of the data type, summary can be one either.
-            if kind == 'student' or kind == 'teacher':
-                query += 'name, surname, profileImageUrl '
-            if kind == 'class':
-                query += 'course, word, level '
-            if kind == 'subject':
-                query += 'name '
+            if params is not None:
 
-            if kind == 'association':
-                query += 'classId, subjectId '
-            if kind == 'impart':
-                query += 'associationId, teacherId '
-            if kind == 'enrollment':
-                query += 'studentId, associationId '
+                # It always included entity id.
+                query += str(kind) + 'Id, '
 
-            query += 'from ' + str(kind) + ' where deleted = 0;'
+                print colored(params, 'red')
+                list_params = str(params).split(',')
+                print list_params
+                for param in list_params:
+                    query += param + ', '
+
+                query = query[:-2]
+
+            else:
+                query += ' * '
+
+            query += ' from ' + str(kind) + ' where deleted = 0;'
 
         # We want all info about one entity.
         else:

@@ -39,9 +39,16 @@ def run_back_end():
     print (red('Thanks for your contribution!'))
 
 
+def run_dbms_api_test():
+    """
+    Run dbms api test
+    """
+    local('pytest -s SMS-Back-End/dbms/test/pytest')
+
+
 def run_front_end():
     """
-    Running SMS Front-End
+    Run SMS Front-End in local.
     """
     print (red('### Running SMS Front-End in localhost in background. ###'))
     print (red('Please look at the list below to know the microservice ports.'))
@@ -61,7 +68,7 @@ def run_mysql():
 
 def data_provision():
     print (red('### Provisioning example data to system. ###'))
-    pass
+    from provisioner import *
 
 
 def run_all():
@@ -72,7 +79,6 @@ def run_all():
     run_back_end()  # Run all microservices in Back End
     run_front_end()  # Run Front End
     data_provision()  # Fill the system with example data.
-
 
 def kill_all():
     """

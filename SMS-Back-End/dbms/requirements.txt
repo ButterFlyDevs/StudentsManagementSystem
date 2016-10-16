@@ -8,3 +8,4 @@ Flask-Testing>=0.4.1
 unittest2>=0.5
 jsonpickle
 termcolor
+pytz
