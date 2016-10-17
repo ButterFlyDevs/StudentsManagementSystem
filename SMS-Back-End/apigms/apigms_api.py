@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, jsonify, request, Response, make_response
+from flask import Flask, request, Response, make_response
 import json
 from google.appengine.api import modules
 import urllib2
 from termcolor import colored
+
+import requests
+import requests_toolbelt.adapters.appengine
+
+# Use the App Engine Requests adapter. This makes sure that Requests uses
+# URLFetch.
+requests_toolbelt.adapters.appengine.monkeypatch()
 
 app = Flask(__name__)
 
 # Activating verbose mode
 v = 1
 
-#DEFAULT PORT TO THIS microService in local: 8001
+# DEFAULT PORT TO THIS microService in local: 8001
 
 microservice_name = '\n ## dbms Data Base mService ##'
 
@@ -36,7 +43,8 @@ def ping(url, payload=None, method=None):
 
     else:
         # We need send data with json format and by default is POST
-        request = urllib2.Request(url, data=json.dumps(payload.get_json()), headers={'Content-Type': 'application/json'})
+        request = urllib2.Request(url, data=json.dumps(payload.get_json()),
+                                  headers={'Content-Type': 'application/json'})
         # We can force to PUT if is the method that we need
         if method is 'PUT':
             request.get_method = lambda: "PUT"
@@ -47,7 +55,7 @@ def ping(url, payload=None, method=None):
     return response
 
 
-@app.route('/test',methods=['GET'])
+@app.route('/test', methods=['GET'])
 def test():
     """
      Test resource.
@@ -55,22 +63,13 @@ def test():
     :return:
 
      Example of use:
-        curl -i -X GET localhost:8002/test
+        curl -i -X GET localhost:8001/test
     """
-
-    url = "http://%s/" % modules.get_hostname(module='dbms')
-    url += 'test'
-
-    req = urllib2.Request(url)
-    f = urllib2.urlopen(req)
-    response = f.read()
-    f.close()
-
-    return response
-
+    response = requests.get("http://%s/test" % modules.get_hostname(module='dbms'))
+    return make_response(response.content, response.status_code)
 
 @app.route('/entities/<string:kind>', methods=['POST'])
-def put_entity(kind):
+def post_entity(kind):
     """
     Data Base micro Service Resource connector, put all kind of entities in this mService.
 
@@ -79,13 +78,13 @@ def put_entity(kind):
     :return:
 
      Example of use:
-      curl -H "Content-Type: application/json" -X POST -d '{ "data": {"name": "María"} }' localhost:8001/entities/student
+      curl -i -H "Content-Type: application/json" -X POST -d '{ "data": {"name": "María"} }' localhost:8001/entities/student
+      curl -i -H "Content-Type: application/json" -X POST -d '{ "data": {"course": 1, "word": "B", "level": "ESO"} }' localhost:8001/entities/class
 
     """
-
-    url = 'http://' + str(modules.get_hostname(module='dbms')) + '/' + 'entities/' + str(kind)
-
-    return ping(url=url, payload=request, method='POST')
+    response = requests.post(url='http://' + str(modules.get_hostname(module='dbms')) + '/entities/' + str(kind),
+                             json=request.get_json())
+    return make_response(response.content, response.status_code)
 
 
 @app.route('/entities/<string:kind>', methods=['GET'])
@@ -106,11 +105,17 @@ def get_entities(kind, entity_id=None):
     """
 
     url = 'http://' + str(modules.get_hostname(module='dbms')) + '/' + 'entities/' + str(kind)
-
     if entity_id is not None:
         url += '/' + str(entity_id)
 
-    return ping(url)
+    params = request.args.get('params', None)
+    if params != None:
+        print params
+        url += '?params='+str(params)
+
+    response = requests.get(url)
+    return make_response(response.content, response.status_code)
+
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
@@ -123,7 +128,7 @@ def update_entities(kind, entity_id):
     :return:
 
     Exampe of use:
-     # curl -H "Content-Type: application/json" -X PUT -d '{ "data": {"name": "NombreModificado"} }' localhost:8001/entities/teacher/1
+     # curl -H "Content-Type: application/json" -X PUT -d '{ "data": {"name": "nameModified", "surname": "surnameModified"} }' localhost:8001/entities/teacher/1
     """
 
     url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id)
@@ -154,11 +159,10 @@ def get_related_entities(kind, entity_id, related_kind):
        curl -i -X GET localhost:8001/entities/student/1/teacher
     """
 
-    url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id) + '/' + str(related_kind)
+    url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id) + '/' + str(
+        related_kind)
     return ping(url=url)
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-

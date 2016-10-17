@@ -118,7 +118,7 @@ def test():
 
 
 @app.route('/entities/<string:kind>', methods=['POST'])
-def put_entity(kind):
+def post_entity(kind):
     """
     Insert a entity in the database, with a special input format:
 
@@ -245,7 +245,6 @@ def get_entities(kind, entity_id=None):
     curl  -i -X GET localhost:8002/entities/student?params=name  -> Only params sent from all students
     curl  -i -X GET  localhost:8002/entities/student/1  -> All data from student with id = 1
     """
-
     return process_response(entitiesManager.get(kind, entity_id, request.args.get('params', None)))
 
 

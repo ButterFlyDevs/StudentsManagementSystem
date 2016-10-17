@@ -1,6 +1,7 @@
 from fabric.api import run
 from fabric.api import local # to run local comands
 from fabric.colors import red
+from provisioner import example_data_provisioner
 
 ##########################
 #  FABRIC Fabfile.
@@ -43,8 +44,13 @@ def run_dbms_api_test():
     """
     Run dbms api test
     """
-    local('pytest -s SMS-Back-End/dbms/test/pytest')
+    local('pytest -s SMS-Back-End/dbms/test')
 
+def run_apigms_api_test():
+    """
+    Run apigms api test
+    """
+    local('pytest -s SMS-Back-End/apigms/test')
 
 def run_front_end():
     """
@@ -62,13 +68,16 @@ def run_front_end():
 
 
 def run_mysql():
+    """
+    Start mysql daemon.
+    """
     print (red('### Running MySQL daemon. ###'))
     local('sudo /etc/init.d/mysql start')
 
 
 def data_provision():
     print (red('### Provisioning example data to system. ###'))
-    from provisioner import *
+    example_data_provisioner.run()
 
 
 def run_all():
