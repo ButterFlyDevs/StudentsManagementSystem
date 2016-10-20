@@ -1,5 +1,5 @@
 angular.module('teachers')
-    .controller('teachersProfileController',function($scope, $stateParams, $mdDialog, TeachersService){
+    .controller('teachersProfileController',function($scope, $resource, $stateParams, $mdDialog, TeachersService){
 
             var vm = this;
 

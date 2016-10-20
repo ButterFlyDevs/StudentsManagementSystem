@@ -2,6 +2,7 @@ from fabric.api import run
 from fabric.api import local # to run local comands
 from fabric.colors import red
 from provisioner import example_data_provisioner
+import time
 
 ##########################
 #  FABRIC Fabfile.
@@ -76,8 +77,8 @@ def run_mysql():
 
 
 def data_provision():
-    print (red('### Provisioning example data to system. ###'))
     example_data_provisioner.run()
+    #example_data_provisioner.test()
 
 
 def run_all():
@@ -87,6 +88,7 @@ def run_all():
     run_mysql()  # Run database engine
     run_back_end()  # Run all microservices in Back End
     run_front_end()  # Run Front End
+    time.sleep(5)
     data_provision()  # Fill the system with example data.
 
 def kill_all():

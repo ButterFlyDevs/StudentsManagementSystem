@@ -27,8 +27,8 @@ class TestClass:
         dir = os.getcwd().split('/')[-1]
 
         sentence = 'mysql -u root -p\'root\' <'
-        if dir == 'pytest':
-            sentence += ' ../../../dbms/dbapi/DBCreator.sql'
+        if dir == 'test':
+            sentence += ' ../../dbms/dbapi/DBCreator.sql'
         elif dir == 'StudentsManagementSystem':
             sentence += ' SMS-Back-End/dbms/dbapi/DBCreator.sql'
 
@@ -74,7 +74,6 @@ class TestClass:
         assert response_data.get('name', None) != None
         assert response_data.get('studentId', None) != None
         assert response_data.get('createdAt', None) != None
-
 
     def test_post_entities(self):
         url = urlBase + '/entities'
@@ -123,9 +122,7 @@ class TestClass:
             # Check status code:
             assert response.status_code == 200
 
-
-
-        # Now check the possible errors:
+        # Now is checked the possible errors:
         response = requests.post(url + '/class', json={'data': {'course': 1, 'word': u'B', 'level': u'ESO'}})
         assert response.status_code == 409  # 409 Conflict: this resource already exists and can't be create again.
 
@@ -137,6 +134,43 @@ class TestClass:
         assert response.status_code == 404
         # 404 Not found: this resource can't be created because the resource "classes" doesn't exists.
 
+    def test_get_related_entities(self):
 
+        url = urlBase + '/entities'
 
+        # Now is checked the relations between classes and subjects
+        class_response = requests.post(url + '/class', json={'data': {'course': 2, 'word': u'B', 'level': u'ESO'}})
+        assert class_response.status_code == 200
+        subject_response = requests.post(url + '/subject', json={'data': {'name': u'Chinesse'}})
+        assert subject_response.status_code == 200
 
+        # Now, we associate the class just saved and the subject just saved.
+        association_response = requests.post(url + '/association',
+                                             json={'data': {'classId': class_response.json().get('classId'),
+                                                            'subjectId': subject_response.json().get('subjectId')
+                                                            }})
+
+        assert association_response.status_code == 200
+
+        # If it tried to save the same relation again isn't possible.
+        association_response = requests.post(url + '/association',
+                                             json={'data': {'classId': class_response.json().get('classId'),
+                                                            'subjectId': subject_response.json().get('subjectId')
+                                                            }})
+        assert association_response.status_code == 409  # The relation already exists
+
+        # Get all subjects related with this class (class posted before)
+        response = requests.get(url + '/class/' + str(class_response.json().get('classId'))+'/subject')
+        # And check if the subject is retrieved fine.
+        assert len(response.json()) == 1  # Only a subject is related with this class
+        # The exactly subject that it related with this class is retrieved.
+        assert any(subject['subjectId'] == subject_response.json().get('subjectId') for subject in response.json())
+
+        # If I can get the teachers that impart class in this class we should have a empty list
+        response = requests.get(url + '/class/' + str(class_response.json().get('classId'))+'/teacher')
+        assert response.status_code == 200
+        assert len(response.json()) == 0
+
+        # If I make an error in the request (writing teachers instead of teacher) I should have an error too.
+        response = requests.get(url + '/class/' + str(class_response.json().get('classId')) + '/teachers')
+        assert response.status_code == 404  # The table teachers is not founded in the system.

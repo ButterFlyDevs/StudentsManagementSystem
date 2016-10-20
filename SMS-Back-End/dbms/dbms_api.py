@@ -65,6 +65,7 @@ def process_response(response):
         1062: Duplicate entry
         1065: Query was empty
         1146: Table x doesn't exist.
+        -1:   When don't exists result, as a in a retrieved "related" data when there aren't related info.
 
     """
 

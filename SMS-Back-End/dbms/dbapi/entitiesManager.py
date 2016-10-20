@@ -41,6 +41,9 @@ def sql_execute(cursor, query): # References
         except IndexError:
             print "MySQL Error: %s" % str(e)
 
+    #print 'status_value: ' + colored(status_value, 'red')
+    #print 'num_elements: ' + colored(num_elements, 'red')
+
     return status_value, num_elements
 
 class entitiesManager:
@@ -308,17 +311,6 @@ class entitiesManager:
     def get_related(cls, kind, entity_id, related_kind):
         """Devuelve una lista de diccionarios con la información pedida."""
 
-        """
-        getEntidadesRelacioandas(tipoBase='Alumno', idEntidad='1', tipoBusqueda='Profesor')
-            Devuelve todos los profesores que imparten clase a ese alumno.
-        getEntidadesRelacionadas(tipoBase='Alumno', idEntidad='1', tipoBusqueda='Asignatura')
-            Devuelve todas las asignaturas en la que está matriculado ese alumno.
-        getEntidadesRelacionadas(tipoBase='Alumno', idEntidad='1', tipoBusqueda='Clases')
-            Devuelve todas las clases en las que está matriculado ese alumno.
-
-        Toda la información de las entidades se devuelve en su versión resumida.
-        """
-
         kind = str(kind)
         entity_id = str(entity_id)
         related_kind = str(related_kind)
@@ -374,20 +366,17 @@ class entitiesManager:
 
         if status_value == 1:
 
+            entities_list = []
+
             if num_elements > 0:
 
                 row = cursor.fetchone()
-                entities_list = []
                 while row is not None:
                     row = dict((k, v) for k, v in row.iteritems() if v)  # To delete None values
                     entities_list.append(row)
                     row = cursor.fetchone()
 
-                print entities_list
-                return_dic['data'] = entities_list
-
-            else: # If doesn't exists.
-                status_value = -1
+            return_dic['data'] = entities_list
 
         return_dic['status'] = status_value
 

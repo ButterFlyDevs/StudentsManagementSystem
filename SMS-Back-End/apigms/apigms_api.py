@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, request, Response, make_response
+from flask.ext.cors import CORS, cross_origin
 import json
 from google.appengine.api import modules
 import urllib2
@@ -14,6 +15,11 @@ import requests_toolbelt.adapters.appengine
 requests_toolbelt.adapters.appengine.monkeypatch()
 
 app = Flask(__name__)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+cors = CORS(app, resources={r"/foo": {"origins": "localhost"}})
+
+
 
 # Activating verbose mode
 v = 1
@@ -68,7 +74,9 @@ def test():
     response = requests.get("http://%s/test" % modules.get_hostname(module='dbms'))
     return make_response(response.content, response.status_code)
 
+
 @app.route('/entities/<string:kind>', methods=['POST'])
+@cross_origin(origin='localhost',headers=['Content- Type'])
 def post_entity(kind):
     """
     Data Base micro Service Resource connector, put all kind of entities in this mService.
@@ -84,7 +92,9 @@ def post_entity(kind):
     """
     response = requests.post(url='http://' + str(modules.get_hostname(module='dbms')) + '/entities/' + str(kind),
                              json=request.get_json())
+    response.headers['Access-Control-Allow-Origin'] = "*"
     return make_response(response.content, response.status_code)
+
 
 
 @app.route('/entities/<string:kind>', methods=['GET'])
@@ -114,7 +124,9 @@ def get_entities(kind, entity_id=None):
         url += '?params='+str(params)
 
     response = requests.get(url)
-    return make_response(response.content, response.status_code)
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
 
 
 
@@ -159,9 +171,14 @@ def get_related_entities(kind, entity_id, related_kind):
        curl -i -X GET localhost:8001/entities/student/1/teacher
     """
 
-    url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id) + '/' + str(
-        related_kind)
-    return ping(url=url)
+    url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id) + '/' + str(related_kind)
+
+    response = requests.get(url)
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
+
+
 
 
 if __name__ == '__main__':
