@@ -1,11 +1,10 @@
-from fabric.api import run
-from fabric.api import local # to run local comands
+from fabric.api import local # to run local commands.
 from fabric.colors import red
 from provisioner import example_data_provisioner
 import time
 
 ##########################
-#  FABRIC Fabfile.
+#  FABRIC Fabfile.  <http://www.fabfile.org/>
 # This is the file to configure Fabric Python Library to admin tasks
 
 # Use:
@@ -47,11 +46,13 @@ def run_dbms_api_test():
     """
     local('pytest -s SMS-Back-End/dbms/test')
 
+
 def run_apigms_api_test():
     """
     Run apigms api test
     """
     local('pytest -s SMS-Back-End/apigms/test')
+
 
 def run_front_end():
     """
@@ -77,8 +78,10 @@ def run_mysql():
 
 
 def data_provision():
+    """
+    Run the data provisioning procedure using the APIGmS.
+    """
     example_data_provisioner.run()
-    #example_data_provisioner.test()
 
 
 def run_all():
@@ -90,6 +93,7 @@ def run_all():
     run_front_end()  # Run Front End
     time.sleep(5)
     data_provision()  # Fill the system with example data.
+
 
 def kill_all():
     """
