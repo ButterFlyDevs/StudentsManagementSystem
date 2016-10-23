@@ -7,7 +7,7 @@
 //teaching -> Teaching module
 
 
-angular.module('main', ['ngMaterial', 'ui.router', 'teachers', 'subjects', 'classes', 'associations', 'imparts', 'ngResource']);
+angular.module('main', ['ngMaterial', 'ui.router', 'teachers', 'students', 'subjects', 'classes', 'associations', 'imparts', 'ngResource']);
 
 
 
@@ -18,8 +18,15 @@ angular.module('main').config(function($stateProvider, $urlRouterProvider){
     $stateProvider
 
         .state('home', { url: '/home', templateUrl: 'app/views/home.html'})
+
         .state('teachers', { url: '/teachers', templateUrl: 'app/views/teaching/teachers/teachersList.html'})
         .state('teachersProfile', {url: '/teachers/:teacherId', templateUrl: 'app/views/teaching/teachers/teachersProfile.html'})
+
+        .state('students', { url: '/students', templateUrl: 'app/views/teaching/students/studentsList.html'})
+        .state('studentsProfile', {url: '/students/:studentId', templateUrl: 'app/views/teaching/students/studentsProfile.html'})
+
+        .state('subjects', { url: '/subjects', templateUrl: 'app/views/teaching/subjects/subjectsList.html'})
+        .state('subjectsProfile', {url: '/subjects/:subjectId', templateUrl: 'app/views/teaching/subjects/subjectsProfile.html'})
 
   })
 
@@ -99,11 +106,11 @@ angular.module('main').controller('AppCtrl', function($scope, $mdSidenav, $mdMed
         }, {
           name: 'Estudiantes',
           icon: 'settings',
-          link: '.home'
+          link: '.students'
         }, {
           name: 'Asignaturas',
           icon: 'settings',
-          link: '.home'
+          link: '.subjects'
         }, {
           name: 'Grupos',
           icon: 'settings',
