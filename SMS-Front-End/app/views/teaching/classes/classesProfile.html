@@ -1,0 +1,193 @@
+<div flex ng-controller="classesProfileController as vm">
+
+
+    <div layout="row" layout-align="center" ng-cloak>
+        <div flex="90" layout-padding>
+            <div  layout="row" layout-align="space-between start">
+                <md-button class="md-primary md-raised"
+                           ui-sref="classes">
+                    <md-icon>keyboard_arrow_left</md-icon>
+                    Atras
+                </md-button>
+            </div>
+
+
+            <div ng-if="vm.class == null">
+                Oups! Parece que este grupo no existe.
+            </div>
+
+            <md-card ng-if="vm.class != null" layout="column" layout-margin layout-padding>
+
+
+                <!-- We can see the layout like a row -->
+                <div layout="row" flex flex="70" layout-align="center">
+
+                    <!-- First column, with a image inside. -->
+                    <div flex="40" layout="column" layout-margin layout layout-align="center center">
+                        <div ng-switch="vm.user.img || '_undefined_'">
+                                        <img ng-switch-when="_undefined_" class="img-profile-big" src="{{ vm.defaultAvatar }}">
+                                        <img ng-switch-default class="img-profile-big"  src="{{ vm.user.img }}">
+                                    </div>
+
+                        <div layout="row">
+                            <md-button class="md-primary md-fab md-mini" aria-label="Update photo">
+                                <md-icon>replay</md-icon>
+                            </md-button>
+
+                            <md-button class="md-primary md-fab md-mini" aria-label="Remove photo">
+                                <md-icon>delete</md-icon>
+                            </md-button>
+                        </div>
+
+                    </div>
+
+                    <!-- Second column, with user data inside. -->
+                    <div flex="60" layout="column">
+                        <form name="userForm">
+                            <div layout layout-sm="column">
+                                <md-input-container flex>
+                                    <label layout="">Curso</label>
+                                    <input ng-model="vm.class.course" required>
+                                </md-input-container>
+                                <md-input-container flex>
+                                    <label layout="">Grupo</label>
+                                    <input ng-model="vm.class.word" required>
+                                </md-input-container>
+                                <md-input-container flex>
+                                    <label layout="">Nivel</label>
+                                    <input ng-model="vm.class.level" required>
+                                </md-input-container>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+
+                <!-- A line divisor -->
+                <!-- <md-divider layout-margin></md-divider> -->
+
+                <!-- Academic related user info section -->
+                <div layout="column">
+
+                    <div class="margin-top-medium">
+                        <span flex class="md-headline" layout-margin>Docencia</span>
+                    </div>
+
+
+                    <!-- Section with three columns -->
+
+
+                    <div layout="column">
+                      <!-- A line divisor -->
+
+                        <md-divider layout-margin></md-divider>
+
+
+                    <div class="margin-top-medium">
+                        <span flex class="md-title" layout-margin>Asignaturas</span>
+                    </div>
+
+                        <!-- If the class have a subjects -->
+                        <div ng-if="vm.teacherSubjects.length != 0">
+
+                            <md-list>
+
+                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherSubjects" ng-click="null">
+                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ item.name }}</h3>
+                                        <h4>OtraCosa</h4>
+                                        <p>OtrasCosaMas</p>
+                                    </div>
+                                </md-list-item>
+
+                            </md-list>
+
+                        </div>
+
+                        <!-- If the subject hasn't any association doing still -->
+                        <div ng-if="vm.teacherSubjects.length == 0">
+                            <span>Este profesor aún no imparte ninguna asignatura. </span>
+                        </div>
+
+
+                    <div class="margin-top-medium">
+                        <span flex class="md-title" layout-margin>Grupos</span>
+                    </div>
+
+                        <!-- If the subject have a classes -->
+                        <div ng-if="vm.teacherClasses.length != 0">
+
+                            <md-list>
+
+                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherClasses" ng-click="null">
+                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ item.course }} º {{ item.word }} {{ item.level}}</h3>
+                                    </div>
+                                </md-list-item>
+
+                            </md-list>
+
+                        </div>
+
+                        <!-- If the subject hasn't any association doing still -->
+                        <div ng-if="vm.teacherClasses.length == 0">
+                            <span>Este profesor aún no da clase en ningún grupo. </span>
+                        </div>
+
+
+                    <div class="margin-top-medium">
+                        <span flex class="md-title" layout-margin>Estudiantes</span>
+                    </div>
+
+
+
+
+                    </div>
+
+
+
+                </div>
+
+                <!-- Button to add new project to user. -->
+                        <div access='admin' layout="row">
+                            <md-button class="md-primary md-raised" ng-click="vm.addRelation()"">
+                                <md-icon>add</md-icon>
+                                Añadir docencia</md-button>
+                        </div>
+
+
+                <md-divider layout-margin></md-divider>
+
+                <div class="margin-top-large">
+                    <!-- Action buttons-->
+                    <div class="md-actions" layout="row" layout-align="end center">
+
+                        <!-- Button to save user changes -->
+                        <md-button class="md-primary md-raised"
+                                   ng-click="vm.saveRelation()">
+                            <md-icon>save</md-icon>
+                            Guardar
+                        </md-button>
+
+                        <!-- Button that delete user, with confirmation message before -->
+                        <md-button class="md-warn md-raised" ng-click="vm.showConfirm(1, vm.user._id)">
+                            <md-icon>delete</md-icon>
+                            Eliminar
+                        </md-button>
+
+
+                    </div>
+
+                </div>
+
+
+
+            </md-card>
+
+        </div>
+    </div>
+
+</div>

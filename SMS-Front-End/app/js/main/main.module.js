@@ -28,6 +28,9 @@ angular.module('main').config(function($stateProvider, $urlRouterProvider){
         .state('subjects', { url: '/subjects', templateUrl: 'app/views/teaching/subjects/subjectsList.html'})
         .state('subjectsProfile', {url: '/subjects/:subjectId', templateUrl: 'app/views/teaching/subjects/subjectsProfile.html'})
 
+        .state('classes', { url: '/classes', templateUrl: 'app/views/teaching/classes/classesList.html'})
+        .state('classesProfile', {url: '/classes/:classId', templateUrl: 'app/views/teaching/classes/classesProfile.html'})
+
   })
 
 
@@ -114,7 +117,7 @@ angular.module('main').controller('AppCtrl', function($scope, $mdSidenav, $mdMed
         }, {
           name: 'Grupos',
           icon: 'settings',
-          link: '.home'
+          link: '.classes'
         }]
       }, {
         name: 'Control Estudiantes',

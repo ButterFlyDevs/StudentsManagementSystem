@@ -1,0 +1,53 @@
+<md-dialog ng-cloak>
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2><md-icon>add</md-icon>Nueva Clase</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="vm.closeDialog()">
+                <md-icon>close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content>
+        <div class="md-dialog-content">
+            <form name="newClassForm">
+
+                    <div layout layout-sm="column">
+
+                        <md-input-container flex>
+                            <label layout="">Curso</label>
+                            <input ng-model="vm.class.data.course" required>
+                        </md-input-container>
+
+                        <md-input-container flex>
+                            <label layout="">Grupo</label>
+                            <input ng-model="vm.class.data.word" required>
+                        </md-input-container>
+
+                        <md-input-container flex>
+                            <label layout="">Nivel</label>
+                            <input ng-model="vm.class.data.level" required>
+                        </md-input-container>
+
+                    </div>
+
+
+            </form>
+        </div>
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+        <span flex></span>
+        <md-button class="" ng-click="vm.closeDialog()">
+            Cancelar
+        </md-button>
+        <md-button class="md-primary md-raised" ng-disabled="createUserForm.$invalid" ng-click="vm.saveClass()"
+                   style="margin-right:20px;">
+            Guardar
+        </md-button>
+    </md-dialog-actions>
+
+
+</md-dialog>
