@@ -14,8 +14,11 @@ angular.module('teachers')
                  method: 'GET',
                  url: restPath + ':id' + '/class',
                  isArray: true
+             },
+             'update': {
+                 method: 'PUT' // this method issues a PUT request
              }
-             });
+         });
 
         /* Default behaviour:
 

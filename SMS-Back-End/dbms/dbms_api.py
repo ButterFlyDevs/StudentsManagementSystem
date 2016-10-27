@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, request, jsonify, Response
+from flask.ext.cors import CORS, cross_origin
 from flask import abort, make_response
 from flask import request
 import jsonpickle
-
 import logging
+from logging.handlers import RotatingFileHandler
+
+
 
 from dbapi.entitiesManager import entitiesManager
 from dbapi.GestorCredencialesSQL import GestorCredenciales
@@ -21,7 +24,34 @@ import json
 from termcolor import colored
 
 
+class HTTPMethodOverrideMiddleware(object):
+    allowed_methods = frozenset([
+        'GET',
+        'HEAD',
+        'POST',
+        'DELETE',
+        'PUT',
+        'PATCH',
+        'OPTIONS'
+    ])
+    bodyless_methods = frozenset(['GET', 'HEAD', 'OPTIONS', 'DELETE'])
+
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        method = environ.get('HTTP_X_HTTP_METHOD_OVERRIDE', '').upper()
+        if method in self.allowed_methods:
+            method = method.encode('ascii', 'replace')
+            environ['REQUEST_METHOD'] = method
+        if method in self.bodyless_methods:
+            environ['CONTENT_LENGTH'] = '0'
+        return self.app(environ, start_response)
+
+
 app = Flask(__name__)
+app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
+
 
 #file_handler = logging.FileHandler('app.log', 'rw')
 #app.logger.addHandler(file_handler)
@@ -53,6 +83,9 @@ class MyEncoder(json.JSONEncoder):
 
 
 def process_response(response):
+
+    print 'HERE'
+
     """
     Function to build a response with sense.
     :param self:
@@ -77,7 +110,10 @@ def process_response(response):
 
         rews = make_response(res)
 
-        rews.headers['Access-Control-Allow-Origin'] = "*"
+       # rews.headers['Access-Control-Allow-Origin'] = "*"
+       # rews.headers['Access-Control-Allow-Origin'] = "*"
+       # rews.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+       # rews.headers['allow'] = 'GET, POST, PUT, DELETE, OPTIONS'
 
         return rews
 
@@ -99,6 +135,10 @@ def process_response(response):
 #####################################################
 #  Definition of Data Base micro Service REST API   #
 #####################################################
+
+
+
+
 
 
 # Test method.
@@ -257,7 +297,11 @@ def update_entities(kind, entity_id):
 
     raw_data = request.get_json()
 
-    print colored('mSDBapi.update_entities', 'green')
+    print colored('dbms.apigms_api.update_entities', 'green')
+    print colored(request.headers, 'green')
+
+    app.logger.info('hi')
+
     print colored(raw_data, 'green')
 
     data = raw_data.get('data', None)
@@ -271,6 +315,7 @@ def update_entities(kind, entity_id):
                 data[key] = value.encode('utf-8')
 
     return process_response(entitiesManager.update(kind, entity_id, data))
+
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['DELETE'])
@@ -336,4 +381,8 @@ def comprobarAccesoUsuario():
     return jsonpickle.encode(salida)
 
 if __name__ == '__main__':
+    handler = RotatingFileHandler('dbms_api_log.log', maxBytes=10000, backupCount=1)
+    handler.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
     app.run(debug=True)
+

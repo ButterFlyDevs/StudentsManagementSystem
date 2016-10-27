@@ -10,6 +10,10 @@ from termcolor import colored
 import requests
 import requests_toolbelt.adapters.appengine
 
+
+from datetime import timedelta
+from flask import make_response, request, current_app
+from functools import update_wrapper
 # Use the App Engine Requests adapter. This makes sure that Requests uses
 # URLFetch.
 requests_toolbelt.adapters.appengine.monkeypatch()
@@ -19,6 +23,48 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 cors = CORS(app, resources={r"/foo": {"origins": "localhost"}})
 
+
+
+def crossdomain(origin=None, methods=None, headers=None,
+                max_age=21600, attach_to_all=True,
+                automatic_options=True):
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, basestring):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, basestring):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        if methods is not None:
+            return methods
+
+        options_resp = current_app.make_default_options_response()
+        return options_resp.headers['allow']
+
+    def decorator(f):
+        def wrapped_function(*args, **kwargs):
+            if automatic_options and request.method == 'OPTIONS':
+                resp = current_app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+
+            h = resp.headers
+
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+    return decorator
 
 
 # Activating verbose mode
@@ -129,8 +175,8 @@ def get_entities(kind, entity_id=None):
     return response
 
 
-
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
+#@crossdomain(origin='*')
 def update_entities(kind, entity_id):
     """
     Data Base micro Service Resource connector, to update all kind of entities in this mService.
@@ -143,9 +189,32 @@ def update_entities(kind, entity_id):
      # curl -H "Content-Type: application/json" -X PUT -d '{ "data": {"name": "nameModified", "surname": "surnameModified"} }' localhost:8001/entities/teacher/1
     """
 
-    url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id)
-    return ping(url=url, payload=request, method='PUT')
 
+
+    #response = requests.put(url='http://' + str(modules.get_hostname(module='dbms')) + '/entities/' + str(kind),
+                             #json=request.get_json())
+
+    """response.headers['Access-Control-Allow-Origin'] = "*"
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Allow'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    return make_response(response.content, response.status_code)
+    """
+    headers = {'allow': 'PUT'}
+    response = requests.put(url='http://' + str(modules.get_hostname(module='dbms')) + '/entities/' + str(kind),
+                            json=request.get_json(), headers=headers)
+
+    print colored(response.request.headers, 'blue')
+
+    #print colored(response.text, 'red')
+    print colored(response.headers, 'red')
+
+    response.headers['Allow'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response = make_response(response.content, response.status_code)
+    #response.headers['Access-Control-Allow-Origin'] = "*"
+    #response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['allow'] = 'GET, POST, PUT, DELETE, OPTIONS'
+
+    return response
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['DELETE'])
 def delete_entity(kind, entity_id):

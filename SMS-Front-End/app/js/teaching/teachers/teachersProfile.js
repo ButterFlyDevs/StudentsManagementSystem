@@ -7,6 +7,7 @@ angular.module('teachers')
 
             // Functions associations
             vm.addRelation = addRelation;
+            vm.saveTeacher = saveTeacher;
 
             vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
 
@@ -58,8 +59,6 @@ angular.module('teachers')
 
             }
 
-
-
             /**
              * Open the dialog to add a relation to this teacher.
              * The add action is done in addUserToProjectController
@@ -79,6 +78,14 @@ angular.module('teachers')
                     });
             }
 
+            function saveTeacher() {
+                vm.teacher.$update(function () {
+                    console.log('Teacher changes saved successfully');
+                    $mdDialog.cancel();
+                }, function(){
+                    console.log('There are any problem saving the teacher.')
+                });
+            }
 
 
 });

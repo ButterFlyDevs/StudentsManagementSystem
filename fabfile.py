@@ -84,18 +84,25 @@ def data_provision():
     example_data_provisioner.run()
 
 
-def run_all():
+def run(provision=False):
     """
     Run entire project, included MySQL daemon, SMS Front-End dev_server and Back-End dev_server.
+
+    Example of use:
+        fab run:provision=yes
     """
+
     run_mysql()  # Run database engine
     run_back_end()  # Run all microservices in Back End
     run_front_end()  # Run Front End
     time.sleep(5)
-    data_provision()  # Fill the system with example data.
+
+    if provision in ['True', 'yes', 'true']:
+        data_provision()  # Fill the system with example data.
 
 
-def kill_all():
+
+def kill():
     """
     Kill all processes that is related with google dev servers.
     """
