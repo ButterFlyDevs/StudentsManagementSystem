@@ -51,7 +51,7 @@
                                 </md-input-container>
                                 <md-input-container flex>
                                     <label layout="">Apellidos</label>
-                                    <input ng-model="vm.user.surname" required>
+                                    <input ng-model="vm.teacher.surname" required>
                                 </md-input-container>
                             </div>
 
@@ -186,7 +186,7 @@
                         </md-button>
 
                         <!-- Button that delete user, with confirmation message before -->
-                        <md-button class="md-warn md-raised" ng-click="vm.showConfirm(1, vm.user._id)">
+                        <md-button class="md-warn md-raised" ng-click="vm.showDeleteUserConfirm()">
                             <md-icon>delete</md-icon>
                             Eliminar
                         </md-button>

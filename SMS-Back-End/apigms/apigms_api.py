@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, Response, make_response
+from flask import Flask, Response
 from flask.ext.cors import CORS, cross_origin
 import json
 from google.appengine.api import modules
@@ -19,52 +19,12 @@ from functools import update_wrapper
 requests_toolbelt.adapters.appengine.monkeypatch()
 
 app = Flask(__name__)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
-cors = CORS(app, resources={r"/foo": {"origins": "localhost"}})
+#app.config['CORS_HEADERS'] = 'Content-Type'
+#cors = CORS(app, resources={r"/foo": {"origins": "localhost"}})
 
-
-
-def crossdomain(origin=None, methods=None, headers=None,
-                max_age=21600, attach_to_all=True,
-                automatic_options=True):
-    if methods is not None:
-        methods = ', '.join(sorted(x.upper() for x in methods))
-    if headers is not None and not isinstance(headers, basestring):
-        headers = ', '.join(x.upper() for x in headers)
-    if not isinstance(origin, basestring):
-        origin = ', '.join(origin)
-    if isinstance(max_age, timedelta):
-        max_age = max_age.total_seconds()
-
-    def get_methods():
-        if methods is not None:
-            return methods
-
-        options_resp = current_app.make_default_options_response()
-        return options_resp.headers['allow']
-
-    def decorator(f):
-        def wrapped_function(*args, **kwargs):
-            if automatic_options and request.method == 'OPTIONS':
-                resp = current_app.make_default_options_response()
-            else:
-                resp = make_response(f(*args, **kwargs))
-            if not attach_to_all and request.method != 'OPTIONS':
-                return resp
-
-            h = resp.headers
-
-            h['Access-Control-Allow-Origin'] = origin
-            h['Access-Control-Allow-Methods'] = get_methods()
-            h['Access-Control-Max-Age'] = str(max_age)
-            if headers is not None:
-                h['Access-Control-Allow-Headers'] = headers
-            return resp
-
-        f.provide_automatic_options = False
-        return update_wrapper(wrapped_function, f)
-    return decorator
+# With this we get that the requests (in terminal) show the method DELETE instead of OPTIONS.
+CORS(app)
 
 
 # Activating verbose mode
@@ -107,6 +67,16 @@ def ping(url, payload=None, method=None):
     return response
 
 
+
+# Function that is called after that any request
+
+"""
+@app.after_request
+def call_after_request_callbacks(response):
+    print ('LA RESPUESTA ES: ' + str(response))
+"""
+
+
 @app.route('/test', methods=['GET'])
 def test():
     """
@@ -121,8 +91,10 @@ def test():
     return make_response(response.content, response.status_code)
 
 
+
+
+
 @app.route('/entities/<string:kind>', methods=['POST'])
-@cross_origin(origin='localhost',headers=['Content- Type'])
 def post_entity(kind):
     """
     Data Base micro Service Resource connector, put all kind of entities in this mService.
@@ -132,7 +104,7 @@ def post_entity(kind):
     :return:
 
      Example of use:
-      curl -i -H "Content-Type: application/json" -X POST -d '{ "data": {"name": "María"} }' localhost:8001/entities/student
+      curl -i -H "Content-Type: application/json" -X POST -d '{ "data": {"name": "new name"} }' localhost:8001/entities/student
       curl -i -H "Content-Type: application/json" -X POST -d '{ "data": {"course": 1, "word": "B", "level": "ESO"} }' localhost:8001/entities/class
 
     """
@@ -175,45 +147,32 @@ def get_entities(kind, entity_id=None):
     return response
 
 
+
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
-#@crossdomain(origin='*')
 def update_entities(kind, entity_id):
+
     """
     Data Base micro Service Resource connector, to update all kind of entities in this mService.
+    More details in dbms.
 
-    :param kind:
-    :param entity_id:
-    :return:
+    :param kind: Type of element to modify.
+    :param entity_id: Id of entity to modify.
+    :param payload:
+
+        A json dict with any elements to change.
+
+    :return: The element modified or error status code if any problem.
 
     Exampe of use:
-     # curl -H "Content-Type: application/json" -X PUT -d '{ "data": {"name": "nameModified", "surname": "surnameModified"} }' localhost:8001/entities/teacher/1
+     # curl -H "Content-Type: application/json" -X PUT -d '{ "name": "nameModified", "surname": "surnameModified"} ' localhost:8001/entities/teacher/1
+
     """
 
+    response = requests.put(url='http://' + str(modules.get_hostname(module='dbms')) + '/entities/' + str(kind) + '/' + str(entity_id),
+                            json=request.get_json())
 
-
-    #response = requests.put(url='http://' + str(modules.get_hostname(module='dbms')) + '/entities/' + str(kind),
-                             #json=request.get_json())
-
-    """response.headers['Access-Control-Allow-Origin'] = "*"
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    response.headers['Allow'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    return make_response(response.content, response.status_code)
-    """
-    headers = {'allow': 'PUT'}
-    response = requests.put(url='http://' + str(modules.get_hostname(module='dbms')) + '/entities/' + str(kind),
-                            json=request.get_json(), headers=headers)
-
-    print colored(response.request.headers, 'blue')
-
-    #print colored(response.text, 'red')
-    print colored(response.headers, 'red')
-
-    response.headers['Allow'] = 'GET, POST, PUT, DELETE, OPTIONS'
     response = make_response(response.content, response.status_code)
-    #response.headers['Access-Control-Allow-Origin'] = "*"
-    #response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    response.headers['allow'] = 'GET, POST, PUT, DELETE, OPTIONS'
-
+    response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['DELETE'])
@@ -224,8 +183,11 @@ def delete_entity(kind, entity_id):
 
     url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id)
 
-    return ping(url=url, method='DELETE')
-
+    #return ping(url=url, method='DELETE')
+    response = requests.delete(url)
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
 
 @app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>', methods=['GET'])
 def get_related_entities(kind, entity_id, related_kind):

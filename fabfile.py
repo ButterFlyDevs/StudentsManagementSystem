@@ -84,6 +84,72 @@ def data_provision():
     example_data_provisioner.run()
 
 
+def requirements(ms=None):
+    """
+    Install all requirements for all or for some microservice.
+
+    Example of use:
+        fab requirements:ms=dbms
+        fab requirements # All system
+
+    """
+
+    def local_requirements():
+
+        commands = [
+            'apt-get install -y unzip',
+            'apt-get install -y curl',
+            'curl -O https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.30.zip',
+            'unzip google_appengine_1.9.30.zip',
+            'rm google_appengine_1.9.30.zip',
+            'apt-get install -y python-pip',
+            'pip install -r requirements.txt ',
+        ]
+
+        for command in commands:
+            local(command)
+
+
+    available_options = ['dbms', 'apigms', 'uims', 'local']
+    if ms is not None:
+        if ms in available_options:
+            if ms == available_options[0] or ms == available_options[1]:
+
+                path = 'SMS-Back-End/' + ms + '/'
+
+                command = 'pip install -r ' + path + 'requirements.txt -t ' + path + 'lib/'
+                local(command)
+
+            if ms == 'uims':
+                command = 'cd SMS-Front-End/app ; bower install'
+                local(command)
+
+            if ms == 'local':
+
+              local_requirements()
+
+        else:
+            print ms + ' microservice doesn\'t exists.'
+            print 'The avilable options are: ' + str(available_options)
+            print 'Example of use: fab requirements:ms=dbms'
+    else:
+
+        print 'Requirements in entire project.'
+
+        for a in range(0,2):
+            path = 'SMS-Back-End/' + available_options[a] + '/'
+            command = 'pip install -r ' + path + 'requirements.txt -t ' + path + 'lib/'
+            local(command)
+
+        command = 'cd SMS-Front-End/app ; bower install'
+        local(command)
+
+        # Run local requirements.
+        local_requirements()
+
+
+
+
 def run(provision=False):
     """
     Run entire project, included MySQL daemon, SMS Front-End dev_server and Back-End dev_server.

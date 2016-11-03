@@ -10,6 +10,6 @@ names
 Faker
 requests
 termcolor
-
+MySQL-python
 
 

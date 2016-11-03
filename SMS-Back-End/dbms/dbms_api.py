@@ -292,7 +292,7 @@ def get_entities(kind, entity_id=None):
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
 def update_entities(kind, entity_id):
     """
-    curl -H "Content-Type: application/json" -X PUT -d '{ "data": {"name": "NombreModificado"} }' localhost:8002/entities/teacher/1
+    curl -H "Content-Type: application/json" -X PUT -d '{ "name": "NombreModificado" }' localhost:8002/entities/teacher/1
     """
 
     raw_data = request.get_json()
@@ -302,19 +302,19 @@ def update_entities(kind, entity_id):
 
     app.logger.info('hi')
 
-    print colored(raw_data, 'green')
+    print colored(raw_data, 'red')
 
-    data = raw_data.get('data', None)
+    #data = raw_data.get('data', None)
 
-    if data is None:
+    if raw_data is None:
         abort(400)
 
-    if data is not None:
-        for key, value in data.iteritems():
+    if raw_data is not None:
+        for key, value in raw_data.iteritems():
             if type(value) is not int:
-                data[key] = value.encode('utf-8')
+                raw_data[key] = value.encode('utf-8')
 
-    return process_response(entitiesManager.update(kind, entity_id, data))
+    return process_response(entitiesManager.update(kind, entity_id, raw_data))
 
 
 
