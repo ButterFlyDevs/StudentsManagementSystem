@@ -1,5 +1,5 @@
 angular.module('teachers')
-    .controller('teachersProfileController',function($scope, $resource, $stateParams, $mdDialog, TeachersService){
+    .controller('teachersProfileController',function($scope, $resource, $state, $stateParams, $mdDialog, TeachersService, toastService){
 
             var vm = this;
 
@@ -35,28 +35,9 @@ angular.module('teachers')
             })
 
 
-            /*
-            vm.teacher = {
-                "name": "El nombre",
-                "surname": "Los apellidos",
-                "locality": "Granada",
-                "email": "correo@gmail.com",
-                "asignaturas":{
-                    "num": 2,
-                    "items": [{
-                        "name": "francés",
-                        "idAsignatura": 324
-                        },{
-                        "name": "francés",
-                        "idAsignatura": 324
-                        }
-                    ]
-                }
-            }*/
-
             activate();
 
-            ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////
             function activate() {
                 console.log('Activating teachersProfileController controller.')
 
@@ -84,12 +65,14 @@ angular.module('teachers')
 
 
 
-
             function deleteUser(){
 
 
                 vm.teacher.$delete(function(){
                             console.log('success')
+                            $state.go('teachers')
+                            toastService.showToast('Profesor eliminado')
+
                         },
                         function(){
                             console.log('fail')
