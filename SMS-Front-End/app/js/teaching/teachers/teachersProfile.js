@@ -124,84 +124,15 @@ angular.module('teachers')
         };
 
 
-
-
-
-
-
-
             function saveTeacher() {
 
-
-                console.log('Try to save')
-
-                /*
-                console.log(vm.teacherId)
-                TeachersService.update({id: vm.teacherId}, function(){
-                console.log('Teacher changes saved successfully')
-                console.log(vm.teacherClasses)
-                }, function(error){
-                    console.log('Una mierda')
-                    console.log(error)
-                })
-                */
-
-                /*
-                vm.teacherSubjects = TeachersService.update({id: vm.teacherId}, function(){
-                    console.log('Teachers subjects')
-                    console.log(vm.teacherSubjects)
-                })
-                */
-
-
-                /*
-                // El metodo funciona pero sin el id en la url
-                console.log('vm.teacher.teacherId')
-                console.log(vm.teacher.teacherId)
-
-                vm.teacher.$update(function(){
-                    console.log('success')
-                }, function(error){
-                    console.log('error')
-                    console.log(error)
-                });
-                */
-                console.log(vm.teacher.teacherId)
-                console.log(vm.teacher)
-             //   vm.teacher.data = {}
-             //   vm.teacher.data.teacherId = vm.teacherId
-                //console.log(vm.teacher)
-                //var teacher = {someProp:"Fiat", model:"500", color:"white"};
-
-                //TeachersService.update({ id:vm.teacherId}, teacher);
-
-
                  vm.teacher.$update(function(){
-                    console.log('success')
+                    console.log('Success saving the teacher.')
                     }, function(error){
-                        console.log('error')
+                        console.log('Error saving the teacher.')
                         console.log(error)
                     });
 
-            /*
-            TeachersService.update({ id:vm.teacherId}, vm.teacher, function(){
-                console.log('done')
-            }, function(error){
-                console.log('error')
-                console.log(error)
-            });
-            */
-
-
-
-                /*
-                vm.teacher.$update(function () {
-                    console.log('Teacher changes saved successfully');
-                    $mdDialog.cancel();
-                }, function(){
-                    console.log('There are any problem saving the teacher.')
-                });
-                */
             }
 
 

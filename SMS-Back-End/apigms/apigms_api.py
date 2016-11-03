@@ -20,9 +20,6 @@ requests_toolbelt.adapters.appengine.monkeypatch()
 
 app = Flask(__name__)
 
-#app.config['CORS_HEADERS'] = 'Content-Type'
-#cors = CORS(app, resources={r"/foo": {"origins": "localhost"}})
-
 # With this we get that the requests (in terminal) show the method DELETE instead of OPTIONS.
 CORS(app)
 
