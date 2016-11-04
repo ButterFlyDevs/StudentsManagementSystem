@@ -1,5 +1,5 @@
 angular.module('teachers')
-    .controller('newTeacherDialogController',function($scope, $mdDialog, TeachersService){
+    .controller('newTeacherDialogController',function($scope, $state, $mdDialog, TeachersService){
 
             var vm = this;
 
@@ -21,10 +21,11 @@ angular.module('teachers')
             }
 
             function saveTeacher(){
-                console.log('Calling save teacher function.')
+                console.log('Calling saveTeacher() function.')
                 vm.teacher.$save(function(){
-                    console.log('Save successfully');
+                    console.log('Teacher saved successfully');
                     $mdDialog.cancel();
+                    $state.reload();
                 });
             }
 

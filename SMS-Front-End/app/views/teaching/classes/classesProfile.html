@@ -167,13 +167,13 @@
 
                         <!-- Button to save user changes -->
                         <md-button class="md-primary md-raised"
-                                   ng-click="vm.saveRelation()">
+                                   ng-click="vm.updateClass()">
                             <md-icon>save</md-icon>
                             Guardar
                         </md-button>
 
                         <!-- Button that delete user, with confirmation message before -->
-                        <md-button class="md-warn md-raised" ng-click="vm.showConfirm(1, vm.user._id)">
+                        <md-button class="md-warn md-raised" ng-click="vm.showDeleteClassConfirm()">
                             <md-icon>delete</md-icon>
                             Eliminar
                         </md-button>

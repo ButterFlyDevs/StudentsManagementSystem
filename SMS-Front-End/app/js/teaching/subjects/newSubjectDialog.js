@@ -1,5 +1,5 @@
 angular.module('subjects')
-    .controller('newSubjectDialogController',function($scope, $mdDialog, SubjectsService){
+    .controller('newSubjectDialogController',function($scope, $state, $mdDialog, SubjectsService){
 
             var vm = this;
 
@@ -23,8 +23,9 @@ angular.module('subjects')
             function saveSubject(){
                 console.log('Calling save subject function.')
                 vm.subject.$save(function(){
-                    console.log('Save successfully');
+                    console.log('Subject saved successfully');
                     $mdDialog.cancel();
+                    $state.reload();
                 });
             }
 

@@ -8,8 +8,8 @@ angular.module('teachers')
 
             // Functions associations
             vm.addRelation = addRelation;
-            vm.saveTeacher = saveTeacher;
-            vm.showDeleteUserConfirm = showDeleteUserConfirm
+            vm.updateTeacher = updateTeacher;
+            vm.showDeleteTeacherConfirm = showDeleteTeacherConfirm
 
             vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
 
@@ -69,19 +69,19 @@ angular.module('teachers')
 
 
                 vm.teacher.$delete(function(){
-                            console.log('success')
+                            console.log('Teacher deleted successfully.')
                             $state.go('teachers')
-                            toastService.showToast('Profesor eliminado')
+                            toastService.showToast('Profesor eliminado.')
 
                         },
                         function(){
-                            console.log('fail')
+                            console.log('Teacher deleted process fail.')
                         });
 
             }
 
 
-            function showDeleteUserConfirm() {
+            function showDeleteTeacherConfirm() {
 
 
                 var confirm = $mdDialog.confirm()
@@ -103,11 +103,10 @@ angular.module('teachers')
                 });
 
 
+            };
 
-        };
 
-
-            function saveTeacher() {
+            function updateTeacher() {
 
                  vm.teacher.$update(function(){
                     console.log('Success saving the teacher.')

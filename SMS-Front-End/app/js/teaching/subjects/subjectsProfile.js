@@ -1,5 +1,5 @@
 angular.module('subjects')
-    .controller('subjectsProfileController',function($scope, $resource, $stateParams, $mdDialog, SubjectsService){
+    .controller('subjectsProfileController',function($scope, $resource, $state, $stateParams, $mdDialog, SubjectsService, toastService){
 
             var vm = this;
 
@@ -7,6 +7,10 @@ angular.module('subjects')
 
             // Functions associations
             //vm.addRelation = addRelation;
+
+            vm.updateSubject = updateSubject;
+            vm.showDeleteSubjectConfirm = showDeleteSubjectConfirm
+
 
             vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
 
@@ -28,6 +32,49 @@ angular.module('subjects')
 
             }
 
+
+            function deleteSubject(){
+
+                vm.subject.$delete(function(){
+                            console.log('Subject deleted successfully.')
+                            $state.go('subjects')
+                            toastService.showToast('Asignatura eliminada.')
+
+                        },
+                        function(){
+                            console.log('Subject deleted process fail.')
+                        });
+
+            }
+
+            function showDeleteSubjectConfirm() {
+
+                var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere eliminar esta asignatura?')
+                //.textContent('If you do, you will be erased from all project which you are and you can not access to app.')
+                //.ariaLabel('Lucky day')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+                $mdDialog.show(confirm).then(function () {
+                    deleteSubject();
+                    }, function () {
+                        console.log('Operacion cancelada.')
+                });
+
+            };
+
+
+            function updateSubject(){
+
+                 vm.subject.$update(function(){
+                    console.log('Subject saved successfully.')
+                    }, function(error){
+                        console.log('Error saving subject.')
+                        console.log(error)
+                    });
+
+            }
 
 
             /**

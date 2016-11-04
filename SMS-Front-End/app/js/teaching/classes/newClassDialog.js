@@ -1,5 +1,5 @@
 angular.module('classes')
-    .controller('newClassDialogController',function($scope, $mdDialog, ClassesService){
+    .controller('newClassDialogController',function($scope, $state, $mdDialog, ClassesService){
 
             var vm = this;
 
@@ -22,8 +22,9 @@ angular.module('classes')
             function saveClass(){
                 console.log('Calling save class function.')
                 vm.class.$save(function(){
-                    console.log('Save successfully');
+                    console.log('Class saved successfully');
                     $mdDialog.cancel();
+                    $state.reload();
                 });
             }
 

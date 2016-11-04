@@ -1,5 +1,5 @@
 angular.module('classes')
-    .controller('classesProfileController',function($scope, $resource, $stateParams, $mdDialog, ClassesService){
+    .controller('classesProfileController',function($scope, $resource, $state, $stateParams, $mdDialog, ClassesService, toastService){
 
             var vm = this;
 
@@ -8,6 +8,11 @@ angular.module('classes')
             console.log(vm.classId)
 
             // Functions associations
+
+            vm.updateClass = updateClass;
+            vm.showDeleteClassConfirm = showDeleteClassConfirm
+
+
             //vm.addRelation = addRelation;
 
             vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
@@ -22,39 +27,6 @@ angular.module('classes')
             })
 
 
-
-
-            /*
-            vm.teacherSubjects = StudentsService.getSubjects({id: vm.teacherId}, function(){
-                console.log('Teachers subjects')
-                console.log(vm.teacherSubjects)
-            })
-
-            vm.teacherClasses = StudentsService.getClasses({id: vm.teacherId}, function(){
-                console.log('Teachers classes')
-                console.log(vm.teacherClasses)
-            })
-            */
-
-            /*
-            vm.teacher = {
-                "name": "El nombre",
-                "surname": "Los apellidos",
-                "locality": "Granada",
-                "email": "correo@gmail.com",
-                "asignaturas":{
-                    "num": 2,
-                    "items": [{
-                        "name": "francés",
-                        "idAsignatura": 324
-                        },{
-                        "name": "francés",
-                        "idAsignatura": 324
-                        }
-                    ]
-                }
-            }*/
-
             activate();
 
             ///////////////////////////////////////////////////////////
@@ -63,26 +35,49 @@ angular.module('classes')
 
             }
 
+            function deleteClass(){
 
+                vm.class.$delete(function(){
+                            console.log('Class deleted successfully.')
+                            $state.go('classes')
+                            toastService.showToast('Grupo eliminada.')
 
-            /**
-             * Open the dialog to add a relation to this teacher.
-             * The add action is done in addUserToProjectController
+                        },
+                        function(){
+                            console.log('Class deleted process fail.')
+                        });
 
-            function addRelation() {
+            }
 
-                $mdDialog.show({
-                    locals: {parentScope: $scope, parentController: vm},
-                    controller: 'addRelationController',
-                    controllerAs: 'vm',
-                    templateUrl: 'app/views/teaching/utils/addRelationTemplate.html'
-                })
-                    .then(function () {
+            function showDeleteClassConfirm() {
 
+                var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere eliminar este grupo?')
+                //.textContent('Si lo hace todos los alumnos quedarán ')
+                //.ariaLabel('Lucky day')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+                $mdDialog.show(confirm).then(function () {
+                    deleteClass();
                     }, function () {
+                        console.log('Operacion cancelada.')
+                });
 
+            };
+
+
+
+            function updateClass(){
+
+                 vm.class.$update(function(){
+                    console.log('Class saved successfully.')
+                    }, function(error){
+                        console.log('Error saving class.')
+                        console.log(error)
                     });
-            }*/
+
+            }
 
 
 

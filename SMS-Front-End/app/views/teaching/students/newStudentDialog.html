@@ -12,18 +12,18 @@
 
     <md-dialog-content>
         <div class="md-dialog-content">
-            <form name="newTeacherForm">
+            <form name="newStudentForm">
 
                     <div layout layout-sm="column">
 
                         <md-input-container flex>
                             <label layout="">Nombre</label>
-                            <input ng-model="vm.teacher.data.name" required>
+                            <input ng-model="vm.student.data.name" required>
                         </md-input-container>
 
                         <md-input-container flex>
                             <label layout="">Apellidos</label>
-                            <input ng-model="vm.teacher.data.surname" required>
+                            <input ng-model="vm.student.data.surname" required>
                         </md-input-container>
 
                     </div>
@@ -31,14 +31,14 @@
                     <div layout layout-sm="column">
                         <md-input-container flex="50">
                             <label layout="">Residencia</label>
-                            <input ng-model="vm.teacher.data.city" required>
+                            <input ng-model="vm.student.data.address" required>
                         </md-input-container>
                     </div>
 
                     <div layout layout-sm="column">
                         <md-input-container flex>
                             <label layout="">Email</label>
-                            <input ng-model="vm.teacher.data.email" type="email">
+                            <input ng-model="vm.student.data.email" type="email">
                         </md-input-container>
                     </div>
 
@@ -51,7 +51,7 @@
         <md-button class="" ng-click="vm.closeDialog()">
             Cancelar
         </md-button>
-        <md-button class="md-primary md-raised" ng-disabled="createUserForm.$invalid" ng-click="vm.saveTeacher()"
+        <md-button class="md-primary md-raised" ng-disabled="newStudentForm.$invalid" ng-click="vm.saveStudent()"
                    style="margin-right:20px;">
             Guardar
         </md-button>

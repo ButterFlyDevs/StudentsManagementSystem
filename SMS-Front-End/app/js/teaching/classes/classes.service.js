@@ -4,11 +4,15 @@ angular.module('classes')
 
          var restPath = 'http://localhost:8001/entities/class/';
 
-         return $resource(restPath + ':id', {id: '@_id'}, {
+         return $resource(restPath + ':id', {id: '@classId'}, {
+
              'getSubjects': {
                  method: 'GET',
                  url: restPath + ':id' + '/subject',
                  isArray: true
-             }});
+             },
+
+             'update': {method: 'PUT'},
+         });
 
         });

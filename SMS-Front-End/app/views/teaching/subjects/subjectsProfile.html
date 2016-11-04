@@ -13,7 +13,7 @@
 
 
             <div ng-if="vm.subject == null">
-                Oups! Parece que este estudiante no existe.
+                Oups! Parece que esta asignatura no existe.
             </div>
 
             <md-card ng-if="vm.subject != null" layout="column" layout-margin layout-padding>
@@ -43,35 +43,23 @@
 
                     <!-- Second column, with user data inside. -->
                     <div flex="60" layout="column">
+
                         <form name="userForm">
+
                             <div layout layout-sm="column">
                                 <md-input-container flex>
                                     <label layout="">Nombre</label>
                                     <input ng-model="vm.subject.name" required>
                                 </md-input-container>
-                                <md-input-container flex>
-                                    <label layout="">Apellidos</label>
-                                    <input ng-model="vm.user.surname" required>
-                                </md-input-container>
                             </div>
 
                             <div layout layout-sm="column">
                                 <md-input-container flex="50">
-                                    <label layout="">Residencia</label>
-                                    <input ng-model="vm.user.city" required>
+                                    <label layout="">Descripción</label>
+                                    <input ng-model="vm.subject.description" required>
                                 </md-input-container>
                             </div>
 
-                            <div layout layout-sm="column">
-                                <md-input-container flex>
-                                    <label layout="">Email</label>
-                                    <input ng-model="vm.user.email" type="email" disabled>
-                                </md-input-container>
-                                <md-input-container flex>
-                                    <label layout="">Rol</label>
-                                    <input ng-model="vm.actualRole" disabled>
-                                </md-input-container>
-                            </div>
                         </form>
                     </div>
 
@@ -96,33 +84,6 @@
 
                         <md-divider layout-margin></md-divider>
 
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Asignaturas</span>
-                    </div>
-
-                        <!-- If the subject have a subjects -->
-                        <div ng-if="vm.teacherSubjects.length != 0">
-
-                            <md-list>
-
-                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherSubjects" ng-click="null">
-                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
-                                    <div class="md-list-item-text" layout="column">
-                                        <h3>{{ item.name }}</h3>
-                                        <h4>OtraCosa</h4>
-                                        <p>OtrasCosaMas</p>
-                                    </div>
-                                </md-list-item>
-
-                            </md-list>
-
-                        </div>
-
-                        <!-- If the subject hasn't any association doing still -->
-                        <div ng-if="vm.teacherSubjects.length == 0">
-                            <span>Este profesor aún no imparte ninguna asignatura. </span>
-                        </div>
 
 
                     <div class="margin-top-medium">
@@ -180,13 +141,13 @@
 
                         <!-- Button to save user changes -->
                         <md-button class="md-primary md-raised"
-                                   ng-click="vm.saveRelation()">
+                                   ng-click="vm.updateSubject()">
                             <md-icon>save</md-icon>
                             Guardar
                         </md-button>
 
                         <!-- Button that delete user, with confirmation message before -->
-                        <md-button class="md-warn md-raised" ng-click="vm.showConfirm(1, vm.user._id)">
+                        <md-button class="md-warn md-raised" ng-click="vm.showDeleteSubjectConfirm()">
                             <md-icon>delete</md-icon>
                             Eliminar
                         </md-button>

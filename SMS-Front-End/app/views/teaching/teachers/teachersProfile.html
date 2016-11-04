@@ -57,8 +57,12 @@
 
                             <div layout layout-sm="column">
                                 <md-input-container flex="50">
-                                    <label layout="">Residencia</label>
-                                    <input ng-model="vm.user.city" required>
+                                    <label layout="">Dirección</label>
+                                    <input ng-model="vm.teacher.address" required>
+                                </md-input-container>
+                                <md-input-container flex="50">
+                                    <label layout="">Teléfono</label>
+                                    <input ng-model="vm.teacher.phone" required>
                                 </md-input-container>
                             </div>
 
@@ -180,13 +184,13 @@
 
                         <!-- Button to save user changes -->
                         <md-button class="md-primary md-raised"
-                                   ng-click="vm.saveTeacher()">
+                                   ng-click="vm.updateTeacher()">
                             <md-icon>save</md-icon>
                             Guardar
                         </md-button>
 
                         <!-- Button that delete user, with confirmation message before -->
-                        <md-button class="md-warn md-raised" ng-click="vm.showDeleteUserConfirm()">
+                        <md-button class="md-warn md-raised" ng-click="vm.showDeleteTeacherConfirm()">
                             <md-icon>delete</md-icon>
                             Eliminar
                         </md-button>

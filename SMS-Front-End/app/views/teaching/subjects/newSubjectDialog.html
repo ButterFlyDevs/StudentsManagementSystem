@@ -12,13 +12,18 @@
 
     <md-dialog-content>
         <div class="md-dialog-content">
-            <form name="newTeacherForm">
+            <form name="newSubjectForm">
 
                     <div layout layout-sm="column">
 
                         <md-input-container flex>
                             <label layout="">Nombre</label>
-                            <input ng-model="vm.teacher.data.name" required>
+                            <input ng-model="vm.subject.data.name" required>
+                        </md-input-container>
+
+                        <md-input-container flex>
+                            <label layout="">Descripción</label>
+                            <input ng-model="vm.subject.data.description" required>
                         </md-input-container>
 
                     </div>
@@ -33,7 +38,7 @@
         <md-button class="" ng-click="vm.closeDialog()">
             Cancelar
         </md-button>
-        <md-button class="md-primary md-raised" ng-disabled="createUserForm.$invalid" ng-click="vm.saveTeacher()"
+        <md-button class="md-primary md-raised" ng-disabled="newSubjectForm.$invalid" ng-click="vm.saveSubject()"
                    style="margin-right:20px;">
             Guardar
         </md-button>
