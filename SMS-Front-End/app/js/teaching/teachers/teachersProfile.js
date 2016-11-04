@@ -1,5 +1,5 @@
 angular.module('teachers')
-    .controller('teachersProfileController',function($scope, $resource, $state, $stateParams, $mdDialog, TeachersService, toastService){
+    .controller('teachersProfileController',function($scope, moment, $resource, $state, $stateParams, $mdDialog, TeachersService, toastService){
 
             var vm = this;
 
@@ -16,6 +16,22 @@ angular.module('teachers')
 
             vm.teacher = TeachersService.get({id: vm.teacherId}, function(){
                 console.log(vm.teacher)
+
+                // We need change time data from string to JavaScript date object.
+
+                // Thu Oct  6 00:00:00 2016
+                console.log(vm.teacher.birthdate);
+                //tmpDateObject.setTime(Date.parse( vm.teacher.birthdate ));
+
+
+
+                var parts = vm.teacher.birthdate.split('-');
+                var tmpDateObject = new Date(parts[0], parts[1]-1, parts[2]);
+
+                vm.teacher.birthdate = tmpDateObject;
+
+                //Date 2016-10-05T22:00:00.000Z teachersProfile.js:26:17
+                console.log(vm.teacher.birthdate);
 
 
             }, function(){
@@ -108,6 +124,12 @@ angular.module('teachers')
 
             function updateTeacher() {
 
+                console.log(vm.teacher.birthdate)
+
+                // A dirty solution to problem that does that the date is saved with a day minus.
+                vm.teacher.birthdate.setDate(vm.teacher.birthdate.getDate() + 1);
+
+
                  vm.teacher.$update(function(){
                     console.log('Success saving the teacher.')
                     }, function(error){
@@ -115,7 +137,21 @@ angular.module('teachers')
                         console.log(error)
                     });
 
+
             }
 
 
-});
+    })
+
+    .config(function($mdDateLocaleProvider) {
+      $mdDateLocaleProvider.formatDate = function(date) {
+          console.log('DATTTEE')
+          console.log(date);
+          if(date == undefined){
+              console.log('undefined')
+              return 'Fecha Nacimiento'
+          }else {
+              return moment(date).format('DD-MM-YYYY');
+          }
+      };
+    });

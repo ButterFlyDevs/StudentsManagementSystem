@@ -8,7 +8,7 @@ angular.module('students')
             vm.saveStudent = saveStudent
 
             vm.student =  new StudentsService();
-
+            vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
 
             ///////////////////////////////////////////////////////////
             function activate() {

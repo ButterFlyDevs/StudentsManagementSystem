@@ -74,10 +74,10 @@ class MyEncoder(json.JSONEncoder):
     """
 
     def default(self, obj):
-        if isinstance(obj, datetime.datetime):
+        if isinstance(obj, datetime.datetime) or isinstance(obj, datetime.date):
             # We can select between two formats, is some places people prefer iso.
-            return obj.ctime()  # Example: Sun Oct 16 08:23:29 2016
-            # return obj.isoformat()  # Example: '2016-10-16T08:23:02
+            #return obj.ctime()  # Example: Sun Oct 16 08:23:29 2016
+            return obj.isoformat()  # Example: '2016-10-16T08:23:02
 
         return json.JSONEncoder.default(self, obj)
 

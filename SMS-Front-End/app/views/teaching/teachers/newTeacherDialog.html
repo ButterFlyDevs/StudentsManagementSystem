@@ -14,13 +14,36 @@
         <div class="md-dialog-content">
             <form name="newTeacherForm">
 
-                    <div layout layout-sm="column">
+
+                    <!-- First column, with a image inside. -->
+                    <div flex layout="column" layout-align="center center">
+                        <div ng-switch="vm.user.img || '_undefined_'">
+                                        <img ng-switch-when="_undefined_" class="img-profile-big" src="{{ vm.defaultAvatar }}">
+                                        <img ng-switch-default class="img-profile-big"  src="{{ vm.user.img }}">
+                                    </div>
+
+                        <div layout="row">
+                            <md-button class="md-primary md-fab md-mini" aria-label="Update photo">
+                                <md-icon>replay</md-icon>
+                            </md-button>
+
+                            <md-button class="md-primary md-fab md-mini" aria-label="Remove photo">
+                                <md-icon>delete</md-icon>
+                            </md-button>
+                        </div>
+
+                    </div>
+
+
+                    <div layout layout-sm="row">
 
                         <md-input-container flex>
                             <label layout="">Nombre</label>
                             <input ng-model="vm.teacher.data.name" required>
                         </md-input-container>
+                    </div>
 
+                    <div layout layout-sm="row">
                         <md-input-container flex>
                             <label layout="">Apellidos</label>
                             <input ng-model="vm.teacher.data.surname" required>
@@ -29,16 +52,56 @@
                     </div>
 
                     <div layout layout-sm="column">
-                        <md-input-container flex="50">
-                            <label layout="">Residencia</label>
-                            <input ng-model="vm.teacher.data.city" required>
+                        <md-input-container flex>
+                            <md-icon style="color:gray;">location_on</md-icon>
+                            <label layout="">Dirección</label>
+                            <input ng-model="vm.teacher.data.address" required>
                         </md-input-container>
+                    </div>
+
+                    <div layout layout-sm="row">
+
+                        <md-input-container flex="50">
+                            <label layout="">Provincia</label>
+                            <input ng-model="vm.teacher.data.province" required>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label layout="">Localidad</label>
+                            <input ng-model="vm.teacher.data.locality" required>
+                        </md-input-container>
+
+                    </div>
+
+                    <div layout layout-sm="row">
+
+                        <md-input-container flex="50">
+                            <md-datepicker
+                                    ng-model="vm.teacher.data.birthdate"
+                                    md-placeholder="Fecha de nacimiento">
+                            </md-datepicker>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <md-icon style="color:gray;">phone</md-icon>
+                            <label layout="">Teléfono</label>
+                            <input ng-model="vm.teacher.data.phone" required>
+                        </md-input-container>
+
                     </div>
 
                     <div layout layout-sm="column">
                         <md-input-container flex>
+                            <md-icon style="color:gray;">email</md-icon>
                             <label layout="">Email</label>
                             <input ng-model="vm.teacher.data.email" type="email">
+                        </md-input-container>
+                    </div>
+
+                    <div layout layout-sm="column">
+                        <md-input-container flex="50">
+                            <label layout="">Dni</label>
+                            <input ng-model="vm.teacher.data.dni">
                         </md-input-container>
                     </div>
 

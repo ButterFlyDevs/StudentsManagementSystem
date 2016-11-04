@@ -18,7 +18,7 @@
 
             <md-card ng-if="vm.teacher != null" layout="column" layout-margin layout-padding>
 
-
+                <form name="teacherUpdateForm">
                 <!-- We can see the layout like a row -->
                 <div layout="row" flex flex="70" layout-align="center">
 
@@ -43,43 +43,94 @@
 
                     <!-- Second column, with user data inside. -->
                     <div flex="60" layout="column">
-                        <form name="userForm">
+
                             <div layout layout-sm="column">
-                                <md-input-container flex>
+                                <md-input-container flex="70">
                                     <label layout="">Nombre</label>
                                     <input ng-model="vm.teacher.name" required>
                                 </md-input-container>
-                                <md-input-container flex>
+                            </div>
+                            <div layout layout-sm="column">
+                            <md-input-container flex="70">
                                     <label layout="">Apellidos</label>
                                     <input ng-model="vm.teacher.surname" required>
                                 </md-input-container>
                             </div>
 
-                            <div layout layout-sm="column">
-                                <md-input-container flex="50">
-                                    <label layout="">Dirección</label>
-                                    <input ng-model="vm.teacher.address" required>
-                                </md-input-container>
-                                <md-input-container flex="50">
-                                    <label layout="">Teléfono</label>
-                                    <input ng-model="vm.teacher.phone" required>
-                                </md-input-container>
-                            </div>
-
-                            <div layout layout-sm="column">
-                                <md-input-container flex>
-                                    <label layout="">Email</label>
-                                    <input ng-model="vm.user.email" type="email" disabled>
-                                </md-input-container>
-                                <md-input-container flex>
-                                    <label layout="">Rol</label>
-                                    <input ng-model="vm.actualRole" disabled>
-                                </md-input-container>
-                            </div>
-                        </form>
                     </div>
 
                 </div>
+
+
+                 <div layout="column" flex flex="70" layout-align="center">
+
+                            <div layout layout-sm="row">
+                                <md-input-container flex>
+                                    <md-icon style="color:gray;">location_on</md-icon>
+                                    <label layout="">Dirección</label>
+                                    <input ng-model="vm.teacher.address" required>
+                                </md-input-container>
+
+                            </div>
+
+                            <div layout layout-sm="row">
+
+                                <md-input-container flex="40">
+                                    <label layout="">Provincia</label>
+                                    <input ng-model="vm.teacher.province" required>
+                                </md-input-container>
+
+                                <md-input-container flex="50">
+                                    <label layout="">Localidad</label>
+                                    <input ng-model="vm.teacher.locality" required>
+                                </md-input-container>
+
+
+                            </div>
+
+
+                            <div layout layout-sm="row">
+
+                                <md-input-container flex="80">
+                                    <md-datepicker
+                                            ng-model="vm.teacher.birthdate"
+                                            md-placeholder="Fecha de nacimiento">
+                                    </md-datepicker>
+                                </md-input-container>
+
+                                <md-input-container flex="50">
+                                    <md-icon style="color:gray;">phone</md-icon>
+                                    <label layout="">Teléfono</label>
+                                    <input ng-model="vm.teacher.phone" required>
+                                </md-input-container>
+
+                            </div>
+
+
+                            <div layout layout-sm="column">
+                                <md-input-container flex>
+                                    <md-icon style="color:gray;">email</md-icon>
+                                    <label layout="">Email</label>
+                                    <input ng-model="vm.teacher.email" type="email">
+                                </md-input-container>
+                            </div>
+
+                            <div layout layout-sm="column">
+                                <md-input-container flex="50">
+                                    <label layout="">Dni</label>
+                                    <input ng-model="vm.teacher.dni">
+                                </md-input-container>
+                            </div>
+
+
+                 </div>
+
+                 </form>
+
+
+
+
+
 
                 <!-- A line divisor -->
                 <!-- <md-divider layout-margin></md-divider> -->
