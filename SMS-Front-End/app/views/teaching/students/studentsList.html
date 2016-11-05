@@ -6,18 +6,39 @@
     <h1 class="md-display-1">Estudiantes</h1>
     <p class="md-body-1">Todos los estudiantes del sistema.</p>
 
+    <div ng-if="vm.studentsList.length != 0" >
 
-    <div  layout="row" layout-align="space-between start">
-        <md-button class="md-primary md-raised"
-                   ng-click="vm.openNewStudentDialog()">
-            <md-icon>add</md-icon>
-            Nuevo
-        </md-button>
+        <div  layout="row" layout-align="space-between start">
+            <md-button class="md-primary md-raised"
+                       ng-click="vm.openNewStudentDialog()">
+                <md-icon>add</md-icon>
+                Nuevo
+            </md-button>
+        </div>
+
     </div>
 
 
 <!-- table wrapper -->
-                <md-card style="background-color: #FFFFFF;>
+                <md-card style="background-color: #FFFFFF;">
+
+
+
+                    <div ng-if="vm.studentsList.length == 0" >
+
+                        <h3 class="md-headline"> Aún no se ha dado de alta ningún estudiante.</h3>
+                        <h3 class="md-headline"> ¿Desea insertar uno? </h3>
+
+                        <div access='admin' layout="row" layout-align="center" layout-margin>
+                            <md-button ng-click="vm.openNewStudentDialog()" class="md-primary md-raised">
+                                <md-icon>add</md-icon>
+                                Insertar</md-button>
+                        </div>
+
+                    </div>
+
+
+                    <div ng-if="vm.studentsList.length > 0" >
 
                     <!-- toolbar for the table -->
                     <md-toolbar class="md-table-toolbar md-default">
@@ -93,6 +114,8 @@
                                          md-page="vm.page" md-total="{{vm.data.total}}"
                                          md-page-select md-boundary-links md-on-paginate="vm.onPaginate">
                     </md-table-pagination>
+
+                        </div>
 
                 </md-card>
 

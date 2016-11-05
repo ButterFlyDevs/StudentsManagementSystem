@@ -4,95 +4,117 @@
 
 
     <h1 class="md-display-1">Asignaturas</h1>
-    <p class="md-body-1">Todos los asignaturas del sistema.</p>
+    <p class="md-body-1">Todos las asignaturas del sistema.</p>
 
 
-    <div  layout="row" layout-align="space-between start">
-        <md-button class="md-primary md-raised"
-                   ng-click="vm.openNewSubjectDialog()">
-            <md-icon>add</md-icon>
-            Nuevo
-        </md-button>
-    </div>
+     <div ng-if="vm.subjectsList.length != 0" >
+        <div  layout="row" layout-align="space-between start">
+            <md-button class="md-primary md-raised"
+                       ng-click="vm.openNewSubjectDialog()">
+                <md-icon>add</md-icon>
+                Nuevo
+            </md-button>
+        </div>
+     </div>
 
 
-<!-- table wrapper -->
-                <md-card style="background-color: #FFFFFF;>
 
-                    <!-- toolbar for the table -->
-                    <md-toolbar class="md-table-toolbar md-default">
-
-                        <!-- search -->
-                        <md-card-title>
-                            <md-card-title-text>
-
-                                <md-input-container>
-                                    <md-icon>search</md-icon>
-                                    <!-- layout="" to avoid parent layout -->
-                                    <label layout="">"Buscar"</label>
-                                    <input type="text" ng-model="vm.query">
-                                </md-input-container>
+                <md-card style="background-color: #FFFFFF;">
 
 
-                            </md-card-title-text>
-                        </md-card-title>
-                    </md-toolbar>
+                    <div ng-if="vm.subjectsList.length == 0" >
+
+                        <h3 class="md-headline"> Aún no se ha creado ninguna asignatura.</h3>
+                        <h3 class="md-headline"> ¿Desea crear una? </h3>
+
+                        <div access='admin' layout="row" layout-align="center" layout-margin>
+                            <md-button ng-click="vm.openNewSubjectDialog()" class="md-primary md-raised">
+                                <md-icon>add</md-icon>
+                                Crear</md-button>
+                        </div>
+
+                    </div>
 
 
-                    <!-- Students list table -->
-                    <md-table-container>
+                    <div ng-if="vm.subjectsList.length > 0" >
 
-                        <table md-table md-progress="vm.promise">
-                            <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
-                            <tr md-row>
-                                <th md-column><span>Imagen</span></th>
-                                <th md-column md-order-by="name"><span>Nombre</span></th>
-                                <th md-column><span>Perfil</span></th>
-                            </tr>
-                            </thead>
+                        <!-- toolbar for the table -->
+                        <md-toolbar class="md-table-toolbar md-default">
 
-                            <tbody md-body>
+                            <!-- search -->
+                            <md-card-title>
+                                <md-card-title-text>
 
-                                <!-- Where we iterate through items list -->
-                                <tr md-row ng-repeat="item in vm.subjectsList">
-
-                                    <!-- 1. User profile image -->
-                                    <td md-cell>
-
-                                        <div ng-switch="item.img || '_undefined_'">
-                                            <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
-                                            <img ng-switch-default class="img-profile" src="{{ item.img }}">
-                                        </div>
+                                    <md-input-container>
+                                        <md-icon>search</md-icon>
+                                        <!-- layout="" to avoid parent layout -->
+                                        <label layout="">"Buscar"</label>
+                                        <input type="text" ng-model="vm.query">
+                                    </md-input-container>
 
 
-                                    </td>
+                                </md-card-title-text>
+                            </md-card-title>
+                        </md-toolbar>
 
-                                    <!-- 2. If user has a name, we prefer show this, but if doesn't have then we show their email.-->
-                                    <td md-cell>
-                                        <div ng-switch="item.name || '_undefined_'">
-                                            <span ng-switch-when="_undefined_">{{ item.email }}</span>
-                                            <!-- Isn't important if he has surname-->
-                                            <span ng-switch-default>{{ item.name }} {{ item.surname }}</span>
-                                        </div>
-                                    </td>
 
-                                     <!-- 3. Go to profile button -->
-                                    <td md-cell>
-                                        <md-button ui-sref="subjectsProfile({subjectId: item.subjectId})" class="md-fab md-mini md-primary">
-                                            <md-icon>forward</md-icon>
-                                        </md-button>
-                                    </td>
+                        <!-- Students list table -->
+                        <md-table-container>
 
+                            <table md-table md-progress="vm.promise">
+                                <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
+                                <tr md-row>
+                                    <th md-column><span>Imagen</span></th>
+                                    <th md-column md-order-by="name"><span>Nombre</span></th>
+                                    <th md-column><span>Perfil</span></th>
                                 </tr>
-                            </tbody>
+                                </thead>
 
-                        </table>
-                    </md-table-container>
+                                <tbody md-body>
 
-                    <md-table-pagination md-limit="vm.limit"
-                                         md-page="vm.page" md-total="{{vm.data.total}}"
-                                         md-page-select md-boundary-links md-on-paginate="vm.onPaginate">
-                    </md-table-pagination>
+                                    <!-- Where we iterate through items list -->
+                                    <tr md-row ng-repeat="item in vm.subjectsList">
+
+                                        <!-- 1. User profile image -->
+                                        <td md-cell>
+
+                                            <div ng-switch="item.img || '_undefined_'">
+                                                <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
+                                                <img ng-switch-default class="img-profile" src="{{ item.img }}">
+                                            </div>
+
+
+                                        </td>
+
+                                        <!-- 2. If user has a name, we prefer show this, but if doesn't have then we show their email.-->
+                                        <td md-cell>
+                                            <div ng-switch="item.name || '_undefined_'">
+                                                <span ng-switch-when="_undefined_">{{ item.email }}</span>
+                                                <!-- Isn't important if he has surname-->
+                                                <span ng-switch-default>{{ item.name }} {{ item.surname }}</span>
+                                            </div>
+                                        </td>
+
+                                         <!-- 3. Go to profile button -->
+                                        <td md-cell>
+                                            <md-button ui-sref="subjectsProfile({subjectId: item.subjectId})" class="md-fab md-mini md-primary">
+                                                <md-icon>forward</md-icon>
+                                            </md-button>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </md-table-container>
+
+                        <md-table-pagination md-limit="vm.limit"
+                                             md-page="vm.page" md-total="{{vm.data.total}}"
+                                             md-page-select md-boundary-links md-on-paginate="vm.onPaginate">
+                        </md-table-pagination>
+
+
+                    </div>
 
                 </md-card>
 

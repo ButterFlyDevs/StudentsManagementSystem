@@ -34,6 +34,8 @@ angular.module('main').config(function($stateProvider, $urlRouterProvider){
   })
 
 
+
+
 angular.module('main').config(function($mdThemingProvider) {
   $mdThemingProvider.theme('default').primaryPalette('indigo');
 })

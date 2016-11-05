@@ -22,24 +22,6 @@
                 <!-- We can see the layout like a row -->
                 <div layout="row" flex flex="70" layout-align="center">
 
-                    <!-- First column, with a image inside. -->
-                    <div flex="40" layout="column" layout-margin layout layout-align="center center">
-                        <div ng-switch="vm.user.img || '_undefined_'">
-                                        <img ng-switch-when="_undefined_" class="img-profile-big" src="{{ vm.defaultAvatar }}">
-                                        <img ng-switch-default class="img-profile-big"  src="{{ vm.user.img }}">
-                                    </div>
-
-                        <div layout="row">
-                            <md-button class="md-primary md-fab md-mini" aria-label="Update photo">
-                                <md-icon>replay</md-icon>
-                            </md-button>
-
-                            <md-button class="md-primary md-fab md-mini" aria-label="Remove photo">
-                                <md-icon>delete</md-icon>
-                            </md-button>
-                        </div>
-
-                    </div>
 
                     <!-- Second column, with user data inside. -->
                     <div flex="60" layout="column">

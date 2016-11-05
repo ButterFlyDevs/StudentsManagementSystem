@@ -1,9 +1,11 @@
 angular.module('students')
-    .controller('newStudentDialogController',function($scope, $state, $mdDialog, StudentsService){
+    .controller('newStudentDialogController',function($scope, $state, $mdDialog, StudentsService, toastService){
 
             var vm = this;
 
             activate();
+
+            // References to functions.
             vm.closeDialog = closeDialog;
             vm.saveStudent = saveStudent
 
@@ -20,13 +22,30 @@ angular.module('students')
                 $mdDialog.cancel();
             }
 
+
+            /** Save student data in server.
+             * Call to server with POST method ($save = POST) using vm.student that is
+             * a instance of StudentsService.*/
             function saveStudent(){
                 console.log('Calling saveStudent() function.')
-                vm.student.$save(function(){
-                    console.log('Student saved successfully');
-                    $mdDialog.cancel();
-                    $state.reload();
-                });
+
+
+                // A dirty solution to problem that does that the date is saved with a day minus.
+                vm.student.data.birthdate.setDate(vm.student.data.birthdate.getDate() + 1);
+
+                vm.student.$save(
+                    function(){ // Success
+                        console.log('Student saved successfully');
+                        $mdDialog.cancel();
+                        $state.reload();
+                        toastService.showToast('Estudiante dado de alta con éxito.')
+                    },
+                    function(error){ // Fail
+                        toastService.showToast('Error al dar de alta al alumno.')
+                        console.log('Error while student was saved.')
+                        console.log(error)
+                    }
+                );
             }
 
 });
