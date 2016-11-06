@@ -1,66 +1,75 @@
-
 ##Contributing Guidelines
 
+Do you want contribute in this project?  **Great !!! :)**
 
-¿Quiéres colaborar en el proyecto?  **¡¡¡ Genial !!! :)**
-
-Pero antes, vamos a explicar como arrancar la aplicación en un entorno local para que no encuentres problemas.
+But before, we want that you know how do the things in this project to everyone follow the same way.
 
 
-####Desarrollo local
-------
+####Python
 
-*SMS de desarrolla en un entorno muy característico*, ya que en síntesis son 4 microservicios distribuidos en dos "aplicaciones" de Google App Engine, que además necesitan de un servidor de desarrollo específico que simula el ecosistema de GAE, asignando puertos a las aplicaciones, nombres de dominio y simulando (entre otras cosas) la base de datos NDB.
+To write python we try to follow the *[PEP-8 Style Guide for Python Code](https://www.python.org/dev/peps/pep-0008/)* as much as possible.
 
-######Requisitos iniciales
+The mainly rules for us are:
 
-Una vez clonado el proyecto **el primer paso** sería  ejecutar el fichero ``requirement_bash.sh``, que descarga e instala todo lo necesario para trabajar.
+* Function names: should be lowercase, with words separated by underscores as necessary to improve readability. 
 
-Es un sencillo script de bash que realiza descargas e instalaciones de forma desatendida, en su mayoría haciendo uso de la herramienta **apt-get**, si no tienes un sistema basado en debian puedes instalar manualmente todos las dependencias del proyecto, ve al fichero y revisa lo que se necesita.
+* Constants: are usually defined on a module level and written in all capital letters with underscores separating words. 
+Examples include MAX_OVERFLOW and TOTAL.
 
-Entre otras cosas lo más importante que realiza el script es:
+* Class: names should normally use the CapWords convention. 
+ 
+* Maximum Line Length: Limit all lines to a maximum of 79 characters.
 
-  1. Descargar el SDK de GAE
-  2. Instalar MySQL
-  3. Instalar algunas herramientas como curl, pip y librerías de conexión.
-  4. Ejecutar los requirements de cada microservicio.
+* Package and Module Names: Modules should have short, all-lowercase 
+names. Underscores can be used in the module name if it improves 
+readability. Python packages should also have short, all-lowercase 
+names, although the use of underscores is discouraged. 
 
-En cada microservicio del BackEnd (en FrontEnd no lo necesita) existe un fichero que instala todas las dependencias de python necesarias en cada caso (que además deben ser instaladas en la carpeta lib de cada uno).
+* Comments: 
+    * Inline Comments. Use inline comments sparingly. An inline comment is a comment on the same 
+    line as a statement. Inline comments should be separated by at least two spaces from the statement. 
+    They should start with a # and a single space.
 
-Es fácil que por algún motivo se produzca algún error en la instalación desatendida, si es así revisa el paquete e intenta una instalación manual.
+    * Block comments generally apply to some (or all) code that follows them, and are indented to the same level as that code. 
+    Each line of a block comment starts with a # and a single space (unless it is indented text inside the comment).Paragraphs inside a block comment are separated by a line containing a single #
+     
+* Documentation Strings. 
+    * Conventions for writing good documentation are immortalized in PEP 257.  Note that most 
+    importantly, the """ that ends a multiline docstring should be on a line by itself.
+    * For one liner docstrings, please keep the closing """ on the same line. 
 
-######Desarrollando
 
-Una vez instalado todo lo necesario lo único que nesitarías sería ejecutar ``runAll.sh``, que primero arranca el FrontEnd y el BackEnd (usando respectivos scrips), arranca MySQL y aprovisiona el sistema con datos de muestra para que tengas usuarios de ejempo cargados.
-Como verás, la apliación web se lanza en http://localhost:8080/ y el servidor GAE en http://localhost:8082/ donde podrás ver el estado de la NDB y las instancias (los tres microservicios del backend).
+* Names to Avoid: Never use the characters 'l' (lowercase letter el), 
+'O' (uppercase letter oh), or 'I' (uppercase letter eye) as single 
+character variable names. In some fonts, these characters are 
+indistinguishable from the numerals one and zero. When tempted 
+to use 'l', use 'L' instead.
 
-**et voilà !** ya puedes empezar a colaborar.
+More details in PEP-8 guide.
 
-Si por algún motivo no quieres levantar toda la aplicación puedes levantar solo el BackEnd ejecutando ``runBackEnd-StandAlone.hs``
-Para detener la aplicación deberás matar los procesos del servidor de desarrollo y para ello lo más sencillo es usar  ``kill -p <PID del proceso> `` aunque una manera más rádia es matando todo los procesos de python (si estás editanto con Atom te dará errores después) con ``kill -9 $(pidof python) ``.
+*Note:
 
-####Issues, ramas y nuevas funcionalidades
-------
-Si no sabes por donde empezar puedes revisar el listado de [**issues**](https://github.com/ButterFlyDevs/StudentsManagementSystem/issues) del proyecto, creando nuevas o reparando y mejorando el código.
+If you use PyCharm like us is easy to achieve this thanks her code automatic corrector.
 
-Como verás en el repositorio, el ciclo de desarrollo tiene dos fases, es decir, consta de dos ramas, **master** y **develop**.
-La rama master será actualizada únicamente con las actualizaciones de código muy estables mientras que en develop iremos implementando las mejoras y nuevas características en testeo.
+####JavaScript
 
-Por eso lo ideal es ir trabajando en la rama **develop** y pasar los cambios a master cuando se considere una nueva release estable del proyecto.
-Además de esto, cuando se quiera añadir una nueva caracterísitca o móudulo mientras se reparan bugs o mejora el código en develop se crearía una raḿa con la característica, como muestra la figura (aunque no es estrictamente necesario).
 
-![](branches.png)
+Write mainly in [lowerCamelCase](http://wiki.c2.com/?LowerCamelCase) 
 
-Para conocer más sobre el modelo de ramas pulsa [aquí](http://nvie.com/posts/a-successful-git-branching-model/).
-Si por otra parte quieres ayudar con la web el proyecto puedes trabajar en la rama **gp-pages** donde usamos jekyll para servir webs estáticas.
+We try to follow the standard JSDoc to doc AngularJS code in JavaScript language that we develop.
 
-####Acuerdo de sintaxis
+####Issues, branchs, and new user stories or complete modules and microservices.
 
-A la hora de implementar, preferimos usar una sintaxis similar a java para nombre compuestos, usando las primeras letras en mayúsculas en lugar de guiones bajos: preferimos funcionQueHaceAlgo() a funcion_que_hace_algo y los nombres largos de variables, funciones, clases, etc, a los cortos y crípticos.
-Además intentamos documentar los máximo posible el código para que se fácilmente entendible por cualquier desarrollador, sin importar en principio la extensión de las explicaciones.
 
-####Agradecimientos
+**About English**
+ 
+ 
+* When writing English, follow Strunk and White. 
+Python coders from non-English speaking countries: please write your 
+omments in English, unless you are 120% sure that the code will never 
+be read by people who don't speak your language. PEP-8.*
 
-Gracias por contribuir con SMS, cualquier aporte por pequeño que sea siempre es interesante.
+Final note:
 
-> Juntos hacemos del Open Source comunidad.
+It's only a lot of rules, but don't worry, relax and code,
+we only do this for fun. :)
