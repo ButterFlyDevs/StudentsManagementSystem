@@ -12,7 +12,7 @@ Si se trata de booleanos : boolean
 
 
 # Uso de variables generales par la conexión a la BD.
-import dbParams
+import db_params
 import datetime
 from termcolor import colored
 
@@ -20,20 +20,16 @@ import pytz
 
 # Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
-apiName = '\n## API DB ##\n'
 
-'''Clase controladora de Asignaturas. Que usando la clase que define el modelo de Asignatura (la info en BD que de el se guarda)
-ofrece una interface de gestión que simplifica y abstrae el uso.
-'''
 
-def sql_execute(cursor, query): # References
+def sql_execute(cursor, query):  # References
 
     status_value = 1  # By default is success.
     num_elements = 0  # By default any entity is retrieved.
 
     try:
         num_elements = cursor.execute(query);
-    except dbParams.MySQLdb.Error, e:
+    except db_params.MySQLdb.Error, e:
         try:
             print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
             print "Error number: " + str(e.args[0])
@@ -46,7 +42,8 @@ def sql_execute(cursor, query): # References
 
     return status_value, num_elements
 
-class entitiesManager:
+
+class EntitiesManager:
     """
     Gestor de entidades de la base de datos, que abstrae el funcionamiento de MySQL
     """
@@ -63,7 +60,7 @@ class entitiesManager:
         if v:
             print colored(locals(), 'blue')
 
-        db = dbParams.conecta()
+        db = db_params.conecta()
         return_dic = {}
 
         now = datetime.datetime.utcnow()
@@ -110,7 +107,7 @@ class entitiesManager:
         try:
             num_elements = cursor.execute(query);
             entity_id = cursor.lastrowid
-        except dbParams.MySQLdb.Error, e:
+        except db_params.MySQLdb.Error, e:
             try:
                 print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
                 print "Error number: " + str(e.args[0])
@@ -142,7 +139,7 @@ class entitiesManager:
         cursor.close()
         db.close()
 
-        return return_dic
+        return return_di
 
     @classmethod
     def get(cls, kind, entity_id=None, params=None):
@@ -158,7 +155,7 @@ class entitiesManager:
         if v:
             print colored(locals(), 'blue')
 
-        db = dbParams.conecta()
+        db = db_params.conecta()
         return_dic = {}
         cursor = db.cursor()
 
@@ -247,7 +244,7 @@ class entitiesManager:
         if v:
             print colored(locals(), 'blue')
 
-        db = dbParams.conecta();
+        db = db_params.conecta();
         return_dic = {}
 
         control_fields = {'modifiedBy': 1, 'modifiedAt': datetime.datetime.now()}
@@ -319,7 +316,7 @@ class entitiesManager:
 
         print locals()
 
-        db = dbParams.conecta()
+        db = db_params.conecta()
         cursor = db.cursor()
 
         query = ''

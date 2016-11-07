@@ -16,7 +16,7 @@ The mainly rules for us are:
 * Constants: are usually defined on a module level and written in all capital letters with underscores separating words. 
 Examples include MAX_OVERFLOW and TOTAL.
 
-* Class: names should normally use the CapWords convention. 
+* Class: names should normally use the CamelCase convention. 
  
 * Maximum Line Length: Limit all lines to a maximum of 79 characters.
 

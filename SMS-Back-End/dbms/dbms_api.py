@@ -10,7 +10,7 @@ from logging.handlers import RotatingFileHandler
 
 
 
-from dbapi.entitiesManager import entitiesManager
+from dbapi.entities_manager import EntitiesManager
 from dbapi.GestorCredencialesSQL import GestorCredenciales
 
 from google.appengine.api import modules
@@ -204,7 +204,7 @@ def post_entity(kind):
                 data[key] = value.encode('utf-8')
 
     # When are really saved data in database
-    response = entitiesManager.put(kind, data)
+    response = EntitiesManager.put(kind, data)
 
     if c:
         salida = salidaGestor
@@ -286,7 +286,7 @@ def get_entities(kind, entity_id=None):
     curl  -i -X GET localhost:8002/entities/student?params=name  -> Only params sent from all students
     curl  -i -X GET  localhost:8002/entities/student/1  -> All data from student with id = 1
     """
-    return process_response(entitiesManager.get(kind, entity_id, request.args.get('params', None)))
+    return process_response(EntitiesManager.get(kind, entity_id, request.args.get('params', None)))
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
@@ -314,7 +314,7 @@ def update_entities(kind, entity_id):
             if type(value) is not int:
                 raw_data[key] = value.encode('utf-8')
 
-    return process_response(entitiesManager.update(kind, entity_id, raw_data))
+    return process_response(EntitiesManager.update(kind, entity_id, raw_data))
 
 
 
@@ -323,7 +323,7 @@ def delete_entity(kind, entity_id):
     """
     curl  -i -X  DELETE localhost:8002/entities/subject/1
     """
-    return process_response(entitiesManager.delete(kind, entity_id))
+    return process_response(EntitiesManager.delete(kind, entity_id))
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>', methods=['GET'])
@@ -331,7 +331,7 @@ def get_related_entities(kind, entity_id, related_kind):
     """
     curl -i -X GET localhost:8080/entities/student/1/teacher
     """
-    return process_response(entitiesManager.get_related(kind, entity_id, related_kind))
+    return process_response(EntitiesManager.get_related(kind, entity_id, related_kind))
 
 
 ##########################

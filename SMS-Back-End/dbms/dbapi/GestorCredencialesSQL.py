@@ -9,7 +9,7 @@
 #from Profesor import *
 
 #Uso de variables generales par la conexión a la BD.
-import dbParams
+import db_params
 
 #Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v=1
