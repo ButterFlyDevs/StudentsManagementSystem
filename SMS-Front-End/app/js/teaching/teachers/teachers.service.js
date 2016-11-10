@@ -5,7 +5,7 @@ angular.module('teachers')
          var restPath = 'http://localhost:8001/entities/teacher/';
 
 
-         // The second param is [paramDeaults] to pass param to URL
+         // The second param is [paramDefaults] to pass param to URL
          return $resource(restPath + ':id', {id: '@teacherId'}, {
 
              'getSubjects': {
@@ -13,13 +13,14 @@ angular.module('teachers')
                  url: restPath + ':id' + '/subject',
                  isArray: true
              },
-
-
-              'update': {
-                 method: 'PUT'
-                },
-
-
+             'getImparts': {
+                 method: 'GET',
+                 url: restPath + ':id' + '/imparts',
+                 isArray: true
+             },
+             'update': {
+                method: 'PUT'
+             },
              'getClasses': {
                  method: 'GET',
                  url: restPath + ':id' + '/class',

@@ -84,8 +84,6 @@ class MyEncoder(json.JSONEncoder):
 
 def process_response(response):
 
-    print 'HERE'
-
     """
     Function to build a response with sense.
     :param self:
@@ -329,7 +327,10 @@ def delete_entity(kind, entity_id):
 @app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>', methods=['GET'])
 def get_related_entities(kind, entity_id, related_kind):
     """
-    curl -i -X GET localhost:8080/entities/student/1/teacher
+    curl -i -X GET localhost:8002/entities/student/1/teacher
+
+    curl -X GET localhost:8002/entities/teacher/4/imparts | python -mjson.tool
+
     """
     return process_response(EntitiesManager.get_related(kind, entity_id, related_kind))
 

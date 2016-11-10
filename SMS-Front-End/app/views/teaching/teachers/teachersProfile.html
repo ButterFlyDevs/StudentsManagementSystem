@@ -18,7 +18,7 @@
 
             <md-card ng-if="vm.teacher != null" layout="column" layout-margin layout-padding>
 
-                <form name="teacherUpdateForm">
+                <form name="teacherUpdateForm" ng-dirty="vm.formUpdated()">
                 <!-- We can see the layout like a row -->
                 <div layout="row" flex flex="70" layout-align="center">
 
@@ -129,87 +129,26 @@
 
 
 
-
-
-
-                <!-- A line divisor -->
-                <!-- <md-divider layout-margin></md-divider> -->
-
                 <!-- Academic related user info section -->
                 <div layout="column">
 
                     <div class="margin-top-medium">
                         <span flex class="md-headline" layout-margin>Docencia</span>
-                    </div>
-
-
-                    <!-- Section with three columns -->
-
-
-                    <div layout="column">
-                      <!-- A line divisor -->
-
                         <md-divider layout-margin></md-divider>
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Asignaturas</span>
                     </div>
 
-                        <!-- If the teacher have a subjects -->
-                        <div ng-if="vm.teacherSubjects.length != 0">
+                    <div ng-repeat="item in vm.teacherImparts">
 
-                            <md-list>
-
-                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherSubjects" ng-click="null">
-                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
-                                    <div class="md-list-item-text" layout="column">
-                                        <h3>{{ item.name }}</h3>
-                                        <h4>OtraCosa</h4>
-                                        <p>OtrasCosaMas</p>
-                                    </div>
-                                </md-list-item>
-
-                            </md-list>
-
-                        </div>
-
-                        <!-- If the teacher hasn't any association doing still -->
-                        <div ng-if="vm.teacherSubjects.length == 0">
-                            <span>Este profesor aún no imparte ninguna asignatura. </span>
-                        </div>
+                        <h3 class="md-headline">{{ item.subject.name }}</h3>
 
 
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Grupos</span>
-                    </div>
-
-                        <!-- If the teacher have a classes -->
-                        <div ng-if="vm.teacherClasses.length != 0">
-
-                            <md-list>
-
-                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherClasses" ng-click="null">
-                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
-                                    <div class="md-list-item-text" layout="column">
-                                        <h3>{{ item.course }} º {{ item.word }} {{ item.level}}</h3>
-                                    </div>
-                                </md-list-item>
-
-                            </md-list>
-
-                        </div>
-
-                        <!-- If the teacher hasn't any association doing still -->
-                        <div ng-if="vm.teacherClasses.length == 0">
-                            <span>Este profesor aún no da clase en ningún grupo. </span>
-                        </div>
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Estudiantes</span>
-                    </div>
-
+                    <md-list class="md-dense">
+                            <md-list-item class="md-3-line" ng-repeat="item in item.classes" ng-click="null">
+                                <div class="md-list-item-text" layout="column">
+                                    <h3>{{ item.course }} {{ item.word }} {{ item.level }}</h3>
+                                </div>
+                            </md-list-item>
+                    </md-list>
 
 
 
@@ -233,19 +172,21 @@
                     <!-- Action buttons-->
                     <div class="md-actions" layout="row" layout-align="end center">
 
-                        <!-- Button to save user changes -->
-                        <md-button class="md-primary md-raised"
-                                   ng-click="vm.updateTeacher()">
-                            <md-icon>save</md-icon>
-                            Guardar
-                        </md-button>
-
                         <!-- Button that delete user, with confirmation message before -->
                         <md-button class="md-warn md-raised" ng-click="vm.showDeleteTeacherConfirm()">
                             <md-icon>delete</md-icon>
                             Eliminar
                         </md-button>
 
+                        <!-- Button to save user changes -->
+                        <md-button
+                                   ng-disabled="!vm.updateButtonEnable"
+                                   class="md-primary md-raised"
+                                   ng-click="vm.updateTeacher()">
+                            <md-icon>save</md-icon>
+                            {{ vm.updateButtonEnable}}
+                            Guardar
+                        </md-button>
 
                     </div>
 

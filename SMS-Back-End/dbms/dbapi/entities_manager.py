@@ -20,7 +20,155 @@ import pytz
 
 # Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
+"""
+    [
+        {
+            "classId": 7,
+            "course": 2,
+            "impartId": 5,
+            "level": "Bachillerato",
+            "name": "Matem\u00e1ticas",
+            "subjectId": 1,
+            "word": "A"
+        },
+        {
+            "classId": 8,
+            "course": 2,
+            "impartId": 44,
+            "level": "Bachillerato",
+            "name": "Matem\u00e1ticas",
+            "subjectId": 1,
+            "word": "B"
+        },
+        {
+            "classId": 1,
+            "course": 1,
+            "impartId": 141,
+            "level": "ESO",
+            "name": "Matem\u00e1ticas",
+            "subjectId": 1,
+            "word": "A"
+        },
+        {
+            "classId": 4,
+            "course": 1,
+            "impartId": 154,
+            "level": "Bachillerato",
+            "name": "Franc\u00e9s",
+            "subjectId": 7,
+            "word": "B"
+        },
+        {
+            "classId": 8,
+            "course": 2,
+            "impartId": 186,
+            "level": "Bachillerato",
+            "name": "Franc\u00e9s",
+            "subjectId": 7,
+            "word": "B"
+        }
+    ]
 
+    [{
+        "subject": {
+            "subjectId": 1,
+            "name": "Matem\u00e1ticas"
+        },
+        "classes": [{
+            "classId": 7,
+            "course": 2,
+            "word": "A"
+            "level": "Bachillerato",
+            "impartId": 5
+        }, {
+            "classId": 8,
+            "course": 2,
+            "word": "B"
+            "level": "Bachillerato",
+            "impartId": 44
+        }, {
+            "classId": 1,
+            "course": 1,
+            "word": "A"
+            "level": "ESO",
+            "impartId": 141
+        }]
+    },
+    {
+        "subject": {
+            "subjectId": 7,
+            "name": "Franc\u00e9s"
+        },
+        "classes": [{
+            "classId": 4,
+            "course": 1,
+            "word": "B"
+            "level": "Bachillerato",
+            "impartId": 154
+        }, {
+            "classId": 8,
+            "course": 2,
+            "word": "B"
+            "level": "Bachillerato",
+            "impartId": 186
+        }]
+    }
+    ]
+
+"""
+
+
+def special_sort(list):
+    """
+    Sort with a special way the items of the list.
+    :param list:
+    :return:
+    """
+
+    sorted_list = []
+
+    for list_element in list:
+
+        if len(sorted_list) == 0:
+            new_subject = {'subjectId': list_element.get('subjectId'),
+                       'name': list_element.get('name')
+                       }
+            new_class = {'classId': list_element.get('classId'),
+                         'course': list_element.get('course'),
+                         'level': list_element.get('level'),
+                         'word': list_element.get('word'),
+                         'impartId': list_element.get('impartId')}
+
+            sorted_list.append({'subject': new_subject, 'classes': [new_class]})
+
+        else:
+            index = -1
+            for item in sorted_list:
+                if item["subject"]["subjectId"] == list_element.get("subjectId"):
+                    index = sorted_list.index(item)
+
+            if index != -1:
+                new_class = {'classId': list_element.get('classId'),
+                             'course': list_element.get('course'),
+                             'level': list_element.get('level'),
+                             'word': list_element.get('word'),
+                             'impartId': list_element.get('impartId')}
+
+                sorted_list[index]["classes"].append(new_class)
+
+            else:
+                new_subject = {'subjectId': list_element.get('subjectId'),
+                               'name': list_element.get('name')
+                               }
+                new_class = {'classId': list_element.get('classId'),
+                             'course': list_element.get('course'),
+                             'level': list_element.get('level'),
+                             'word': list_element.get('word'),
+                             'impartId': list_element.get('impartId')}
+
+                sorted_list.append({'subject': new_subject, 'classes': [new_class]})
+
+    return sorted_list
 
 def sql_execute(cursor, query):  # References
 
@@ -139,7 +287,7 @@ class EntitiesManager:
         cursor.close()
         db.close()
 
-        return return_di
+        return return_dic
 
     @classmethod
     def get(cls, kind, entity_id=None, params=None):
@@ -339,6 +487,12 @@ class EntitiesManager:
                 query = 'SELECT classId, course, word, level FROM class WHERE deleted = 0 and classId IN (SELECT classId FROM association where associationId IN(SELECT associationId FROM impart WHERE teacherId=' + entity_id + '));'
             elif related_kind == 'subject':  # Todas las asignaturas que el profesor imparte.
                 query = 'SELECT subjectId, name FROM subject WHERE deleted = 0 and subjectId IN (SELECT subjectId FROM association WHERE associationId IN (SELECT associationId FROM impart WHERE teacherId=' + entity_id + '));'
+            elif related_kind == 'imparts':
+                query = 'SELECT i.impartId, c.classId, c.course, c.word, c.level, s.subjectId, s.name FROM ' \
+                        '( SELECT impart.associationId, impartId , association.subjectId, association.classId ' \
+                        'FROM impart JOIN association WHERE impart.associationId = association.associationId ' \
+                        'AND impart.teacherId=' + entity_id + ') i JOIN class c JOIN subject s on (i.classId = c.classId ' \
+                        'AND i.subjectId = s.subjectId);'
 
         elif kind == 'class':  # Queremos buscar entidades relacionadas con una entidad de tipo class.
             if related_kind == 'student':  # Todos los alumnos matriculados en esa clase.
@@ -350,7 +504,7 @@ class EntitiesManager:
 
         elif kind == 'subject':  # Queremos buscar entidades relacionadas con una entidad de tipo subject.
             if related_kind == 'student':
-                query = 'SELECT studentId, name, surname from student where deleted = 0 and studentId in (select studentId from enrollment where associationId IN ( select associationId from association where subjectId=' + entity_id + '));'
+                query = 'SELECT studentId, name, surname from student where deleted = 0 and studentId in (SELECT studentId from enrollment where associationId IN ( select associationId from association where subjectId=' + entity_id + '));'
             elif related_kind == 'teacher':
                 query = 'SELECT teacherId, name, surname from teacher where deleted = 0 and teacherId in (select teacherId from impart where associationId IN ( select associationId from association where subjectId=' + entity_id + '));'
             elif related_kind == 'class':
@@ -380,5 +534,8 @@ class EntitiesManager:
         db.commit()
         cursor.close()
         db.close()
+
+        if related_kind == 'imparts' and status_value == 1:
+            return_dic['data'] = special_sort(return_dic['data']);
 
         return return_dic

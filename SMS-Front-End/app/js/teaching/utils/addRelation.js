@@ -1,7 +1,7 @@
 
 
 angular.module('teachers')
-    .controller('addRelationController',function($scope, $resource, $mdDialog, $stateParams, TeachersService, SubjectsService, ClassesService, AssociationsService, ImpartsService){
+    .controller('addRelationController',function($scope, $resource, $mdDialog, $stateParams, TeachersService, SubjectsService, ClassesService, AssociationsService, parentController){
 
             var vm = this;
 
@@ -25,14 +25,6 @@ angular.module('teachers')
             function activate() {
                 console.log('Activating addRelation controller.')
 
-                // IT's retrieved all tea
-                vm.teachersList = TeachersService.query({}, function(){
-                    console.log('List of teachers retrieved.')
-                    console.log(vm.teachersList)
-                }, function(){
-                    console.log('Any problem found when was retrieved the teachers list.')
-                })
-
                 // We need all signatures
                 vm.subjectsList = SubjectsService.query({}, function(){
                     console.log('List of subjects retrieved.')
@@ -50,21 +42,14 @@ angular.module('teachers')
                 })
 
                 // We need all associations
-                vm.associationsList = AssociationsService.query({}, function(){
+                parentController.associationsList = AssociationsService.query({}, function(){
                     console.log('List of associations retrieved.')
+                    // This way we have the same info in both controllers.
+                    vm.associationsList = parentController.associationsList;
                     console.log(vm.associationsList)
                 },function(){
                     console.log('Any problem found when was retrieved the associations list.')
                 })
-
-                // We need all imparts
-                vm.impartsList = ImpartsService.query({}, function(){
-                    console.log('List of imparts retrieved.')
-                    console.log(vm.impartsList)
-                },function(){
-                    console.log('Any problem found when was retrieved the imparts list.')
-                })
-
 
             }
 
@@ -73,25 +58,86 @@ angular.module('teachers')
                 $mdDialog.cancel();
             }
 
-            // Function to call backend to save the relation.
+            // Function to save relation in the model of parent, in parentController.teacherImparts
             function saveRelation(){
+
                 console.log('saveRelation function called')
 
-                var impart = new ImpartsService();
-                impart.data = {
-                  teacherId: vm.teacherId,
-                  associationId: vm.associationId
+                var list = parentController.teacherImparts;
+                console.log(list)
+                console.log(list.length)
+
+                // We add the new relation in the parentController array teacherImparts, obviously with the same format.
+
+                var exists = false;
+
+                // It searched if the subject exists in the list.
+                for (var i=0; i<list.length; i++){
+
+                    // If the subject already exists in the list
+                    if (list[i].subject.subjectId == vm.subjectSelected){
+                        exists = true;
+                        // We add the class inside a class list inside of item:
+
+                        var index=-1;
+                        for(var j=0; j<vm.classesList.length; j++)
+                          if(vm.classesList[j].classId == vm.classSelected){index=j;break;}
+
+
+
+                        var new_class = {classId: vm.classSelected,
+                                     course: vm.classesList[index].course,
+                                     level: vm.classesList[index].level,
+                                     word: vm.classesList[index].word}
+
+                        console.log(new_class)
+
+                        list[i].classes.push(new_class)
+
+                    }
                 }
-                impart.$save(function(){
-                    console.log('Save successfully');
-                    $mdDialog.cancel();
-                });
+
+
+                if (!exists){
+
+                    // We need create the subject in list and insert the class inside.
+
+                    var indexClass=-1;
+                    for(var j=0; j<vm.classesList.length; j++)
+                      if(vm.classesList[j].classId == vm.classSelected){indexClass=j;break;}
+
+                    var indexSubject=-1;
+                    for(var k=0; k<vm.subjectsList.length; k++)
+                      if(vm.subjectsList[k].subjectId == vm.subjectSelected){indexSubject=k;break;}
+
+
+                    var new_subject ={subjectId: vm.subjectSelected,
+                                      name: vm.subjectsList[indexSubject].name
+                    }
+
+                    var new_class = {classId: vm.classSelected,
+                                 course: vm.classesList[indexClass].course,
+                                 level: vm.classesList[indexClass].level,
+                                 word: vm.classesList[indexClass].word}
+
+                    var classes_list = []
+                    classes_list.push(new_class)
+
+                    list.push({subject: new_subject, classes: classes_list})
+
+                }
+
+                console.log(list)
+
+                $mdDialog.cancel();
+
             }
 
             function checkRelationSelected(subjectSelected, classSelected) {
 
                 console.log(vm.teacherId)
 
+                // If
                 if (subjectSelected != -1 && classSelected != -1) {
                     console.log('subjectSelected:  ' + subjectSelected + '   classSelected: ' + classSelected)
                     var exists = false;
@@ -107,20 +153,22 @@ angular.module('teachers')
 
                         vm.associationRelationExists = true;
 
-                        for (var i = 0; i < vm.impartsList.length; i++) {
-                            if (vm.impartsList[i].associationId == vm.associationId && vm.impartsList[i].teacherId == vm.teacherId){
-                                vm.associationImpartExists = true;
+
+                        // It searched if the relation between the teacher and this relation exists already.
+                        for (var i=0; i < parentController.teacherImparts.length; i++){
+                            if(parentController.teacherImparts[i].subject.subjectId == subjectSelected){
+                                for (var j=0; j<parentController.teacherImparts[i].classes.length; j++){
+                                    if(parentController.teacherImparts[i].classes[j].classId == classSelected){
+                                        vm.associationImpartExists = true;
+                                    }
+                                }
                             }
                         }
+
 
                         if (!vm.associationImpartExists){
                             vm.addButtonEnable = true;
                         }
-
-
-
-
-
 
                     } else {
                         // To show a message in the dialog to confirm that this relation doesn't exists.
@@ -130,5 +178,3 @@ angular.module('teachers')
             }
 
 });
-
-//angular.module('teachers').controller('teachersListController', ['$scope', function($scope) {}]);
