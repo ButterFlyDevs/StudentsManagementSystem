@@ -191,10 +191,16 @@ angular.module('teachers')
             console.log('Calling updateTeacher() function.')
 
 
+            // Declaro un array de llamadas:
+
+            var promises = [];
+
+            //Introduzco en el array todas las llamadas que se van a realizar.
+
             if ($scope.teacherModelHasChanged) { // We update teacher data.
                 // A dirty solution to problem that does that the date is saved with a day minus.
                 vm.teacher.birthdate.setDate(vm.teacher.birthdate.getDate() + 1);
-                vm.teacher.$update(
+                var promise = vm.teacher.$update(
                     function () { // Success
                         console.log('Success saving the teacher.')
                         toastService.showToast('Profesor actualizado con éxito.')
@@ -204,6 +210,7 @@ angular.module('teachers')
                         console.log(error)
                         toastService.showToast('Error actualizando al profesor.')
                     });
+                promises.push(promise)
             }
 
             if ($scope.teacherImpartsModelHasChanged) { // We update the teacher imparts info.
@@ -217,6 +224,15 @@ angular.module('teachers')
 
 
             }
+
+
+
+
+            // Ejecuto el array de llamadas y en controlo si existe algún error para mostrarselo al usuario de forma general
+            // y si all ha funcionado recargar los datos y mostrar tb mensaje de confirmación.
+            console.log('Promises')
+            console.log(promises)
+
 
             // It reloaded all data to avoid problems.
             // How wait to exit from teacher.$update
