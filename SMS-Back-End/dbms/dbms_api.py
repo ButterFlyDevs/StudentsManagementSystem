@@ -1,22 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, request, jsonify, Response
-from flask.ext.cors import CORS, cross_origin
+from flask import Flask, Response
 from flask import abort, make_response
 from flask import request
 import jsonpickle
 import logging
 from logging.handlers import RotatingFileHandler
-
-
-
 from dbapi.entities_manager import EntitiesManager
 from dbapi.GestorCredencialesSQL import GestorCredenciales
-
-from google.appengine.api import modules
-from google.appengine.api import urlfetch
-import urllib
-import urllib2
 
 import datetime
 
@@ -24,33 +15,7 @@ import json
 from termcolor import colored
 
 
-class HTTPMethodOverrideMiddleware(object):
-    allowed_methods = frozenset([
-        'GET',
-        'HEAD',
-        'POST',
-        'DELETE',
-        'PUT',
-        'PATCH',
-        'OPTIONS'
-    ])
-    bodyless_methods = frozenset(['GET', 'HEAD', 'OPTIONS', 'DELETE'])
-
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        method = environ.get('HTTP_X_HTTP_METHOD_OVERRIDE', '').upper()
-        if method in self.allowed_methods:
-            method = method.encode('ascii', 'replace')
-            environ['REQUEST_METHOD'] = method
-        if method in self.bodyless_methods:
-            environ['CONTENT_LENGTH'] = '0'
-        return self.app(environ, start_response)
-
-
 app = Flask(__name__)
-app.wsgi_app = HTTPMethodOverrideMiddleware(app.wsgi_app)
 
 
 #file_handler = logging.FileHandler('app.log', 'rw')
@@ -83,6 +48,19 @@ class MyEncoder(json.JSONEncoder):
 
 
 def process_response(response):
+    """
+    Function that process the response of entites manager
+    to adjust to APIRest communications, reading the error
+    messages and adjust this to the standard REST, and in
+    case of error adding this in body of response becasue
+    the user maybe want to be informed.
+
+    :param response: a list with three params: status, data and log.
+    :return:
+    """
+
+    print 'In process response'
+    print response
 
     """
     Function to build a response with sense.
@@ -104,27 +82,20 @@ def process_response(response):
         # return json.dumps(response['data'], cls=MyEncoder)
         #app.logger.info('informing')
 
-        res = Response(json.dumps(response['data'], cls=MyEncoder), mimetype='application/json')
+        return make_response(Response(json.dumps(response['data'], cls=MyEncoder), mimetype='application/json'))
 
-        rews = make_response(res)
+    elif response['status'] == -1:
+        # The element that it searched doesn't exists.
+        abort(404)  # Is returned standard "Not found" error.
 
-       # rews.headers['Access-Control-Allow-Origin'] = "*"
-       # rews.headers['Access-Control-Allow-Origin'] = "*"
-       # rews.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-       # rews.headers['allow'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    elif response['status'] in [1054, 1452, 1146]:
+        abort(404, response['log'])  # The same plus log.
 
-        return rews
-
-    # The element that it searched doesn't exists.
-    elif response['status'] in [-1, 1452, 1054, 1065, 1146]:
-        abort(404) # Is returned standard "Not found" error.
-
-    # 1062 is a error code directly from MySQL driver.
     elif response['status'] == 1062:
 
-        # 409 Conflict because the item already exists in database and the user can't create another
+        # 409 Conflict because the item already exists in database and the user can't create another.
         # resource with the same values.
-        abort(409)
+        abort(409, response['log'])
 
     else:
         # Another problem that we don't have identified.
@@ -204,6 +175,7 @@ def post_entity(kind):
     # When are really saved data in database
     response = EntitiesManager.put(kind, data)
 
+    """
     if c:
         salida = salidaGestor
         print colored(salidaGestor, 'green')
@@ -268,6 +240,7 @@ def post_entity(kind):
         #return json.dumps(salidaGestor)
         print colored(salida, 'green')
         return json.dumps(salida)
+    """
 
     return process_response(response)
 

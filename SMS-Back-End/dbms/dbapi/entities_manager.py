@@ -172,23 +172,26 @@ def special_sort(list):
 
 def sql_execute(cursor, query):  # References
 
-    status_value = 1  # By default is success.
+    status = 1  # By default is success.
     num_elements = 0  # By default any entity is retrieved.
+    log = None
 
     try:
         num_elements = cursor.execute(query);
     except db_params.MySQLdb.Error, e:
         try:
-            print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-            print "Error number: " + str(e.args[0])
-            status_value = e.args[0]
+            error = "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+            print error
+            log = error
+            status = e.args[0]
         except IndexError:
             print "MySQL Error: %s" % str(e)
 
-    #print 'status_value: ' + colored(status_value, 'red')
-    #print 'num_elements: ' + colored(num_elements, 'red')
 
-    return status_value, num_elements
+    print 'status: ' + colored(status, 'red')
+    print 'num_elements: ' + colored(num_elements, 'red')
+
+    return status, num_elements, log
 
 
 class EntitiesManager:
@@ -251,14 +254,15 @@ class EntitiesManager:
 
         status_value = 1 # By default is success.
         num_elements = 0 # By default any entity is retrieved.
+        log = None
 
         try:
             num_elements = cursor.execute(query);
             entity_id = cursor.lastrowid
         except db_params.MySQLdb.Error, e:
             try:
-                print "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-                print "Error number: " + str(e.args[0])
+                error = "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+                log = error
                 status_value = e.args[0]
             except IndexError:
                 print "MySQL Error: %s" % str(e)
@@ -269,6 +273,7 @@ class EntitiesManager:
         if status_value == 1:
 
             retrieve_query = 'select * from ' + kind + ' where ' + kind + 'Id = ' + str(entity_id) + ';'
+            print colored('Populating item', 'green')
             print colored(retrieve_query, 'green')
 
             if cursor.execute(retrieve_query) == 1: # If query obtain one element.
@@ -281,6 +286,7 @@ class EntitiesManager:
                 return_dic['data'] = row
 
         return_dic['status'] = status_value
+        return_dic['log'] = log
 
         # Confirm the changes
         db.commit()
@@ -340,7 +346,7 @@ class EntitiesManager:
 
         cursor = db.cursor()
 
-        status_value, num_elements = sql_execute(cursor, query)
+        status_value, num_elements, log = sql_execute(cursor, query)
 
         # If the query execute has success we are going to retrieve all data saved in database about this item.
         if status_value == 1:
@@ -372,6 +378,7 @@ class EntitiesManager:
                     status_value = -1
 
         return_dic['status'] = status_value
+        return_dic['log'] = log
 
         db.commit()
         cursor.close()
@@ -416,14 +423,18 @@ class EntitiesManager:
 
         cursor = db.cursor()
 
-        status_value, num_elements = sql_execute(cursor, query)
+        status_value, num_elements, log = sql_execute(cursor, query)
+
+        print colored(status_value, 'yellow')
+        print colored(num_elements, 'yellow')
 
         db.commit()
 
         # If the query execute has success we are going to retrieve all data saved in database about this item.
-        if status_value == 1 and num_elements == 1:
+        if status_value == 1:
 
             retrieve_query = 'select * from ' + str(kind) + ' where ' + str(kind) + 'Id = ' + str(entity_id) + ';'
+            print colored('Populating item', 'green')
             print colored(retrieve_query, 'green')
 
             if cursor.execute(retrieve_query) == 1:  # If query obtain one element.
@@ -435,10 +446,9 @@ class EntitiesManager:
 
                 return_dic['data'] = row
 
-        if num_elements == 1:
-            return_dic['status'] = status_value
-        else:
-            return_dic['status'] = -1
+        return_dic['status'] = status_value
+        return_dic['log'] = log
+
 
         # Confirm the changes
         db.commit()
@@ -513,7 +523,7 @@ class EntitiesManager:
         if v:
             print colored(query, 'yellow')
 
-        status_value, num_elements = sql_execute(cursor, query)
+        status_value, num_elements, log = sql_execute(cursor, query)
 
         if status_value == 1:
 
@@ -530,6 +540,7 @@ class EntitiesManager:
             return_dic['data'] = entities_list
 
         return_dic['status'] = status_value
+        return_dic['log'] = log
 
         db.commit()
         cursor.close()

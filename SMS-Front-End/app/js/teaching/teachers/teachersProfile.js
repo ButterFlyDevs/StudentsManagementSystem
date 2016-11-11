@@ -1,5 +1,5 @@
 angular.module('teachers')
-    .controller('teachersProfileController', function ($scope, moment, $resource, $state, $stateParams, $mdDialog, TeachersService, AssociationsService, ImpartsService, toastService, globalService) {
+    .controller('teachersProfileController', function ($scope, moment, $q, $resource, $state, $stateParams, $mdDialog, TeachersService, AssociationsService, ImpartsService, toastService, globalService) {
 
         var vm = this;
 
@@ -19,7 +19,9 @@ angular.module('teachers')
 
         vm.defaultAvatar = globalService.defaultAvatar;
 
+            // Declaro un array de llamadas:
 
+            var promises = [];
 
 
 
@@ -191,27 +193,27 @@ angular.module('teachers')
             console.log('Calling updateTeacher() function.')
 
 
-            // Declaro un array de llamadas:
-
-            var promises = [];
+            // El array de promises está decalrado arriba.
 
             //Introduzco en el array todas las llamadas que se van a realizar.
 
             if ($scope.teacherModelHasChanged) { // We update teacher data.
                 // A dirty solution to problem that does that the date is saved with a day minus.
                 vm.teacher.birthdate.setDate(vm.teacher.birthdate.getDate() + 1);
+
+                var deferred = $q.defer();
+
                 var promise = vm.teacher.$update(
                     function () { // Success
-                        console.log('Success saving the teacher.')
-                        toastService.showToast('Profesor actualizado con éxito.')
+                        deferred.resolve('Success updating the teacher with vm.teacher.$update.');
                     },
                     function (error) { // Fail
-                        console.log('Error saving the teacher.')
-                        console.log(error)
-                        toastService.showToast('Error actualizando al profesor.')
+                        deferred.reject('Error updating the teacher with vm.teacher.$update, error: ' + error)
                     });
-                promises.push(promise)
+                promises.push(deferred.promise)
             }
+
+
 
             if ($scope.teacherImpartsModelHasChanged) { // We update the teacher imparts info.
 
@@ -233,10 +235,28 @@ angular.module('teachers')
             console.log('Promises')
             console.log(promises)
 
+            $q.all(promises).then(
 
-            // It reloaded all data to avoid problems.
-            // How wait to exit from teacher.$update
-            loadData();
+                function(value){
+                    console.log('Resolving all promises, SUCCESS,  value: ')
+                    console.log(value);
+                    toastService.showToast('Profesor actualizado con éxito.');
+
+                    // It reloaded all data to avoid problems.
+                    // How wait to exit from teacher.$update
+                    loadData();
+
+                    promises = [];
+
+                },function(reason){
+                    console.log('Resolving all promises, FAIL, reason: ')
+                    console.log(reason);
+                    toastService.showToast('Error actualizando al profesor.');
+                }
+            )
+
+
+
 
 
         }
@@ -247,6 +267,8 @@ angular.module('teachers')
         }
 
         function newImpart(classId, subjectId){
+
+          var deferred = $q.defer();
 
           // This function will decide if it need create a new A
           // relation before to create new I relation with the teacher related.
@@ -268,19 +290,25 @@ angular.module('teachers')
 
                 console.log('Creating a new Imparts relation');
                 var newImpart = new ImpartsService({data: {associationId: vm.associationsList[index].associationId,
+
                                                            teacherId: vm.teacherId}});
                 newImpart.$save(
                     function(){ // Success
-                        console.log('Success saving the impart.');
-                        console.log(newImpart)
-                        toastService.showToast('Relación imparte guardada con éxito.')
+                        //console.log('Success saving the impart.');
+                        //console.log(newImpart)
+                        //toastService.showToast('Relación imparte guardada con éxito.')
+                        deferred.resolve('Success saving the impart relation with newImpart.$save');
                     },
                     function(error){ // Fail
-                        console.log('Error saving the impart relation.');
-                        console.log(newImpart)
-                        console.log(error);
-                        toastService.showToast('Error al guardar relación imparte.')
+                        //console.log('Error saving the impart relation.');
+                        //console.log(newImpart)
+                        //console.log(error);
+                        //toastService.showToast('Error al guardar relación imparte.')
+                        deferred.reject('Error saving the the impart relation with newImpart.$save, error: ' + error)
                     });
+                promises.push(deferred.promise)
+
+
 
             }else{ // We need create a new Association relation and before a new Imparts relation.
                 console.log('Creating a new Association relation and Imparts relation.');
