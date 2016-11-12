@@ -143,13 +143,19 @@
 
 
                     <md-list class="md-dense">
-                            <md-list-item class="md-3-line" ng-repeat="item in item.classes" ng-click="null">
+                            <md-list-item class="md-3-line" ng-repeat="class in item.classes" ng-click="null">
                                 <div class="md-list-item-text" layout="column">
-                                    <h3>{{ item.course }} {{ item.word }} {{ item.level }}</h3>
+                                    <h3>{{ class.course }} {{ class.word }} {{ class.level }}</h3>
                                 </div>
+
+                                <md-button ng-click="vm.showDeleteTeacherImpartConfirm(item.subject.subjectId, class.classId)" class="md-icon-button" aria-label="More">
+                                    <md-icon>more_vert</md-icon>
+                                </md-button>
+
                             </md-list-item>
                     </md-list>
 
+                        <!-- <md-icon ng-click="alert('search')" >delete</md-icon>-->
 
 
                     </div>

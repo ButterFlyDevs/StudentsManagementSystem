@@ -10,7 +10,6 @@ Si se trata de booleanos : boolean
 
 """
 
-
 # Uso de variables generales par la conexión a la BD.
 import db_params
 import datetime
@@ -131,8 +130,8 @@ def special_sort(list):
 
         if len(sorted_list) == 0:
             new_subject = {'subjectId': list_element.get('subjectId'),
-                       'name': list_element.get('name')
-                       }
+                           'name': list_element.get('name')
+                           }
             new_class = {'classId': list_element.get('classId'),
                          'course': list_element.get('course'),
                          'level': list_element.get('level'),
@@ -170,6 +169,7 @@ def special_sort(list):
 
     return sorted_list
 
+
 def sql_execute(cursor, query):  # References
 
     status = 1  # By default is success.
@@ -186,7 +186,6 @@ def sql_execute(cursor, query):  # References
             status = e.args[0]
         except IndexError:
             print "MySQL Error: %s" % str(e)
-
 
     print 'status: ' + colored(status, 'red')
     print 'num_elements: ' + colored(num_elements, 'red')
@@ -217,7 +216,7 @@ class EntitiesManager:
         now = datetime.datetime.utcnow()
         tz = pytz.timezone('Europe/Madrid')
         tzoffset = tz.utcoffset(now)
-        mynow = now+tzoffset
+        mynow = now + tzoffset
 
         control_fields = {'createdBy': 1,
                           'createdAt': mynow,
@@ -252,8 +251,8 @@ class EntitiesManager:
 
         cursor = db.cursor()
 
-        status_value = 1 # By default is success.
-        num_elements = 0 # By default any entity is retrieved.
+        status_value = 1  # By default is success.
+        num_elements = 0  # By default any entity is retrieved.
         log = None
 
         try:
@@ -276,7 +275,7 @@ class EntitiesManager:
             print colored('Populating item', 'green')
             print colored(retrieve_query, 'green')
 
-            if cursor.execute(retrieve_query) == 1: # If query obtain one element.
+            if cursor.execute(retrieve_query) == 1:  # If query obtain one element.
                 row = cursor.fetchone()
                 # None values are not necessary.
                 row = dict((k, v) for k, v in row.iteritems() if v)
@@ -319,7 +318,6 @@ class EntitiesManager:
         # and whe don't want all info, only the most relevant, name and id.
         if entity_id is None:
 
-
             if params is not None:
 
                 # It always included entity id.
@@ -340,7 +338,7 @@ class EntitiesManager:
 
         # We want all info about one entity.
         else:
-             query += '* from ' + str(kind) + ' where ' + str(kind) + 'Id = ' + str(entity_id) + ' and deleted = 0;'
+            query += '* from ' + str(kind) + ' where ' + str(kind) + 'Id = ' + str(entity_id) + ' and deleted = 0;'
 
         print colored(query, 'yellow')
 
@@ -369,12 +367,12 @@ class EntitiesManager:
             # All info about one
             else:
 
-                if num_elements != 0: # If the element exists in database.
+                if num_elements != 0:  # If the element exists in database.
 
-                    row = dict((k, v) for k, v in cursor.fetchone().iteritems() if v) # To delete None values
+                    row = dict((k, v) for k, v in cursor.fetchone().iteritems() if v)  # To delete None values
                     return_dic['data'] = row
 
-                else: # If doesn't exists.
+                else:  # If doesn't exists.
                     status_value = -1
 
         return_dic['status'] = status_value
@@ -449,7 +447,6 @@ class EntitiesManager:
         return_dic['status'] = status_value
         return_dic['log'] = log
 
-
         # Confirm the changes
         db.commit()
         cursor.close()
@@ -470,7 +467,7 @@ class EntitiesManager:
         entity_id = str(entity_id)
         related_kind = str(related_kind)
 
-        return_dic={}
+        return_dic = {}
 
         print locals()
 
@@ -498,11 +495,12 @@ class EntitiesManager:
             elif related_kind == 'subject':  # Todas las asignaturas que el profesor imparte.
                 query = 'SELECT subjectId, name FROM subject WHERE deleted = 0 and subjectId IN (SELECT subjectId FROM association WHERE associationId IN (SELECT associationId FROM impart WHERE teacherId=' + entity_id + '));'
             elif related_kind == 'imparts':
+                # More bit complex query:
                 query = 'SELECT i.impartId, c.classId, c.course, c.word, c.level, s.subjectId, s.name FROM ' \
                         '( SELECT impart.associationId, impartId , association.subjectId, association.classId ' \
                         'FROM impart JOIN association WHERE impart.associationId = association.associationId ' \
-                        'AND impart.teacherId=' + entity_id + ') i JOIN class c JOIN subject s on (i.classId = c.classId ' \
-                        'AND i.subjectId = s.subjectId);'
+                        'AND impart.teacherId = ' + entity_id + ' AND impart.deleted = 0) i JOIN class c JOIN subject s on (i.classId = c.classId ' \
+                                                              'AND i.subjectId = s.subjectId);'
 
         elif kind == 'class':  # Queremos buscar entidades relacionadas con una entidad de tipo class.
             if related_kind == 'student':  # Todos los alumnos matriculados en esa clase.

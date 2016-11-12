@@ -47,7 +47,7 @@ CREATE TABLE student (
   deleted         BOOL,
 
   PRIMARY KEY (studentId),
-  UNIQUE (dni)
+  # UNIQUE (dni)
 );
 
 /*Creación de la tabla Profesor, con todos los atributos de esta entidad.
@@ -80,7 +80,7 @@ CREATE TABLE teacher (
   deleted         BOOL,
 
   PRIMARY KEY (teacherId),
-  UNIQUE (dni)
+  # UNIQUE (dni)
 );
 
 #Creación de la tabla Asignatura, con todos los atributos de esta entidad.
@@ -101,7 +101,7 @@ CREATE TABLE subject (
   deleted     BOOL,
 
   PRIMARY KEY (subjectId),
-  UNIQUE (name) #No se entiende que haya dos asignaturas con el mismo nombre exacto, por eso no se permite.
+  # UNIQUE (name) #No se entiende que haya dos asignaturas con el mismo nombre exacto, por eso no se permite.
 );
 
 #Creación de la tabla Clase, ejemplo
@@ -125,7 +125,7 @@ CREATE TABLE class (
   #La clave primaria la forman los tres campos que juntos no pueden ser repetidos. (Sólo puede existir una entidad con ellos)
   PRIMARY KEY (classId),
   #Hacemos que los tres campos sean UNIQUE para que no pueda exisir una clase con los mismos datos que otra
-  UNIQUE (course, word, level)
+  # UNIQUE (course, word, level)
 );
 
 #Creacion de la tabla para los Grupos
@@ -151,7 +151,7 @@ CREATE TABLE association (
   FOREIGN KEY (classId) REFERENCES class (classId),
 
   PRIMARY KEY (associationId),
-  UNIQUE (subjectId, classId)
+  # UNIQUE (subjectId, classId)
 );
 
 
@@ -176,9 +176,9 @@ CREATE TABLE impart (
   FOREIGN KEY (associationId) REFERENCES association (associationId),
   FOREIGN KEY (teacherId) REFERENCES teacher (teacherId),
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (impartId),
-  #Especificamos que la formación idAsociacion, idProfesor) como par no pueda repetirse:
-  UNIQUE (associationId, teacherId)
+  PRIMARY KEY (impartId)
+  # Especificamos que la formación idAsociacion, idProfesor) como par no pueda repetirse:
+  # UNIQUE (associationId, teacherId)
 
 );
 
@@ -205,9 +205,15 @@ CREATE TABLE enrollment (
   #Establecemos la clave primaria compuesta.
   PRIMARY KEY (enrollmentId),
   #Un alumno no puede estar dos veces matriuclado a la misma asociacion
-  UNIQUE (studentId, associationId)
+  # UNIQUE (studentId, associationId)
 
 );
+
+/*
+Se han eliminado los atributos unique para que puedan exsistir dos item que sean el mismo, debido a que uno fue creado
+y luego eliminado mientras que otro fue creado después. Eso nos permite trazabilidad de los elementos repetidos
+sin entrar en conflicto.
+ */
 
 /*
 CREATE TABLE Credenciales(
