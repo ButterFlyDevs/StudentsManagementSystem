@@ -46,7 +46,7 @@ CREATE TABLE student (
   deletedAt       DATETIME,
   deleted         BOOL,
 
-  PRIMARY KEY (studentId),
+  PRIMARY KEY (studentId)
   # UNIQUE (dni)
 );
 
@@ -79,7 +79,7 @@ CREATE TABLE teacher (
   deletedAt       DATETIME,
   deleted         BOOL,
 
-  PRIMARY KEY (teacherId),
+  PRIMARY KEY (teacherId)
   # UNIQUE (dni)
 );
 
@@ -100,7 +100,7 @@ CREATE TABLE subject (
   deletedAt   DATETIME,
   deleted     BOOL,
 
-  PRIMARY KEY (subjectId),
+  PRIMARY KEY (subjectId)
   # UNIQUE (name) #No se entiende que haya dos asignaturas con el mismo nombre exacto, por eso no se permite.
 );
 
@@ -123,7 +123,7 @@ CREATE TABLE class (
   deleted    BOOL,
 
   #La clave primaria la forman los tres campos que juntos no pueden ser repetidos. (Sólo puede existir una entidad con ellos)
-  PRIMARY KEY (classId),
+  PRIMARY KEY (classId)
   #Hacemos que los tres campos sean UNIQUE para que no pueda exisir una clase con los mismos datos que otra
   # UNIQUE (course, word, level)
 );
@@ -150,7 +150,7 @@ CREATE TABLE association (
   FOREIGN KEY (subjectId) REFERENCES subject (subjectId),
   FOREIGN KEY (classId) REFERENCES class (classId),
 
-  PRIMARY KEY (associationId),
+  PRIMARY KEY (associationId)
   # UNIQUE (subjectId, classId)
 );
 
@@ -203,7 +203,7 @@ CREATE TABLE enrollment (
   FOREIGN KEY (associationId) REFERENCES association (associationId),
   FOREIGN KEY (studentId) REFERENCES student (studentId),
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (enrollmentId),
+  PRIMARY KEY (enrollmentId)
   #Un alumno no puede estar dos veces matriuclado a la misma asociacion
   # UNIQUE (studentId, associationId)
 

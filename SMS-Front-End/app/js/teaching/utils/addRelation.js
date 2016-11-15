@@ -16,7 +16,7 @@ angular.module('teachers')
             vm.createNewAssociationCheckboxValue = false;
 
             vm.associationRelationExists = true;
-            vm.associationImpartExists = false;
+            vm.impartRelationExists = false;
             vm.addButtonEnable = false;
 
             vm.teacherId = $stateParams.teacherId
@@ -135,45 +135,37 @@ angular.module('teachers')
 
             function checkRelationSelected(subjectSelected, classSelected) {
 
-                console.log(vm.teacherId)
+                console.log('Executing checkRelationSelected')
 
-                // If
+                // We first check if the relation between the class and the subject (association) already exists.
                 if (subjectSelected != -1 && classSelected != -1) {
-                    console.log('subjectSelected:  ' + subjectSelected + '   classSelected: ' + classSelected)
-                    var exists = false;
+
+                    vm.associationRelationExists = false;
+                    vm.impartRelationExists = false;
+
+                    // Primero comprobamos si la relación existe ya en el servidor con la lista de asociaciones que le pedimos.
                     for (var i = 0; i < vm.associationsList.length; i++) {
                         if (vm.associationsList[i].subjectId == subjectSelected && vm.associationsList[i].classId == classSelected) {
-                            exists = true;
-                            vm.associationId = vm.associationsList[i].associationId;
-                            console.log(vm.associationId)
+                            vm.associationRelationExists = true;
+                            console.log('detectada en el servidor')
                         }
                     }
 
-                    if (exists) {
-
-                        vm.associationRelationExists = true;
-
-
-                        // It searched if the relation between the teacher and this relation exists already.
-                        for (var i=0; i < parentController.teacherImparts.length; i++){
-                            if(parentController.teacherImparts[i].subject.subjectId == subjectSelected){
-                                for (var j=0; j<parentController.teacherImparts[i].classes.length; j++){
-                                    if(parentController.teacherImparts[i].classes[j].classId == classSelected){
-                                        vm.associationImpartExists = true;
-                                    }
+                    /* Después comprobamos si la relación existe porque se haya creado en una iteración previa en teacherImparts
+                     que aún no se ha subido al servidor. */
+                    for (var i=0; i < parentController.teacherImparts.length; i++)
+                        if (parentController.teacherImparts[i].subject.subjectId == subjectSelected)
+                            for (var j = 0; j < parentController.teacherImparts[i].classes.length; j++)
+                                if (parentController.teacherImparts[i].classes[j].classId == classSelected) {
+                                    vm.associationRelationExists = true;
+                                    vm.impartRelationExists = true; // Tb vemos que la relacion imparte con este profe existe.
                                 }
-                            }
-                        }
 
-
-                        if (!vm.associationImpartExists){
-                            vm.addButtonEnable = true;
-                        }
-
-                    } else {
-                        // To show a message in the dialog to confirm that this relation doesn't exists.
-                        vm.associationRelationExists = false;
-                    }
+                    //Si la associacion ya existe se puede asociar este profesor a ella:
+                    if(vm.associationRelationExists && !vm.impartRelationExists)
+                        vm.addButtonEnable = true;
+                    else
+                        vm.addButtonEnable = false;
                 }
             }
 

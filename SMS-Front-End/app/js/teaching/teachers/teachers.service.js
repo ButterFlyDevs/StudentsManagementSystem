@@ -15,7 +15,7 @@ angular.module('teachers')
              },
              'getImparts': {
                  method: 'GET',
-                 url: restPath + ':id' + '/imparts',
+                 url: restPath + ':id' + '/impart',
                  isArray: true
              },
              'update': {

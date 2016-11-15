@@ -3,7 +3,7 @@
 
     <div layout="row" layout-align="center" ng-cloak>
         <div flex="90" layout-padding>
-            <div  layout="row" layout-align="space-between start">
+            <div layout="row" layout-align="space-between start">
                 <md-button class="md-primary md-raised"
                            ui-sref="students">
                     <md-icon>keyboard_arrow_left</md-icon>
@@ -19,31 +19,31 @@
             <md-card ng-if="vm.student != null" layout="column" layout-margin layout-padding>
 
 
-                 <form name="studentUpdateForm">
-                <!-- We can see the layout like a row -->
-                <div layout="row" flex flex="70" layout-align="center">
+                <form name="studentUpdateForm">
+                    <!-- We can see the layout like a row -->
+                    <div layout="row" flex flex="70" layout-align="center">
 
-                    <!-- First column, with a image inside. -->
-                    <div flex="40" layout="column" layout-margin layout layout-align="center center">
-                        <div ng-switch="vm.user.img || '_undefined_'">
-                                        <img ng-switch-when="_undefined_" class="img-profile-big" src="{{ vm.defaultAvatar }}">
-                                        <img ng-switch-default class="img-profile-big"  src="{{ vm.user.img }}">
-                                    </div>
+                        <!-- First column, with a image inside. -->
+                        <div flex="40" layout="column" layout-margin layout layout-align="center center">
+                            <div ng-switch="vm.user.img || '_undefined_'">
+                                <img ng-switch-when="_undefined_" class="img-profile-big" src="{{ vm.defaultAvatar }}">
+                                <img ng-switch-default class="img-profile-big" src="{{ vm.user.img }}">
+                            </div>
 
-                        <div layout="row">
-                            <md-button class="md-primary md-fab md-mini" aria-label="Update photo">
-                                <md-icon>replay</md-icon>
-                            </md-button>
+                            <div layout="row">
+                                <md-button class="md-primary md-fab md-mini" aria-label="Update photo">
+                                    <md-icon>replay</md-icon>
+                                </md-button>
 
-                            <md-button class="md-primary md-fab md-mini" aria-label="Remove photo">
-                                <md-icon>delete</md-icon>
-                            </md-button>
+                                <md-button class="md-primary md-fab md-mini" aria-label="Remove photo">
+                                    <md-icon>delete</md-icon>
+                                </md-button>
+                            </div>
+
                         </div>
 
-                    </div>
-
-                    <!-- Second column, with user data inside. -->
-                    <div flex="60" layout="column">
+                        <!-- Second column, with user data inside. -->
+                        <div flex="60" layout="column">
 
                             <div layout layout-sm="column">
                                 <md-input-container flex="70">
@@ -52,80 +52,80 @@
                                 </md-input-container>
                             </div>
                             <div layout layout-sm="column">
-                            <md-input-container flex="70">
+                                <md-input-container flex="70">
                                     <label layout="">Apellidos</label>
                                     <input ng-model="vm.student.surname" required>
                                 </md-input-container>
                             </div>
 
+                        </div>
+
                     </div>
 
-                </div>
+
+                    <div layout="column" flex flex="70" layout-align="center">
+
+                        <div layout layout-sm="row">
+                            <md-input-container flex>
+                                <label layout="">Dirección</label>
+                                <input ng-model="vm.student.address" required>
+                            </md-input-container>
+
+                        </div>
+
+                        <div layout layout-sm="row">
+
+                            <md-input-container flex="40">
+                                <label layout="">Provincia</label>
+                                <input ng-model="vm.student.province" required>
+                            </md-input-container>
+
+                            <md-input-container flex="50">
+                                <label layout="">Localidad</label>
+                                <input ng-model="vm.student.locality" required>
+                            </md-input-container>
 
 
-                 <div layout="column" flex flex="70" layout-align="center">
-
-                            <div layout layout-sm="row">
-                                <md-input-container flex>
-                                    <label layout="">Dirección</label>
-                                    <input ng-model="vm.student.address" required>
-                                </md-input-container>
-
-                            </div>
-
-                            <div layout layout-sm="row">
-
-                                <md-input-container flex="40">
-                                    <label layout="">Provincia</label>
-                                    <input ng-model="vm.student.province" required>
-                                </md-input-container>
-
-                                <md-input-container flex="50">
-                                    <label layout="">Localidad</label>
-                                    <input ng-model="vm.student.locality" required>
-                                </md-input-container>
+                        </div>
 
 
-                            </div>
+                        <div layout layout-sm="row">
+
+                            <md-input-container flex="80">
+                                <md-datepicker
+                                        ng-model="vm.student.birthdate"
+                                        md-placeholder="Fecha de nacimiento">
+                                </md-datepicker>
+                            </md-input-container>
+
+                            <md-input-container flex="50">
+                                <md-icon style="color:gray;">phone</md-icon>
+                                <label layout="">Teléfono</label>
+                                <input ng-model="vm.student.phone" required>
+                            </md-input-container>
+
+                        </div>
 
 
-                            <div layout layout-sm="row">
+                        <div layout layout-sm="column">
+                            <md-input-container flex>
+                                <md-icon style="color:gray;">email</md-icon>
+                                <label layout="">Email</label>
+                                <input ng-model="vm.student.email" type="email">
+                            </md-input-container>
+                        </div>
 
-                                <md-input-container flex="80">
-                                    <md-datepicker
-                                            ng-model="vm.student.birthdate"
-                                            md-placeholder="Fecha de nacimiento">
-                                    </md-datepicker>
-                                </md-input-container>
-
-                                <md-input-container flex="50">
-                                    <md-icon style="color:gray;">phone</md-icon>
-                                    <label layout="">Teléfono</label>
-                                    <input ng-model="vm.student.phone" required>
-                                </md-input-container>
-
-                            </div>
+                        <div layout layout-sm="column">
+                            <md-input-container flex="50">
+                                <label layout="">Dni</label>
+                                <input ng-model="vm.student.dni">
+                            </md-input-container>
+                        </div>
 
 
-                            <div layout layout-sm="column">
-                                <md-input-container flex>
-                                    <md-icon style="color:gray;">email</md-icon>
-                                    <label layout="">Email</label>
-                                    <input ng-model="vm.student.email" type="email">
-                                </md-input-container>
-                            </div>
+                    </div>
 
-                            <div layout layout-sm="column">
-                                <md-input-container flex="50">
-                                    <label layout="">Dni</label>
-                                    <input ng-model="vm.student.dni">
-                                </md-input-container>
-                            </div>
-
-
-                 </div>
-
-                 </form>
+                </form>
                 <!-- A line divisor -->
                 <!-- <md-divider layout-margin></md-divider> -->
 
@@ -134,122 +134,121 @@
 
                     <div class="margin-top-medium">
                         <span flex class="md-headline" layout-margin>Docencia</span>
-                    </div>
-
-
-                    <!-- Section with three columns -->
-
-
-                    <div layout="column">
-                      <!-- A line divisor -->
-
                         <md-divider layout-margin></md-divider>
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Asignaturas</span>
-                    </div>
-
-                        <!-- If the student have a subjects -->
-                        <div ng-if="vm.teacherSubjects.length != 0">
-
-                            <md-list>
-
-                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherSubjects" ng-click="null">
-                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
-                                    <div class="md-list-item-text" layout="column">
-                                        <h3>{{ item.name }}</h3>
-                                        <h4>OtraCosa</h4>
-                                        <p>OtrasCosaMas</p>
-                                    </div>
-                                </md-list-item>
-
-                            </md-list>
-
-                        </div>
-
-                        <!-- If the student hasn't any association doing still -->
-                        <div ng-if="vm.teacherSubjects.length == 0">
-                            <span>Este profesor aún no imparte ninguna asignatura. </span>
-                        </div>
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Grupos</span>
-                    </div>
-
-                        <!-- If the student have a classes -->
-                        <div ng-if="vm.teacherClasses.length != 0">
-
-                            <md-list>
-
-                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherClasses" ng-click="null">
-                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
-                                    <div class="md-list-item-text" layout="column">
-                                        <h3>{{ item.course }} º {{ item.word }} {{ item.level}}</h3>
-                                    </div>
-                                </md-list-item>
-
-                            </md-list>
-
-                        </div>
-
-                        <!-- If the student hasn't any association doing still -->
-                        <div ng-if="vm.teacherClasses.length == 0">
-                            <span>Este profesor aún no da clase en ningún grupo. </span>
-                        </div>
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Estudiantes</span>
+                        </br>
+                        </br>
                     </div>
 
 
+                    <div ng-repeat="item in vm.studentEnrollments">
+
+                        <span class="md-title">{{ item.class.course }}º {{ item.class.word }} {{ item.class.level }}</span>
+
+
+                        <md-list class="md-dense">
+                            <md-list-item class="md-3-line" ng-repeat="subject in item.subjects" ng-click="null">
+                                <div class="md-list-item-text" layout="column">
+                                    <h3>{{ subject.name }}</h3>
+                                </div>
+
+
+                                <md-menu>
+
+                                    <md-button aria-label="Open phone interactions menu" class="md-icon-button"
+                                               ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                        <md-icon md-menu-origin>more_vert</md-icon>
+                                    </md-button>
+
+                                    <md-menu-content width="4">
+
+                                        <md-menu-item>
+                                            <md-button ng-click="">
+                                                <md-icon>list</md-icon>
+                                                Ver asociacion
+                                            </md-button>
+                                        </md-menu-item>
+
+                                        <md-menu-item>
+                                            <md-button
+                                                    ng-click="vm.showDeleteStudentEnrollmentConfirm(item.subject.subjectId, class.classId)">
+                                                <md-icon>delete</md-icon>
+                                                Eliminar docencia
+                                            </md-button>
+                                        </md-menu-item>
+
+                                        <md-menu-divider></md-menu-divider>
+
+                                        <md-menu-item>
+                                            <md-button disabled="disabled"
+                                                       ng-click="vm.showDeleteTeacherImpartConfirm(item.subject.subjectId, class.classId)">
+                                                <md-icon>delete</md-icon>
+                                                Eliminar docencia
+                                            </md-button>
+                                        </md-menu-item>
+
+                                    </md-menu-content>
+
+                                </md-menu>
+
+
+                            </md-list-item>
+                        </md-list>
 
 
                     </div>
-
 
 
                 </div>
 
                 <!-- Button to add new project to user. -->
-                        <div access='admin' layout="row">
-                            <md-button class="md-primary md-raised" ng-click="vm.addRelation()"">
-                                <md-icon>add</md-icon>
-                                Añadir docencia</md-button>
-                        </div>
-
-
-                <md-divider layout-margin></md-divider>
-
-                <div class="margin-top-large">
-                    <!-- Action buttons-->
-                    <div class="md-actions" layout="row" layout-align="end center">
-
-                        <!-- Button to save user changes -->
-                        <md-button class="md-primary md-raised"
-                                   ng-click="vm.updateStudent()">
-                            <md-icon>save</md-icon>
-                            Guardar
+                <div ng-if="vm.studentEnrollments.length == 0" layout="column">
+                    <span layout="row"> Oups! Parece que este estudiante aún no tiene docencia asignada.</span>
+                    <span layout="row">¡Dale un poco de trabajo!</span>
+                    <br>
+                    <div layout="row">
+                        <md-button class="md-primary md-raised" ng-click="vm.addRelation()">
+                            <md-icon>add</md-icon>
+                            Añadir
                         </md-button>
-
-                        <!-- Button that delete user, with confirmation message before -->
-                        <md-button class="md-warn md-raised" ng-click="vm.showDeleteStudentConfirm()">
-                            <md-icon>delete</md-icon>
-                            Eliminar
-                        </md-button>
-
-
                     </div>
-
                 </div>
 
 
+        <div ng-if="vm.studentEnrollments.length != 0" layout="row">
+            <md-button class="md-primary md-raised" ng-click="vm.addRelation()">
+                <md-icon>add</md-icon>
+                Añadir
+            </md-button>
+        </div>
 
-            </md-card>
+
+        <md-divider layout-margin></md-divider>
+
+        <div class="margin-top-large">
+            <!-- Action buttons-->
+            <div class="md-actions" layout="row" layout-align="end center">
+
+                <!-- Button to save user changes -->
+                <md-button class="md-primary md-raised"
+                           ng-click="vm.updateStudent()">
+                    <md-icon>save</md-icon>
+                    Guardar
+                </md-button>
+
+                <!-- Button that delete user, with confirmation message before -->
+                <md-button class="md-warn md-raised" ng-click="vm.showDeleteStudentConfirm()">
+                    <md-icon>delete</md-icon>
+                    Eliminar
+                </md-button>
+
+
+            </div>
 
         </div>
-    </div>
 
+
+        </md-card>
+
+    </div>
+</div>
 </div>

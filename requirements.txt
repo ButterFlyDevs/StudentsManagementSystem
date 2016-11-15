@@ -11,5 +11,6 @@ Faker
 requests
 termcolor
 MySQL-python
+progressbar
 
 

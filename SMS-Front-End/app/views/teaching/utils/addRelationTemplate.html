@@ -35,9 +35,9 @@
                     <md-option
                             ng-repeat="item in vm.classesList"
                             value="{{item.classId}}">
-                        {{item.level}}
-                        {{item.course}}
+                        {{item.course}}º 
                         {{item.word}}
+                        {{item.level}}
                     </md-option>
                 </md-select>
             </md-input-container>
@@ -57,7 +57,7 @@
 
         </div>
 
-        <div ng-if="vm.associationImpartExists">
+        <div ng-if="vm.impartRelationExists">
             <p>Este profesor ya imparte clase de esta asignatura a este grupo.</p>
         </div>
 

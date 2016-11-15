@@ -10,7 +10,11 @@ angular.module('students')
                  url: restPath + ':id' + '/subject',
                  isArray: true
              },
-
+             'getEnrollments': {
+                 method: 'GET',
+                 url: restPath + ':id' + '/enrollment',
+                 isArray: true
+             },
              'update': {method: 'PUT'},
 
              'getClasses': {

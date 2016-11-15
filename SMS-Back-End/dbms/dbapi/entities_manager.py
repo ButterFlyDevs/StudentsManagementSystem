@@ -19,109 +19,13 @@ import pytz
 
 # Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
-"""
-    [
-        {
-            "classId": 7,
-            "course": 2,
-            "impartId": 5,
-            "level": "Bachillerato",
-            "name": "Matem\u00e1ticas",
-            "subjectId": 1,
-            "word": "A"
-        },
-        {
-            "classId": 8,
-            "course": 2,
-            "impartId": 44,
-            "level": "Bachillerato",
-            "name": "Matem\u00e1ticas",
-            "subjectId": 1,
-            "word": "B"
-        },
-        {
-            "classId": 1,
-            "course": 1,
-            "impartId": 141,
-            "level": "ESO",
-            "name": "Matem\u00e1ticas",
-            "subjectId": 1,
-            "word": "A"
-        },
-        {
-            "classId": 4,
-            "course": 1,
-            "impartId": 154,
-            "level": "Bachillerato",
-            "name": "Franc\u00e9s",
-            "subjectId": 7,
-            "word": "B"
-        },
-        {
-            "classId": 8,
-            "course": 2,
-            "impartId": 186,
-            "level": "Bachillerato",
-            "name": "Franc\u00e9s",
-            "subjectId": 7,
-            "word": "B"
-        }
-    ]
-
-    [{
-        "subject": {
-            "subjectId": 1,
-            "name": "Matem\u00e1ticas"
-        },
-        "classes": [{
-            "classId": 7,
-            "course": 2,
-            "word": "A"
-            "level": "Bachillerato",
-            "impartId": 5
-        }, {
-            "classId": 8,
-            "course": 2,
-            "word": "B"
-            "level": "Bachillerato",
-            "impartId": 44
-        }, {
-            "classId": 1,
-            "course": 1,
-            "word": "A"
-            "level": "ESO",
-            "impartId": 141
-        }]
-    },
-    {
-        "subject": {
-            "subjectId": 7,
-            "name": "Franc\u00e9s"
-        },
-        "classes": [{
-            "classId": 4,
-            "course": 1,
-            "word": "B"
-            "level": "Bachillerato",
-            "impartId": 154
-        }, {
-            "classId": 8,
-            "course": 2,
-            "word": "B"
-            "level": "Bachillerato",
-            "impartId": 186
-        }]
-    }
-    ]
-
-"""
-
 
 def special_sort(list):
     """
     Sort with a special way the items of the list.
     :param list:
     :return:
+    See example in newTest.py test file.
     """
 
     sorted_list = []
@@ -168,6 +72,61 @@ def special_sort(list):
                 sorted_list.append({'subject': new_subject, 'classes': [new_class]})
 
     return sorted_list
+
+
+def special_sort_2(list):
+    """
+    Sort with a special way the items of the list.
+    :param list:
+    :return:
+    See example in newTest.py test file.
+    """
+
+    sorted_list = []
+
+    for list_element in list:
+
+        if len(sorted_list) == 0:
+            new_class = {'classId': list_element.get('classId'),
+                         'course': list_element.get('course'),
+                         'level': list_element.get('level'),
+                         'word': list_element.get('word')}
+
+            new_subject = {'subjectId': list_element.get('subjectId'),
+                           'name': list_element.get('name'),
+                           'enrollmentId': list_element.get('enrollmentId')
+                           }
+
+            sorted_list.append({'class': new_class, 'subjects': [new_subject]})
+
+        else:
+            index = -1
+            for item in sorted_list:
+                if item["class"]["classId"] == list_element.get("classId"):
+                    index = sorted_list.index(item)
+
+            if index != -1:
+                new_subject = {'subjectId': list_element.get('subjectId'),
+                               'name': list_element.get('name'),
+                               'enrollmentId': list_element.get('enrollmentId')
+                               }
+                sorted_list[index]["subjects"].append(new_subject)
+
+            else:
+                new_class = {'classId': list_element.get('classId'),
+                             'course': list_element.get('course'),
+                             'level': list_element.get('level'),
+                             'word': list_element.get('word')}
+
+                new_subject = {'subjectId': list_element.get('subjectId'),
+                               'name': list_element.get('name'),
+                               'enrollmentId': list_element.get('enrollmentId')
+                               }
+
+                sorted_list.append({'class': new_class, 'subjects': [new_subject]})
+
+    return sorted_list
+
 
 
 def sql_execute(cursor, query):  # References
@@ -480,12 +439,19 @@ class EntitiesManager:
 
             if related_kind == 'teacher':  # Todos los profesores que dan clase al alumno.
                 query = 'SELECT teacherId, name, surname FROM teacher WHERE deleted = 0 and teacherId IN (SELECT teacherId FROM impart, enrollment WHERE impart.associationId=enrollment.associationId and enrollment.studentId=' + entity_id + ');'
-
             elif related_kind == 'class':  # Todos las clases en las que está matriculado el alumno.
                 query = 'SELECT classId, course, word, level FROM class WHERE deleted = 0 and classId IN (SELECT classId FROM association WHERE associationId IN (SELECT associationId FROM enrollment WHERE studentId=' + entity_id + '));'
-
             elif related_kind == 'subject':  # Todas las asignaturas en la que está matriculado el alumno.
                 query = 'SELECT subjectId, name FROM subject WHERE deleted = 0 and subjectId IN (SELECT subjectId FROM association WHERE associationId IN (SELECT associationId FROM enrollment WHERE studentId=' + entity_id + '));'
+            elif related_kind == 'enrollment':
+                # More bit complex query:
+                query = 'SELECT e.enrollmentId, c.classId, c.course, c.word, c.level, s.subjectId, s.name FROM ' \
+                        '( SELECT enrollment.associationId, enrollmentId , association.subjectId, association.classId ' \
+                        'FROM enrollment JOIN association WHERE enrollment.associationId = association.associationId ' \
+                        'AND enrollment.studentId = ' + entity_id + ' AND enrollment.deleted = 0) e JOIN class c JOIN subject s on (e.classId = c.classId ' \
+                                                                'AND e.subjectId = s.subjectId);'
+
+
 
         elif kind == 'teacher':  # Queremos buscar entidades relacionadas con una entidad de tipo teacher
             if related_kind == 'student':  # Todos los alumnos a los que da clase ese profesor.
@@ -494,7 +460,7 @@ class EntitiesManager:
                 query = 'SELECT classId, course, word, level FROM class WHERE deleted = 0 and classId IN (SELECT classId FROM association where associationId IN(SELECT associationId FROM impart WHERE teacherId=' + entity_id + '));'
             elif related_kind == 'subject':  # Todas las asignaturas que el profesor imparte.
                 query = 'SELECT subjectId, name FROM subject WHERE deleted = 0 and subjectId IN (SELECT subjectId FROM association WHERE associationId IN (SELECT associationId FROM impart WHERE teacherId=' + entity_id + '));'
-            elif related_kind == 'imparts':
+            elif related_kind == 'impart':
                 # More bit complex query:
                 query = 'SELECT i.impartId, c.classId, c.course, c.word, c.level, s.subjectId, s.name FROM ' \
                         '( SELECT impart.associationId, impartId , association.subjectId, association.classId ' \
@@ -544,7 +510,11 @@ class EntitiesManager:
         cursor.close()
         db.close()
 
-        if related_kind == 'imparts' and status_value == 1:
-            return_dic['data'] = special_sort(return_dic['data']);
+        if related_kind == 'impart' and status_value == 1:
+            return_dic['data'] = special_sort(return_dic['data'])
+
+        if related_kind == 'enrollment' and status_value == 1:
+            return_dic['data'] = special_sort_2(return_dic['data'])
+
 
         return return_dic

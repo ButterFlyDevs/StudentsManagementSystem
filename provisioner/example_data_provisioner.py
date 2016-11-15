@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+"""Data Provisioned Tool.
+
+Tool to insert data with sense in the system to check the way of work of this,
+very helpfully in the developing process.
+
+Example:
+
+    > python example_data_provisioner.py
+
+"""
 
 import os
 import requests
@@ -6,8 +16,9 @@ from termcolor import colored
 from faker import Factory
 import logging
 from random import randint
+import progressbar
 
-fake = Factory.create('es_ES')
+fake = Factory.create('es_ES')  # Set the language from the data in spanish.
 
 logging.basicConfig(filename='provisioner/provisioner.log', filemode='w', level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -43,13 +54,14 @@ def test():
 
 def run():
     print colored('### Provisioning example data to system randomly. ###', 'red')
-    print colored('This script uses apigms to save data in the system.', 'red')
+    print colored('This script uses Api Gateway microService to save data in the system.', 'red')
 
     # Reset database!
-    os.system('mysql -u root -p\'root\' < SMS-Back-End/dbms/dbapi/DBCreator.sql')
+    os.system("mysql -u root -p\'root\' < SMS-Back-End/dbms/dbapi/DBCreator.sql >/dev/null 2>&1")
+    # >/dev/null 2>&1 to avoid warnings in console log.
 
-    num_teachers = 16;
-    num_students = 80;
+    num_teachers = 16
+    num_students = 80
 
     # 8 subjects
     subjects = ['Matemáticas',
@@ -61,6 +73,10 @@ def run():
                 'Francés',
                 'Dibujo Técnico'
                 ]
+
+
+
+
 
     # 8 classes
     courses = [1, 2]
@@ -124,16 +140,35 @@ def run():
 
     elements.append('space')
 
-    # Now we need an random array between teachersIds and subjects_classes_associations
+    # Now we need a random array between teachersIds and subjects_classes_associations
     teachers_s_c_associations = random_relations_generator(range(1, num_teachers+1), range(1, len(subjects_classes_association)+1))
     for item in teachers_s_c_associations:
         elements.append({"kind": "impart", "data": {"teacherId": item[0], "associationId": item[1]}})
 
+    elements.append('space')
+
+    # Now we need a random array between studentsIds and subjects_classes_associations
+    students_s_c_associations = random_relations_generator(range(1, num_students+1), range(1, len(subjects_classes_association)+1))
+
+
+    for item in students_s_c_associations:
+        elements.append({"kind": "enrollment", "data": {"studentID": item[0], "associationId": item[1]}})
+
+
+
+
+    # Proccess to save data in the database:
 
     url = url_base + '/entities'
-
     success = True
-    # Way to insert the data in the database:
+
+    print 'Saving {} elements. Please, be patient.\n'.format(len(elements))
+
+    bar = progressbar.ProgressBar(maxval=len(elements), \
+                                  widgets=[progressbar.Timer(),progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+    i = 0;
+    bar.start()
+
     for element in elements:
 
         if element is 'space':
@@ -149,7 +184,15 @@ def run():
                              str(response_data.get(element['kind']+'Id', None)) +
                              '  ' + str(response_data))
 
-    if success:
-        print colored('Done provision with SUCCESS !', 'green')
-        print colored('Remember that you can see the data saved in provisioner.log log file.', 'green')
+        bar.update(i + 1)
+        i=i+1
 
+    bar.finish()
+
+    if success:
+        print colored('\nDone provision with SUCCESS!', 'green')
+        print 'Remember that you can see the data saved in provisioner/provisioner.log file.'
+
+    else:
+        print colored('\nProvision FAIL!', 'red')
+        print '### There seems to be something wrong, please revise provisioner/provisioner.log to debug. ###'

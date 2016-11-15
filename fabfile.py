@@ -2,6 +2,10 @@ from fabric.api import local # to run local commands.
 from fabric.colors import red
 from provisioner import example_data_provisioner
 import time
+from fabric.api import local # to run local commands.
+from fabric.colors import red
+from provisioner import example_data_provisioner
+import time
 
 ##########################
 #  FABRIC Fabfile.  <http://www.fabfile.org/>

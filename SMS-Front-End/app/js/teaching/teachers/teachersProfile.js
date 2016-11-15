@@ -23,6 +23,9 @@ angular.module('teachers')
 
         var promises = [];
 
+        vm.openMenu = openMenu
+
+
 
         activate();
 
@@ -99,6 +102,14 @@ angular.module('teachers')
                 }
             )
         }
+
+
+        function openMenu($mdOpenMenu, ev) {
+          originatorEv = ev;
+          $mdOpenMenu(ev);
+        };
+
+
 
         function formUpdated() {
             console.log('formUpdated')
@@ -349,11 +360,12 @@ angular.module('teachers')
             } else { // We need create a new Association relation and before a new Imparts relation.
                 console.log('Creating a new Association relation and Imparts relation.');
 
+                var nestedDeferred = $q.defer();
+
                 var newAssociation = new AssociationsService({data: {classId: classId, subjectId: subjectId}});
                 newAssociation.$save(
                     function () { // Success
-                        console.log('Success saving the association.');
-                        console.log(newAssociation);
+                        deferred.resolve('Success saving the association relation with AssociationsService $save');
 
                         // Now we save the impart with this associationId
 
@@ -365,21 +377,17 @@ angular.module('teachers')
                         })
                         newImpart.$save(
                             function () { // Success
-                                console.log('Success saving the impart.')
-                                console.log(newImpart)
-                                toastService.showToast('Relación imparte guardada con éxito.')
+                                nestedDeferred.resolve('Success saving the impart relation with ImpartService $save');
                             },
                             function (error) { // Fail
-                                console.log('Error saving the impart relation.');
-                                console.log(error);
-                                toastService.showToast('Error al guardar relación imparte.')
+                               nestedDeferred.reject('Error saving the the impart relation with ImpartService $save, error: ' + error)
                             })
                     },
                     function (error) { // Fail
-                        console.log('Error saving the association.')
-                        console.log(error)
+                        deferred.reject('Error saving the the association relation with AssociationsService $save, error: ' + error)
                     });
-
+                promises.push(deferred.promise)
+                promises.push(nestedDeferred.promise)
 
             }
 
