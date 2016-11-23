@@ -79,8 +79,8 @@ CREATE TABLE teacher (
   deletedAt       DATETIME,
   deleted         BOOL,
 
-  PRIMARY KEY (teacherId)
-  # UNIQUE (dni)
+  PRIMARY KEY (teacherId),
+  UNIQUE (dni, deleted)
 );
 
 #Creación de la tabla Asignatura, con todos los atributos de esta entidad.

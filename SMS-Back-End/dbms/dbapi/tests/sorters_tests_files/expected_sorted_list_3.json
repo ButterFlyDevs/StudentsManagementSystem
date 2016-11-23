@@ -1,0 +1,125 @@
+[
+  {
+    "class": {
+      "classId": 8,
+      "course": 2,
+      "word": "B",
+      "level": "Bachillerato",
+      "associationId": 9
+    },
+    "teachers": [
+      {
+        "teacherId": 6,
+        "name": "Enrique",
+        "impartId": 21
+      },
+      {
+        "teacherId": 4,
+        "name": "Blanca",
+        "impartId": 79
+      },
+      {
+        "teacherId": 15,
+        "name": "Carmen",
+        "impartId": 91
+      }
+    ]
+  },
+  {
+    "class": {
+      "classId": 5,
+      "course": 2,
+      "word": "A",
+      "level": "ESO",
+      "associationId": 10
+    },
+    "teachers": [
+      {
+        "teacherId": 4,
+        "name": "Blanca",
+        "impartId": 5
+      },
+      {
+        "teacherId": 1,
+        "name": "Felipe",
+        "impartId": 34
+      }
+    ]
+  },
+  {
+    "class": {
+      "classId": 1,
+      "course": 1,
+      "word": "A",
+      "level": "ESO",
+      "associationId": 11
+    },
+    "teachers": [
+      {
+        "teacherId": 3,
+        "name": "Margarita",
+        "impartId": 7
+      },
+      {
+        "teacherId": 10,
+        "name": "Jose Carlos",
+        "impartId": 40
+      },
+      {
+        "teacherId": 14,
+        "name": "Felix",
+        "impartId": 51
+      },
+      {
+        "teacherId": 6,
+        "name": "Enrique",
+        "impartId": 68
+      },
+      {
+        "teacherId": 15,
+        "name": "Carmen",
+        "impartId": 90
+      }
+    ]
+  },
+  {
+    "class": {
+      "classId": 4,
+      "course": 1,
+      "word": "B",
+      "level": "Bachillerato",
+      "associationId": 12
+    },
+    "teachers": [
+      {
+        "teacherId": 9,
+        "name": "Victor",
+        "impartId": 27
+      },
+      {
+        "teacherId": 8,
+        "name": "Lorena",
+        "impartId": 46
+      },
+      {
+        "teacherId": 10,
+        "name": "Jose Carlos",
+        "impartId": 67
+      },
+      {
+        "teacherId": 4,
+        "name": "Blanca",
+        "impartId": 81
+      }
+    ]
+  },
+  {
+    "class": {
+      "level": "Bachillerato",
+      "word": "A",
+      "associationId": 24,
+      "classId": 3,
+      "course": 1
+    }
+  }
+]

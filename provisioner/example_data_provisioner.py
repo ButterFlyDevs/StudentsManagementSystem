@@ -36,6 +36,7 @@ def random_relations_generator(group_a, group_b):
         # To avoid repeated items.
         while True:
             tmp_relation = [group_a[randint(0, len(group_a)-1)], group_b[randint(0, len(group_b)-1)]]
+            # I avoided the repeated pairs.
             if tmp_relation not in relations_created:
                 relations_created.append(tmp_relation)
                 break
@@ -162,7 +163,11 @@ def run():
     url = url_base + '/entities'
     success = True
 
-    print 'Saving {} elements. Please, be patient.\n'.format(len(elements))
+    print 'Saving {} elements.'.format(len(elements))
+    print '\t {} classes, {} subjects, {} teachers and {} students.'.format(len(classes), len(subjects), num_teachers, num_students)
+    print '\t {} subject-class relations, {} imparts relations and {} enrollments relations.'\
+        .format(len(subjects_classes_association), len(teachers_s_c_associations), len(students_s_c_associations))
+    print 'Please, be patient.'
 
     bar = progressbar.ProgressBar(maxval=len(elements), \
                                   widgets=[progressbar.Timer(),progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])

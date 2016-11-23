@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
-"""
-Fichero de testing unitario a los módulos de conexión y gestión de la lógica con la BD.
-Usando la librería unittest, más info en: https://docs.python.org/2/library/unittest.html
-@execution: Para ejecutar el test sólo hay que hacer: > python testUnitario.py y añadir la opción -v si queremos ver detalles.
-"""
-import unittest
+
 #Para poder acceder a los ficheros en el directorio padre, los añadimos al path de python
 import sys, os
 sys.path.insert(0,os.pardir)
 
-from entitiesManager import entitiesManager
+from entities_manager import EntitiesManager
 from termcolor import colored
 
 import datetime
+
+import pytest
 
 ########################################################
 ###  sobre ENTIDADES(tablas) y RELACIONES(tablas)    ###
@@ -20,11 +17,86 @@ import datetime
 
 ### ENTIDADES, como Alumno, Profesor... ###
 
-class entitiesManagerTester(unittest.TestCase):
+class TestEntitiesManager:
 
-    def setUp(self):
-        os.system('mysql -u root -p\'root\' < ../DBCreator.sql')
 
+    def setup_method(self, method):
+        os.system('mysql -u root -p\'root\' < ../DBCreator.sql >/dev/null 2>&1')
+
+    def test_1_inserctions_with_put_method(restart_db):
+
+
+        tests = [
+            {'kind': 'student',
+             'data': {'name': u'súperNombre'}
+             },
+            {'kind': 'student',
+             'data': {'name': u'Juan'}
+             },
+            {'kind': 'teacher',
+             'data': {'name': u'súperNombre'}
+             },
+            {'kind': 'subject',
+             'data': {'name': u'Francés'}
+             },
+            {'kind': 'class',
+             'data': {'course': 1, 'word': u'B', 'level': u'ESO'}
+             }
+        ]
+
+
+        for item in tests:
+
+            entity = EntitiesManager.put(kind=item['kind'], data=item['data'])
+            print colored(entity, 'yellow')
+
+            for i in ['status', 'data', 'log']:
+                assert i in entity
+
+            for k, v in item['data'].iteritems():
+                assert entity['data'][k] == v
+
+            assert entity['data']['createdAt'].date().strftime("%d-%m-%Y %H:%M") \
+                == datetime.datetime.now().date().strftime("%d-%m-%Y %H:%M")
+
+
+        # Check some errors
+        entity = EntitiesManager.put(kind='cat', data={'name': u'Juan'})
+        print entity
+        assert entity['status'] == 1146 and "Table 'sms.cat' doesn't exist" in entity['log']
+
+
+        entity = EntitiesManager.put(kind='student', data={'number': u'Juan'})
+        if entity['status'] != 1054 and "Unknown column 'number'" not in entity['log']:
+            assert False
+
+
+        # Two teachers with the same dni can't be saved.
+        original_entity =  EntitiesManager.put(kind='teacher', data={'name': u'Luis', 'dni': 1234})
+        assert original_entity['status'] == 1
+        duplicated_entity = EntitiesManager.put(kind='teacher', data={'name': u'Manu', 'dni': 1234})
+        assert duplicated_entity['status'] == 1062 and 'Duplicate entry' in duplicated_entity['log']
+
+        print 'HERE'
+        print original_entity
+
+        # Is checked if the item can be deleted fine.
+        a = EntitiesManager.delete(kind='teacher', entity_id=original_entity['data']['teacherId'])
+        print 'BEFORE DELET'
+        print a
+        assert a['status'] == 1
+
+        """
+
+        duplicate = EntitiesManager.put(kind='teacher', data={'name': u'Luis', 'dni': 1234})
+        if entity['status'] != 1062 and "Duplicate entry" not in duplicate['log']:
+            result = False
+
+        #entity = EntitiesManager.delete(kind='teacher', entity_id=entity['data'])
+        """
+
+
+    """
     def test_01_insert(self):
 
         # To execute only this test: python test.py entitiesManagerTester.test_01_insert
@@ -70,8 +142,6 @@ class entitiesManagerTester(unittest.TestCase):
 
         #test = Fale
 
-
-        """
         #Testeando la asociación de una asignatura a una clase, y sus errores
         if GestorEntidades.putEntidad(tipo='Asociacion', datos={'idClase': '1', 'idAsignatura': '1'})['status'] != 'OK': test = False
         #No se puede realizar la misma asociación si ya existe
@@ -104,7 +174,7 @@ class entitiesManagerTester(unittest.TestCase):
 
 
         """
-        self.assertTrue(test)
+        #assert(True)
 
 
     """
@@ -290,5 +360,5 @@ class entitiesManagerTester(unittest.TestCase):
         self.assertTrue(test)
     """
 
-if __name__ == '__main__':
-    unittest.main()
+
+

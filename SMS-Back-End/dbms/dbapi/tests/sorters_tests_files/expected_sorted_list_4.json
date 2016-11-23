@@ -1,0 +1,99 @@
+[{
+  "subject":{
+    "subjectId": 2,
+    "subjectName": "Lengua",
+    "associationId": 1
+  },
+  "teachers":[
+    {
+      "teacherId": 10,
+      "teacherName": "Jose Carlos",
+      "impartId": 60
+    }
+  ]
+},
+  {
+    "subject": {
+      "subjectId": 1,
+      "subjectName": "Matemáticas",
+      "associationId": 11
+    },
+    "teachers": [
+      {
+        "teacherId": 3,
+        "teacherName": "Margarita",
+        "impartId": 7
+      },
+      {
+        "teacherId": 10,
+        "teacherName": "Jose Carlos",
+        "impartId": 40
+      },
+      {
+        "teacherId": 14,
+        "teacherName": "Felix",
+        "impartId": 51
+      },
+      {
+        "teacherId": 6,
+        "teacherName": "Enrique",
+        "impartId": 68
+      },
+            {
+        "teacherId": 15,
+        "teacherName": "Carmen",
+        "impartId": 90
+      }
+    ]
+  },
+  {
+    "subject": {
+      "subjectId": 6,
+      "subjectName": "Música",
+      "associationId": 16
+    },
+    "teachers": [
+            {
+        "teacherId": 7,
+        "teacherName": "Santiago",
+        "impartId": 14
+      },
+      {
+        "teacherId": 4,
+        "teacherName": "Blanca",
+        "impartId": 52
+      }
+
+    ]
+  },
+  {
+    "subject": {
+      "subjectId": 4,
+      "subjectName": "Sociales",
+      "associationId": 25
+    },
+    "teachers": [
+            {
+        "teacherId": 3,
+        "teacherName": "Margarita",
+        "impartId": 16
+      },
+      {
+        "teacherId": 8,
+        "teacherName": "Lorena",
+        "impartId": 44
+      },
+      {
+        "teacherId": 16,
+        "teacherName": "Esther",
+        "impartId": 59
+      },
+      {
+        "teacherId": 2,
+        "teacherName": "Francisco Javier",
+        "impartId": 64
+      }
+
+    ]
+  }
+]

@@ -7,7 +7,7 @@
 //teaching -> Teaching module
 
 
-angular.module('main', ['ngMaterial', 'ui.router', 'teachers', 'students', 'subjects', 'classes', 'associations', 'imparts', 'ngResource', 'angularMoment']);
+angular.module('main', ['ngMaterial', 'ui.router', 'teachers', 'students', 'subjects', 'classes', 'associations', 'imparts', 'enrollments', 'ngResource', 'angularMoment']);
 
 
 

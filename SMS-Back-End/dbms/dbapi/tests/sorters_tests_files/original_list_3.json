@@ -1,0 +1,177 @@
+[
+  {
+    "level": "Bachillerato",
+    "teacherId": 6,
+    "classId": 8,
+    "name": "Enrique",
+    "associationId": 9,
+    "course": 2,
+    "word": "B",
+    "impartId": 21
+  },
+  {
+    "level": "Bachillerato",
+    "teacherId": 4,
+    "classId": 8,
+    "name": "Blanca",
+    "associationId": 9,
+    "course": 2,
+    "word": "B",
+    "impartId": 79
+  },
+  {
+    "level": "Bachillerato",
+    "teacherId": 15,
+    "classId": 8,
+    "name": "Carmen",
+    "associationId": 9,
+    "course": 2,
+    "word": "B",
+    "impartId": 91
+  },
+  {
+    "level": "ESO",
+    "teacherId": 4,
+    "classId": 5,
+    "name": "Blanca",
+    "associationId": 10,
+    "course": 2,
+    "word": "A",
+    "impartId": 5
+  },
+  {
+    "level": "ESO",
+    "teacherId": 1,
+    "classId": 5,
+    "name": "Felipe",
+    "associationId": 10,
+    "course": 2,
+    "word": "A",
+    "impartId": 34
+  },
+  {
+    "level": "ESO",
+    "teacherId": 3,
+    "classId": 1,
+    "name": "Margarita",
+    "associationId": 11,
+    "course": 1,
+    "word": "A",
+    "impartId": 7
+  },
+  {
+    "level": "ESO",
+    "teacherId": 10,
+    "classId": 1,
+    "name": "Jose Carlos",
+    "associationId": 11,
+    "course": 1,
+    "word": "A",
+    "impartId": 40
+  },
+  {
+    "level": "ESO",
+    "teacherId": 14,
+    "classId": 1,
+    "name": "Felix",
+    "associationId": 11,
+    "course": 1,
+    "word": "A",
+    "impartId": 51
+  },
+  {
+    "level": "ESO",
+    "teacherId": 6,
+    "classId": 1,
+    "name": "Enrique",
+    "associationId": 11,
+    "course": 1,
+    "word": "A",
+    "impartId": 68
+  },
+  {
+    "level": "ESO",
+    "teacherId": 15,
+    "classId": 1,
+    "name": "Carmen",
+    "associationId": 11,
+    "course": 1,
+    "word": "A",
+    "impartId": 90
+  },
+  {
+    "level": "Bachillerato",
+    "teacherId": 9,
+    "classId": 4,
+    "name": "Victor",
+    "associationId": 12,
+    "course": 1,
+    "word": "B",
+    "impartId": 27
+  },
+  {
+    "level": "Bachillerato",
+    "teacherId": 8,
+    "classId": 4,
+    "name": "Lorena",
+    "associationId": 12,
+    "course": 1,
+    "word": "B",
+    "impartId": 46
+  },
+  {
+    "level": "Bachillerato",
+    "teacherId": 10,
+    "classId": 4,
+    "name": "Jose Carlos",
+    "associationId": 12,
+    "course": 1,
+    "word": "B",
+    "impartId": 67
+  },
+  {
+    "level": "Bachillerato",
+    "teacherId": 4,
+    "classId": 4,
+    "name": "Blanca",
+    "associationId": 12,
+    "course": 1,
+    "word": "B",
+    "impartId": 81
+  },
+  {
+    "level": "Bachillerato",
+    "word": "B",
+    "associationId": 9,
+    "classId": 8,
+    "course": 2
+  },
+  {
+    "level": "ESO",
+    "word": "A",
+    "associationId": 10,
+    "classId": 5,
+    "course": 2
+  },
+  {
+    "level": "ESO",
+    "word": "A",
+    "associationId": 11,
+    "classId": 1,
+    "course": 1
+  },
+  {
+    "level": "Bachillerato",
+    "word": "B",
+    "associationId": 12,
+    "classId": 4,
+    "course": 1
+  },
+  {
+    "level": "Bachillerato",
+    "word": "A",
+    "associationId": 24,
+    "classId": 3,
+    "course": 1
+  }
+]

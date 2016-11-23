@@ -3,9 +3,12 @@ angular.module('teachers')
 
         var vm = this;
 
+        vm.controllerName = 'teachersProfileController';
+
         vm.teacherId = $stateParams.teacherId
         vm.updateButtonEnable = false;
         vm.associationsList = null;
+
 
         vm.formUpdated = formUpdated
 
@@ -31,7 +34,7 @@ angular.module('teachers')
 
         ///////////////////////////////////////////////////////////////////
         function activate() {
-            console.log('Activating teachersProfileController controller.')
+            console.log('Activating teachersProfileController controller.');
             vm.addButtonEnable = false;
             loadData();
         }
@@ -410,7 +413,7 @@ angular.module('teachers')
                             delImpart(original[i].classes[c].impartId)
                     else
                         for (var c2 = 0; c2 < original[i].classes.length; c2++) {
-                            indexC = -1;
+                            var indexC = -1;
                             for (var d = 0; d < modified[index].classes.length; d++)
                                 if (original[i].classes[c2].classId == modified[index].classes[d].classId)
                                     indexC = d;

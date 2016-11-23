@@ -170,7 +170,7 @@
 
                                         <md-menu-item>
                                             <md-button
-                                                    ng-click="vm.showDeleteStudentEnrollmentConfirm(item.subject.subjectId, class.classId)">
+                                                    ng-click="vm.showDeleteStudentEnrollmentConfirm(item.class.classId, subject.subjectId)">
                                                 <md-icon>delete</md-icon>
                                                 Eliminar docencia
                                             </md-button>
@@ -180,7 +180,7 @@
 
                                         <md-menu-item>
                                             <md-button disabled="disabled"
-                                                       ng-click="vm.showDeleteTeacherImpartConfirm(item.subject.subjectId, class.classId)">
+                                                       ng-click="vm.showDeleteStudentEnrollmentConfirm(item.class.classId, subject.subjectId)">
                                                 <md-icon>delete</md-icon>
                                                 Eliminar docencia
                                             </md-button>
@@ -214,41 +214,43 @@
                 </div>
 
 
-        <div ng-if="vm.studentEnrollments.length != 0" layout="row">
-            <md-button class="md-primary md-raised" ng-click="vm.addRelation()">
-                <md-icon>add</md-icon>
-                Añadir
-            </md-button>
+                <div ng-if="vm.studentEnrollments.length != 0" layout="row">
+                    <md-button class="md-primary md-raised" ng-click="vm.addRelation()">
+                        <md-icon>add</md-icon>
+                        Añadir
+                    </md-button>
+                </div>
+
+
+                <md-divider layout-margin></md-divider>
+
+                <div class="margin-top-large">
+                    <!-- Action buttons-->
+                    <div class="md-actions" layout="row" layout-align="end center">
+
+
+                        <!-- Button that delete user, with confirmation message before -->
+                        <md-button class="md-warn md-raised" ng-click="vm.showDeleteStudentConfirm()">
+                            <md-icon>delete</md-icon>
+                            Eliminar
+                        </md-button>
+
+                        <!-- Button to save user changes -->
+                        <md-button
+                                ng-disabled="!vm.updateButtonEnable"
+                                class="md-primary md-raised"
+                                ng-click="vm.updateStudent()">
+                            <md-icon>save</md-icon>
+                            Guardar
+                        </md-button>
+
+                    </div>
+
+                </div>
+
+
+            </md-card>
+
         </div>
-
-
-        <md-divider layout-margin></md-divider>
-
-        <div class="margin-top-large">
-            <!-- Action buttons-->
-            <div class="md-actions" layout="row" layout-align="end center">
-
-                <!-- Button to save user changes -->
-                <md-button class="md-primary md-raised"
-                           ng-click="vm.updateStudent()">
-                    <md-icon>save</md-icon>
-                    Guardar
-                </md-button>
-
-                <!-- Button that delete user, with confirmation message before -->
-                <md-button class="md-warn md-raised" ng-click="vm.showDeleteStudentConfirm()">
-                    <md-icon>delete</md-icon>
-                    Eliminar
-                </md-button>
-
-
-            </div>
-
-        </div>
-
-
-        </md-card>
-
     </div>
-</div>
 </div>

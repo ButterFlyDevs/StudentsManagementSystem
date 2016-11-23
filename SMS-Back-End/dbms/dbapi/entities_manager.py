@@ -14,119 +14,12 @@ Si se trata de booleanos : boolean
 import db_params
 import datetime
 from termcolor import colored
+from utils import *
 
 import pytz
 
 # Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
-
-def special_sort(list):
-    """
-    Sort with a special way the items of the list.
-    :param list:
-    :return:
-    See example in newTest.py test file.
-    """
-
-    sorted_list = []
-
-    for list_element in list:
-
-        if len(sorted_list) == 0:
-            new_subject = {'subjectId': list_element.get('subjectId'),
-                           'name': list_element.get('name')
-                           }
-            new_class = {'classId': list_element.get('classId'),
-                         'course': list_element.get('course'),
-                         'level': list_element.get('level'),
-                         'word': list_element.get('word'),
-                         'impartId': list_element.get('impartId')}
-
-            sorted_list.append({'subject': new_subject, 'classes': [new_class]})
-
-        else:
-            index = -1
-            for item in sorted_list:
-                if item["subject"]["subjectId"] == list_element.get("subjectId"):
-                    index = sorted_list.index(item)
-
-            if index != -1:
-                new_class = {'classId': list_element.get('classId'),
-                             'course': list_element.get('course'),
-                             'level': list_element.get('level'),
-                             'word': list_element.get('word'),
-                             'impartId': list_element.get('impartId')}
-
-                sorted_list[index]["classes"].append(new_class)
-
-            else:
-                new_subject = {'subjectId': list_element.get('subjectId'),
-                               'name': list_element.get('name')
-                               }
-                new_class = {'classId': list_element.get('classId'),
-                             'course': list_element.get('course'),
-                             'level': list_element.get('level'),
-                             'word': list_element.get('word'),
-                             'impartId': list_element.get('impartId')}
-
-                sorted_list.append({'subject': new_subject, 'classes': [new_class]})
-
-    return sorted_list
-
-
-def special_sort_2(list):
-    """
-    Sort with a special way the items of the list.
-    :param list:
-    :return:
-    See example in newTest.py test file.
-    """
-
-    sorted_list = []
-
-    for list_element in list:
-
-        if len(sorted_list) == 0:
-            new_class = {'classId': list_element.get('classId'),
-                         'course': list_element.get('course'),
-                         'level': list_element.get('level'),
-                         'word': list_element.get('word')}
-
-            new_subject = {'subjectId': list_element.get('subjectId'),
-                           'name': list_element.get('name'),
-                           'enrollmentId': list_element.get('enrollmentId')
-                           }
-
-            sorted_list.append({'class': new_class, 'subjects': [new_subject]})
-
-        else:
-            index = -1
-            for item in sorted_list:
-                if item["class"]["classId"] == list_element.get("classId"):
-                    index = sorted_list.index(item)
-
-            if index != -1:
-                new_subject = {'subjectId': list_element.get('subjectId'),
-                               'name': list_element.get('name'),
-                               'enrollmentId': list_element.get('enrollmentId')
-                               }
-                sorted_list[index]["subjects"].append(new_subject)
-
-            else:
-                new_class = {'classId': list_element.get('classId'),
-                             'course': list_element.get('course'),
-                             'level': list_element.get('level'),
-                             'word': list_element.get('word')}
-
-                new_subject = {'subjectId': list_element.get('subjectId'),
-                               'name': list_element.get('name'),
-                               'enrollmentId': list_element.get('enrollmentId')
-                               }
-
-                sorted_list.append({'class': new_class, 'subjects': [new_subject]})
-
-    return sorted_list
-
 
 
 def sql_execute(cursor, query):  # References
@@ -261,7 +154,7 @@ class EntitiesManager:
         :param kind: Type of data, student, teacher, class, etc.
         :param entity_id: Entity id that we want retrieve. Can be None, in this case we want all entities of this kind.
         :param params: When we want retrieve a list with specific data from entities we pass here.
-        :return: A dict with all info about one or a list with dicts.
+        :return: A dict with all info about one or a list with dict with the format: [status][data][log]
         """
 
         if v:
@@ -366,7 +259,10 @@ class EntitiesManager:
         for key, value in data.iteritems():
             if isinstance(value, int):
                 value = str(value)
-            query += str(key) + ' = \'' + value + '\','
+            if value == 'NULL':
+                query += str(key) + ' = ' + value + ' ,'
+            else:
+                query += str(key) + ' = \'' + value + '\','
 
         # The same with control_fields values
         for key, value in control_fields.iteritems():
@@ -416,7 +312,7 @@ class EntitiesManager:
     @classmethod
     def delete(cls, kind, entity_id):
 
-        return cls.update(kind, entity_id, {'deleted': 1})
+        return cls.update(kind, entity_id, {'deleted': 'NULL'})
 
     @classmethod
     def get_related(cls, kind, entity_id, related_kind):
@@ -434,6 +330,7 @@ class EntitiesManager:
         cursor = db.cursor()
 
         query = ''
+
 
         if kind == 'student':  # Queremos buscar entidades relacionadas con una entidad de tipo student
 
@@ -474,7 +371,10 @@ class EntitiesManager:
             elif related_kind == 'teacher':  # Todos los profesores que imparten en esa clase alguna asignatura.
                 query = 'SELECT teacherId, name, surname FROM teacher WHERE deleted = 0 and teacherId IN (SELECT teacherId FROM impart WHERE associationId IN (SELECT associationId FROM association WHERE classId=' + entity_id + '))';
             elif related_kind == 'subject':  # Todas las asignaturas que se imparten en esa clase.
-                query = 'SELECT subjectId, name FROM subject WHERE deleted = 0 and subjectId in (SELECT subjectId FROM association WHERE classId =' + entity_id + ')'
+                query = 'select sbs.subjectId, sbs.name as \'subjectName\', t.name as \'teacherName\', t.surname as \'teacherSurname\', t.teacherId, i.impartId, sbs.associationId from impart i JOIN (select name, s.subjectId, a.associationId from (select name, subjectId from subject) s JOIN ' \
+                        '(select subjectId, associationId from association where classId=' + entity_id + ') a where s.subjectId = a.subjectId) sbs JOIN teacher t where i.associationId = sbs.associationId and i.teacherId = t.teacherId union  select s.subjectId, ' \
+                        's.name, null, null, null, null,  a.associationId   from (select subjectId, associationId from association where classId=' + entity_id + ') a JOIN subject s where a.subjectId = s.subjectId;'
+
 
         elif kind == 'subject':  # Queremos buscar entidades relacionadas con una entidad de tipo subject.
             if related_kind == 'student':
@@ -482,10 +382,15 @@ class EntitiesManager:
             elif related_kind == 'teacher':
                 query = 'SELECT teacherId, name, surname from teacher where deleted = 0 and teacherId in (select teacherId from impart where associationId IN ( select associationId from association where subjectId=' + entity_id + '));'
             elif related_kind == 'class':
-                query = 'SELECT classId, course, word, level from class where deleted = 0 and idClase in (select idClase from association where subjectId=' + entity_id + ')'
+                # An especial case, it needed info in special format to show in the view.
+                query = 'select cls.classId, cls.course, cls.word, cls.level, t.name, t.surname, t.teacherId, i.impartId, cls.associationId from impart i JOIN (select course, word, level, c.classId, a.associationId from (select course, word, level, classId from class) c ' \
+                        'JOIN (select classId, associationId from association where subjectId=' + entity_id + ') a where c.classId = a.classId) cls JOIN teacher t where i.associationId = cls.associationId and i.teacherId = t.teacherId union select c.classId, c.course, c.word, c.level, null, null, null, null,  a.associationId   ' \
+                        'from (select classId, associationId from association where subjectId=' + entity_id + ') a JOIN class c where a.classId = c.classId;'
+
 
         if v:
             print colored(query, 'yellow')
+
 
         status_value, num_elements, log = sql_execute(cursor, query)
 
@@ -511,10 +416,15 @@ class EntitiesManager:
         db.close()
 
         if related_kind == 'impart' and status_value == 1:
-            return_dic['data'] = special_sort(return_dic['data'])
+            return_dic['data'] = sorters.special_sort(return_dic['data'])
 
         if related_kind == 'enrollment' and status_value == 1:
-            return_dic['data'] = special_sort_2(return_dic['data'])
+            return_dic['data'] = sorters.special_sort_2(return_dic['data'])
 
+        if kind == 'subject' and related_kind == 'class':
+            return_dic['data'] = sorters.special_sort_3(return_dic['data'])
+
+        if kind == 'class' and related_kind == 'subject':
+            return_dic['data'] = sorters.special_sort_4(return_dic['data'])
 
         return return_dic
