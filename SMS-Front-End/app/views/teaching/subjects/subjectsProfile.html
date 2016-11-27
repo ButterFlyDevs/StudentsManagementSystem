@@ -55,54 +55,68 @@
 
                     <div class="margin-top-medium">
                         <span flex class="md-headline" layout-margin>Docencia</span>
-                    </div>
-
-
-                    <!-- Section with three columns -->
-
-
-                    <div layout="column">
-                      <!-- A line divisor -->
-
                         <md-divider layout-margin></md-divider>
-
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Grupos</span>
-                    </div>
-
-                        <!-- If the subject have a classes -->
-                        <div ng-if="vm.teacherClasses.length != 0">
-
-                            <md-list>
-
-                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherClasses" ng-click="null">
-                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
-                                    <div class="md-list-item-text" layout="column">
-                                        <h3>{{ item.course }} º {{ item.word }} {{ item.level}}</h3>
-                                    </div>
-                                </md-list-item>
-
-                            </md-list>
-
-                        </div>
-
-                        <!-- If the subject hasn't any association doing still -->
-                        <div ng-if="vm.teacherClasses.length == 0">
-                            <span>Este profesor aún no da clase en ningún grupo. </span>
-                        </div>
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Estudiantes</span>
+                        </br>
+                        </br>
                     </div>
 
 
+                    <div ng-repeat="item in vm.subjectClasses">
+
+                        <span class="md-title">{{ item.class.course }} {{ item.class.word }} {{ item.class.level }}</span>
+
+
+                        <md-list class="md-dense">
+                            <md-list-item class="md-3-line" ng-repeat="teacher in item.teachers" ng-click="null">
+                                <div class="md-list-item-text" layout="column">
+                                    <h3>{{ teacher.name }} {{ teacher.surname }}</h3>
+                                </div>
+
+
+                                <md-menu>
+
+                                    <md-button aria-label="Open phone interactions menu" class="md-icon-button"
+                                               ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                        <md-icon md-menu-origin>more_vert</md-icon>
+                                    </md-button>
+
+                                    <md-menu-content width="4">
+
+                                        <md-menu-item>
+                                            <md-button ng-click="">
+                                                <md-icon>list</md-icon>
+                                                Ver asociacion
+                                            </md-button>
+                                        </md-menu-item>
+
+                                        <md-menu-item>
+                                            <md-button
+                                                    ng-click="vm.showDeleteSubjectClassImpartConfirm(item.class.classId, teacher.teacherId)">
+                                                <md-icon>delete</md-icon>
+                                                Eliminar docencia
+                                            </md-button>
+                                        </md-menu-item>
+
+                                        <md-menu-divider></md-menu-divider>
+
+                                        <md-menu-item>
+                                            <md-button disabled="disabled"
+                                                       ng-click="vm.showDeleteSubjectClassImpartConfirm(item.class.classId, teacher.teacherId)">
+                                                <md-icon>delete</md-icon>
+                                                Eliminar docencia
+                                            </md-button>
+                                        </md-menu-item>
+
+                                    </md-menu-content>
+
+                                </md-menu>
+
+
+                            </md-list-item>
+                        </md-list>
 
 
                     </div>
-
 
 
                 </div>

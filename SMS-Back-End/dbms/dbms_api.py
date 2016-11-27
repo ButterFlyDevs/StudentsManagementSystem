@@ -261,7 +261,7 @@ def get_entities(kind, entity_id=None):
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
-def update_entities(kind, entity_id):
+def put_entities(kind, entity_id):  # UPDATE
     """
     curl -H "Content-Type: application/json" -X PUT -d '{ "name": "NombreModificado" }' localhost:8002/entities/teacher/1
     """

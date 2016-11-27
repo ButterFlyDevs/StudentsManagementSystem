@@ -13,18 +13,13 @@ import datetime
 
 # How check code quality: pylint dbms_api.py
 
-
 urlBase = 'http://localhost:8002'
-
 
 class TestClass:
 
-    def setup(self):
-        # pytest -s dbms_api_test.py::TestClass::test_dbms_api_test
-        print '\nReset Database'
-        import os.path
-        print os.path.abspath(os.path.join('.', os.pardir))
-        os.system('mysql -u root -p\'root\' < SMS-Back-End/dbms/dbapi/DBCreator.sql')
+    def setup_method(self):
+        # pytest test/dbms_api_test.py::TestClass::test_dbms_api_test -vv -s
+        os.system('mysql -u root -p\'root\' < dbapi/DBCreator.sql >/dev/null 2>&1')
 
     def test_dbms_api_test(self):
         url = urlBase+'/test'
@@ -49,6 +44,17 @@ class TestClass:
              },
             {'kind': 'class',
              'data': {'course': 1, 'word': u'B', 'level': u'ESO'}
+             },
+            {
+                'kind': 'association',
+                'data': {'subjectId': 1, 'classId': 1}  # Last subject and class created
+            },
+            {
+                'kind': 'impart',
+                'data': {'teacherId': 1, 'associationId': 1}  # Last association with a teacher with id=1
+            },
+            {'kind': 'enrollment',
+             'data': {'studentId': 1, 'associationId': 1}
              }
         ]
 
@@ -67,7 +73,7 @@ class TestClass:
 
             # Control attributes.
             # Transform the ctime format to datetime to best management.
-            date_entity = datetime.datetime.strptime(json_response.get('createdAt', None), "%a %b %d %H:%M:%S %Y")
+            date_entity = datetime.datetime.strptime(json_response.get('createdAt'),'%Y-%m-%dT%H:%M:%S')
 
             # Check if the hours and minutes both are the same.
             assert date_entity.strftime("%H:%M") == date_time_now.strftime("%H:%M")
@@ -88,12 +94,6 @@ class TestClass:
         response = requests.post(url + '/classes', json={'data': {'course': 1, 'word': u'B', 'level': u'ESO'}})
         assert response.status_code == 404
         # 404 Not found: this resource can't be created because the resource "classes" doesn't exists.
-
-
-
-        # We try to insert related items.
-
-
 
 
     def test_get_entities(self):
@@ -140,7 +140,7 @@ class TestClass:
             assert response.status_code == 200
 
         # We modify the name of a user.
-        response = requests.put(url + '/student/1', json={'data': {'name': 'newName'}})
+        response = requests.put(url + '/student/1', json={'name': 'newName'})
         assert response.status_code == 200
         assert response.json().get('name', None) == 'newName'
 
@@ -157,10 +157,8 @@ class TestClass:
         # Check if the student is deleted
         response = requests.delete(url + '/student/1')
         assert response.status_code == 200
-        assert response.json().get('deleted', None) == 1
 
         # The element isn't accessible.
         response = requests.get(url + '/student/1')
         assert response.status_code == 404
-
 

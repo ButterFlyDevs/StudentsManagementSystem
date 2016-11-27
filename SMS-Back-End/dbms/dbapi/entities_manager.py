@@ -311,8 +311,11 @@ class EntitiesManager:
 
     @classmethod
     def delete(cls, kind, entity_id):
-
-        return cls.update(kind, entity_id, {'deleted': 'NULL'})
+        # If the update is delete an item, we not want send the erased data.
+        item_dict = cls.update(kind, entity_id, {'deleted': 'NULL'})
+        if item_dict['status'] == 1:
+            item_dict['data'] = None
+        return item_dict
 
     @classmethod
     def get_related(cls, kind, entity_id, related_kind):

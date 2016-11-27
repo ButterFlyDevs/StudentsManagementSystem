@@ -16,31 +16,106 @@
     <md-dialog-content>
         <div class="md-dialog-content">
 
-            <md-input-container class="md-block" flex-gt-sm>
-                <label>Asignatura</label>
-                <md-select ng-model="vm.subjectSelected"
-                           ng-change="vm.checkRelationSelected(vm.subjectSelected, vm.classSelected)">
-                    <md-option
-                            ng-repeat="item in vm.subjectsList"
-                            value="{{item.subjectId}}">
-                        {{item.name}}
-                    </md-option>
-                </md-select>
-            </md-input-container>
+            <!-- Fields when the dialog is over subject teacher or student, view and process: SUBJECT - CLASS -->
+            <div ng-if="vm.itsAboutTeacher || vm.itsAboutStudent">
 
-            <md-input-container class="md-block" flex-gt-sm>
-                <label>Grupo</label>
-                <md-select ng-model="vm.classSelected"
-                           ng-change="vm.checkRelationSelected(vm.subjectSelected, vm.classSelected)">
-                    <md-option
-                            ng-repeat="item in vm.classesList"
-                            value="{{item.classId}}">
-                        {{item.course}}º 
-                        {{item.word}}
-                        {{item.level}}
-                    </md-option>
-                </md-select>
-            </md-input-container>
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Asignatura</label>
+                    <md-select ng-model="vm.subjectSelected"
+                               ng-change="vm.checkRelationSelected_Subject_Class(vm.subjectSelected, vm.classSelected)">
+                        <md-option
+                                ng-repeat="item in vm.subjectsList"
+                                value="{{item.subjectId}}">
+                            {{item.name}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Grupo</label>
+                    <md-select ng-model="vm.classSelected"
+                               ng-change="vm.checkRelationSelected_Subject_Class(vm.subjectSelected, vm.classSelected)">
+                        <md-option
+                                ng-repeat="item in vm.classesList"
+                                value="{{item.classId}}">
+                            {{item.course}}º
+                            {{item.word}}
+                            {{item.level}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+
+            <!-- Fields when the dialog is over subject profile view and process: CLASS - TEACHER -->
+            <div ng-if="vm.itsAboutSubject">
+
+
+                <!-- CLASS -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Grupo</label>
+                    <md-select ng-model="vm.classSelected"
+                               ng-change="vm.checkRelationSelected_Class_Teacher(vm.classSelected, vm.teacherSelected)">
+                        <md-option
+                                ng-repeat="item in vm.classesList"
+                                value="{{item.classId}}">
+                            {{item.course}}º
+                            {{item.word}}
+                            {{item.level}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <!-- Would be Autocomplete custom template AUTOCOMPLETE for teachers -->
+                <!-- TEACHER -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Profesor</label>
+                    <md-select ng-model="vm.subjectSelected"
+                               ng-change="vm.checkRelationSelected_Class_Teacher(vm.classSelected, vm.teacherSelected)">
+                        <md-option
+                                ng-repeat="item in vm.teachersList"
+                                value="{{item.teacherId}}">
+                            {{item.name}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+
+            </div>
+
+
+            <!-- Fields when the dialog is over class profile view and process: SUBJECT - TEACHER -->
+            <div ng-if="vm.itsAboutClass">
+
+                <!-- SUBJECT -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Asignatura</label>
+                    <md-select ng-model="vm.subjectSelected"
+                               ng-change="vm.checkRelationSelected_Subject_Teacher(vm.subjectSelected, vm.teacherSelected)">
+                        <md-option
+                                ng-repeat="item in vm.subjectsList"
+                                value="{{item.subjectId}}">
+                            {{item.name}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <!-- Would be Autocomplete custom template AUTOCOMPLETE for teachers -->
+                <!-- TEACHER -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Profesor</label>
+                    <md-select ng-model="vm.subjectSelected"
+                               ng-change="vm.checkRelationSelected_Subject_Teacher(vm.subjectSelected, vm.teacherSelected)">
+                        <md-option
+                                ng-repeat="item in vm.teachersList"
+                                value="{{item.teacherId}}">
+                            {{item.name}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+
+            </div>
 
 
         </div>
@@ -72,7 +147,7 @@
 
         <span flex></span>
 
-        <md-button ng-click="vm.closeDialog()"> Cancelar </md-button>
+        <md-button ng-click="vm.closeDialog()"> Cancelar</md-button>
 
         <md-button ng-disabled="!vm.addButtonEnable"
                    class="md-primary md-raised"

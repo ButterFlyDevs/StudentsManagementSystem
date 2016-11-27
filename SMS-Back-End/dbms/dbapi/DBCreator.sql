@@ -100,8 +100,8 @@ CREATE TABLE subject (
   deletedAt   DATETIME,
   deleted     BOOL,
 
-  PRIMARY KEY (subjectId)
-  # UNIQUE (name) #No se entiende que haya dos asignaturas con el mismo nombre exacto, por eso no se permite.
+  PRIMARY KEY (subjectId),
+  UNIQUE (name, deleted)
 );
 
 #Creación de la tabla Clase, ejemplo
@@ -123,9 +123,9 @@ CREATE TABLE class (
   deleted    BOOL,
 
   #La clave primaria la forman los tres campos que juntos no pueden ser repetidos. (Sólo puede existir una entidad con ellos)
-  PRIMARY KEY (classId)
+  PRIMARY KEY (classId),
   #Hacemos que los tres campos sean UNIQUE para que no pueda exisir una clase con los mismos datos que otra
-  # UNIQUE (course, word, level)
+  UNIQUE (course, word, level, deleted)
 );
 
 #Creacion de la tabla para los Grupos
@@ -150,8 +150,8 @@ CREATE TABLE association (
   FOREIGN KEY (subjectId) REFERENCES subject (subjectId),
   FOREIGN KEY (classId) REFERENCES class (classId),
 
-  PRIMARY KEY (associationId)
-  # UNIQUE (subjectId, classId)
+  PRIMARY KEY (associationId),
+  UNIQUE (subjectId, classId, deleted)
 );
 
 
@@ -176,9 +176,9 @@ CREATE TABLE impart (
   FOREIGN KEY (associationId) REFERENCES association (associationId),
   FOREIGN KEY (teacherId) REFERENCES teacher (teacherId),
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (impartId)
+  PRIMARY KEY (impartId),
   # Especificamos que la formación idAsociacion, idProfesor) como par no pueda repetirse:
-  # UNIQUE (associationId, teacherId)
+  UNIQUE (associationId, teacherId, deleted)
 
 );
 
@@ -203,9 +203,9 @@ CREATE TABLE enrollment (
   FOREIGN KEY (associationId) REFERENCES association (associationId),
   FOREIGN KEY (studentId) REFERENCES student (studentId),
   #Establecemos la clave primaria compuesta.
-  PRIMARY KEY (enrollmentId)
+  PRIMARY KEY (enrollmentId),
   #Un alumno no puede estar dos veces matriuclado a la misma asociacion
-  # UNIQUE (studentId, associationId)
+  UNIQUE (studentId, associationId, deleted)
 
 );
 

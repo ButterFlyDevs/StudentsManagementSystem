@@ -26,7 +26,6 @@ angular.module('teachers')
 
         var promises = [];
 
-        vm.openMenu = openMenu
 
 
 
@@ -105,14 +104,6 @@ angular.module('teachers')
                 }
             )
         }
-
-
-        function openMenu($mdOpenMenu, ev) {
-          originatorEv = ev;
-          $mdOpenMenu(ev);
-        };
-
-
 
         function formUpdated() {
             console.log('formUpdated')

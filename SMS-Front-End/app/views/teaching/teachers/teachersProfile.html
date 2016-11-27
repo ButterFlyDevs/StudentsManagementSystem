@@ -154,7 +154,7 @@
                                 <md-menu>
 
                                     <md-button aria-label="Open phone interactions menu" class="md-icon-button"
-                                               ng-click="vm.openMenu($mdOpenMenu, $event)">
+                                               ng-click="originatorEv = ev; $mdOpenMenu(ev);">
                                         <md-icon md-menu-origin>more_vert</md-icon>
                                     </md-button>
 
