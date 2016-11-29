@@ -6,7 +6,7 @@ angular.module('teachers')
         vm.controllerName = 'teachersProfileController';
 
         vm.teacherId = $stateParams.teacherId
-        vm.updateButtonEnable = false;
+        vm.updateButtonEnable = false; // To control when the update button could be enabled.
         vm.associationsList = null;
 
 
@@ -22,8 +22,7 @@ angular.module('teachers')
 
         vm.defaultAvatar = globalService.defaultAvatar;
 
-        // Declaro un array de llamadas:
-
+        // An array of promises from calls.
         var promises = [];
 
 

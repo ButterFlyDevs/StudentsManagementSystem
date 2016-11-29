@@ -47,7 +47,7 @@
 
             </div>
 
-            <!-- Fields when the dialog is over subject profile view and process: CLASS - TEACHER -->
+            <!-- Fields when the dialog is over SUBJECT PROFILE view and process: CLASS - TEACHER -->
             <div ng-if="vm.itsAboutSubject">
 
 
@@ -70,7 +70,7 @@
                 <!-- TEACHER -->
                 <md-input-container class="md-block" flex-gt-sm>
                     <label>Profesor</label>
-                    <md-select ng-model="vm.subjectSelected"
+                    <md-select ng-model="vm.teacherSelected"
                                ng-change="vm.checkRelationSelected_Class_Teacher(vm.classSelected, vm.teacherSelected)">
                         <md-option
                                 ng-repeat="item in vm.teachersList"
@@ -84,7 +84,7 @@
             </div>
 
 
-            <!-- Fields when the dialog is over class profile view and process: SUBJECT - TEACHER -->
+            <!-- Fields when the dialog is over CLASS PROFILE view and process: SUBJECT - TEACHER -->
             <div ng-if="vm.itsAboutClass">
 
                 <!-- SUBJECT -->
@@ -120,23 +120,38 @@
 
         </div>
 
+        <!-- Messages and options when is about teacher or student view -->
+        <div ng-if="vm.itsAboutTeacher || vm.itsAboutStudent">
+            <div ng-if="vm.associationRelationExists">
+                <p>La relación entre la asignatura y la clase no existe.</p>
+                ¿Deséa crearla al mismo tiempo que asignas a un profesor?
+                <md-checkbox ng-model="vm.createNewAssociationCheckboxValue"
+                             aria-label="Checkbox 1"
+                             ng-click="vm.addButtonEnable = !vm.createNewAssociationCheckboxValue">
 
-        <div ng-if="!vm.associationRelationExists">
-            <p>La relación entre la asignatura y la clase no existe.</p>
-            ¿Deséa crearla al mismo tiempo que asignas a un profesor?
-            <md-checkbox ng-model="vm.createNewAssociationCheckboxValue"
-                         aria-label="Checkbox 1"
-                         ng-click="vm.addButtonEnable = !vm.createNewAssociationCheckboxValue">
+                </md-checkbox>
 
-            </md-checkbox>
+            </div>
 
+            <div ng-if="vm.impartRelationExists">
+                <p>Este profesor ya imparte clase de esta asignatura a este grupo.</p>
+            </div>
+            <div ng-if="vm.enrollmentRelationExists">
+                <p>Este alumno ya está matriculado en esa asignatura y grupo.</p>
+            </div>
         </div>
 
-        <div ng-if="vm.impartRelationExists">
-            <p>Este profesor ya imparte clase de esta asignatura a este grupo.</p>
-        </div>
-        <div ng-if="vm.enrollmentRelationExists">
-            <p>Este alumno ya está matriculado en esa asignatura y grupo.</p>
+        <!-- When the case is over SUBJECT view -->
+        <div ng-if="vm.itsAboutSubject">  <!-- All options -->
+
+            <div ng-if="vm.associationRelationExists && vm.teacherSelected == -1">
+                <p>Es necesario que seleccione un profesor.</p>
+            </div>
+
+            <div ng-if="vm.impartRelationExists">
+                <p>Esta relación ya existe.</p>
+            </div>
+
         </div>
 
 

@@ -386,9 +386,9 @@ class EntitiesManager:
                 query = 'SELECT teacherId, name, surname from teacher where deleted = 0 and teacherId in (select teacherId from impart where associationId IN ( select associationId from association where subjectId=' + entity_id + '));'
             elif related_kind == 'class':
                 # An especial case, it needed info in special format to show in the view.
-                query = 'select cls.classId, cls.course, cls.word, cls.level, t.name, t.surname, t.teacherId, i.impartId, cls.associationId from impart i JOIN (select course, word, level, c.classId, a.associationId from (select course, word, level, classId from class) c ' \
-                        'JOIN (select classId, associationId from association where subjectId=' + entity_id + ') a where c.classId = a.classId) cls JOIN teacher t where i.associationId = cls.associationId and i.teacherId = t.teacherId union select c.classId, c.course, c.word, c.level, null, null, null, null,  a.associationId   ' \
-                        'from (select classId, associationId from association where subjectId=' + entity_id + ') a JOIN class c where a.classId = c.classId;'
+                query = 'select cls.classId, cls.course, cls.word, cls.level, t.name, t.surname, t.teacherId, i.impartId, cls.associationId from (select * from impart where impart.deleted = 0) i JOIN (select course, word, level, c.classId, a.associationId from (select course, word, level, classId from class) c ' \
+                        'JOIN (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a where c.classId = a.classId) cls JOIN teacher t where i.associationId = cls.associationId and i.teacherId = t.teacherId union select c.classId, c.course, c.word, c.level, null, null, null, null,  a.associationId   ' \
+                        'from (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a JOIN class c where a.classId = c.classId;'
 
 
         if v:
@@ -417,6 +417,7 @@ class EntitiesManager:
         db.commit()
         cursor.close()
         db.close()
+
 
         if related_kind == 'impart' and status_value == 1:
             return_dic['data'] = sorters.special_sort(return_dic['data'])

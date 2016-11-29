@@ -25,7 +25,7 @@ angular.module('teachers')
         vm.teacherSelected = -1;
 
 
-        vm.associationRelationExists = true;
+        vm.associationRelationExists = false;
 
         vm.itsAboutTeacher = false;
         vm.impartRelationExists = false;
@@ -128,12 +128,97 @@ angular.module('teachers')
                 list = parentController.teacherImparts;
             if (vm.itsAboutStudent)
                 list = parentController.studentEnrollments;
-
+            if (vm.itsAboutSubject)
+                list = parentController.subjectClasses;
 
             console.log(list)
             console.log(list.length)
 
             var exists = false;
+
+            if (vm.itsAboutSubject) {
+                // We add the new relation in the parentController array subjectClasses, obviously with the same format.
+                // It searched if the class exists in the list.
+                for (var i = 0; i < list.length; i++) {
+
+                    // If the class already exists in the list
+                    if (list[i].class.classId == vm.classSelected) {
+                        exists = true;
+
+                        // We add a teacher inside a teachers list inside of item of subjectClasses:
+
+                        var index = -1;
+                        for (var j = 0; j < vm.teachersList.length; j++)
+                            if (vm.teachersList[j].teacherId == vm.teacherSelected) {
+                                index = j;
+                                break;
+                            }
+
+
+                        var new_teacher = {
+                            teacherId: vm.teacherSelected,
+                            name: vm.teachersList[index].name
+                        }
+
+                        console.log(new_teacher);
+
+                        // Maybe the item hasn't an array created yet:
+                        if (list[i].teachers == undefined) {
+                            list[i].teachers = []
+                        }
+
+                        list[i].teachers.push(new_teacher);
+
+                    }
+                }
+
+
+                // If the class doesn't exists in the block data.
+                if (!exists) {
+
+                    // We need create the class item.
+                    var indexClass = -1;
+                    for (var j = 0; j < vm.classesList.length; j++)
+                        if (vm.classesList[j].classId == vm.classSelected) {
+                            indexClass = j;
+                            break;
+                        }
+
+                    var new_class = {
+                        classId: vm.classSelected,
+                        course: vm.classesList[indexClass].course,
+                        level: vm.classesList[indexClass].level,
+                        word: vm.classesList[indexClass].word
+                    }
+
+                    // We only have a class:
+                    if (vm.teacherSelected == -1) {
+                        list.push({class: new_class})
+                    } else {
+
+                        var indexTeacher = -1;
+                        for (var j = 0; j < vm.teachersList.length; j++)
+                            if (vm.teachersList[j].teacherId == vm.teacherSelected) {
+                                indexTeacher = j;
+                                break;
+                            }
+
+                        var new_teacher = {
+                            teacherId: vm.teacherSelected,
+                            name: vm.teachersList[indexTeacher].name
+                        };
+
+                        var teacher_list = [];
+                        teacher_list.push(new_teacher);
+                        list.push({class: new_class, teachers: teacher_list});
+
+                    }
+
+
+                }
+
+            }
+
 
             if (vm.itsAboutTeacher)
             // We add the new relation in the parentController array teacherImparts, obviously with the same format.
@@ -192,7 +277,6 @@ angular.module('teachers')
             if (!exists) {
 
                 if (vm.itsAboutTeacher) {
-                    console.log('REACCHHHERR')
                     // We need create the subject in list and insert the class inside.
                     var indexClass = -1;
                     for (var j = 0; j < vm.classesList.length; j++)
@@ -223,7 +307,9 @@ angular.module('teachers')
 
                 if (vm.itsAboutStudent) {
                     console.log('STUDEEEENT')
+
                     // We need create the class in list and insert the subject inside.
+
                     var indexSubject = -1;
                     for (var j = 0; j < vm.subjectsList.length; j++)
                         if (vm.subjectsList[j].subjectId == vm.subjectSelected) {
@@ -256,6 +342,7 @@ angular.module('teachers')
                     list.push({class: new_class, subjects: subjects_list})
                 }
 
+
             }
 
             console.log(list)
@@ -271,8 +358,62 @@ angular.module('teachers')
          */
         function checkRelationSelected_Class_Teacher(classSelected, teacherSelected) {
             console.log('Executing checkRelationSelected_Class_Teacher');
-            vm.associationRelationExists = false;
+            // The values are reseated before.
             vm.impartRelationExists = false;
+            vm.associationRelationExists = false;
+
+            // We only select a class:
+            if (teacherSelected == -1) {
+
+                console.log('teacherSelected == -1')
+                /*
+                 for(var i=0; i<vm.associationsList.length; i++){
+                 if (vm.associationsList[i].subjectId == parentController.subjectId && vm.associationsList[i].classId == classSelected) {
+                 vm.associationRelationExists = true;
+                 console.log('Relación asignatura - clase detectada en el servidor')
+                 console.log('You need assign a teacher to save this relation because already exists.')
+                 }
+                 }
+                 */
+                // We check if this class is already in the block.
+
+                for (var i = 0; i < parentController.subjectClasses.length; i++) {
+
+                    if (parentController.subjectClasses[i].class.classId == classSelected) {
+                        vm.associationRelationExists = true;
+                    }
+
+                }
+                vm.addButtonEnable = !vm.associationRelationExists;
+            }else if(classSelected == -1){
+                vm.addButtonEnable = false;
+            } else { // We have both.
+
+                for (var i = 0; i < parentController.subjectClasses.length; i++) {
+
+
+                    if (parentController.subjectClasses[i].class.classId == vm.classSelected)
+                    // If there are teachers with the subject wer iterate over them.
+                        if ('teachers' in parentController.subjectClasses[i]) {
+                            for (var j = 0; j < parentController.subjectClasses[i].teachers.length; j++) {
+                                if (parentController.subjectClasses[i].teachers[j].teacherId == vm.teacherSelected) {
+                                    vm.impartRelationExists = true;
+                                    console.log('IMPART RELATION EXISTS')
+                                }
+
+                            }
+                        }
+                }
+                if (!vm.impartRelationExists) {
+                    console.log('IMPART RELATION DOESNT EXISTS');
+                    vm.addButtonEnable = true;
+                } else {
+                    vm.addButtonEnable = false;
+                }
+
+
+            }
+
 
         }
 

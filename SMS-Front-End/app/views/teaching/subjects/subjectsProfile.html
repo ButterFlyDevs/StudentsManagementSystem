@@ -3,7 +3,7 @@
 
     <div layout="row" layout-align="center" ng-cloak>
         <div flex="90" layout-padding>
-            <div  layout="row" layout-align="space-between start">
+            <div layout="row" layout-align="space-between start">
                 <md-button class="md-primary md-raised"
                            ui-sref="subjects">
                     <md-icon>keyboard_arrow_left</md-icon>
@@ -65,6 +65,38 @@
 
                         <span class="md-title">{{ item.class.course }} {{ item.class.word }} {{ item.class.level }}</span>
 
+                        <md-menu>
+
+                            <md-button aria-label="Open phone interactions menu" class="md-icon-button"
+                                       ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                <md-icon md-menu-origin>more_vert</md-icon>
+                            </md-button>
+
+                            <md-menu-content width="4">
+
+                                <md-menu-item>
+                                    <md-button ng-click="">
+                                        <md-icon>list</md-icon>
+                                        Ver grupo
+                                    </md-button>
+                                </md-menu-item>
+
+                                <md-menu-item>
+                                    <md-button
+                                            ng-click="vm.showDeleteClassConfirm(item.class.classId)">
+                                        <md-icon>delete</md-icon>
+                                        Eliminar grupo
+                                    </md-button>
+                                </md-menu-item>
+
+                            </md-menu-content>
+
+                        </md-menu>
+
+
+                        <div ng-if="item.teachers == undefined">
+                            No hay profesores.
+                        </div>
 
                         <md-list class="md-dense">
                             <md-list-item class="md-3-line" ng-repeat="teacher in item.teachers" ng-click="null">
@@ -122,11 +154,12 @@
                 </div>
 
                 <!-- Button to add new project to user. -->
-                        <div access='admin' layout="row">
-                            <md-button class="md-primary md-raised" ng-click="vm.addRelation()"">
-                                <md-icon>add</md-icon>
-                                Añadir docencia</md-button>
-                        </div>
+                <div access='admin' layout="row">
+                    <md-button class="md-primary md-raised" ng-click="vm.addRelation()"
+                    ">
+                    <md-icon>add</md-icon>
+                    Añadir docencia</md-button>
+                </div>
 
 
                 <md-divider layout-margin></md-divider>
@@ -135,24 +168,25 @@
                     <!-- Action buttons-->
                     <div class="md-actions" layout="row" layout-align="end center">
 
-                        <!-- Button to save user changes -->
-                        <md-button class="md-primary md-raised"
-                                   ng-click="vm.updateSubject()">
-                            <md-icon>save</md-icon>
-                            Guardar
-                        </md-button>
-
                         <!-- Button that delete user, with confirmation message before -->
                         <md-button class="md-warn md-raised" ng-click="vm.showDeleteSubjectConfirm()">
                             <md-icon>delete</md-icon>
                             Eliminar
                         </md-button>
 
+                        <!-- Button to save user changes -->
+                        <md-button
+                                ng-disabled="!vm.updateButtonEnable"
+                                class="md-primary md-raised"
+                                ng-click="vm.updateSubject()">
+                            <md-icon>save</md-icon>
+                            Guardar
+                        </md-button>
+
 
                     </div>
 
                 </div>
-
 
 
             </md-card>
