@@ -3,7 +3,7 @@
 
     <div layout="row" layout-align="center" ng-cloak>
         <div flex="90" layout-padding>
-            <div  layout="row" layout-align="space-between start">
+            <div layout="row" layout-align="space-between start">
                 <md-button class="md-primary md-raised"
                            ui-sref="classes">
                     <md-icon>keyboard_arrow_left</md-icon>
@@ -49,96 +49,296 @@
                 <!-- A line divisor -->
                 <!-- <md-divider layout-margin></md-divider> -->
 
-                <!-- Academic related user info section -->
-                <div layout="column">
 
-                    <div class="margin-top-medium">
-                        <span flex class="md-headline" layout-margin>Docencia</span>
-                    </div>
+                <md-tabs md-dynamic-height md-border-bottom>
 
-
-                    <!-- Section with three columns -->
+                    <md-tab label="Docencia">
+                        <md-content class="md-padding">
 
 
-                    <div layout="column">
-                      <!-- A line divisor -->
+                            <!-- <h1 class="md-title">Tab One</h1>-->
 
-                        <md-divider layout-margin></md-divider>
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Asignaturas</span>
-                    </div>
-
-                        <!-- If the class have a subjects -->
-                        <div ng-if="vm.teacherSubjects.length != 0">
-
-                            <md-list>
-
-                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherSubjects" ng-click="null">
-                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
-                                    <div class="md-list-item-text" layout="column">
-                                        <h3>{{ item.name }}</h3>
-                                        <h4>OtraCosa</h4>
-                                        <p>OtrasCosaMas</p>
-                                    </div>
-                                </md-list-item>
-
-                            </md-list>
-
-                        </div>
-
-                        <!-- If the subject hasn't any association doing still -->
-                        <div ng-if="vm.teacherSubjects.length == 0">
-                            <span>Este profesor aún no imparte ninguna asignatura. </span>
-                        </div>
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Grupos</span>
-                    </div>
-
-                        <!-- If the subject have a classes -->
-                        <div ng-if="vm.teacherClasses.length != 0">
-
-                            <md-list>
-
-                                <md-list-item class="md-3-line" ng-repeat="item in vm.teacherClasses" ng-click="null">
-                                    <!--<img ng-src="{{item.face}}?{{$index}}" class="md-avatar" alt="{{item.who}}" />-->
-                                    <div class="md-list-item-text" layout="column">
-                                        <h3>{{ item.course }} º {{ item.word }} {{ item.level}}</h3>
-                                    </div>
-                                </md-list-item>
-
-                            </md-list>
-
-                        </div>
-
-                        <!-- If the subject hasn't any association doing still -->
-                        <div ng-if="vm.teacherClasses.length == 0">
-                            <span>Este profesor aún no da clase en ningún grupo. </span>
-                        </div>
-
-
-                    <div class="margin-top-medium">
-                        <span flex class="md-title" layout-margin>Estudiantes</span>
-                    </div>
+                            <div ng-repeat="item in vm.classSubjects">
 
 
 
+                                <md-card>
+                                <md-card-title>
+                                    <md-card-title-text>
+                                        <span class="md-headline">{{ item.subject.subjectName }}</span>
 
-                    </div>
+                                    </md-card-title-text>
+                                </md-card-title>
+
+                                <md-card-content>
+
+                                     <!-- If there aren't teachers -->
+                                <div ng-if="item.teachers == undefined">
+                                    <p>Aún no hay profesores que impartan esta asignatura en este grupo.</p>
+                                </div>
+
+                                <!-- If there are -->
+                                <md-list class="md-dense">
+                                    <md-list-item class="md-3-line" ng-repeat="teacher in item.teachers"
+                                                  ng-click="null">
+                                        <p>
+                                              <div ng-switch="item.img || '_undefined_'">
+                                                    <img ng-switch-when="_undefined_" class="img-profile"
+                                                         src="{{ vm.defaultAvatar }}">
+                                                    <img ng-switch-default class="img-profile" src="{{ item.img }}">
+                                                </div>
+
+                                            {{ teacher.teacherName }} {{ teacher.teacherSurname }}</p>
 
 
 
-                </div>
+                                        <md-menu>
 
-                <!-- Button to add new project to user. -->
-                        <div access='admin' layout="row">
-                            <md-button class="md-primary md-raised" ng-click="vm.addRelation()"">
+                                            <md-button aria-label="Open phone interactions menu" class="md-icon-button"
+                                                       ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                                <md-icon md-menu-origin>more_vert</md-icon>
+                                            </md-button>
+
+                                            <md-menu-content width="4">
+
+                                                <md-menu-item>
+                                                    <md-button ng-click="">
+                                                        <md-icon>list</md-icon>
+                                                        Ver profesor
+                                                    </md-button>
+                                                </md-menu-item>
+
+                                                <md-menu-item>
+                                                    <md-button
+                                                            ng-click="vm.showDeleteSubjectClassImpartConfirm(item.class.classId, teacher.teacherId)">
+                                                        <md-icon>delete</md-icon>
+                                                        Eliminar profesor
+                                                    </md-button>
+                                                </md-menu-item>
+
+                                                <md-menu-divider></md-menu-divider>
+
+                                                <md-menu-item>
+                                                    <md-button disabled="disabled"
+                                                               ng-click="vm.showDeleteSubjectClassImpartConfirm(item.class.classId, teacher.teacherId)">
+                                                        <md-icon>delete</md-icon>
+                                                        Accion denegada
+                                                    </md-button>
+                                                </md-menu-item>
+
+                                            </md-menu-content>
+
+                                        </md-menu>
+
+
+                                    </md-list-item>
+                                </md-list>
+
+
+                                </md-card-content>
+
+
+                                <md-card-actions layout="row" layout-align="end center">
+
+                                    <md-menu>
+
+                                    <md-button aria-label="Open phone interactions menu" class="md-icon-button"
+                                               ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                        <md-icon md-menu-origin>more_vert</md-icon>
+                                    </md-button>
+
+                                    <md-menu-content width="4">
+
+                                        <md-menu-item>
+                                            <md-button ng-click="">
+                                                <md-icon>list</md-icon>
+                                                Ver asignatura
+                                            </md-button>
+                                        </md-menu-item>
+
+                                        <md-menu-item>
+                                            <md-button ng-click="">
+                                                <md-icon>list</md-icon>
+                                                Ver estudiantes del grupo matriculados
+                                            </md-button>
+                                        </md-menu-item>
+
+                                        <md-menu-item>
+                                            <md-button
+                                                    ng-click="vm.showDeleteSubjectConfirm(item.subject.subjectId)">
+                                                <md-icon>delete</md-icon>
+                                                Eliminar asignatura
+                                            </md-button>
+                                        </md-menu-item>
+
+                                    </md-menu-content>
+
+                                </md-menu>
+                                </md-card-actions>
+                            </md-card>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            </div>
+
+
+                            <!-- Button to add new project to user. -->
+                            <div access='admin' layout="row">
+                                <md-button class="md-primary md-raised" ng-click="vm.addRelation()"
+                                ">
                                 <md-icon>add</md-icon>
-                                Añadir docencia</md-button>
-                        </div>
+                                Añadir</md-button>
+                            </div>
+                        </md-content>
+                    </md-tab>
+
+
+                    <md-tab label="Estudiantes">
+                        <md-content class="md-padding">
+
+                            <div ng-if="vm.classStudents.length == 0">
+
+                                <h3 class="md-headline"> Aún no se ha matriculado a ningún estudiante en ninguna
+                                    asignatura que se imparta en este grupo.</h3>
+                                <h3 class="md-headline"> ¿Desea matricular uno? </h3>
+
+                                <div access='admin' layout="row" layout-align="center" layout-margin>
+                                    <md-button ng-click="vm.openNewStudentDialog()" class="md-primary md-raised">
+                                        <md-icon>add</md-icon>
+                                        Insertar
+                                    </md-button>
+                                </div>
+
+                            </div>
+
+
+                            <div ng-if="vm.classStudents.length > 0">
+
+                                <!-- toolbar for the table -->
+                                <md-toolbar class="md-table-toolbar md-default">
+
+                                    <!-- search -->
+                                    <md-card-title>
+                                        <md-card-title-text>
+
+                                            <md-input-container>
+                                                <md-icon>search</md-icon>
+                                                <!-- layout="" to avoid parent layout -->
+                                                <label layout="">"Buscar"</label>
+                                                <input type="text" ng-model="vm.query">
+                                            </md-input-container>
+
+
+                                        </md-card-title-text>
+                                    </md-card-title>
+                                </md-toolbar>
+
+
+                                <!-- Students list table -->
+                                <md-table-container>
+
+                                    <table md-table md-progress="vm.promise">
+                                        <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
+                                        <tr md-row>
+                                            <th md-column><span>Imagen</span></th>
+                                            <th md-column md-order-by="name"><span>Nombre</span></th>
+                                            <th md-column><span>Perfil</span></th>
+                                        </tr>
+                                        </thead>
+
+                                        <tbody md-body>
+
+                                        <!-- Where we iterate through items list -->
+                                        <tr md-row ng-repeat="item in vm.classStudents">
+
+                                            <!-- 1. User profile image -->
+                                            <td md-cell>
+
+                                                <div ng-switch="item.img || '_undefined_'">
+                                                    <img ng-switch-when="_undefined_" class="img-profile"
+                                                         src="{{ vm.defaultAvatar }}">
+                                                    <img ng-switch-default class="img-profile" src="{{ item.img }}">
+                                                </div>
+
+
+                                            </td>
+
+                                            <!-- 2. Name and surname -->
+                                            <td md-cell>
+                                                <span>{{ item.name }} {{ item.surname }}</span>
+                                            </td>
+
+                                            <!-- 3. Go to profile button -->
+                                            <td md-cell>
+                                                <md-button ui-sref="studentsProfile({studentId: item.studentId})"
+                                                           class="md-fab md-mini md-primary">
+                                                    <md-icon>forward</md-icon>
+                                                </md-button>
+                                            </td>
+
+                                        </tr>
+                                        </tbody>
+
+                                    </table>
+                                </md-table-container>
+
+                                <md-table-pagination md-limit="vm.limit"
+                                                     md-page="vm.page" md-total="{{vm.data.total}}"
+                                                     md-page-select md-boundary-links md-on-paginate="vm.onPaginate">
+                                </md-table-pagination>
+
+                            </div>
+                        </md-content>
+                    </md-tab>
+                    <md-tab label="Gráficas">
+                        <md-content class="md-padding">
+                            highcharts
+                        </md-content>
+                    </md-tab>
+                </md-tabs>
 
 
                 <md-divider layout-margin></md-divider>
@@ -164,7 +364,6 @@
                     </div>
 
                 </div>
-
 
 
             </md-card>

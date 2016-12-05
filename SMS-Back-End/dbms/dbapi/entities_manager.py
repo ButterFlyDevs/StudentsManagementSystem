@@ -366,7 +366,7 @@ class EntitiesManager:
                         '( SELECT impart.associationId, impartId , association.subjectId, association.classId ' \
                         'FROM impart JOIN association WHERE impart.associationId = association.associationId ' \
                         'AND impart.teacherId = ' + entity_id + ' AND impart.deleted = 0) i JOIN class c JOIN subject s on (i.classId = c.classId ' \
-                                                              'AND i.subjectId = s.subjectId);'
+                        'AND i.subjectId = s.subjectId);'
 
         elif kind == 'class':  # Queremos buscar entidades relacionadas con una entidad de tipo class.
             if related_kind == 'student':  # Todos los alumnos matriculados en esa clase.
@@ -375,9 +375,8 @@ class EntitiesManager:
                 query = 'SELECT teacherId, name, surname FROM teacher WHERE deleted = 0 and teacherId IN (SELECT teacherId FROM impart WHERE associationId IN (SELECT associationId FROM association WHERE classId=' + entity_id + '))';
             elif related_kind == 'subject':  # Todas las asignaturas que se imparten en esa clase.
                 query = 'select sbs.subjectId, sbs.name as \'subjectName\', t.name as \'teacherName\', t.surname as \'teacherSurname\', t.teacherId, i.impartId, sbs.associationId from impart i JOIN (select name, s.subjectId, a.associationId from (select name, subjectId from subject) s JOIN ' \
-                        '(select subjectId, associationId from association where classId=' + entity_id + ') a where s.subjectId = a.subjectId) sbs JOIN teacher t where i.associationId = sbs.associationId and i.teacherId = t.teacherId union  select s.subjectId, ' \
-                        's.name, null, null, null, null,  a.associationId   from (select subjectId, associationId from association where classId=' + entity_id + ') a JOIN subject s where a.subjectId = s.subjectId;'
-
+                        '(select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a where s.subjectId = a.subjectId) sbs JOIN teacher t where i.associationId = sbs.associationId and i.teacherId = t.teacherId union  select s.subjectId, ' \
+                        's.name, null, null, null, null,  a.associationId   from (select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a JOIN subject s where a.subjectId = s.subjectId;'
 
         elif kind == 'subject':  # Queremos buscar entidades relacionadas con una entidad de tipo subject.
             if related_kind == 'student':

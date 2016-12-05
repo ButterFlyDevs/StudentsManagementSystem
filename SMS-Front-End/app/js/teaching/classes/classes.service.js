@@ -12,6 +12,12 @@ angular.module('classes')
                  isArray: true
              },
 
+             'getStudents': {
+                 method: 'GET',
+                 url: restPath + ':id' + '/student',
+                 isArray: true
+             },
+
              'update': {method: 'PUT'},
          });
 
