@@ -1,7 +1,7 @@
-Entities Manager
+Mensajes con SCE
 ================
 
-.. automodule:: dbapi.entities_manager
+.. automodule:: mensajes.mensajesSCE
     :members:
     :undoc-members:
     :show-inheritance:

@@ -6,10 +6,15 @@ angular.module('classes')
 
          return $resource(restPath + ':id', {id: '@classId'}, {
 
-             'getSubjects': {
+             'getTeaching': {
                  method: 'GET',
-                 url: restPath + ':id' + '/subject',
+                 url: restPath + ':id' + '/teaching',
                  isArray: true
+             },
+
+             'getReport': {
+                 method: 'GET',
+                 url: restPath + ':id' + '/report',
              },
 
              'getStudents': {

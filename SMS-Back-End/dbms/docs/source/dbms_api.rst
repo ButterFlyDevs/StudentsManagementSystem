@@ -1,7 +1,7 @@
-Entities Manager
+DBmS Flask APIRest
 ================
 
-.. automodule:: dbapi.entities_manager
+.. automodule:: dbms_api
     :members:
     :undoc-members:
     :show-inheritance:

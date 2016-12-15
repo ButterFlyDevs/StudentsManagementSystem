@@ -58,7 +58,7 @@
 
                             <!-- <h1 class="md-title">Tab One</h1>-->
 
-                            <div ng-repeat="item in vm.classSubjects">
+                            <div ng-repeat="item in vm.classTeaching">
 
 
 
@@ -235,7 +235,6 @@
                         </md-content>
                     </md-tab>
 
-
                     <md-tab label="Estudiantes">
                         <md-content class="md-padding">
 
@@ -333,9 +332,14 @@
                             </div>
                         </md-content>
                     </md-tab>
+
                     <md-tab label="Gráficas">
                         <md-content class="md-padding">
-                            highcharts
+                            <!--
+                           <hc-chart options="vm.chartOptions">Placeholder for generic chart</hc-chart>
+                            <hc-pie-chart title="Browser usage" data="pieData">Placeholder for pie chart</hc-pie-chart>
+                            -->
+                             <chart config="vm.chartConfig"></chart>
                         </md-content>
                     </md-tab>
                 </md-tabs>

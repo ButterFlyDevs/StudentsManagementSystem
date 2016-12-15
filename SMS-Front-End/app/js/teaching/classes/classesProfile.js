@@ -1,4 +1,90 @@
 angular.module('classes')
+// Directive for generic chart, pass in chart options
+    .directive('hcChart', function () {
+        return {
+            restrict: 'E',
+            template: '<div></div>',
+            scope: {
+                options: '='
+            },
+            link: function (scope, element) {
+                Highcharts.chart(element[0], scope.options);
+            }
+        };
+    })
+    .directive('chart', function () {
+        return {
+            restrict: 'E',
+            replace: true,
+            template: '<div></div>',
+            scope: {
+                config: '='
+            },
+            link: function (scope, element, attrs) {
+                var chart;
+                var process = function () {
+                    var defaultOptions = {
+                        chart: {renderTo: element[0]},
+                    };
+                    var config = angular.extend(defaultOptions, scope.config);
+                    chart = new Highcharts.Chart(config);
+                };
+                process();
+                $scope.$watch("config.series", function (newValue, oldValue) {
+                    console.log('new data received');
+                    console.log('newValue');
+                    console.log(newValue);
+                    console.log('oldValue');
+                    console.log(oldValue);
+
+                    process();
+                });
+                $scope.$watch("config.loading", function (loading) {
+                    if (!chart) {
+                        return;
+                    }
+                    if (loading) {
+                        chart.showLoading();
+                    } else {
+                        chart.hideLoading();
+                    }
+                });
+            }
+        };
+    })
+    .directive('hcPieChart', function () {
+        return {
+            restrict: 'E',
+            template: '<div></div>',
+            scope: {
+                title: '@',
+                data: '='
+            },
+            link: function (scope, element) {
+                Highcharts.chart(element[0], {
+                    chart: {
+                        type: 'pie'
+                    },
+                    title: {
+                        text: scope.title
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                            }
+                        }
+                    },
+                    series: [{
+                        data: scope.data
+                    }]
+                });
+            }
+        };
+    })
     .controller('classesProfileController', function ($scope, $resource, $state, $stateParams, $mdDialog, ClassesService, toastService) {
 
         var vm = this;
@@ -15,9 +101,9 @@ angular.module('classes')
         vm.addRelation = addRelation;
 
 
-
-
+        vm.classReport = null;
         activate();
+
 
         ///////////////////////////////////////////////////////////
         function activate() {
@@ -53,7 +139,7 @@ angular.module('classes')
 
 
             vm.classStudents = ClassesService.getStudents({id: vm.classId},
-                function(){
+                function () {
                     console.log('Class Students');
                     console.log(vm.classStudents);
                 },
@@ -65,34 +151,57 @@ angular.module('classes')
             );
 
 
-            vm.classSubjects = ClassesService.getSubjects({id: vm.classId},
+            vm.classTeaching = ClassesService.getTeaching({id: vm.classId},
                 function () {
-                    console.log('Class Subjects');
-                    console.log(vm.classSubjects);
+                    console.log('Class Teaching Data Block');
+                    console.log(vm.classTeaching);
 
                     // ### Do a copy to save process. ###
-                    vm.classSubjectsOriginalCopy = angular.copy(vm.classSubjects);
+                    vm.classTeachingOriginalCopy = angular.copy(vm.classTeaching);
 
-                    $scope.classSubjectsModelHasChanged = false;
+                    $scope.classTeachingModelHasChanged = false;
 
-                    $scope.$watch('vm.classSubjects', function (newValue, oldValue) {
+                    $scope.$watch('vm.classTeaching', function (newValue, oldValue) {
                         if (newValue != oldValue) {
-                            $scope.classSubjectsModelHasChanged = !angular.equals(vm.classSubjects, vm.classSubjectsOriginalCopy);
+                            $scope.classTeachingModelHasChanged = !angular.equals(vm.classTeaching, vm.classTeachingOriginalCopy);
                         }
                         compare()
                     }, true);
 
                 }, function (error) {
-                    console.log('Get class subjects process fail.')
-                    console.log(error)
+                    console.log('Get class subjects process fail.');
+                    console.log(error);
                     toastService.showToast('Error obteniendo las asignaturas que se imparten en la clase.')
                 }
-            )
+            );
+
+            vm.classReport = ClassesService.getReport({id: vm.classId},
+                function () {
+                    console.log('Class Report Data Block');
+                    console.log(vm.classReport);
+
+                    vm.chartConfig['series'][0]['data'] = [vm.classReport['students']['gender_percentage']['M'],
+                                                           vm.classReport['students']['gender_percentage']['F']];
+                    console.log(vm.chartConfig);
+
+                    $scope.pieData = [{
+                        name: "Chicos",
+                        y: vm.classReport['students']['gender_percentage']['M']
+                    },
+                        {
+                            name: "Chicas",
+                            y: vm.classReport['students']['gender_percentage']['M']
+                        }]
+                }, function (error) {
+                    console.log('Get class report process fail.');
+                    console.og(error);
+                    toastService.showToast('Error obteniendo las asignaturas que se imparten en la clase.')
+                })
 
         }
 
         function compare() {
-            if ($scope.classModelHasChanged || $scope.classSubjectsModelHasChanged) {
+            if ($scope.classModelHasChanged || $scope.classTeachingModelHasChanged) {
                 vm.updateButtonEnable = true;
             } else {
                 vm.updateButtonEnable = false;
@@ -174,4 +283,127 @@ angular.module('classes')
                 });
         }
 
+        // Sample options for first chart
+        vm.chartOptions = {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: 0,
+                plotShadow: false
+            },
+            title: {
+                text: 'Browser<br>shares<br>2015',
+                align: 'center',
+                verticalAlign: 'middle',
+                y: 40
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    dataLabels: {
+                        enabled: true,
+                        distance: -50,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'white'
+                        }
+                    },
+                    startAngle: -90,
+                    endAngle: 90,
+                    center: ['50%', '75%']
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: 'Browser share',
+                innerSize: '50%',
+                data: [
+                    // ['Chicas', vm.classReport['students']['gender_percentage']['F']],
+                    // ['Chicos', vm.classReport['students']['gender_percentage']['M']],
+                    ['Chicas', 40],
+                    ['Chicos', 60],
+                    {
+                        name: 'Proprietary or Undetectable',
+                        y: 0.2,
+                        dataLabels: {
+                            enabled: false
+                        }
+                    }
+                ]
+            }]
+        };
+
+        // Sample data for pie chart
+        $scope.pieData = [{
+            name: "Microsoft Internet Explorer",
+            y: 56.33
+        }, {
+            name: "Chrome",
+            y: 24.03,
+            sliced: true,
+            selected: true
+        }, {
+            name: "Firefox",
+            y: 10.38
+        }, {
+            name: "Safari",
+            y: 4.77
+        }, {
+            name: "Opera",
+            y: 0.91
+        }, {
+            name: "Proprietary or Undetectable",
+            y: 0.2
+        }]
+
+
+        vm.chartConfig = {
+            xAxis: {
+                categories: ['Jan', 'Feb']
+            },
+            title: {
+                text: 'USD to EUR exchange rate from 2006 through 2008'
+            }, subtitle: {
+                text: document.ontouchstart === undefined ?
+                    'Click and drag in the plot area to zoom in' :
+                    'Pinch the chart to zoom in'
+            },
+            yAxis: {title: {text: 'Temperature (Celsius)'}},
+            tooltip: {valueSuffix: ' celsius'},
+            legend: {align: 'center', verticalAlign: 'bottom', borderWidth: 0},
+            plotOptions: {
+                area: {
+                    fillColor: {
+                        linearGradient: {x1: 0, y1: 0, x2: 0, y2: 1},
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    lineWidth: 1,
+                    states: {
+                        hover: {
+                            lineWidth: 1
+                        }
+                    },
+                    threshold: null
+                }
+            },
+            series: [{
+                type: 'area',
+                data: [0, 1]
+            }]
+        };
+        console.log('ACCESS')
+        console.log(vm.chartConfig['series'])
+        vm.chartConfig['series'][0]['data'] = [1,1];
+        console.log(vm.chartConfig['series'])
+
+
     });
+
+

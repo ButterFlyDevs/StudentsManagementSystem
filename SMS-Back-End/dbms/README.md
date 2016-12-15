@@ -31,3 +31,5 @@ If you want, you can provide that data to service executing the provisioner `pro
 
 This microservice is documented with Sphinx, before you read the doc you need generated it, running `make html` 
 inside docs folder and then open *index.html* in `build/html` in the same folder, all doc is web based.
+
+Also **fab doc_dbms** from main folder (firefox required).

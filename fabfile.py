@@ -2,8 +2,8 @@ from fabric.api import local # to run local commands.
 from fabric.colors import red
 from provisioner import example_data_provisioner
 import time
-from fabric.api import local # to run local commands.
-from fabric.colors import red
+from fabric.api import local, lcd, run # to run local commands.
+from fabric.colors import red, blue
 from provisioner import example_data_provisioner
 import time
 
@@ -12,10 +12,13 @@ import time
 # This is the file to configure Fabric Python Library to admin tasks
 
 # Use:
-# fab <commands>
+# fab <command>
 
 # How to know the commands? :
 # fab -l
+
+# Info about command:
+# fab -d <command>
 
 ##########################
 
@@ -44,12 +47,81 @@ def run_back_end():
     print (red('Thanks for your contribution!'))
 
 
+def test(ms):
+    """
+    Tests runner.
+    Execute the test over specific microservice, part ot it of over all system.
+
+    Example: fab test:'tdbms'
+
+    """
+    # All microservice.
+    if ms == 'tdbms':
+        print (blue('## Runnig Teaching Daba Base microService entire Test Suite. ## '))
+
+    # Only the apiRest.
+    if ms == 'tdbms.api':
+        print (blue('## Runnig Teaching Daba Base microService apiRest test. ## '))
+        with lcd("SMS-Back-End/dbms"):
+            local("pytest test/ -vv")
+
+    # It fail yet:
+    if ms == 'tdbms.dbapi':
+        print (blue('## Runnig Teaching Daba Base microService dbapi library test. ## '))
+        with lcd("SMS-Back-End/dbms"):
+            local('pwd')
+            local("pytest test/")
+
+
+def doc(ms):
+    """
+    Doc generator.
+    Build the documentation to the microservice passed.
+
+    Examples:
+        fab doc:'tdbms'
+        fab doc:'apigms'
+        fab doc:'back-end'
+    """
+
+    # Generate and open the documentation of Teaching DataBase microService
+    if ms == 'tdbms':
+        local('make -C SMS-Back-End/dbms/docs html')
+        local('firefox SMS-Back-End/dbms/docs/build/html/index.html')
+
+    if ms == 'apigms':
+        local('make -C SMS-Back-End/apigms/docs html')
+        local('firefox SMS-Back-End/apigms/docs/build/html/index.html')
+
+    if ms == 'back-end':
+        local('make -C SMS-Back-End/docs html')
+        local('firefox SMS-Back-End/docs/build/html/index.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
 def run_dbms_api_test():
     """
     Run dbms api test
     """
     local('pytest -s SMS-Back-End/dbms/test')
 
+
+def doc_dbms():
+    """
+    Generate and open the documentation of DataBase microService
+    """
+    local('make -C SMS-Back-End/dbms/docs html')
+    local('firefox SMS-Back-End/dbms/docs/build/html/index.html')
 
 def run_apigms_api_test():
     """
@@ -154,7 +226,7 @@ def requirements(ms=None):
 
 
 
-def run(provision=False):
+def run2(provision=False):
     """
     Run entire project, included MySQL daemon, SMS Front-End dev_server and Back-End dev_server.
 

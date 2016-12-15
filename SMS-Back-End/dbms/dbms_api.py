@@ -73,7 +73,9 @@ def process_response(response):
         1054 unknown column, is when a value isn't a column in database
         1062: Duplicate entry
         1065: Query was empty
+        1644: Some attribute fault.
         1146: Table x doesn't exist.
+        1048: Column can't be null.
         -1:   When don't exists result, as a in a retrieved "related" data when there aren't related info.
 
     """
@@ -81,21 +83,43 @@ def process_response(response):
     if response['status'] == 1:
         # return json.dumps(response['data'], cls=MyEncoder)
         #app.logger.info('informing')
-
-        return make_response(Response(json.dumps(response['data'], cls=MyEncoder), mimetype='application/json'))
+        # If there aren't data to return, it not needed json.dumps and use make_response.
+        if response.get('data', None) == None:
+            return ''
+        elif len(response.get('data')) == 0:
+            return ('', 204)
+        else:
+            return make_response(Response(json.dumps(response['data'], cls=MyEncoder), mimetype='application/json'))
 
     elif response['status'] == -1:
         # The element that it searched doesn't exists.
         abort(404)  # Is returned standard "Not found" error.
 
-    elif response['status'] in [1054, 1452, 1146]:
-        abort(404, response['log'])  # The same plus log.
+    elif response['status'] == 1054:
+        abort(400) # Bad request
+
+    elif response['status'] == 1048:
+        abort(400, response['log']) # Bad request
+
+    elif response['status'] in [1452, 1146]:
+        if response['log']:
+            abort(404, response['log'])  # The same plus log.
+        else:
+            abort(404) # Not found
 
     elif response['status'] == 1062:
 
         # 409 Conflict because the item already exists in database and the user can't create another.
         # resource with the same values.
         abort(409, response['log'])
+
+    elif response['status'] == 1644:
+        if 'is required' in response['log']:
+            abort(400, response['log']) # 400: Bad request.
+        elif '404' in response['log']:
+            abort(404) # 404 Not found
+        else:
+            abort(409, response['log']) # Conflict
 
     else:
         # Another problem that we don't have identified.
@@ -106,21 +130,15 @@ def process_response(response):
 #####################################################
 
 
-
-
-
-
-# Test method.
 @app.route('/test',methods=['GET'])
 def test():
     """
     Test resource.
 
     Example of use:
-    curl -i -X GET localhost:8002/test
+        curl -i -X GET localhost:8002/test
     """
     return json.dumps({'dbms_api_test_status': 'ok'})
-
 
 #################################
 #   Resources about entities    #
@@ -130,15 +148,13 @@ def test():
 @app.route('/entities/<string:kind>', methods=['POST'])
 def post_entity(kind):
     """
-    Insert a entity in the database, with a special input format:
+    INSERT a entity in the database, with a special input format:
 
     Input:
 
         Json payload:
-        {
-          kind: string, kind of entity that is wanted inserted in the database.
-          data: dict, with pairs: key (name of value in database), value (value to save in this key in database)
-        }
+        dict,  {}, with pairs: key (name of value in database), value (value to save in this key in database)
+
 
     Json return:
 
@@ -146,8 +162,8 @@ def post_entity(kind):
         A json with the entire entity which is saved in database (with all extra control values) or error status code.
 
     Example of use:
-        curl -H "Content-Type: application/json" -X POST -d '{ "data": {"name": "María"} }' localhost:8002/entities/student
-        curl -H "Content-Type: application/json" -X POST -d '{"data": {"course": 1, "word": "B", "level": "ESO"} }' localhost:8002/entities/class
+        curl -H "Content-Type: application/json" -X POST -d '{"name": "María"}' localhost:8002/entities/student
+        curl -H "Content-Type: application/json" -X POST -d '{"course": 1, "word": "B", "level": "ESO"}' localhost:8002/entities/class
 
     Example of return:
         {"createdBy": 1, "course": 5, "createdAt": "Thu Sep 22 16:09:36 2016", "word": "B", "level": "Primary", "classId": 19}
@@ -155,94 +171,35 @@ def post_entity(kind):
     If we want to use a file instead of:
         curl -H "Content-Type: application/json" -X POST -d @entityData.json localhost:8002/entidades
 
+
+
+    Use "| python -mjson.tool" after curl to see better the return to call on terminal.
+
+
+
+    Special cases in entity CLASS:
+
+
+
+
+
     """
 
-    raw_data = request.get_json()
+    received_json = request.get_json()
 
-    print colored('mSDBapi.putEntity', 'green')
-    print colored(raw_data, 'green')
+    print colored('mSDBapi.postEntity', 'green')
+    print colored(received_json, 'green')
 
-    data = raw_data.get('data', None)
+    if received_json is None:
+        abort(400)  # Bad request.
 
-    if data is None:
-        abort(400)
-
-    if data is not None:
-        for key, value in data.iteritems():
+    else:
+        for key, value in received_json.iteritems():
             if type(value) is not int:
-                data[key] = value.encode('utf-8')
+                received_json[key] = value.encode('utf-8')
 
     # When are really saved data in database
-    response = EntitiesManager.put(kind, data)
-
-    """
-    if c:
-        salida = salidaGestor
-        print colored(salidaGestor, 'green')
-
-        #Si la salida del gestor es correcta llamaremos al mSCE para añadir un elemento de referencia:
-        if salidaGestor['status'] == 'OK':
-            print colored('Entidad creada con Exito en SBD, enviando datos al SCE', 'red')
-            url = "http://%s/" % modules.get_hostname(module="sce")
-            url+="entidadesReferencia"
-
-            #Creamos un diccionario con los datos.
-            dicDatos = {
-              'tipo' : tipo,
-              #Usamos el id de la entidad que nos devuelve el gestor.
-              'idEntidad': salidaGestor['idEntidad'],
-            }
-
-            #Dependiendo del tipo de entidad que recibamos componemos el nombre de la entidad de una manera u otra
-            if tipo == 'Alumno' or tipo == 'Profesor':
-                dicDatos['nombreEntidad'] = datos['nombre']+' '+datos['apellidos']
-
-            if tipo == 'Clase':
-                dicDatos['nombreEntidad'] = str(datos['curso'])+' '+str(datos['grupo'])+' '+datos['nivel']
-
-            if tipo == 'Asignatura':
-                dicDatos['nombreEntidad'] = datos['nombre']
-
-
-            print colored(dicDatos, 'green')
-
-            print colored(url,'green')
-            req = urllib2.Request(url, json.dumps(dicDatos), {'Content-Type': 'application/json'})
-            print colored(req, 'green')
-            f = urllib2.urlopen(req)
-            response = json.loads(f.read())
-            print colored(response, 'green')
-            f.close()
-
-            if response['status'] != 'OK':
-                salida['status'] = 'FAIL'
-                salida['info'] = 'SCE subcall fail'
-
-            print colored(response, 'green')
-
-
-        #En caso de que la entidad introducida sea un profesor se cargarán lascredenciales por defecto en el sistema.
-        if tipo == 'Profesor':
-            print ' Profesor creado con éxito. Creando sus credenciales de acceso al sistema.'
-            #Creamos las credenciales del usuario en la tabla credenciales usando el id del usuario que devuelve nuevoProfesor
-            #Por defecto el alias y el password de un profesor en el sistemas serán su dni
-            #salida Creacion CredencialespostProfesor
-            salidaCC=GestorCredenciales.postCredenciales(salidaGestor['idEntidad'], dicDatos['nombreEntidad'], datos['dni'], datos['dni'], 'admin')
-            if salidaCC != 'OK':
-                salida['status'] = 'FAIL'
-                salida['info']='SBD credential creation fail'
-
-
-        ######
-
-
-        #Realizamos la petición al gestor y devolvemos la respuesta transformada a json.
-        #return json.dumps(salidaGestor)
-        print colored(salida, 'green')
-        return json.dumps(salida)
-    """
-
-    return process_response(response)
+    return process_response(EntitiesManager.post(kind, received_json))
 
 
 @app.route('/entities/<string:kind>', methods=['GET']) #Si pedimos todas las entidades de un tipo
@@ -252,18 +209,30 @@ def get_entities(kind, entity_id=None):
     Retrieve info about entities, a list of all of them with all info or specific params or all data from one.
 
     Example of use:
-
+    Mode 1: all
     curl  -i -X GET localhost:8002/entities/student  -> All items of student list with all data
-    curl  -i -X GET localhost:8002/entities/student?params=name  -> Only params sent from all students
+    Mode 2: all with params:
+    curl  -i -X GET localhost:8002/entities/student?params=name, surname  -> Only params sent from all students
+    Mode 3: only one
     curl  -i -X GET  localhost:8002/entities/student/1  -> All data from student with id = 1
     """
     return process_response(EntitiesManager.get(kind, entity_id, request.args.get('params', None)))
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
-def put_entities(kind, entity_id):  # UPDATE
+def put_entities(kind, entity_id):
     """
+    UPDATE an entity in the data base of microService.
+
     curl -H "Content-Type: application/json" -X PUT -d '{ "name": "NombreModificado" }' localhost:8002/entities/teacher/1
+
+
+
+    When we put a item on tdbms there are a metadata params that are saved too, in all cases in the inserction it are:
+    itemId, createdAt and createdBy.
+
+    We pass data into a dict
+
     """
 
     raw_data = request.get_json()
@@ -275,12 +244,9 @@ def put_entities(kind, entity_id):  # UPDATE
 
     print colored(raw_data, 'red')
 
-    #data = raw_data.get('data', None)
-
     if raw_data is None:
-        abort(400)
-
-    if raw_data is not None:
+        abort(400) # Bad request.
+    else:
         for key, value in raw_data.iteritems():
             if type(value) is not int:
                 raw_data[key] = value.encode('utf-8')
@@ -288,13 +254,17 @@ def put_entities(kind, entity_id):  # UPDATE
     return process_response(EntitiesManager.update(kind, entity_id, raw_data))
 
 
-
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['DELETE'])
 def delete_entity(kind, entity_id):
     """
     curl  -i -X  DELETE localhost:8002/entities/subject/1
+    curl  -i -X  DELETE localhost:8002/entities/subject/1?action=dd
     """
-    return process_response(EntitiesManager.delete(kind, entity_id))
+    response = EntitiesManager.delete(kind, entity_id, request.args.get('action', None))
+    if response.get('log',None) and 'not found element to del' in response.get('log', None):
+        abort(404)
+    else:
+        return process_response(response)
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>', methods=['GET'])
@@ -308,51 +278,12 @@ def get_related_entities(kind, entity_id, related_kind):
     return process_response(EntitiesManager.get_related(kind, entity_id, related_kind))
 
 
-##########################
-# COLECCIÓN CREDENCIALES #
-##########################
-
-@app.route('/credenciales', methods=['GET'])
-def getCredenciales():
-    '''
-    Devuelve las credenciales de todos los usuarios almacenadas en la base de datos.
-    curl -i -X GET localhost:8002/credenciales
-    '''
-    return jsonpickle.encode(GestorCredenciales.getCredenciales())
-
-@app.route('/credenciales', methods=['POST'])
-def postCredenciales():
-    '''
-    Introduce las credenciales de un usuario en el sistema.
-    curl -d "idUsuario=1&nombre=lucas&username=juan&password=677164459&rol=admin" -i -X POST localhost:8002/credenciales
-    '''
-    #Devolvemos directamente la salida de la función.
-    return GestorCredenciales.postCredenciales(request.form['idUsuario'], request.form['nombre'], request.form['username'], request.form['password'], request.form['rol'] )
-
-@app.route('/comprobarAccesoUsuario', methods=['POST'])
-def comprobarAccesoUsuario():
-    '''
-    Comprueba que el login y el password de un usuario le da acceso al sistema.
-    curl -d "username=46666&password=46666" -i -X POST localhost:8002/comprobarAccesoUsuario
-    '''
-
-    #Info de seguimiento
-    if v:
-        print nombreMicroservicio
-        print ' Recurso: /comprobarAccesoUsuario , metodo: POST'
-        print " Petición: "
-        print ' '+str(request.form)
-
-    salida=GestorCredenciales.comprobarUsuario(request.form['username'], request.form['password'])
-
-    #Info de seguimiento
-    if v:
-        print nombreMicroservicio
-        print salida
-        print ' Return /comprobarAccesoUsuario: '+str(salida)+'\n'
-
-    #Devolvemos los datos en formato JSON
-    return jsonpickle.encode(salida)
+@app.route('/entities/<string:kind>/<int:entity_id>/report', methods=['GET'])
+def get_report(kind, entity_id):
+    """
+    curl -i -X GET localhost:8002/entities/class/1/report
+    """
+    return process_response(EntitiesManager.get_report(kind, entity_id))
 
 if __name__ == '__main__':
     handler = RotatingFileHandler('dbms_api_log.log', maxBytes=10000, backupCount=1)

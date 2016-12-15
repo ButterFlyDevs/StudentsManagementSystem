@@ -28,8 +28,8 @@ angular.module('main').config(function($stateProvider, $urlRouterProvider){
         .state('subjects', { url: '/subjects', templateUrl: 'app/views/teaching/subjects/subjectsList.html'})
         .state('subjectsProfile', {url: '/subjects/:subjectId', templateUrl: 'app/views/teaching/subjects/subjectsProfile.html'})
 
-        .state('classes', { url: '/classes', templateUrl: 'app/views/teaching/classes/classesList.html'})
-        .state('classesProfile', {url: '/classes/:classId', templateUrl: 'app/views/teaching/classes/classesProfile.html'})
+        .state('classes', { url: '/grupos', templateUrl: 'app/views/teaching/classes/classesList.html'})
+        .state('classesProfile', {url: '/grupos/:classId', templateUrl: 'app/views/teaching/classes/classesProfile.html'})
 
   })
 
