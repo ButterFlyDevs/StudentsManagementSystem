@@ -485,21 +485,24 @@ class EntitiesManager:
                             dd_status = False
 
             if kind == 'class':
-                association_relations = cls.get_related('class', entity_id, 'association').get('data', None)
-                impart_relations = cls.get_related('class', entity_id, 'impart').get('data', None)
-                enrollment_relations = cls.get_related('class', entity_id, 'enrollment').get('data', None)
 
-                if len(impart_relations) > 0 and dd_status:
+
+                association_relations = cls.get_related('class', entity_id, 'association', internall_call=True).get('data', None)
+                impart_relations = cls.get_related('class', entity_id, 'impart', internall_call=True).get('data', None)
+                enrollment_relations = cls.get_related('class', entity_id, 'enrollment', internall_call=True).get('data', None)
+                print association_relations
+
+                if impart_relations and len(impart_relations) > 0 and dd_status:
                     for impart in impart_relations:
                         if cls.delete('impart', impart.get('impartId')).get('status') != 1:
                             dd_status = False
 
-                if len(enrollment_relations) > 0 and dd_status:
+                if enrollment_relations and len(enrollment_relations) > 0 and dd_status:
                     for enrollment in impart_relations:
                         if cls.delete('enrollment', enrollment.get('enrollmentId')).get('status') != 1:
                             dd_status = False
 
-                if len(association_relations) > 0 and dd_status:
+                if association_relations and len(association_relations) > 0 and dd_status:
                     for association in association_relations:
                         if cls.delete('association', association.get('associationId')).get('status') != 1:
                             dd_status = False
@@ -530,6 +533,8 @@ class EntitiesManager:
     def get_related(cls, kind, entity_id, related_kind, with_special_sorter=True, internall_call=False):
         """Devuelve una lista de diccionarios con la información pedida."""
 
+        print 'get_related'
+
         kind = str(kind)
         entity_id = str(entity_id)
         related_kind = str(related_kind)
@@ -544,11 +549,12 @@ class EntitiesManager:
 
             return return_dic
 
-        if kind in ['teacher','student', 'class', 'subject'] and related_kind in ['association', 'enrollment', 'impart'] and internall_call == False:
-            return_dic['status'] = 1048  # Bad requests with log.
-            return_dic['log'] = '{} is not a valid nested resource.'.format(related_kind)
+        if not internall_call:
+            if kind in ['teacher','student', 'class', 'subject'] and related_kind in ['association', 'enrollment', 'impart'] and internall_call == False:
+                return_dic['status'] = 1048  # Bad requests with log.
+                return_dic['log'] = '{} is not a valid nested resource.'.format(related_kind)
 
-            return return_dic
+                return return_dic
 
         if kind in ['association','impart', 'enrollment'] and related_kind in ['impart', 'association', 'enrollment', 'teacher', 'student', 'class', 'subject'] and internall_call == False:
             return_dic['status'] = 1048  # Bad requests with log.

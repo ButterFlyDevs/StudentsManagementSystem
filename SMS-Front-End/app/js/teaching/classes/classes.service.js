@@ -14,9 +14,12 @@ angular.module('classes')
 
              'getReport': {
                  method: 'GET',
-                 url: restPath + ':id' + '/report',
+                 url: restPath + ':id' + '/report'
              },
-
+             'delete':{
+                 method: 'DELETE',
+                 url: restPath + ':id' + '?action=dd' // Delete dependencies also.
+             },
              'getStudents': {
                  method: 'GET',
                  url: restPath + ':id' + '/student',

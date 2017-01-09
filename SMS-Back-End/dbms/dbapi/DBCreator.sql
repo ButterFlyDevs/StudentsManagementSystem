@@ -290,7 +290,7 @@ CREATE TRIGGER update_subject_trigger
 BEFORE UPDATE ON subject FOR EACH ROW
   BEGIN
 
-     IF EXISTS (SELECT * FROM association where subjectId = NEW.subjectId and deleted IS NOT NULL) THEN   # Only active items.
+     IF EXISTS (SELECT * FROM association where subjectId = NEW.subjectId and deleted IS NOT NULL and NEW.deleted IS NULL) THEN   # Only active items.
           SIGNAL SQLSTATE '45000'
           SET MESSAGE_TEXT = 'Impossible delete the subject, this is related with some class , and this broke the consistency.';
      END IF;
@@ -303,7 +303,7 @@ CREATE TRIGGER update_class_trigger
 BEFORE UPDATE ON class FOR EACH ROW
   BEGIN
 
-     IF EXISTS (SELECT * FROM association where classId = NEW.classId and deleted IS NOT NULL) THEN   # Only active items.
+     IF EXISTS (SELECT * FROM association where classId = NEW.classId and deleted IS NOT NULL and NEW.deleted IS NULL) THEN   # Only active items.
           SIGNAL SQLSTATE '45000'
           SET MESSAGE_TEXT = 'Impossible delete the class, this is related with some subject , and this broke the consistency.';
      END IF;
@@ -470,7 +470,7 @@ CREATE TRIGGER avoid_fail_references_with_impart_teacher_trigger
     BEFORE UPDATE ON teacher
     FOR EACH ROW
     BEGIN
-     IF EXISTS (SELECT * FROM impart where teacherId = NEW.teacherId and deleted IS NOT NULL) THEN   # Only active items.
+     IF EXISTS (SELECT * FROM impart where teacherId = NEW.teacherId and deleted IS NOT NULL and NEW.deleted IS NULL) THEN   # Only active items.
               SIGNAL SQLSTATE '45000'
               SET MESSAGE_TEXT = 'Impossible delete the teacher, this is related with some association in impart table, and this broke the consistency.';
              END IF;

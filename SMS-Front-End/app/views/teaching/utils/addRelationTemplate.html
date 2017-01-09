@@ -4,7 +4,12 @@
         <div class="md-toolbar-tools">
             <h2>
                 <md-icon>add</md-icon>
-                Añadir docencia
+                <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'subject' ">
+                    Añadir asignatura
+                </div>
+                <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'teacher' ">
+                    Añadir profesor
+                </div>
             </h2>
             <span flex></span>
             <md-button class="md-icon-button" ng-click="vm.closeDialog()">
@@ -83,15 +88,14 @@
 
             </div>
 
-
-            <!-- Fields when the dialog is over CLASS PROFILE view and process: SUBJECT - TEACHER -->
-            <div ng-if="vm.itsAboutClass">
+            <!-- Fields when the dialog is over CLASS PROFILE view and the process is add a new subject to this class. -->
+            <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'subject' ">
 
                 <!-- SUBJECT -->
                 <md-input-container class="md-block" flex-gt-sm>
                     <label>Asignatura</label>
-                    <md-select ng-model="vm.subjectSelected"
-                               ng-change="vm.checkRelationSelected_Subject_Teacher(vm.subjectSelected, vm.teacherSelected)">
+                    <md-select ng-model="vm.itemSelected"
+                               ng-change="vm.checkSelectedItem(vm.itemSelected)">
                         <md-option
                                 ng-repeat="item in vm.subjectsList"
                                 value="{{item.subjectId}}">
@@ -100,23 +104,26 @@
                     </md-select>
                 </md-input-container>
 
-                <!-- Would be Autocomplete custom template AUTOCOMPLETE for teachers -->
+            </div>
+
+            <!-- Fields when the dialog is over CLASS PROFILE, inside of SUBJECT
+             VIEW and the process is add a new teacher to this subject inside a this class. -->
+            <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'teacher' ">
+
                 <!-- TEACHER -->
                 <md-input-container class="md-block" flex-gt-sm>
                     <label>Profesor</label>
-                    <md-select ng-model="vm.subjectSelected"
-                               ng-change="vm.checkRelationSelected_Subject_Teacher(vm.subjectSelected, vm.teacherSelected)">
+                    <md-select ng-model="vm.itemSelected"
+                               ng-change="vm.checkSelectedItem(vm.itemSelected)">
                         <md-option
                                 ng-repeat="item in vm.teachersList"
                                 value="{{item.teacherId}}">
-                            {{item.name}}
+                            {{item.name}} {{item.surname}}
                         </md-option>
                     </md-select>
                 </md-input-container>
 
-
             </div>
-
 
         </div>
 
@@ -152,6 +159,19 @@
                 <p>Esta relación ya existe.</p>
             </div>
 
+        </div>
+
+
+        <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'subject'">
+            <div ng-if="vm.subjectRelationExists">
+                <p>Esta asignatura ya se imparte a este grupo.</p>
+            </div>
+        </div>
+
+        <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'teacher'">
+            <div ng-if="vm.subjectRelationExists">
+                <p>Esta aprofesor ya se imparte a este grupo esa asignatura.</p>
+            </div>
         </div>
 
 
