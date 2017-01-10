@@ -1,6 +1,6 @@
 angular.module('classes')
     .directive('chart', chartDirective)
-    .controller('classesProfileController', function ($scope, $resource, $state, $stateParams, $mdDialog, ClassesService, toastService) {
+    .controller('classesProfileController', function ($scope, $resource, $state, $stateParams, $mdDialog, ClassesService, AssociationsService, ImpartsService, toastService) {
 
         var vm = this;
 
@@ -18,13 +18,23 @@ angular.module('classes')
 
         vm.showDeleteClassConfirm = showDeleteClassConfirm;
         vm.showDeleteStudentConfirm = showDeleteStudentConfirm;
+        vm.showDeleteSubjectConfirm = showDeleteSubjectConfirm;
+        vm.showDeleteTeacherFromSubjectConfirm = showDeleteTeacherFromSubjectConfirm;
+
+        vm.loadStudents = loadStudents;
+        vm.loadTeaching = loadTeaching;
+        vm.loadReports = loadReports;
+
         vm.modValues = modValues;
         vm.cancelModValues = cancelModValues;
-        vm.loadTeaching = loadTeaching;
+
 
         vm.addRelation = addRelation;
 
+        vm.associationIdSelected = null;
 
+
+        vm.states = ('AL', 'AK');
 
         vm.classReport = null;
         activate();
@@ -38,26 +48,62 @@ angular.module('classes')
         }
 
         /**
+         * Load students
+         */
+        function loadStudents(associationId){
+
+            console.log(associationId)
+
+            if (!associationId) {
+
+                vm.classStudents = ClassesService.getStudents({id: vm.classId},
+                    function () {
+                        console.log('Class Students');
+                        console.log(vm.classStudents);
+                    },
+                    function (error) {
+                        console.log('Get class students process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos inscritos a este grupo.');
+                    }
+                );
+            }
+            else{
+                vm.classStudents = AssociationsService.getStudents({id: associationId},
+                    function () {
+                        console.log('Class Students');
+                        console.log(vm.classStudents);
+                    },
+                    function (error) {
+                        console.log('Get SUBJECT- class students process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos inscritos a este grupo.');
+                    }
+                );
+            }
+        }
+
+        /**
          * Load only the teaching info about thsi class.
          */
-        function loadTeaching(){
+        function loadTeaching() {
             vm.classTeaching = ClassesService.getTeaching({id: vm.classId},
                 function () {
                     console.log('Class Teaching Data Block');
                     console.log(vm.classTeaching);
                     /*
-                    // ### Do a copy to save process. ###
-                    vm.classTeachingOriginalCopy = angular.copy(vm.classTeaching);
+                     // ### Do a copy to save process. ###
+                     vm.classTeachingOriginalCopy = angular.copy(vm.classTeaching);
 
-                    $scope.classTeachingModelHasChanged = false;
+                     $scope.classTeachingModelHasChanged = false;
 
-                    $scope.$watch('vm.classTeaching', function (newValue, oldValue) {
-                        if (newValue != oldValue) {
-                            $scope.classTeachingModelHasChanged = !angular.equals(vm.classTeaching, vm.classTeachingOriginalCopy);
-                        }
-                        compare()
-                    }, true);
-                    */
+                     $scope.$watch('vm.classTeaching', function (newValue, oldValue) {
+                     if (newValue != oldValue) {
+                     $scope.classTeachingModelHasChanged = !angular.equals(vm.classTeaching, vm.classTeachingOriginalCopy);
+                     }
+                     compare()
+                     }, true);
+                     */
 
                 }, function (error) {
                     console.log('Get class subjects process fail.');
@@ -67,15 +113,16 @@ angular.module('classes')
             );
         }
 
-        function loadReports(){
+        function loadReports() {
             vm.classReport = ClassesService.getReport({id: vm.classId},
                 function () {
                     console.log('Class Report Data Block');
                     console.log(vm.classReport);
-
-                    vm.chartConfig['series'][0]['data'][0]['y'] = vm.classReport['students']['gender_percentage']['M']
-                    vm.chartConfig['series'][0]['data'][1]['y'] = vm.classReport['students']['gender_percentage']['F'];
-                    console.log(vm.chartConfig);
+                    if (!vm.classReport.report_log) {
+                        vm.chartConfig['series'][0]['data'][0]['y'] = vm.classReport['students']['gender_percentage']['M']
+                        vm.chartConfig['series'][0]['data'][1]['y'] = vm.classReport['students']['gender_percentage']['F'];
+                        console.log(vm.chartConfig);
+                    }
 
                 }, function (error) {
                     console.log('Get class report process fail.');
@@ -97,7 +144,7 @@ angular.module('classes')
 
                 $scope.$watch('vm.class', function (newValue, oldValue) {
                     console.log('Checking');
-                    if(!angular.equals(vm.class.course, vm.classOriginalCopy.course)){
+                    if (!angular.equals(vm.class.course, vm.classOriginalCopy.course)) {
                         vm.class.course = parseInt(vm.class.course);
                     }
                     $scope.classModelHasChanged = !angular.equals(vm.class, vm.classOriginalCopy);
@@ -115,30 +162,21 @@ angular.module('classes')
             });
 
 
-            vm.classStudents = ClassesService.getStudents({id: vm.classId},
-                function () {
-                    console.log('Class Students');
-                    console.log(vm.classStudents);
-                },
-                function (error) {
-                    console.log('Get class students process fail.');
-                    console.log(error);
-                    toastService.showToast('Error obteniendo los alumnos inscritos a este grupo.');
-                }
-            );
+
 
 
             loadTeaching();
 
 
+
         }
 
 
-        function modValues(){
+        function modValues() {
             vm.editValuesEnabled = true;
         }
 
-        function cancelModValues(){
+        function cancelModValues() {
             vm.editValuesEnabled = false;
 
             vm.class = angular.copy(vm.classOriginalCopy);
@@ -165,9 +203,72 @@ angular.module('classes')
 
         }
 
-        function deleteStudentFromClass(){
+        function deleteTeacherFromSubject(impartId) {
+
+            ImpartsService.delete({id: impartId},
+                function () { // Success
+                    console.log('Class deleted successfully.');
+                    loadTeaching(); // Reload the specific section.
+                    toastService.showToast('Relación eliminada con éxito.')
+                },
+                function (error) { // Fail
+                    console.log('Class deleted process fail.');
+                    console.log(error)
+                    toastService.showToast('Error eliminando la relación.')
+                });
+
+        }
+
+        function showDeleteTeacherFromSubjectConfirm(impartId){
+             var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere que este profesor deje de impartir la asingatura en esta clase?')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteTeacherFromSubject(impartId);
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        }
+
+        function deleteSubjectFromClass(associationId){
+
+            AssociationsService.delete({id: associationId},
+                function () { // Success
+                    loadTeaching(); // Reload the specific section.
+                    toastService.showToast('Relación eliminada con éxito.')
+                },
+                function (error) { // Fail
+                    console.log('Class deleted process fail.');
+                    console.log(error)
+                    toastService.showToast('Error eliminando la relación.')
+                });
+
+        }
+
+        function showDeleteSubjectConfirm(associationId){
+             var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere eliminar esta asignatura? Si lo hace, también eliminará las matrículas' +
+                    'de los estudiantes matriculados a esta.')
+                //.textContent('Si lo hace todos los alumnos quedarán ')
+                //.ariaLabel('Lucky day')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteSubjectFromClass(associationId);
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        }
+
+        function deleteStudentFromClass() {
             console.log('Deleting student from class.')
         }
+
 
         /** Show the previous step to delete item, a confirm message */
         function showDeleteClassConfirm() {
@@ -187,10 +288,8 @@ angular.module('classes')
 
         };
 
-
         /** Show the previous step to delete item, a confirm message */
         function showDeleteStudentConfirm() {
-
 
 
             var confirm = $mdDialog.confirm()
@@ -234,7 +333,12 @@ angular.module('classes')
         function addRelation(itemTypeToAdd, secondaryItem) {
 
             $mdDialog.show({
-                locals: {parentScope: $scope, parentController: vm, itemTypeToAdd: itemTypeToAdd, secondaryItem: secondaryItem},
+                locals: {
+                    parentScope: $scope,
+                    parentController: vm,
+                    itemTypeToAdd: itemTypeToAdd,
+                    secondaryItem: secondaryItem
+                },
                 // We use the same basic controller.
                 controller: 'addRelationController',
                 controllerAs: 'vm',

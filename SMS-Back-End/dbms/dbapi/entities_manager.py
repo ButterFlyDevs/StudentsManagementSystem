@@ -81,13 +81,11 @@ class EntitiesManager:
 
         # Control special case:
         if data.get('course', None) and data.get('level', None) and not data.get('word', None) and \
-                (not data.get('group', None) or not data.get('subgroup',None)):
-            return_dic['status'] = 1048 #  Because cause a 400 Bad Request fail with log message included.
+                (not data.get('group', None) or not data.get('subgroup', None)):
+            return_dic['status'] = 1048  # Because cause a 400 Bad Request fail with log message included.
             return_dic['log'] = 'In this special case you need group and subgroup values to create an optional group ' \
                                 ' , please review it.'
             return return_dic
-
-
 
         # Only when is a special optional group we create a new value to word value:
         if not data.get('word', None) and data.get('group', None) and data.get('subgroup'):
@@ -272,9 +270,7 @@ class EntitiesManager:
                             students.append(row)
                             row = cursor.fetchone()
 
-
                         data_block['students'] = students
-
 
             return_dic['data'] = data_block
             return_dic['status'] = status_value
@@ -308,8 +304,7 @@ class EntitiesManager:
 
             # We want all info about one entity.
             else:
-                query += '* from {} where {}Id = {} and deleted = 0;'.format(kind,kind,entity_id)
-
+                query += '* from {} where {}Id = {} and deleted = 0;'.format(kind, kind, entity_id)
 
             print colored(query, 'yellow')
 
@@ -378,7 +373,7 @@ class EntitiesManager:
         tzoffset = tz.utcoffset(now)
         mynow = now + tzoffset
 
-        if data.get('deleted', None) == 'NULL': # If is a deleting the control_fieds are others.
+        if data.get('deleted', None) == 'NULL':  # If is a deleting the control_fieds are others.
             control_fields = {'deletedBy': 1, 'deletedAt': mynow}
         else:
             control_fields = {'modifiedBy': 1, 'modifiedAt': mynow}
@@ -446,9 +441,15 @@ class EntitiesManager:
         # If the update is delete an item, we not want send the erased data.
         # We only update the item with the value to NULL
 
-        dd_status = True;
+        # First check if the item exists to be deleted.
+        item = cls.get(kind, entity_id)
+        if item.get('status') == -1:
+            return item
+
+        dd_status = True
 
         if actions == 'dd':  # Delete dependencies.  (BEFORE)
+
             if kind == 'student':
                 response = cls.get(kind='enrollment', params='studentId, enrollmentId')
                 if response.get('status') == 1:
@@ -457,26 +458,29 @@ class EntitiesManager:
                         for item in enrollments_list:
                             if item.get('studentId', None) == entity_id:
                                 # Delete the enrollment associated with the student.
-                                if cls.delete(kind='enrollment', entity_id=item.get('enrollmentId')).get('status', None) != 1:
+                                if cls.delete(kind='enrollment', entity_id=item.get('enrollmentId')).get('status',
+                                                                                                         None) != 1:
                                     dd_status = False  # Something gone wrong.
             if kind == 'subject':
-                association_relations = cls.get_related('subject', entity_id, 'association', False, True).get('data', None)
-                impart_relations = cls.get_related('subject', entity_id, 'impart', False, True).get('data',None)
-                enrollment_relations = cls.get_related('subject', entity_id, 'enrollment', False, True).get('data',None)
+                association_relations = cls.get_related('subject', entity_id, 'association', False, True).get('data',
+                                                                                                              None)
+                impart_relations = cls.get_related('subject', entity_id, 'impart', False, True).get('data', None)
+                enrollment_relations = cls.get_related('subject', entity_id, 'enrollment', False, True).get('data',
+                                                                                                            None)
 
                 print 'ENROLLMENTs'
                 print enrollment_relations
 
                 if len(impart_relations) > 0 and dd_status:
                     for impart in impart_relations:
-                        if cls.delete('impart',impart.get('impartId')).get('status') != 1:
+                        if cls.delete('impart', impart.get('impartId')).get('status') != 1:
                             dd_status = False
 
                 if len(enrollment_relations) > 0 and dd_status:
                     for enrollment in enrollment_relations:
                         print 'ENROLLMENT'
                         print colored(enrollment, 'red')
-                        if cls.delete('enrollment',enrollment.get('enrollmentId')).get('status') != 1:
+                        if cls.delete('enrollment', enrollment.get('enrollmentId')).get('status') != 1:
                             dd_status = False
 
                 if len(association_relations) > 0 and dd_status:
@@ -484,12 +488,41 @@ class EntitiesManager:
                         if cls.delete('association', association.get('associationId')).get('status') != 1:
                             dd_status = False
 
+            # Delete an association with all elements related with it.
+            if kind == 'association':
+                print 'Deleting association relations'
+
+                enrollments_data_block = cls.get(kind='enrollment', params='enrollmentId, associationId')
+                imparts_data_block = cls.get(kind='impart', params='impartId, associationId')
+
+                if enrollments_data_block.get('status') == 1 and imparts_data_block.get('status') == 1:
+
+                    enrollments_list = enrollments_data_block.get('data', None)
+                    imparts_list = imparts_data_block.get('data', None)
+
+                    if len(enrollments_list) > 0:
+                        for item in enrollments_list:
+                            if item.get('associationId', None) == entity_id:
+                                # Delete the enrollment associated with the association.
+                                if cls.delete(kind='enrollment', entity_id=item.get('enrollmentId')).get('status', None) != 1:
+                                    dd_status = False  # Something gone wrong.
+
+                    if len(imparts_list) > 0:
+                        for item in imparts_list:
+                            if item.get('associationId', None) == entity_id:
+                                # Delete the impart associated with the association.
+                                if cls.delete(kind='impart', entity_id=item.get('impartId')).get('status', None) != 1:
+                                    dd_status = False  # Something gone wrong.
+
+
+
             if kind == 'class':
 
-
-                association_relations = cls.get_related('class', entity_id, 'association', internall_call=True).get('data', None)
+                association_relations = cls.get_related('class', entity_id, 'association', internall_call=True).get(
+                    'data', None)
                 impart_relations = cls.get_related('class', entity_id, 'impart', internall_call=True).get('data', None)
-                enrollment_relations = cls.get_related('class', entity_id, 'enrollment', internall_call=True).get('data', None)
+                enrollment_relations = cls.get_related('class', entity_id, 'enrollment', internall_call=True).get(
+                    'data', None)
                 print association_relations
 
                 if impart_relations and len(impart_relations) > 0 and dd_status:
@@ -515,17 +548,17 @@ class EntitiesManager:
                         for item in imparts_list:
                             if item.get('teacherId', None) == entity_id:
                                 # Delete the impart associated with the teacher.
-                                if cls.delete(kind='impart', entity_id=item.get('impartId')).get('status',None) != 1:
+                                if cls.delete(kind='impart', entity_id=item.get('impartId')).get('status', None) != 1:
                                     dd_status = False  # Something gone wrong.
 
-
+        # Finally we delete the proper object.
         if dd_status:
             item_dict = cls.update(kind, entity_id, {'deleted': 'NULL'})
             if item_dict['status'] == 1:
                 item_dict['data'] = None
 
         else:
-            item_dict = {'status': 99} # Something gone wrong.
+            item_dict = {'status': 99}  # Something gone wrong.
 
         return item_dict
 
@@ -540,7 +573,6 @@ class EntitiesManager:
         related_kind = str(related_kind)
         return_dic = {}
 
-
         # Avoiding errors with nested resources :
 
         if kind == related_kind:
@@ -550,13 +582,16 @@ class EntitiesManager:
             return return_dic
 
         if not internall_call:
-            if kind in ['teacher','student', 'class', 'subject'] and related_kind in ['association', 'enrollment', 'impart'] and internall_call == False:
+            if kind in ['teacher', 'student', 'class', 'subject'] and related_kind in ['association', 'enrollment',
+                                                                                       'impart'] and internall_call == False:
                 return_dic['status'] = 1048  # Bad requests with log.
                 return_dic['log'] = '{} is not a valid nested resource.'.format(related_kind)
 
                 return return_dic
 
-        if kind in ['association','impart', 'enrollment'] and related_kind in ['impart', 'association', 'enrollment', 'teacher', 'student', 'class', 'subject'] and internall_call == False:
+        if kind in ['association', 'impart', 'enrollment'] and related_kind in ['impart', 'association', 'enrollment',
+                                                                                'teacher', 'class',
+                                                                                'subject'] and internall_call == False:
             return_dic['status'] = 1048  # Bad requests with log.
             return_dic['log'] = '{} is not a valid nested resource.'.format(related_kind)
 
@@ -594,8 +629,7 @@ class EntitiesManager:
         # If the query execute has success we are going to retrieve all data saved in database about this item.
         if status_value == 1:
             result = cursor.fetchone()
-            exists = result.items()[0][1] # Because with our way to get data we have a dict.
-
+            exists = result.items()[0][1]  # Because with our way to get data we have a dict.
 
         db.commit()
 
@@ -639,9 +673,13 @@ class EntitiesManager:
                         'AND impart.teacherId = ' + entity_id + ' AND impart.deleted = 0) i JOIN class c JOIN subject s on (i.classId = c.classId ' \
                                                                 'AND i.subjectId = s.subjectId);'
 
+        elif kind == 'association':
+            if related_kind == 'student':
+                query = 'select name, surname, profileImageUrl,  studentId from student where studentId IN (SELECT studentId FROM enrollment where associationId={} and deleted={});'.format(entity_id, 0)
+
         elif kind == 'class':  # Queremos buscar entidades relacionadas con una entidad de tipo class.
             if related_kind == 'student':  # Todos los alumnos matriculados en esa clase.
-                query = 'SELECT studentId, name, surname FROM student WHERE deleted = 0 and studentId IN (SELECT studentId FROM enrollment WHERE associationId IN (SELECT associationId FROM association WHERE classId=' + entity_id + '));'
+                query = 'SELECT * FROM student WHERE deleted = 0 and studentId IN (SELECT studentId FROM enrollment WHERE associationId IN (SELECT associationId FROM association WHERE classId=' + entity_id + ' and deleted = 0));'
             elif related_kind == 'teacher':  # Todos los profesores que imparten en esa clase alguna asignatura.
                 query = 'SELECT teacherId, name, surname FROM teacher WHERE deleted = 0 and teacherId IN (SELECT teacherId FROM impart WHERE associationId IN (SELECT associationId FROM association WHERE classId=' + entity_id + '))';
             elif related_kind == 'subject':  # Todas las asignaturas que se imparten en esa clase.
@@ -649,11 +687,14 @@ class EntitiesManager:
                         '(select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a where s.subjectId = a.subjectId) sbs JOIN teacher t where i.associationId = sbs.associationId and i.teacherId = t.teacherId AND i.deleted = 0 union  select s.subjectId, ' \
                                                                                                          's.name, null, null, null, null,  a.associationId   from (select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a JOIN subject s where a.subjectId = s.subjectId;'
             elif related_kind == 'association':
-                query = 'SELECT associationId, subjectId, classId FROM association WHERE deleted = {} and classId = {};'.format(0, entity_id)
+                query = 'SELECT associationId, subjectId, classId FROM association WHERE deleted = {} and classId = {};'.format(
+                    0, entity_id)
             elif related_kind == 'impart':
-                query = 'SELECT impartId, teacherId, associationId FROM impart WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(0, 0, entity_id)
+                query = 'SELECT impartId, teacherId, associationId FROM impart WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
+                    0, 0, entity_id)
             elif related_kind == 'enrollment':
-                query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(0, 0, entity_id)
+                query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
+                    0, 0, entity_id)
 
 
         elif kind == 'subject':  # Queremos buscar entidades relacionadas con una entidad de tipo subject.
@@ -663,11 +704,14 @@ class EntitiesManager:
                 query = 'SELECT teacherId, name, surname from teacher where deleted = 0 and teacherId in (select teacherId from impart where associationId IN ( select associationId from association where subjectId=' + entity_id + '));'
 
             elif related_kind == 'association':
-                query = 'SELECT associationId, subjectId, classId FROM association WHERE deleted = {} and subjectId = {};'.format(0,entity_id)
+                query = 'SELECT associationId, subjectId, classId FROM association WHERE deleted = {} and subjectId = {};'.format(
+                    0, entity_id)
             elif related_kind == 'impart':
-                query = 'SELECT impartId, teacherId, associationId FROM impart WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and subjectId = {});'.format(0,0,entity_id)
+                query = 'SELECT impartId, teacherId, associationId FROM impart WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and subjectId = {});'.format(
+                    0, 0, entity_id)
             elif related_kind == 'enrollment':
-                query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and subjectId = {});'.format(0,0,entity_id)
+                query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and subjectId = {});'.format(
+                    0, 0, entity_id)
 
 
             elif related_kind == 'class':
@@ -675,7 +719,6 @@ class EntitiesManager:
                 query = 'select cls.classId, cls.course, cls.word, cls.level, t.name, t.surname, t.teacherId, i.impartId, cls.associationId from (select * from impart where impart.deleted = 0) i JOIN (select course, word, level, c.classId, a.associationId from (select course, word, level, classId from class) c ' \
                         'JOIN (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a where c.classId = a.classId) cls JOIN teacher t where i.associationId = cls.associationId and i.teacherId = t.teacherId union select c.classId, c.course, c.word, c.level, null, null, null, null,  a.associationId   ' \
                                                                                                               'from (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a JOIN class c where a.classId = c.classId;'
-
 
         if v:
             print colored(query, 'yellow')
@@ -732,65 +775,81 @@ class EntitiesManager:
 
             data_block = {}
 
-            data_block['students'] = {}
+
 
             # Students analysis:
-            students = cls.get(kind='student', params='birthdate,gender').get('data', None)
+            #students = cls.get(kind='student', params='birthdate,gender').get('data', None)
+            students = cls.get_related(kind=kind, entity_id=entity_id, related_kind='student').get('data', None)
+
 
             # Count:
             num_students = len(students)
+
+            if num_students == 0:
+                data_block['report_log'] = None
+
+                return_dic['data'] = data_block
+                return_dic['status'] = 1
+
+                return return_dic
+
+            data_block['students'] = {}
+
             data_block['students']['count'] = num_students
 
             # Gender:
             f = 0
             m = 0
             for student in students:
+                print 'PUTA'
+                print student
                 gender = student.get('gender', None)
-                if gender != None:
+                if gender is not None:
                     if gender == 'F':
-                        f+=1
+                        f += 1
                     elif gender == 'M':
-                        m+=1
+                        m += 1
                 else:
                     set_lack_data_message = True
 
-            # percentage
-            f_per = (f * 100) / (f + m)
-            m_per = (m * 100) / (f + m)
+            # Gender percentage:
+            if f+m != 0:
+                f_per = (f * 100) / (f + m)
+                m_per = (m * 100) / (f + m)
+            else:
+                f_per = 0
+                m_per = 0
 
             data_block['students']['gender_percentage'] = {'M': m_per, 'F': f_per}
 
-            print f_per
-            print m_per
-            print 'here'
-
             # Medium age:
-            ages = []
-            medium_age = 0
-            for student in students:
-                print student
-                birthdate = student.get('birthdate', None)
-                if birthdate != None:
-                    print birthdate
-                    print type(birthdate)
-                    #birthdate = datetime.datetime.strptime(birthdate, '%Y-%m-%d')
-                    ages.append(datetime.date.today().year - birthdate.year)
-                else:
-                    set_lack_data_message = True
+            if f + m != 0:
+                ages = []
+                medium_age = 0
+                for student in students:
+                    print student
+                    birthdate = student.get('birthdate', None)
+                    if birthdate != None:
+                        print birthdate
+                        print type(birthdate)
+                        # birthdate = datetime.datetime.strptime(birthdate, '%Y-%m-%d')
+                        ages.append(datetime.date.today().year - birthdate.year)
+                    else:
+                        set_lack_data_message = True
 
-            medium_age = sum(ages)/len(ages)
+                medium_age = sum(ages) / len(ages)
+
+            else:
+                medium_age = None
 
             data_block['students']['medium_age'] = medium_age
 
-
             if set_lack_data_message:
-                data_block['report_log'] = 'data lack' # Meaning that some data is missing .
-
+                data_block['report_log'] = 'data lack'  # Meaning that some data is missing .
 
             return_dic['data'] = data_block
             return_dic['status'] = 1
 
             return return_dic
-
 
         pass

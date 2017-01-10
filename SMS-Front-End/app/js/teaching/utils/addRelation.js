@@ -6,7 +6,7 @@
  * This is the controller to addRelationTemplate.
  */
 angular.module('teachers')
-    .controller('addRelationController', function ($scope, $resource, $mdDialog, $stateParams, TeachersService, SubjectsService, ClassesService, AssociationsService, parentController, itemTypeToAdd, secondaryItem, toastService) {
+    .controller('addRelationController', function ($scope, $resource, $mdDialog, $stateParams, TeachersService, SubjectsService, ImpartsService, ClassesService, AssociationsService, parentController, itemTypeToAdd, secondaryItem, toastService) {
 
         var vm = this;
 
@@ -148,8 +148,8 @@ angular.module('teachers')
             console.log('saveRelation function called')
 
 
-            if (vm.itsAboutClass) {
-                var newAssociation = new AssociationsService({subjectId: vm.subjectSelected, classId: vm.classId});
+            if (vm.itsAboutClass  && vm.itemTypeToAdd == 'subject') {
+                var newAssociation = new AssociationsService({subjectId: vm.itemSelected, classId: vm.classId});
                 newAssociation.$save(
                     function () { // Success
                         toastService.showToast('Asignatura asociada con éxito.')
@@ -157,6 +157,21 @@ angular.module('teachers')
                     },
                     function (error) { // Fail
                         toastService.showToast('Error asociando la asignatura a este grupo.')
+                    });
+            }
+
+            if (vm.itsAboutClass  && vm.itemTypeToAdd == 'teacher') {
+
+
+                // secondaryItem is the para used to know the subject related in the class view.
+                var newImpart = new ImpartsService({teacherId: vm.itemSelected, associationId: secondaryItem});
+                newImpart.$save(
+                    function () { // Success
+                        toastService.showToast('Relación creada con éxito.')
+                        parentController.loadTeaching();  // Reload the teaching data block.
+                    },
+                    function (error) { // Fail
+                        toastService.showToast('Error creando la relación.')
                     });
             }
 
@@ -396,6 +411,7 @@ angular.module('teachers')
         function checkSelectedItem(itemSelected) {
 
             var exists = false;
+            vm.itemSelected = itemSelected;
 
             if (vm.itsAboutClass && vm.itemTypeToAdd == 'subject') {
 
@@ -432,7 +448,7 @@ angular.module('teachers')
 
                         if(vm.classTeaching[i].subject.associationId == secondaryItem){
                             console.log('first if')
-                            if(vm.classTeaching[i].teachers !== 'undefined') {
+                            if(vm.classTeaching[i].teachers) {
                                 console.log('second if')
                                 for (var j = 0; j < vm.classTeaching[i].teachers.length; j++){
                                     console.log(vm.classTeaching[i].teachers[j].teacherId)

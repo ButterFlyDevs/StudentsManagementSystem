@@ -26,26 +26,29 @@
                     <div flex="60" layout="column">
                         <form name="userForm">
                             <div layout layout-sm="column">
-                                <md-input-container  flex>
+                                <md-input-container flex>
                                     <label layout="">Curso</label>
                                     <input
-                                           style="background-image:none;"
-                                           ng-model="vm.class.course"
-                                           required
-                                           ng-disabled="!vm.editValuesEnabled"
-                                           md-no-asterisk>
+                                            style="background-image:none;"
+                                            ng-model="vm.class.course"
+                                            required
+                                            ng-disabled="!vm.editValuesEnabled"
+                                            md-no-asterisk>
                                 </md-input-container>
                                 <md-input-container flex>
                                     <label layout="">Grupo</label>
-                                    <input style="background-image:none;" ng-model="vm.class.word" required ng-disabled="!vm.editValuesEnabled">
+                                    <input style="background-image:none;" ng-model="vm.class.word" required
+                                           ng-disabled="!vm.editValuesEnabled">
                                 </md-input-container>
                                 <md-input-container flex>
                                     <label layout="">Nivel</label>
-                                    <input style="background-image:none;" ng-model="vm.class.level" required ng-disabled="!vm.editValuesEnabled">
+                                    <input style="background-image:none;" ng-model="vm.class.level" required
+                                           ng-disabled="!vm.editValuesEnabled">
                                 </md-input-container>
                                 <md-input-container led flex>
                                     <label layout="">Descripcion</label>
-                                    <input style="background-image:none;" ng-model="vm.class.description" ng-disabled="!vm.editValuesEnabled">
+                                    <input style="background-image:none;" ng-model="vm.class.description"
+                                           ng-disabled="!vm.editValuesEnabled">
                                 </md-input-container>
                             </div>
 
@@ -124,7 +127,8 @@
 
                 <md-tabs md-dynamic-height md-border-bottom>
 
-                    <md-tab label="Asignaturas">
+                    <!-- SUBJECTS SECTION -->
+                    <md-tab label="Asignaturas" ng-click="vm.loadTeaching()">
                         <md-content class="md-padding">
 
 
@@ -173,7 +177,8 @@
                                                     <md-menu-content width="4">
 
                                                         <md-menu-item>
-                                                            <md-button ng-click="">
+                                                            <md-button
+                                                                    ui-sref="teachersProfile({teacherId: teacher.teacherId})">
                                                                 <md-icon>list</md-icon>
                                                                 Ver profesor
                                                             </md-button>
@@ -181,7 +186,7 @@
 
                                                         <md-menu-item>
                                                             <md-button
-                                                                    ng-click="vm.showDeleteSubjectClassImpartConfirm(item.class.classId, teacher.teacherId)">
+                                                                    ng-click="vm.showDeleteTeacherFromSubjectConfirm(teacher.impartId)">
                                                                 <md-icon>delete</md-icon>
                                                                 Eliminar profesor
                                                             </md-button>
@@ -221,7 +226,8 @@
                                             <md-menu-content width="4">
 
                                                 <md-menu-item>
-                                                    <md-button ng-click="">
+                                                    <md-button
+                                                            ui-sref="subjectsProfile({subjectId: subject.subjectId})">
                                                         <md-icon>list</md-icon>
                                                         Ver asignatura
                                                     </md-button>
@@ -229,7 +235,8 @@
 
                                                 <md-menu-item>
                                                     <!-- Call to addRelation to open this floating menu with teacher as type -->
-                                                    <md-button ng-click="vm.addRelation('teacher', item.subject.associationId); ">
+                                                    <md-button
+                                                            ng-click="vm.addRelation('teacher', item.subject.associationId)">
                                                         <md-icon>add</md-icon>
                                                         Añadir profesor
                                                     </md-button>
@@ -237,7 +244,7 @@
 
                                                 <md-menu-item>
                                                     <md-button
-                                                            ng-click="vm.showDeleteSubjectConfirm(item.subject.subjectId)">
+                                                            ng-click="vm.showDeleteSubjectConfirm(item.subject.associationId)">
                                                         <md-icon>delete</md-icon>
                                                         Eliminar asignatura
                                                     </md-button>
@@ -264,22 +271,41 @@
                         </md-content>
                     </md-tab>
 
-
-
                     <!-- STUDENTS SECTION -->
-                    <md-tab label="Estudiantes">
+                    <md-tab label="Estudiantes" ng-click="vm.loadStudents()">
                         <md-content class="md-padding">
+
+
+                            <md-input-container>
+                                <label>Asignatura</label>
+                                <md-select ng-model="vm.associationIdSelected"
+                                           ng-change="vm.loadStudents(vm.associationIdSelected)">
+                                    <md-option ng-value="null" ng-selected="true">Todas</md-option>
+                                    <md-option ng-repeat="object in vm.classTeaching"
+                                               ng-value="object.subject.associationId">
+                                        {{object.subject.subjectName}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+
 
                             <div ng-if="vm.classStudents.length == 0">
 
-                                <h3 class="md-headline"> Aún no se ha matriculado a ningún estudiante en ninguna
-                                    asignatura que se imparta en este grupo.</h3>
-                                <h3 class="md-headline"> ¿Desea matricular uno? </h3>
+                                <div ng-if="!vm.associationIdSelected">
+                                    <p>Aún no se ha matriculado a ningún estudiante en ninguna asignatura que se
+                                    imparta en este grupo.</p>
+                                    </p>¿Desea matricular uno en alguna asignatura?</p>
+                                </div>
+
+                                <div ng-if="vm.associationIdSelected">
+                                    <p>Aun no se ha matriculado a ningun estudiante en esta clase para esta asignatura.</p>
+                                    <p>¿Desea matricular alguno ahora?</p>
+                                </div>
 
                                 <div access='admin' layout="row" layout-align="center" layout-margin>
                                     <md-button ng-click="vm.openNewStudentDialog()" class="md-primary md-raised">
                                         <md-icon>add</md-icon>
-                                        Insertar
+                                        Matricular
                                     </md-button>
                                 </div>
 
@@ -367,11 +393,14 @@
                         </md-content>
                     </md-tab>
 
-                    <md-tab label="Gráficas">
+                    <!-- GRAPHICS SECTION -->
+                    <md-tab label="Gráficas" ng-click="vm.loadReports()">
                         <md-content class="md-padding">
+                            <div ng-if="vm.classReport.report_log">
+                                No hay datos para analizar.
+                            </div>
 
-
-                            <div layout="row">
+                            <div layout="row" ng-if="!vm.classReport.report_log">
                                 <div flex>
                                     <chart config="vm.chartConfig"></chart>
                                 </div>
@@ -383,6 +412,7 @@
                                     <p class="me-body-2">
                                         Edad media: {{ vm.classReport.students.medium_age }}
                                     </p>
+
                                 </div>
                             </div>
 
@@ -390,7 +420,6 @@
                         </md-content>
                     </md-tab>
                 </md-tabs>
-
 
 
             </md-card>

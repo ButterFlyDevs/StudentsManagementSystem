@@ -176,9 +176,16 @@ def update_entities(kind, entity_id):
 def delete_entity(kind, entity_id):
     """
     curl  -i -X  DELETE localhost:8002/entities/subject/1
+    curl  -i -X  DELETE localhost:8002/entities/subject/1?action=dd
     """
 
     url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id)
+    action = request.args.get('action', None)
+    if action:
+        url += '?action=' + action
+
+
+    print url
 
     #return ping(url=url, method='DELETE')
     response = requests.delete(url)
