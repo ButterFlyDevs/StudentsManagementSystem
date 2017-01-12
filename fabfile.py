@@ -153,11 +153,18 @@ def run_mysql():
     local('sudo /etc/init.d/mysql start')
 
 
-def data_provision():
+def data_provision(kind='Simple'):
     """
     Run the data provisioning procedure using the APIGmS.
+
+    fab data_provision:kind='Simple'
     """
-    example_data_provisioner.run()
+
+    if kind in ['Comlex', 'complex', 'C']:
+        example_data_provisioner.run()  # Fill the system with example data.
+    if kind in ['Simple', 'simple', 'S']:
+        print 'yeah'
+
 
 
 def requirements(ms=None):
@@ -223,10 +230,7 @@ def requirements(ms=None):
         # Run local requirements.
         local_requirements()
 
-
-
-
-def run2(provision=False):
+def run2(provision=False, kind='Simple'):
     """
     Run entire project, included MySQL daemon, SMS Front-End dev_server and Back-End dev_server.
 
@@ -239,8 +243,8 @@ def run2(provision=False):
     run_front_end()  # Run Front End
     time.sleep(5)
 
-    if provision in ['True', 'yes', 'true']:
-        data_provision()  # Fill the system with example data.
+    if provision is True:
+        data_provision(kind)
 
 
 

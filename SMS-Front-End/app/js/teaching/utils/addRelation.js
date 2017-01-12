@@ -6,7 +6,7 @@
  * This is the controller to addRelationTemplate.
  */
 angular.module('teachers')
-    .controller('addRelationController', function ($scope, $resource, $mdDialog, $stateParams, TeachersService, SubjectsService, ImpartsService, ClassesService, AssociationsService, parentController, itemTypeToAdd, secondaryItem, toastService) {
+    .controller('addRelationController', function ($scope, $resource, $mdDialog, $stateParams, TeachersService, StudentsService, SubjectsService, ImpartsService, ClassesService, AssociationsService, EnrollmentsService, parentController, itemTypeToAdd, secondaryItem, toastService) {
 
         var vm = this;
 
@@ -21,6 +21,14 @@ angular.module('teachers')
 
         vm.subjectSelected = -1;
         vm.classSelected = -1;
+
+        // Errors management.
+        vm.errorExists = false;
+        vm.errorMessage = '';
+
+        // Info messages management.
+        vm.infoExists = false;
+        vm.infoMessage = '';
 
 
         vm.itemSelected = -1;
@@ -111,6 +119,22 @@ angular.module('teachers')
                     });
                 }
 
+                if (vm.itemTypeToAdd == 'student') {
+
+                    // We need all subjects of this class, to select in wich the student want to be enrolled.
+                    vm.classTeaching = parentController.classTeaching;
+
+
+                    // We need all students
+                    vm.studentsList = StudentsService.query({}, function () {
+                        console.log('List of students retrieved.');
+                        console.log(vm.studentsList);
+                    }, function () {
+                        console.log('Any problem found when was retrieved the students list.')
+                    });
+
+                }
+
             }
 
 
@@ -148,7 +172,7 @@ angular.module('teachers')
             console.log('saveRelation function called')
 
 
-            if (vm.itsAboutClass  && vm.itemTypeToAdd == 'subject') {
+            if (vm.itsAboutClass && vm.itemTypeToAdd == 'subject') {
                 var newAssociation = new AssociationsService({subjectId: vm.itemSelected, classId: vm.classId});
                 newAssociation.$save(
                     function () { // Success
@@ -160,7 +184,7 @@ angular.module('teachers')
                     });
             }
 
-            if (vm.itsAboutClass  && vm.itemTypeToAdd == 'teacher') {
+            if (vm.itsAboutClass && vm.itemTypeToAdd == 'teacher') {
 
 
                 // secondaryItem is the para used to know the subject related in the class view.
@@ -173,6 +197,49 @@ angular.module('teachers')
                     function (error) { // Fail
                         toastService.showToast('Error creando la relación.')
                     });
+            }
+
+            if (vm.itsAboutClass && vm.itemTypeToAdd == 'student') {
+
+
+                console.log('saving');
+                console.log(vm.associationSelected);
+
+                console.log(vm.studentSelected);
+                /*
+                 Si la associaiton seleccionada es 0 hay que matricular al estudiante en todas las
+                 asignaturas.constructor.
+
+                 Hay que montar un deferred.
+                 */
+
+                //Si la associacion es una en concreto pues se matricula a esa en concreto.
+
+                if (vm.associationSelected != 0) {
+                    var newEnrollment = new EnrollmentsService({associationId: vm.associationSelected, studentId: vm.studentSelected});
+                    newEnrollment.$save(
+                        function () { // Success
+                            toastService.showToast('Relación creada con éxito.')
+                            parentController.loadStudents(parentController.associationIdSelected);  // Reload the teaching data block.
+                        },
+                        function (error) { // Fail
+                            toastService.showToast('Error creando la relación.')
+                        });
+                }
+
+
+                /*
+                 // secondaryItem is the para used to know the subject related in the class view.
+                 var newImpart = new ImpartsService({teacherId: vm.itemSelected, associationId: secondaryItem});
+                 newImpart.$save(
+                 function () { // Success
+                 toastService.showToast('Relación creada con éxito.')
+                 parentController.loadTeaching();  // Reload the teaching data block.
+                 },
+                 function (error) { // Fail
+                 toastService.showToast('Error creando la relación.')
+                 });
+                 */
             }
 
 
@@ -408,10 +475,33 @@ angular.module('teachers')
         }
 
 
-        function checkSelectedItem(itemSelected) {
+        function checkSelectedItem(firstItemSelected, secondItemSelected) {
 
             var exists = false;
-            vm.itemSelected = itemSelected;
+
+            function checkInside() {
+                var error = false;
+                for (var i = 0; i < vm.specificStudentList.length; i++) {
+                    if (vm.specificStudentList[i].studentId == secondItemSelected) { //secondItemSelected is the studentId of the student.
+                        vm.errorExists = true;
+                        error = true;
+                        if (firstItemSelected == 0) {
+                            vm.errorMessage = "El estudiante ya se encuentra matriculado en alguna asignatura de esta clase."
+                        } else {
+                            vm.errorMessage = "El estudiante ya se encuentra matriculado en esta asignatura."
+                        }
+                    }
+                }
+                if (firstItemSelected == 0 && !error) {
+                    vm.infoExists = true;
+                    vm.infoMessage = 'Ojo, se matriculará a todas las asignaturas de la clase.'
+                }
+            }
+
+
+            vm.errorExists = false;
+            vm.infoExists = false;
+            vm.itemSelected = firstItemSelected;
 
             if (vm.itsAboutClass && vm.itemTypeToAdd == 'subject') {
 
@@ -428,7 +518,7 @@ angular.module('teachers')
                 }
             }
 
-            if (vm.itsAboutClass && vm.itemTypeToAdd == 'teacher' ) {
+            if (vm.itsAboutClass && vm.itemTypeToAdd == 'teacher') {
 
                 //In this case itemSelected is a teacher.
 
@@ -446,11 +536,11 @@ angular.module('teachers')
                     // We check if this subject already exists in the block.
                     for (var i = 0; i < vm.classTeaching.length; i++) {
 
-                        if(vm.classTeaching[i].subject.associationId == secondaryItem){
+                        if (vm.classTeaching[i].subject.associationId == secondaryItem) {
                             console.log('first if')
-                            if(vm.classTeaching[i].teachers) {
+                            if (vm.classTeaching[i].teachers) {
                                 console.log('second if')
-                                for (var j = 0; j < vm.classTeaching[i].teachers.length; j++){
+                                for (var j = 0; j < vm.classTeaching[i].teachers.length; j++) {
                                     console.log(vm.classTeaching[i].teachers[j].teacherId)
                                     if (vm.classTeaching[i].teachers[j].teacherId == itemSelected)
                                         exists = true
@@ -461,6 +551,89 @@ angular.module('teachers')
                     }
 
                 }
+            }
+
+
+            if (vm.itsAboutClass && vm.itemTypeToAdd == 'student') {
+
+                console.log('checkSelectedItem')
+                console.log(firstItemSelected)
+                console.log(secondItemSelected)
+
+                //In this case firstItemSelected must be a associationId (subject related with class) and secondItemSelected must be a studentId.
+
+                if (firstItemSelected && secondItemSelected) {
+                    console.log('maybe')
+
+
+                    if (firstItemSelected == 0) {
+                        /*We need all students of this class, because if student select already exists in the list, this action must be invalid
+                         and specific info message must be showed.*/
+                        vm.specificStudentList = ClassesService.getStudents({id: parentController.classId},
+                            function () {
+                                console.log('specificStudentList form all class');
+                                console.log(vm.specificStudentList);
+                                checkInside();
+                            },
+                            function (error) {
+                                console.log('Get class students process fail.');
+                                console.log(error);
+                                toastService.showToast('Error obteniendo los alumnos inscritos a este grupo.');
+                            }
+                        );
+                    } else {
+                        vm.specificStudentList = AssociationsService.getStudents({id: firstItemSelected},
+                            function () {
+                                console.log('specificStudentList from specific subject in class');
+                                console.log(vm.specificStudentList);
+                                checkInside();
+                            },
+                            function (error) {
+                                console.log('Get SUBJECT- class students process fail.');
+                                console.log(error);
+                                toastService.showToast('Error obteniendo los alumnos inscritos a este grupo.');
+                            }
+                        );
+                    }
+
+
+                } else {
+
+                    // The error: both fields have to be selected.
+                    vm.errorExists = true;
+                    // But we don't show any erro message.
+                }
+
+                /*
+                 if (itemSelected != -1 && secondaryItem !== 'undefined') {
+
+                 //In this case secondaryItem is the id of the association between a subject and the class
+                 // related where we want associate the teacher selected.
+
+                 console.log('secondaryItem')
+                 console.log(secondaryItem)
+
+                 console.log('itemSelected')
+                 console.log(itemSelected)
+
+                 // We check if this subject already exists in the block.
+                 for (var i = 0; i < vm.classTeaching.length; i++) {
+
+                 if (vm.classTeaching[i].subject.associationId == secondaryItem) {
+                 console.log('first if')
+                 if (vm.classTeaching[i].teachers) {
+                 console.log('second if')
+                 for (var j = 0; j < vm.classTeaching[i].teachers.length; j++) {
+                 console.log(vm.classTeaching[i].teachers[j].teacherId)
+                 if (vm.classTeaching[i].teachers[j].teacherId == itemSelected)
+                 exists = true
+                 }
+
+                 }
+                 }
+                 }
+
+                 }*/
             }
 
             vm.subjectRelationExists = exists;

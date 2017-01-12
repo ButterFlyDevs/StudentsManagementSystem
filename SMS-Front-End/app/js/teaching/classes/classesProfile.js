@@ -1,6 +1,6 @@
 angular.module('classes')
     .directive('chart', chartDirective)
-    .controller('classesProfileController', function ($scope, $resource, $state, $stateParams, $mdDialog, ClassesService, AssociationsService, ImpartsService, toastService) {
+    .controller('classesProfileController', function ($scope, $resource, $state, $stateParams, $mdDialog, ClassesService, AssociationsService, EnrollmentsService, ImpartsService, toastService) {
 
         var vm = this;
 
@@ -52,6 +52,7 @@ angular.module('classes')
          */
         function loadStudents(associationId){
 
+            console.log('loadStudents associationId')
             console.log(associationId)
 
             if (!associationId) {
@@ -118,7 +119,7 @@ angular.module('classes')
                 function () {
                     console.log('Class Report Data Block');
                     console.log(vm.classReport);
-                    if (!vm.classReport.report_log) {
+                    if (vm.classReport.report_log != null) {
                         vm.chartConfig['series'][0]['data'][0]['y'] = vm.classReport['students']['gender_percentage']['M']
                         vm.chartConfig['series'][0]['data'][1]['y'] = vm.classReport['students']['gender_percentage']['F'];
                         console.log(vm.chartConfig);
@@ -265,9 +266,37 @@ angular.module('classes')
 
         }
 
-        function deleteStudentFromClass() {
-            console.log('Deleting student from class.')
+        function deleteStudentFromClass(enrollmentId) {
+            console.log('Deleting student from class.');
+
+            EnrollmentsService.delete({id: enrollmentId},
+                function () { // Success
+                    loadStudents(vm.associationIdSelected); // Reload the specific section.
+                    toastService.showToast('Relación eliminada con éxito.')
+                },
+                function (error) { // Fail
+                    console.log('Relation deleted process fail.');
+                    console.log(error)
+                    toastService.showToast('Error eliminando la relación.')
+                });
+
         }
+                /** Show the previous step to delete item, a confirm message */
+        function showDeleteStudentConfirm(enrollmentId) {
+
+
+            var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere eliminar al estudiante?')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteStudentFromClass(enrollmentId);
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        };
 
 
         /** Show the previous step to delete item, a confirm message */
@@ -288,22 +317,7 @@ angular.module('classes')
 
         };
 
-        /** Show the previous step to delete item, a confirm message */
-        function showDeleteStudentConfirm() {
 
-
-            var confirm = $mdDialog.confirm()
-                .title('¿Está seguro de que quiere eliminar al estudiante de este grupo?')
-                .ok('Estoy seguro')
-                .cancel('Cancelar');
-
-            $mdDialog.show(confirm).then(function () {
-                deleteStudentFromClass();
-            }, function () {
-                console.log('Operacion cancelada.')
-            });
-
-        };
 
 
         /** Update class data in server.

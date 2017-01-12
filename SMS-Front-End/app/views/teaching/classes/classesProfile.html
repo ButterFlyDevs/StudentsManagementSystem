@@ -303,7 +303,7 @@
                                 </div>
 
                                 <div access='admin' layout="row" layout-align="center" layout-margin>
-                                    <md-button ng-click="vm.openNewStudentDialog()" class="md-primary md-raised">
+                                    <md-button ng-click="vm.addRelation('student', vm.associationIdSelected)" class="md-primary md-raised">
                                         <md-icon>add</md-icon>
                                         Matricular
                                     </md-button>
@@ -342,7 +342,7 @@
                                         <tr md-row>
                                             <th md-column><span>Imagen</span></th>
                                             <th md-column md-order-by="name"><span>Nombre</span></th>
-                                            <th md-column><span>Perfil</span></th>
+                                            <th md-column><span></span></th>
                                         </tr>
                                         </thead>
 
@@ -368,12 +368,49 @@
                                                 <span>{{ item.name }} {{ item.surname }}</span>
                                             </td>
 
-                                            <!-- 3. Go to profile button -->
+                                            <!-- 3. Actions buttons. -->
                                             <td md-cell>
-                                                <md-button ui-sref="studentsProfile({studentId: item.studentId})"
-                                                           class="md-fab md-mini md-primary">
-                                                    <md-icon>forward</md-icon>
-                                                </md-button>
+
+                                                <md-menu>
+
+                                                    <md-button aria-label="Open phone interactions menu"
+                                                               class="md-icon-button"
+                                                               ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                                        <md-icon md-menu-origin>more_vert</md-icon>
+                                                    </md-button>
+
+                                                    <md-menu-content width="4">
+
+                                                        <md-menu-item>
+                                                            <md-button
+                                                                    ui-sref="studentsProfile({studentId: item.studentId})">
+                                                                <md-icon>person</md-icon>
+                                                                Ver estudiante
+                                                            </md-button>
+                                                        </md-menu-item>
+
+                                                        <md-menu-item>
+                                                            <md-button
+                                                                    ng-click="vm.showDeleteStudentConfirm(item.enrollmentId)">
+                                                                <md-icon>delete</md-icon>
+                                                                Eliminar estudiante
+                                                            </md-button>
+                                                        </md-menu-item>
+
+                                                        <md-menu-divider></md-menu-divider>
+
+                                                        <md-menu-item>
+                                                            <md-button disabled="disabled"
+                                                                       ng-click="vm.showDeleteSubjectClassImpartConfirm(item.class.classId, teacher.teacherId)">
+                                                                <md-icon>delete</md-icon>
+                                                                Accion denegada
+                                                            </md-button>
+                                                        </md-menu-item>
+
+                                                    </md-menu-content>
+
+                                                </md-menu>
+
                                             </td>
 
 
@@ -388,6 +425,14 @@
                                                      md-page-select md-boundary-links md-on-paginate="vm.onPaginate">
                                 </md-table-pagination>
 
+
+                                <div access='admin' layout="row" layout-align="center" layout-margin>
+                                    <md-button ng-click="vm.addRelation('student', vm.associationIdSelected)" class="md-primary md-raised">
+                                        <md-icon>add</md-icon>
+                                        Matricular
+                                    </md-button>
+                                </div>
+
                             </div>
 
                         </md-content>
@@ -396,11 +441,11 @@
                     <!-- GRAPHICS SECTION -->
                     <md-tab label="Gráficas" ng-click="vm.loadReports()">
                         <md-content class="md-padding">
-                            <div ng-if="vm.classReport.report_log">
+                            <div ng-if="vm.classReport.report_log == null">
                                 No hay datos para analizar.
                             </div>
 
-                            <div layout="row" ng-if="!vm.classReport.report_log">
+                            <div layout="row" ng-if="vm.classReport.report_log != null">
                                 <div flex>
                                     <chart config="vm.chartConfig"></chart>
                                 </div>

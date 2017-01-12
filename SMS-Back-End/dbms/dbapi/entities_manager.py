@@ -462,11 +462,18 @@ class EntitiesManager:
                                                                                                          None) != 1:
                                     dd_status = False  # Something gone wrong.
             if kind == 'subject':
-                association_relations = cls.get_related('subject', entity_id, 'association', False, True).get('data',
-                                                                                                              None)
-                impart_relations = cls.get_related('subject', entity_id, 'impart', False, True).get('data', None)
-                enrollment_relations = cls.get_related('subject', entity_id, 'enrollment', False, True).get('data',
-                                                                                                            None)
+                association_relations = cls.get_related(kind='subject', entity_id=entity_id, related_kind='association',
+                                                        params=None, with_special_sorter=False,
+                                                        internall_call=True).get('data',None)
+
+                impart_relations = cls.get_related(kind='subject', entity_id=entity_id,
+                                                   related_kind='impart', params=None,
+                                                   with_special_sorter=False,
+                                                   internall_call=True).get('data', None)
+
+                enrollment_relations = cls.get_related(kind='subject', entity_id=entity_id,
+                                                       related_kind='enrollment', params=None,
+                                                       with_special_sorter=False, internall_call=True).get('data',None)
 
                 print 'ENROLLMENTs'
                 print enrollment_relations
@@ -563,10 +570,11 @@ class EntitiesManager:
         return item_dict
 
     @classmethod
-    def get_related(cls, kind, entity_id, related_kind, with_special_sorter=True, internall_call=False):
+    def get_related(cls, kind, entity_id, related_kind, params=None, with_special_sorter=True, internall_call=False):
         """Devuelve una lista de diccionarios con la información pedida."""
 
         print 'get_related'
+        print locals()
 
         kind = str(kind)
         entity_id = str(entity_id)
@@ -642,6 +650,29 @@ class EntitiesManager:
 
         query = ''
 
+
+        # Preparation of params passed if they exists:
+        query_params = ''
+
+        if params is not None:
+
+            # Always the related_kind type:
+            if kind == 'association' and related_kind == 'student':
+                query_params += 'e.studentId as studentId, enrollmentId,  '
+            else:
+                query_params += str(related_kind) + 'Id, '
+
+            list_params = str(params).split(',')
+            for param in list_params:
+                query_params += param + ', '
+
+            query_params = query_params[:-2]
+
+        else:
+            query_params += ' * '
+
+
+
         if kind == 'student':  # Queremos buscar entidades relacionadas con una entidad de tipo student
 
             if related_kind == 'teacher':  # Todos los profesores que dan clase al alumno.
@@ -675,26 +706,43 @@ class EntitiesManager:
 
         elif kind == 'association':
             if related_kind == 'student':
-                query = 'select name, surname, profileImageUrl,  studentId from student where studentId IN (SELECT studentId FROM enrollment where associationId={} and deleted={});'.format(entity_id, 0)
+                #query = 'select {0} from student where studentId IN (SELECT studentId, enrollmentId FROM enrollment where associationId={1} and deleted={2});'.format(query_params, entity_id, 0)
 
-        elif kind == 'class':  # Queremos buscar entidades relacionadas con una entidad de tipo class.
-            if related_kind == 'student':  # Todos los alumnos matriculados en esa clase.
-                query = 'SELECT * FROM student WHERE deleted = 0 and studentId IN (SELECT studentId FROM enrollment WHERE associationId IN (SELECT associationId FROM association WHERE classId=' + entity_id + ' and deleted = 0));'
+                # TODO: review to avoid e.studentId in the response.
+                query = 'select {0} from student s join (select enrollmentId, studentId from enrollment where associationId = {1} and deleted = {2}) e where s.studentId = e.studentId and s.deleted = {2};'.format(query_params, entity_id, 0)
+
+
+        elif kind == 'class': # Info about entities related with the class kind entity.
+
+            # Normal queries:
+
+            if related_kind == 'student':  # Simple query that get the students related with the class passed and show the params pased or all of them in another case.
+                query = 'SELECT {0} FROM student WHERE deleted = {2} and studentId IN (SELECT studentId FROM enrollment WHERE associationId IN (SELECT associationId FROM association WHERE classId={1} and deleted = {2}) and deleted = {2});'.format(query_params, entity_id, 0)
+                #query_params += ', enrollmentId '
+                # TODO: review this query!
+                #query = 'select {0} from (SELECT e.enrollmentId, e.studentId from enrollment e join (SELECT associationId FROM association WHERE classId={1} and deleted = {2}) a  where e.associationId = a.associationId and e.deleted = {2}) ae JOIN (SELECT * FROM student)s where s.deleted = {2} and ae.studentId = s.studentId;'.format(query_params, entity_id, 0)
+
             elif related_kind == 'teacher':  # Todos los profesores que imparten en esa clase alguna asignatura.
-                query = 'SELECT teacherId, name, surname FROM teacher WHERE deleted = 0 and teacherId IN (SELECT teacherId FROM impart WHERE associationId IN (SELECT associationId FROM association WHERE classId=' + entity_id + '))';
+                query = 'SELECT {0} FROM teacher WHERE deleted = {2} and teacherId IN (SELECT teacherId FROM impart WHERE associationId IN (SELECT associationId FROM association WHERE classId={1} and deleted = {2}));'.format(query_params, entity_id, 0)
+
+            # Special queries:
+
             elif related_kind == 'subject':  # Todas las asignaturas que se imparten en esa clase.
                 query = 'select sbs.subjectId, sbs.name as \'subjectName\', t.name as \'teacherName\', t.surname as \'teacherSurname\', t.teacherId, i.impartId, sbs.associationId from impart i JOIN (select name, s.subjectId, a.associationId from (select name, subjectId from subject) s JOIN ' \
                         '(select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a where s.subjectId = a.subjectId) sbs JOIN teacher t where i.associationId = sbs.associationId and i.teacherId = t.teacherId AND i.deleted = 0 union  select s.subjectId, ' \
                                                                                                          's.name, null, null, null, null,  a.associationId   from (select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a JOIN subject s where a.subjectId = s.subjectId;'
+            #TODO: review if this code is useful.
+            """
             elif related_kind == 'association':
-                query = 'SELECT associationId, subjectId, classId FROM association WHERE deleted = {} and classId = {};'.format(
-                    0, entity_id)
+                query = 'SELECT associationId, subjectId, classId FROM association WHERE deleted = {} and classId = {};'.format(0, entity_id)
+
             elif related_kind == 'impart':
                 query = 'SELECT impartId, teacherId, associationId FROM impart WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
                     0, 0, entity_id)
             elif related_kind == 'enrollment':
                 query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
                     0, 0, entity_id)
+            """
 
 
         elif kind == 'subject':  # Queremos buscar entidades relacionadas con una entidad de tipo subject.

@@ -95,10 +95,7 @@ def process_response(response):
         # The element that it searched doesn't exists.
         abort(404)  # Is returned standard "Not found" error.
 
-    elif response['status'] == 1054:
-        abort(400) # Bad request
-
-    elif response['status'] == 1048:
+    elif response['status'] == 1054 or response['status'] == 1048:
         abort(400, response['log']) # Bad request
 
     elif response['status'] in [1452, 1146]:
@@ -272,10 +269,13 @@ def get_related_entities(kind, entity_id, related_kind):
     """
     curl -i -X GET localhost:8002/entities/student/1/teacher
 
+    Mode 2: all with params:
+    curl  -i -X GET localhost:8002/entities/class/2/student?params=name, surname  -> Only params sent from all students
+
     curl -X GET localhost:8002/entities/teacher/4/imparts | python -mjson.tool
 
     """
-    return process_response(EntitiesManager.get_related(kind, entity_id, related_kind))
+    return process_response(EntitiesManager.get_related(kind, entity_id, related_kind, request.args.get('params', None)))
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>/report', methods=['GET'])
