@@ -21,7 +21,8 @@ requests_toolbelt.adapters.appengine.monkeypatch()
 app = Flask(__name__)
 
 # With this we get that the requests (in terminal) show the method DELETE instead of OPTIONS.
-CORS(app)
+#CORS(app)
+cors = CORS(app, resources={r"/entities/*": {"origins": "*"}})
 
 
 # Activating verbose mode

@@ -279,10 +279,11 @@ angular.module('classes')
                     });
             else if (kind == 'student')
 
-                ClassesService.nested_delete({id: vm.classId, nested_kind_plus_id:'student'+'/'+enrollmentId}, // Because the behaviour of $resource we pass the nested element this way.
+                var abc='student'+'/'+enrollmentId;
+                ClassesService.nested_delete({id: vm.classId, a:'student', b:enrollmentId}, //nested_kind_plus_id Because the behaviour of $resource we pass the nested element this way.
                     function () { // Success
                         loadStudents(vm.associationIdSelected); // Reload the specific section.
-                        toastService.showToast('Relación eliminada con éxito.')
+                        toastService.showToast('Relación múltiple eliminada con éxito.')
                     },
                     function (error) { // Fail
                         console.log('Relation deleted process fail.');

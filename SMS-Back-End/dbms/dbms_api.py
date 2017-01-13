@@ -260,8 +260,8 @@ def put_entities(kind, entity_id):
     return process_response(EntitiesManager.update(kind, entity_id, raw_data))
 
 
-@app.route('/entities/<string:kind>/<int:entity_id>/<string:optional_nested_kind>/<int:onk_entity_id>', methods=['DELETE'])
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['DELETE'])
+@app.route('/entities/<string:kind>/<int:entity_id>/<string:optional_nested_kind>/<int:onk_entity_id>', methods=['DELETE'])
 def delete_entity(kind, entity_id, optional_nested_kind = None, onk_entity_id = None):
     """
     curl  -i -X  DELETE localhost:8002/entities/subject/1

@@ -481,9 +481,7 @@ class EntitiesManager:
         return_dic = {}
 
         if kind == 'class' and entity_id != 0 and optional_nested_kind == 'student' and onk_entity_id != 0:
-            data_block = cls.get_related(kind='student', entity_id=entity_id, related_kind='teaching', internal_call=True)
-
-            print data_block
+            data_block = cls.get_related(kind='student', entity_id=onk_entity_id, related_kind='teaching', internal_call=True)
             data_block = data_block.get('data',None)
 
             enrollments_ids_list = []

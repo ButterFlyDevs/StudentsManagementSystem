@@ -4,7 +4,7 @@ angular.module('classes')
 
          var restPath = 'http://localhost:8001/entities/class/';
 
-         return $resource(restPath + ':id', {id: '@classId'}, {
+         return $resource(restPath + ':id', {id: '@classId', a:'a', b:'b'}, {
 
              'getTeaching': {
                  method: 'GET',
@@ -22,7 +22,7 @@ angular.module('classes')
              },
              'nested_delete':{
                  method: 'DELETE',
-                 url: restPath + ':id/:nested_kind_plus_id'
+                 url: restPath + ':id/:a/:b'
 
              },
              'getStudents': {
