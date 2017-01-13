@@ -50,7 +50,7 @@ angular.module('classes')
         /**
          * Load students
          */
-        function loadStudents(associationId){
+        function loadStudents(associationId) {
 
             console.log('loadStudents associationId')
             console.log(associationId)
@@ -69,7 +69,7 @@ angular.module('classes')
                     }
                 );
             }
-            else{
+            else {
                 vm.classStudents = AssociationsService.getStudents({id: associationId},
                     function () {
                         console.log('Class Students');
@@ -163,11 +163,7 @@ angular.module('classes')
             });
 
 
-
-
-
             loadTeaching();
-
 
 
         }
@@ -220,8 +216,8 @@ angular.module('classes')
 
         }
 
-        function showDeleteTeacherFromSubjectConfirm(impartId){
-             var confirm = $mdDialog.confirm()
+        function showDeleteTeacherFromSubjectConfirm(impartId) {
+            var confirm = $mdDialog.confirm()
                 .title('¿Está seguro de que quiere que este profesor deje de impartir la asingatura en esta clase?')
                 .ok('Estoy seguro')
                 .cancel('Cancelar');
@@ -234,7 +230,7 @@ angular.module('classes')
 
         }
 
-        function deleteSubjectFromClass(associationId){
+        function deleteSubjectFromClass(associationId) {
 
             AssociationsService.delete({id: associationId},
                 function () { // Success
@@ -249,8 +245,8 @@ angular.module('classes')
 
         }
 
-        function showDeleteSubjectConfirm(associationId){
-             var confirm = $mdDialog.confirm()
+        function showDeleteSubjectConfirm(associationId) {
+            var confirm = $mdDialog.confirm()
                 .title('¿Está seguro de que quiere eliminar esta asignatura? Si lo hace, también eliminará las matrículas' +
                     'de los estudiantes matriculados a esta.')
                 //.textContent('Si lo hace todos los alumnos quedarán ')
@@ -266,34 +262,45 @@ angular.module('classes')
 
         }
 
-        function deleteStudentFromClass(enrollmentId) {
+        function deleteStudentFromClass(enrollmentId, kind) {
             console.log('Deleting student from class.');
             console.log(enrollmentId);
 
-            EnrollmentsService.delete({id: enrollmentId},
-                function () { // Success
-                    loadStudents(vm.associationIdSelected); // Reload the specific section.
-                    toastService.showToast('Relación eliminada con éxito.')
-                },
-                function (error) { // Fail
-                    console.log('Relation deleted process fail.');
-                    console.log(error)
-                    toastService.showToast('Error eliminando la relación.')
-                });
+            if (kind == 'enrollment')
+                EnrollmentsService.delete({id: enrollmentId},
+                    function () { // Success
+                        loadStudents(vm.associationIdSelected); // Reload the specific section.
+                        toastService.showToast('Relación eliminada con éxito.')
+                    },
+                    function (error) { // Fail
+                        console.log('Relation deleted process fail.');
+                        console.log(error)
+                        toastService.showToast('Error eliminando la relación.')
+                    });
+            else if (kind == 'student')
 
-
-
+                ClassesService.nested_delete({id: vm.classId, nested_kind_plus_id:'student'+'/'+enrollmentId}, // Because the behaviour of $resource we pass the nested element this way.
+                    function () { // Success
+                        loadStudents(vm.associationIdSelected); // Reload the specific section.
+                        toastService.showToast('Relación eliminada con éxito.')
+                    },
+                    function (error) { // Fail
+                        console.log('Relation deleted process fail.');
+                        console.log(error)
+                        toastService.showToast('Error eliminando la relación.')
+                    });
 
         }
-                /** Show the previous step to delete item, a confirm message */
-        function showDeleteStudentConfirm(enrollmentId) {
 
-            var message=''
+        /** Show the previous step to delete item, a confirm message */
+        function showDeleteStudentConfirm(enrollmentId, kind) {
+
+            var message = ''
             console.log(vm.associationIdSelected);
-            if(vm.associationIdSelected)
-                message='¿Está seguro de querer eliminar al estudiante de la asignatura?'
+            if (vm.associationIdSelected)
+                message = '¿Está seguro de querer eliminar al estudiante de la asignatura?'
             else
-                message='¿Está seguro de querer eliminar al estudiante de TODAS las asignaturas de esta clase?'
+                message = '¿Está seguro de querer eliminar al estudiante de TODAS las asignaturas de esta clase?'
 
             var confirm = $mdDialog.confirm()
                 .title(message)
@@ -301,7 +308,7 @@ angular.module('classes')
                 .cancel('Cancelar');
 
             $mdDialog.show(confirm).then(function () {
-                deleteStudentFromClass(enrollmentId);
+                deleteStudentFromClass(enrollmentId, kind);
             }, function () {
                 console.log('Operacion cancelada.')
             });
@@ -326,8 +333,6 @@ angular.module('classes')
             });
 
         };
-
-
 
 
         /** Update class data in server.

@@ -20,6 +20,11 @@ angular.module('classes')
                  method: 'DELETE',
                  url: restPath + ':id' + '?action=dd' // Delete dependencies also.
              },
+             'nested_delete':{
+                 method: 'DELETE',
+                 url: restPath + ':id/:nested_kind_plus_id'
+
+             },
              'getStudents': {
                  method: 'GET',
                  url: restPath + ':id' + '/student',

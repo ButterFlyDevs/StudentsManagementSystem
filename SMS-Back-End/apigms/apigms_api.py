@@ -172,14 +172,21 @@ def update_entities(kind, entity_id):
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
+
+@app.route('/entities/<string:kind>/<int:entity_id>/<string:optional_nested_kind>/<int:onk_entity_id>', methods=['DELETE'])
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['DELETE'])
-def delete_entity(kind, entity_id):
+def delete_entity(kind, entity_id, optional_nested_kind = None, onk_entity_id = None):
     """
     curl  -i -X  DELETE localhost:8002/entities/subject/1
     curl  -i -X  DELETE localhost:8002/entities/subject/1?action=dd
     """
 
+
     url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id)
+
+    if optional_nested_kind is not None and onk_entity_id is not None:
+        url += '/{}/{}'.format(optional_nested_kind, onk_entity_id)
+
     action = request.args.get('action', None)
     if action:
         url += '?action=' + action

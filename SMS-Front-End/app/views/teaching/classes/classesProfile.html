@@ -390,11 +390,20 @@
                                                         </md-menu-item>
 
                                                         <md-menu-item>
-                                                            <md-button
-                                                                    ng-click="vm.showDeleteStudentConfirm(item.enrollmentId)">
+
+
+                                                            <md-button ng-if="item.enrollmentId"
+                                                                    ng-click="vm.showDeleteStudentConfirm(item.enrollmentId, 'enrollment')">
                                                                 <md-icon>delete</md-icon>
-                                                                Eliminar estudiante
+                                                                Eliminar estudiante A
                                                             </md-button>
+
+                                                             <md-button ng-if="!item.enrollmentId"
+                                                                    ng-click="vm.showDeleteStudentConfirm(item.studentId, 'student')">
+                                                                <md-icon>delete</md-icon>
+                                                                Eliminar estudiante B
+                                                            </md-button>
+
                                                         </md-menu-item>
 
                                                         <md-menu-divider></md-menu-divider>

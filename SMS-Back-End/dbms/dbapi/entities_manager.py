@@ -469,8 +469,61 @@ class EntitiesManager:
 
     @classmethod
     def nested_delete(cls, kind, entity_id, optional_nested_kind, onk_entity_id):
-        print 'PUTA'
-        pass
+        """
+        Attention: For now only works for class kind with student nested kind!
+        :param kind:
+        :param entity_id:
+        :param optional_nested_kind:
+        :param onk_entity_id:
+        :return:
+        """
+
+        return_dic = {}
+
+        if kind == 'class' and entity_id != 0 and optional_nested_kind == 'student' and onk_entity_id != 0:
+            data_block = cls.get_related(kind='student', entity_id=entity_id, related_kind='teaching', internal_call=True)
+
+            print data_block
+            data_block = data_block.get('data',None)
+
+            enrollments_ids_list = []
+
+            status_ok = True
+
+            # Que hace cuando no está en ninguna clase, enviar un not found.
+            if data_block:
+                for cl in data_block: # cl is class in each teaching data block from student.
+                    subjects = cl.get('subjects', None)
+                    if subjects:
+                        for sub in subjects:
+                            enrollments_ids_list.append(sub.get('enrollmentId'))
+                print enrollments_ids_list
+
+                for enrollment_id in enrollments_ids_list:
+                    response = cls.delete('enrollment', enrollment_id)
+                    if response.get('status', None) != 1:
+                        status_ok = False
+
+                if status_ok:
+                    return_dic['status'] = 1
+                    return_dic['data'] = None
+
+                else:
+                    return_dic = {'status': 99}  # Something gone wrong.
+
+                return return_dic
+
+            else:
+                return_dic['status'] = -1
+                #TODO: Maybe we can insert a more specific message ;)
+                return return_dic
+
+        else:
+            # Los parámetros no son los correctos.
+            print 'ERROR'
+
+
+
 
     @classmethod
     def delete(cls, kind, entity_id, actions=None):
@@ -500,16 +553,16 @@ class EntitiesManager:
             if kind == 'subject':
                 association_relations = cls.get_related(kind='subject', entity_id=entity_id, related_kind='association',
                                                         params=None, with_special_sorter=False,
-                                                        internall_call=True).get('data',None)
+                                                        internal_call=True).get('data',None)
 
                 impart_relations = cls.get_related(kind='subject', entity_id=entity_id,
                                                    related_kind='impart', params=None,
                                                    with_special_sorter=False,
-                                                   internall_call=True).get('data', None)
+                                                   internal_call=True).get('data', None)
 
                 enrollment_relations = cls.get_related(kind='subject', entity_id=entity_id,
                                                        related_kind='enrollment', params=None,
-                                                       with_special_sorter=False, internall_call=True).get('data',None)
+                                                       with_special_sorter=False, internal_call=True).get('data',None)
 
                 print 'ENROLLMENTs'
                 print enrollment_relations
@@ -561,10 +614,10 @@ class EntitiesManager:
 
             if kind == 'class':
 
-                association_relations = cls.get_related('class', entity_id, 'association', internall_call=True).get(
+                association_relations = cls.get_related('class', entity_id, 'association', internal_call=True).get(
                     'data', None)
-                impart_relations = cls.get_related('class', entity_id, 'impart', internall_call=True).get('data', None)
-                enrollment_relations = cls.get_related('class', entity_id, 'enrollment', internall_call=True).get(
+                impart_relations = cls.get_related('class', entity_id, 'impart', internal_call=True).get('data', None)
+                enrollment_relations = cls.get_related('class', entity_id, 'enrollment', internal_call=True).get(
                     'data', None)
                 print association_relations
 
@@ -606,7 +659,7 @@ class EntitiesManager:
         return item_dict
 
     @classmethod
-    def get_related(cls, kind, entity_id, related_kind, params=None, with_special_sorter=True, internall_call=False):
+    def get_related(cls, kind, entity_id, related_kind, params=None, with_special_sorter=True, internal_call=False):
         """Devuelve una lista de diccionarios con la información pedida."""
 
         print 'get_related'
@@ -625,9 +678,9 @@ class EntitiesManager:
 
             return return_dic
 
-        if not internall_call:
+        if not internal_call:
             if kind in ['teacher', 'student', 'class', 'subject'] and related_kind in ['association', 'enrollment',
-                                                                                       'impart'] and internall_call == False:
+                                                                                       'impart'] and internal_call == False:
                 return_dic['status'] = 1048  # Bad requests with log.
                 return_dic['log'] = '{} is not a valid nested resource.'.format(related_kind)
 
@@ -635,7 +688,7 @@ class EntitiesManager:
 
         if kind in ['association', 'impart', 'enrollment'] and related_kind in ['impart', 'association', 'enrollment',
                                                                                 'teacher', 'class',
-                                                                                'subject'] and internall_call == False:
+                                                                                'subject'] and internal_call == False:
             return_dic['status'] = 1048  # Bad requests with log.
             return_dic['log'] = '{} is not a valid nested resource.'.format(related_kind)
 
