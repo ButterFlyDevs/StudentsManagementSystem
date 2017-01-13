@@ -91,7 +91,7 @@ The erros that this method can be produce with this resource are the same that w
 Delete
 ******
 
-We can delete a resource using the DELETE HTTP method, for example: :: 
+We can delete a resource using the DELETE HTTP method, for example: ::
 
     curl  -i -X  DELETE localhost:8002/entities/teacher/1
 
@@ -244,6 +244,22 @@ It return a list with the teaching related with the subject, perfect to build hi
 
 This resource has the same behaviour that the rest, with the same management of the calls and errors except the method ``teaching`` and the concept of **optional classes**.
 
+
+Delete
+******
+
+We can delete a resource using the DELETE HTTP method, as in the other resoureces, for example: ::
+
+    curl  -i -X  DELETE localhost:8002/entities/class/1
+
+But in this case we have an **special delete method** with entities nested, and this is the reason: must be easy
+delete an estudent fron all the subjects that are associated with this class, so we can do this:
+
+    curl  -i -X  DELETE localhost:8002/entities/class/1/student/3
+
+This method will delete all the enrollements items that exists beween the student and any association of the any subject
+with the class related. *This special delete method with nested item is only available in **Class resource** *.
+
 Optional classes
 ****************
 This resource can be store two kind of items, a normal class that are items with three values, *course*, *level* and *word* but in some cases can be exists (because of the domain of problem) classes that are optional for all words of a course-level. For example if we have 1º Primary A, 1º Primary B and 1º Primary C but we can offer a common group 1º Primary Optional the call is made by other way with other values besides of these, see some examples: ::
@@ -370,7 +386,36 @@ This is the aspect of the common response:
    }
     
     
-    
+
+**Enrollment** Resource
+------------------------
+
+An enrollment item is a relation between a subject and an association between a  class and a subject.
+
+
+
+PUT
+***
+
+To put a new enrollment relation in the sistem you need use the PUT method, and it can be used
+two diferents ways.
+
+   curl -H "Content-Type: application/json" -X POST -d '{"associationId": 16, "studentId": 1}' localhost:8002/entities/enrollment
+
+But is easy to need save mulitple relations with the same student, when it is enrolled to all subject of
+a class or in any other process that we can imagine, because of this you can pass, instead of *associationId*,
+*associationsIds* where the value must be an array of identificators of associations.
+
+Something like this:
+
+   '{"associationsIds": [16,17,18,19], "studentId": 1}'
+
+To this way we focus the complexity of this kind of  processes in the server.
+
+
+
+
+
     
     
 

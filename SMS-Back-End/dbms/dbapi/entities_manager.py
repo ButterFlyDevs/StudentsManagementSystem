@@ -51,6 +51,36 @@ class EntitiesManager:
     """
 
     @classmethod
+    def multiple_enrollment(cls, kind, data):
+
+        return_dic = {}
+        data_list = []
+        log = ''
+
+        associationsIdsList = data.get('associationsIds', None)
+        studentId = data.get('studentId', None)
+        process_ok = True
+
+        if associationsIdsList is not None and studentId is not None:
+
+            for association in associationsIdsList:
+                response = cls.post('enrollment', {'associationId': association, 'studentId': studentId})
+                print response
+                if response.get('status') != 1:
+                    process_ok = False
+                    return response
+                    break
+                else:
+                    data_list.append(response.get('data'))
+
+        if process_ok:
+            return_dic['status'] = 1
+            return_dic['data'] = data_list
+
+        return return_dic
+
+
+    @classmethod
     def post(cls, kind, data):
         """
         INSERT data entity in the database or a relation entity between two of them.
@@ -64,6 +94,7 @@ class EntitiesManager:
         """
         if v:
             print colored(locals(), 'blue')
+
 
         db = db_params.conecta()
         return_dic = {}
@@ -435,6 +466,11 @@ class EntitiesManager:
         db.close()
 
         return return_dic
+
+    @classmethod
+    def nested_delete(cls, kind, entity_id, optional_nested_kind, onk_entity_id):
+        print 'PUTA'
+        pass
 
     @classmethod
     def delete(cls, kind, entity_id, actions=None):
@@ -849,7 +885,6 @@ class EntitiesManager:
             f = 0
             m = 0
             for student in students:
-                print 'PUTA'
                 print student
                 gender = student.get('gender', None)
                 if gender is not None:

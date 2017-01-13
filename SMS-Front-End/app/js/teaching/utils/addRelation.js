@@ -214,10 +214,9 @@ angular.module('teachers')
                  */
 
                 //Si la associacion es una en concreto pues se matricula a esa en concreto.
-
                 if (vm.associationSelected != 0) {
-                    var newEnrollment = new EnrollmentsService({associationId: vm.associationSelected, studentId: vm.studentSelected});
-                    newEnrollment.$save(
+
+                    EnrollmentsService.save({associationId: vm.associationSelected, studentId: vm.studentSelected},
                         function () { // Success
                             toastService.showToast('Relación creada con éxito.')
                             parentController.loadStudents(parentController.associationIdSelected);  // Reload the teaching data block.
@@ -225,6 +224,26 @@ angular.module('teachers')
                         function (error) { // Fail
                             toastService.showToast('Error creando la relación.')
                         });
+
+                } else {
+                    // We want enrollment a student in all subjects that are associated with this class:
+                    console.log('Multiple enrollment.');
+                    var classTeaching = parentController.classTeaching;
+                    var associationsList = []
+                    for (var i = 0; i < classTeaching.length; i++)
+                        associationsList.push(classTeaching[i].subject.associationId);
+
+                    console.log(associationsList)
+                    console.log(vm.studentSelected)
+                    EnrollmentsService.multiple_save({associationsIds: associationsList, studentId: vm.studentSelected},
+                        function () { // Success
+                            toastService.showToast('Matriculación múltiple creada con éxito.')
+                            parentController.loadStudents(parentController.associationIdSelected);  // Reload the teaching data block.
+                        },
+                        function (error) { // Fail
+                            toastService.showToast('Error creando la matriculación múltiple.')
+                        });
+
                 }
 
 

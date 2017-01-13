@@ -268,6 +268,7 @@ angular.module('classes')
 
         function deleteStudentFromClass(enrollmentId) {
             console.log('Deleting student from class.');
+            console.log(enrollmentId);
 
             EnrollmentsService.delete({id: enrollmentId},
                 function () { // Success
@@ -280,13 +281,22 @@ angular.module('classes')
                     toastService.showToast('Error eliminando la relación.')
                 });
 
+
+
+
         }
                 /** Show the previous step to delete item, a confirm message */
         function showDeleteStudentConfirm(enrollmentId) {
 
+            var message=''
+            console.log(vm.associationIdSelected);
+            if(vm.associationIdSelected)
+                message='¿Está seguro de querer eliminar al estudiante de la asignatura?'
+            else
+                message='¿Está seguro de querer eliminar al estudiante de TODAS las asignaturas de esta clase?'
 
             var confirm = $mdDialog.confirm()
-                .title('¿Está seguro de que quiere eliminar al estudiante?')
+                .title(message)
                 .ok('Estoy seguro')
                 .cancel('Cancelar');
 

@@ -4,6 +4,11 @@ angular.module('enrollments')
 
          var restPath = 'http://localhost:8001/entities/enrollment/';
 
-         return $resource(restPath + ':id');
+         return $resource(restPath + ':id', {}, {
+                 'multiple_save': {
+                     method: 'POST', isArray: true
+                 }
+             }
+             );
 
         });

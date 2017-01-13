@@ -168,6 +168,9 @@ def post_entity(kind):
     If we want to use a file instead of:
         curl -H "Content-Type: application/json" -X POST -d @entityData.json localhost:8002/entidades
 
+    Another example:
+     curl -H "Content-Type: application/json" -X POST -d '{"associationId": 16, "studentId": 1}' localhost:8002/entities/enrollment
+    {"createdBy": 1, "associationId": 16, "enrollmentId": 16, "createdAt": "2017-01-13T10:10:17", "studentId": 1}
 
 
     Use "| python -mjson.tool" after curl to see better the return to call on terminal.
@@ -192,11 +195,17 @@ def post_entity(kind):
 
     else:
         for key, value in received_json.iteritems():
-            if type(value) is not int:
+            if type(value) is not int and type(value) is not list: # Because we accept a list of associationIds in enrollment resource.
                 received_json[key] = value.encode('utf-8')
 
     # When are really saved data in database
-    return process_response(EntitiesManager.post(kind, received_json))
+
+
+    # Special multiple enrollment checking:
+    if 'associationsIds' in received_json:
+        return process_response(EntitiesManager.multiple_enrollment(kind, received_json))
+    else:
+        return process_response(EntitiesManager.post(kind, received_json))
 
 
 @app.route('/entities/<string:kind>', methods=['GET']) #Si pedimos todas las entidades de un tipo
@@ -251,13 +260,19 @@ def put_entities(kind, entity_id):
     return process_response(EntitiesManager.update(kind, entity_id, raw_data))
 
 
+@app.route('/entities/<string:kind>/<int:entity_id>/<string:optional_nested_kind>/<int:onk_entity_id>', methods=['DELETE'])
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['DELETE'])
-def delete_entity(kind, entity_id):
+def delete_entity(kind, entity_id, optional_nested_kind = None, onk_entity_id = None):
     """
     curl  -i -X  DELETE localhost:8002/entities/subject/1
     curl  -i -X  DELETE localhost:8002/entities/subject/1?action=dd
     """
-    response = EntitiesManager.delete(kind, entity_id, request.args.get('action', None))
+
+    if kind == 'class' and optional_nested_kind is not None and onk_entity_id is not None:
+        response = EntitiesManager.delete(kind, entity_id, optional_nested_kind, onk_entity_id)
+    else:
+        response = EntitiesManager.delete(kind, entity_id, request.args.get('action', None))
+
     if response.get('log',None) and 'not found element to del' in response.get('log', None):
         abort(404)
     else:
