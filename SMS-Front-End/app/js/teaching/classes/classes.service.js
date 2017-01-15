@@ -4,7 +4,7 @@ angular.module('classes')
 
          var restPath = 'http://localhost:8001/entities/class/';
 
-         return $resource(restPath + ':id', {id: '@classId', a:'a', b:'b'}, {
+         return $resource(restPath + ':id', {id: '@classId'}, {
 
              'getTeaching': {
                  method: 'GET',

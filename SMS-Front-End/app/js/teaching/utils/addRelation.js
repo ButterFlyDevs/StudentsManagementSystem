@@ -23,7 +23,7 @@ angular.module('teachers')
         vm.classSelected = -1;
 
         // Errors management.
-        vm.errorExists = false;
+        vm.errorExists = true; //Becuase normally when the dialog is open the save button is disabled.
         vm.errorMessage = '';
 
         // Info messages management.
@@ -109,6 +109,7 @@ angular.module('teachers')
                 }
 
 
+                // The actions is over the class view, in the process to add a teacher to subject (inside of this class).
                 if (vm.itemTypeToAdd == 'teacher') {
                     // We need all teacher
                     vm.teachersList = TeachersService.query({}, function () {
@@ -496,8 +497,6 @@ angular.module('teachers')
 
         function checkSelectedItem(firstItemSelected, secondItemSelected) {
 
-            var exists = false;
-
             function checkInside() {
                 var error = false;
                 for (var i = 0; i < vm.specificStudentList.length; i++) {
@@ -517,59 +516,44 @@ angular.module('teachers')
                 }
             }
 
-
             vm.errorExists = false;
             vm.infoExists = false;
             vm.itemSelected = firstItemSelected;
 
             if (vm.itsAboutClass && vm.itemTypeToAdd == 'subject') {
 
-                //In this case itemSelected is a subject.
+                //In this case firstItemSelected is a subjectId of a subject.
 
-                if (itemSelected != -1) {
+                if (firstItemSelected != -1)
                     // We check if this subject already exists in the block.
-                    for (var i = 0; i < vm.classTeaching.length; i++) {
+                    for (var i = 0; i < vm.classTeaching.length; i++)
                         //console.log(vm.classTeaching[i].subject.subjectId)
-                        if (vm.classTeaching[i].subject.subjectId == itemSelected)
-                            exists = true;
-                    }
-
-                }
+                        if (vm.classTeaching[i].subject.subjectId == firstItemSelected) {
+                            vm.errorExists = true;
+                            vm.errorMessage = "La asignatura ya está asociada a este grupo."
+                        }
             }
 
             if (vm.itsAboutClass && vm.itemTypeToAdd == 'teacher') {
 
-                //In this case itemSelected is a teacher.
+                if (firstItemSelected != -1 && secondaryItem !== 'undefined') {
 
-                if (itemSelected != -1 && secondaryItem !== 'undefined') {
+                    /* In this case firstItemSelected is the teacherId. Secondary item is the associationId form
+                    classesProfile when the user open the dialog and click in add new teacher, so, the id of
+                    association between class and subject is passed to addRelation like secondaryItem. */
 
-                    //In this case secondaryItem is the id of the association between a subject and the class
-                    // related where we want associate the teacher selected.
-
-                    console.log('secondaryItem')
-                    console.log(secondaryItem)
-
-                    console.log('itemSelected')
-                    console.log(itemSelected)
-
-                    // We check if this subject already exists in the block.
-                    for (var i = 0; i < vm.classTeaching.length; i++) {
-
-                        if (vm.classTeaching[i].subject.associationId == secondaryItem) {
-                            console.log('first if')
-                            if (vm.classTeaching[i].teachers) {
-                                console.log('second if')
-                                for (var j = 0; j < vm.classTeaching[i].teachers.length; j++) {
-                                    console.log(vm.classTeaching[i].teachers[j].teacherId)
-                                    if (vm.classTeaching[i].teachers[j].teacherId == itemSelected)
-                                        exists = true
-                                }
-
-                            }
-                        }
-                    }
-
-                }
+                    // Check if the teacher impart the subject in this group already.
+                    for (var i = 0; i < vm.classTeaching.length; i++)
+                        if (vm.classTeaching[i].subject.associationId == secondaryItem)
+                            if (vm.classTeaching[i].teachers)
+                                for (var j = 0; j < vm.classTeaching[i].teachers.length; j++)
+                                    if (vm.classTeaching[i].teachers[j].teacherId == firstItemSelected) {
+                                        vm.errorExists = true;
+                                        vm.errorMessage = "El profesor ya imparte la asignatura a este grupo."
+                                    }
+                }else
+                    // A teacher must be select. In this case isn't necessary show any message.
+                    vm.errorExists = true;
             }
 
 
@@ -579,7 +563,8 @@ angular.module('teachers')
                 console.log(firstItemSelected)
                 console.log(secondItemSelected)
 
-                //In this case firstItemSelected must be a associationId (subject related with class) and secondItemSelected must be a studentId.
+                //In this case firstItemSelected must be a associationId (subject related with class)
+                // and secondItemSelected must be a studentId.
 
                 if (firstItemSelected && secondItemSelected) {
                     console.log('maybe')
@@ -615,48 +600,11 @@ angular.module('teachers')
                         );
                     }
 
-
-                } else {
-
-                    // The error: both fields have to be selected.
+                }else
+                    // The error: both fields have to be selected. But we don't show any erro message.
                     vm.errorExists = true;
-                    // But we don't show any erro message.
-                }
-
-                /*
-                 if (itemSelected != -1 && secondaryItem !== 'undefined') {
-
-                 //In this case secondaryItem is the id of the association between a subject and the class
-                 // related where we want associate the teacher selected.
-
-                 console.log('secondaryItem')
-                 console.log(secondaryItem)
-
-                 console.log('itemSelected')
-                 console.log(itemSelected)
-
-                 // We check if this subject already exists in the block.
-                 for (var i = 0; i < vm.classTeaching.length; i++) {
-
-                 if (vm.classTeaching[i].subject.associationId == secondaryItem) {
-                 console.log('first if')
-                 if (vm.classTeaching[i].teachers) {
-                 console.log('second if')
-                 for (var j = 0; j < vm.classTeaching[i].teachers.length; j++) {
-                 console.log(vm.classTeaching[i].teachers[j].teacherId)
-                 if (vm.classTeaching[i].teachers[j].teacherId == itemSelected)
-                 exists = true
-                 }
-
-                 }
-                 }
-                 }
-
-                 }*/
             }
 
-            vm.subjectRelationExists = exists;
-            vm.addButtonEnable = !exists;
         }
 
         /*

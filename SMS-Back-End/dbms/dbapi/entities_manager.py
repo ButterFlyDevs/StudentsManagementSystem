@@ -562,8 +562,6 @@ class EntitiesManager:
                                                        related_kind='enrollment', params=None,
                                                        with_special_sorter=False, internal_call=True).get('data',None)
 
-                print 'ENROLLMENTs'
-                print enrollment_relations
 
                 if len(impart_relations) > 0 and dd_status:
                     for impart in impart_relations:
@@ -608,8 +606,6 @@ class EntitiesManager:
                                 if cls.delete(kind='impart', entity_id=item.get('impartId')).get('status', None) != 1:
                                     dd_status = False  # Something gone wrong.
 
-
-
             if kind == 'class':
 
                 association_relations = cls.get_related('class', entity_id, 'association', internal_call=True).get(
@@ -617,7 +613,6 @@ class EntitiesManager:
                 impart_relations = cls.get_related('class', entity_id, 'impart', internal_call=True).get('data', None)
                 enrollment_relations = cls.get_related('class', entity_id, 'enrollment', internal_call=True).get(
                     'data', None)
-                print association_relations
 
                 if impart_relations and len(impart_relations) > 0 and dd_status:
                     for impart in impart_relations:
@@ -818,18 +813,19 @@ class EntitiesManager:
                 query = 'select sbs.subjectId, sbs.name as \'subjectName\', t.name as \'teacherName\', t.surname as \'teacherSurname\', t.teacherId, i.impartId, sbs.associationId from impart i JOIN (select name, s.subjectId, a.associationId from (select name, subjectId from subject) s JOIN ' \
                         '(select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a where s.subjectId = a.subjectId) sbs JOIN teacher t where i.associationId = sbs.associationId and i.teacherId = t.teacherId AND i.deleted = 0 union  select s.subjectId, ' \
                                                                                                          's.name, null, null, null, null,  a.associationId   from (select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a JOIN subject s where a.subjectId = s.subjectId;'
-            #TODO: review if this code is useful.
-            """
-            elif related_kind == 'association':
-                query = 'SELECT associationId, subjectId, classId FROM association WHERE deleted = {} and classId = {};'.format(0, entity_id)
+            # Only for inernal calls:
+            if internal_call:
 
-            elif related_kind == 'impart':
-                query = 'SELECT impartId, teacherId, associationId FROM impart WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
-                    0, 0, entity_id)
-            elif related_kind == 'enrollment':
-                query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
-                    0, 0, entity_id)
-            """
+                if related_kind == 'association':
+                    query = 'SELECT associationId, subjectId, classId FROM association WHERE deleted = {} and classId = {};'.format(0, entity_id)
+
+                elif related_kind == 'impart':
+                    query = 'SELECT impartId, teacherId, associationId FROM impart WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
+                        0, 0, entity_id)
+                elif related_kind == 'enrollment':
+                    query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
+                        0, 0, entity_id)
+
 
 
         elif kind == 'subject':  # Queremos buscar entidades relacionadas con una entidad de tipo subject.

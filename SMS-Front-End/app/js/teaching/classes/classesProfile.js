@@ -34,8 +34,6 @@ angular.module('classes')
         vm.associationIdSelected = null;
 
 
-        vm.states = ('AL', 'AK');
-
         vm.classReport = null;
         activate();
 
@@ -199,6 +197,24 @@ angular.module('classes')
                 });
 
         }
+        /** Show the previous step to delete item, a confirm message */
+        function showDeleteClassConfirm() {
+
+            var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere eliminar este grupo?')
+                //.textContent('Si lo hace todos los alumnos quedarán ')
+                //.ariaLabel('Lucky day')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteClass();
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        };
+
 
         function deleteTeacherFromSubject(impartId) {
 
@@ -230,7 +246,7 @@ angular.module('classes')
 
         }
 
-        function deleteSubjectFromClass(associationId) {
+        function deleteSubject(associationId) {
 
             AssociationsService.delete({id: associationId},
                 function () { // Success
@@ -255,16 +271,17 @@ angular.module('classes')
                 .cancel('Cancelar');
 
             $mdDialog.show(confirm).then(function () {
-                deleteSubjectFromClass(associationId);
+                deleteSubject(associationId);
             }, function () {
                 console.log('Operacion cancelada.')
             });
 
         }
 
-        function deleteStudentFromClass(enrollmentId, kind) {
+        function deleteStudent(enrollmentId, kind) {
             console.log('Deleting student from class.');
             console.log(enrollmentId);
+            console.log(kind);
 
             if (kind == 'enrollment')
                 EnrollmentsService.delete({id: enrollmentId},
@@ -279,16 +296,15 @@ angular.module('classes')
                     });
             else if (kind == 'student')
 
-                var abc='student'+'/'+enrollmentId;
                 ClassesService.nested_delete({id: vm.classId, a:'student', b:enrollmentId}, //nested_kind_plus_id Because the behaviour of $resource we pass the nested element this way.
                     function () { // Success
                         loadStudents(vm.associationIdSelected); // Reload the specific section.
                         toastService.showToast('Relación múltiple eliminada con éxito.')
                     },
                     function (error) { // Fail
-                        console.log('Relation deleted process fail.');
+                        console.log('Multiple relation deleted process fail.');
                         console.log(error)
-                        toastService.showToast('Error eliminando la relación.')
+                        toastService.showToast('Error eliminando la relación múltiple.')
                     });
 
         }
@@ -309,7 +325,7 @@ angular.module('classes')
                 .cancel('Cancelar');
 
             $mdDialog.show(confirm).then(function () {
-                deleteStudentFromClass(enrollmentId, kind);
+                deleteStudent(enrollmentId, kind);
             }, function () {
                 console.log('Operacion cancelada.')
             });
@@ -317,23 +333,7 @@ angular.module('classes')
         };
 
 
-        /** Show the previous step to delete item, a confirm message */
-        function showDeleteClassConfirm() {
 
-            var confirm = $mdDialog.confirm()
-                .title('¿Está seguro de que quiere eliminar este grupo?')
-                //.textContent('Si lo hace todos los alumnos quedarán ')
-                //.ariaLabel('Lucky day')
-                .ok('Estoy seguro')
-                .cancel('Cancelar');
-
-            $mdDialog.show(confirm).then(function () {
-                deleteClass();
-            }, function () {
-                console.log('Operacion cancelada.')
-            });
-
-        };
 
 
         /** Update class data in server.

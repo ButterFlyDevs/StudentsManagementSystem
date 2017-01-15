@@ -166,6 +166,7 @@
         </div>
 
         <!-- Messages and options when is about teacher or student view -->
+
         <div ng-if="vm.itsAboutTeacher || vm.itsAboutStudent">
             <div ng-if="vm.associationRelationExists">
                 <p>La relación entre la asignatura y la clase no existe.</p>
@@ -200,25 +201,15 @@
         </div>
 
 
-        <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'subject'">
-            <div ng-if="vm.subjectRelationExists">
-                <p>Esta asignatura ya se imparte a este grupo.</p>
-            </div>
-        </div>
-
-        <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'teacher'">
-            <div ng-if="vm.subjectRelationExists">
-                <p>Este profesor ya imparte a este grupo esa asignatura.</p>
-            </div>
-        </div>
-
-        <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'student'">
+        <!-- ITS ABOUT CLASS -->
+        <div ng-if="vm.itsAboutClass">
             <div ng-if="vm.errorExists">
-                <p>{{vm.errorMessage}}</p>
+                <!-- warn is red -->
+                <span md-colors="{color:'warn'}">{{vm.errorMessage}}</span>
             </div>
-
             <div ng-if="vm.infoExists">
-                <p>{{vm.infoMessage}}</p>
+                <!-- primary is blue -->
+                <span md-colors="{color:'primary'}">{{vm.infoMessage}}</span>
             </div>
         </div>
 
@@ -232,7 +223,6 @@
 
         <md-button ng-click="vm.closeDialog()"> Cancelar</md-button>
 
-        <!--vm.addButtonEnable-->
         <md-button ng-disabled="vm.errorExists"
                    class="md-primary md-raised"
                    style="margin-right:20px;"
