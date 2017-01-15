@@ -22,6 +22,15 @@ import pytz
 v = 1
 
 def sql_execute2(query):  # References
+    """
+    :param query:
+    :return:
+
+     return_dic['data'] = entities_list
+     return_dic['status'] = status
+     return_dic['log'] = log
+
+    """
 
     print colored(query, 'yellow')
 
@@ -30,12 +39,14 @@ def sql_execute2(query):  # References
 
     status = 1  # By default is success.
     num_elements = 0  # By default any entity is retrieved.
+    last_row_id = 0
     log = None
 
     return_dic = {}
 
     try:
         num_elements = cursor.execute(query)
+        last_row_id = cursor.lastrowid
 
     except db_params.MySQLdb.Error, e:
         try:
@@ -48,13 +59,16 @@ def sql_execute2(query):  # References
 
     print 'status: ' + colored(status, 'red')
     print 'num_elements: ' + colored(num_elements, 'red')
+    print 'last_row_id:' + colored(last_row_id, 'red')
 
 
     if status == 1:
 
         if num_elements == 1:
-            row = dict((k, v) for k, v in cursor.fetchone().iteritems() if v)  # To delete None values
-            return_dic['data'] = row
+            row = cursor.fetchone() # When is POST fetchone return None.
+            if row is not None:
+                row = dict((k, v) for k, v in row.iteritems() if v is not None)  # To delete None values
+                return_dic['data'] = row
 
         if num_elements > 1:
             entities_list = []
@@ -65,8 +79,14 @@ def sql_execute2(query):  # References
                 row = cursor.fetchone()
             return_dic['data'] = entities_list
 
+        if num_elements == 0:
+            status = -1 # Code for element not found.
+
     return_dic['status'] = status
     return_dic['log'] = log
+    return_dic['last_row_id'] = last_row_id
+
+    #TODO: opción para que devuelva el último id en cualquier consulta:
 
     db.commit()
     cursor.close()
@@ -120,14 +140,14 @@ class EntitiesManager:
         data_list = []
         log = ''
 
-        associationsIdsList = data.get('associationsIds', None)
-        studentId = data.get('studentId', None)
+        associations_ids_list = data.get('associationsIds', None)
+        student_id = data.get('studentId', None)
         process_ok = True
 
-        if associationsIdsList is not None and studentId is not None:
+        if associations_ids_list is not None and student_id is not None:
 
-            for association in associationsIdsList:
-                response = cls.post('enrollment', {'associationId': association, 'studentId': studentId})
+            for association in associations_ids_list:
+                response = cls.post('enrollment', {'associationId': association, 'studentId': student_id})
                 print response
                 if response.get('status') != 1:
                     process_ok = False
@@ -141,7 +161,6 @@ class EntitiesManager:
             return_dic['data'] = data_list
 
         return return_dic
-
 
     @classmethod
     def post(cls, kind, data):
@@ -158,8 +177,6 @@ class EntitiesManager:
         if v:
             print colored(locals(), 'blue')
 
-
-        db = db_params.conecta()
         return_dic = {}
 
         now = datetime.datetime.utcnow()
@@ -167,13 +184,11 @@ class EntitiesManager:
         tzoffset = tz.utcoffset(now)
         mynow = now + tzoffset
 
-        control_fields = {'createdBy': 1,
-                          'createdAt': mynow,
-                          'deleted': 0}
+        control_fields = {'createdBy': 1, 'createdAt': mynow, 'deleted': 0}
 
-        query = 'insert into ' + str(kind) + ' (' + str(kind) + 'Id, '
+        query = 'insert into {0} ({0}Id, '.format(kind)
 
-        # Control special case:
+        # Control to special case:
         if data.get('course', None) and data.get('level', None) and not data.get('word', None) and \
                 (not data.get('group', None) or not data.get('subgroup', None)):
             return_dic['status'] = 1048  # Because cause a 400 Bad Request fail with log message included.
@@ -189,80 +204,45 @@ class EntitiesManager:
             del data['group']
             del data['subgroup']
 
-        ## We insert the keys:
+        # We insert the keys:
         for key, value in data.iteritems():
-            query += str(key) + ', '
+            query += '{}, '.format(key)
 
         # The same with control_fields keys
         for key, value in control_fields.iteritems():
-            query += str(key) + ', '
+            query += '{}, '.format(key)
 
-        ## We insert now the values:
+        # We insert now the values:
         query = query[:-2]
         query += ') values (NULL, '
 
         for key, value in data.iteritems():
             if isinstance(value, int):
                 value = str(value)
-
-            query += '\'' + value + '\', '
+            query += '{0}{1}{0}, '.format('\'', value)
 
         # The same with control_fields values
         for key, value in control_fields.iteritems():
-            query += '\'' + str(value) + '\', '
+            query += '{0}{1}{0}, '.format('\'', value)
 
         query = query[:-2]
         query += ');'
 
-        print colored(query, 'red')
-
-        cursor = db.cursor()
-
-        status_value = 1  # By default is success.
-        num_elements = 0  # By default any entity is retrieved.
-        log = None
-
-
-        try:
-            num_elements = cursor.execute(query);
-            entity_id = cursor.lastrowid
-        except db_params.MySQLdb.Error, e:
-            try:
-                error = "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-                log = error
-                status_value = e.args[0]
-            except IndexError:
-                print "MySQL Error: %s" % str(e)
-
-        db.commit()
+        data_block = sql_execute2(query)
 
         # If the query execute has success we are going to retrieve all data saved in database about this item.
-        if status_value == 1:
+        if data_block.get('status') == 1:
 
-            retrieve_query = 'select * from ' + kind + ' where ' + kind + 'Id = ' + str(entity_id) + ';'
-            print colored('Populating item', 'green')
-            print colored(retrieve_query, 'green')
+            retrieve_query = 'select * from {0} where {0}Id = {1};'.format(kind, data_block.get('last_row_id'))
 
-            if cursor.execute(retrieve_query) == 1:  # If query obtain one element.
-                row = cursor.fetchone()
-                # None values are not necessary.
-                row = dict((k, v) for k, v in row.iteritems() if v is not None)
+            data_block_2 = sql_execute2(retrieve_query)
+            entity_data = data_block_2.get('data', None)
+            if entity_data.get('deleted') is not None:
+                del entity_data['deleted']
 
-                print colored(row, 'magenta')
-
-                return_dic['data'] = row
-
-                # The deleted value isn't relevant in the UI and because of this it will not sended.
-                if return_dic['data'].get('deleted') != None:
-                    del return_dic['data']['deleted']
-
-        return_dic['status'] = status_value
-        return_dic['log'] = log
-
-        # Confirm the changes
-        db.commit()
-        cursor.close()
-        db.close()
+            return_dic['data'] = entity_data
+            return_dic['status'] = data_block['status']
+            return_dic['log'] = data_block['log']
 
         return return_dic
 
@@ -284,93 +264,67 @@ class EntitiesManager:
         if v:
             print colored(locals(), 'blue')
 
-        db = db_params.conecta()
-        return_dic = {}
-        cursor = db.cursor()
-
         if kind == 'association' and entity_id is not None:
+
+            return_dic = {}
+
             query = 'select a.*, c.course as \'classCourse\', c.level as \'classLevel\', c.word as \'classWord\', ' \
                     's.name as \'subjectName\' from association a INNER JOIN subject s ' \
                     'ON (a.subjectId = s.subjectId) INNER JOIN class c ON (a.classId = c.classId) ' \
                     'where a.associationId = {} and a.deleted = {};'.format(entity_id, 0)
 
-            status_value, num_elements, log = sql_execute(cursor, query)
+            query_for_teachers = 'select t.teacherId as \'teacherId\', t.name as \'teacherName\', t.surname as' \
+                                 ' \'teacherSurname\' from impart i inner join teacher t on ' \
+                                 '(i.teacherId = t.teacherId) where i.associationId = {} and ' \
+                                 'i.deleted = {};'.format(entity_id, 0)
 
+            query_for_students = 'select s.studentId as \'studentId\', s.name as \'studentName\', s.surname as' \
+                                 ' \'studentSurname\' from enrollment e inner join student s on ' \
+                                 '(e.studentId = s.studentId) where e.associationId = {} ' \
+                                 'and e.deleted = {};'.format(entity_id, 0)
 
+            return_data_block = sql_execute2(query)
 
-            print 'HERE'
-            print status_value
-            print num_elements
+            if return_data_block['status'] == -1:
+                # The associations doesn't exists and we return the same response from sql_execute2
+                return return_data_block
 
-            if num_elements == 0:
-                return_dic['status'] = -1  # Element not found
-                return return_dic
-
-            elif status_value == 1 and num_elements == 1:
-                print colored('ALL IS GOOD!!', 'red')
-                raw_data = cursor.fetchone()
-                raw_data = dict((k, v) for k, v in raw_data.iteritems() if v)  # To delete None values
-
+            elif return_data_block['status'] == 1 and return_data_block.get('data', None) is not None:
+                data = return_data_block['data']
                 # The composition of the special data block:
                 data_block = {
-                    'class': {'classId': raw_data.get('classId', None),
-                              'course': raw_data.get('classCourse', None),
-                              'level': raw_data.get('classLevel', None),
-                              'word': raw_data.get('classWord', None)
+                    'class': {'classId': data.get('classId', None),
+                              'course': data.get('classCourse', None),
+                              'level': data.get('classLevel', None),
+                              'word': data.get('classWord', None)
                               },
-                    'subject': {'subjectId': raw_data.get('subjectId', None),
-                                'name': raw_data.get('subjectName', None)
+                    'subject': {'subjectId': data.get('subjectId', None),
+                                'name': data.get('subjectName', None)
                                 }
                 }
 
-                for key, value in raw_data.items():
+                for key, value in data.items():
                     if 'class' in str(key) or 'subject' in str(key):
-                        del raw_data[key]
+                        del data[key]
 
                 # Update with the rest of data without special format.
-                data_block.update(raw_data)
+                data_block.update(data)
 
                 print colored(data_block, 'red')
 
                 # Now we search all teachers and students related with this association and we will insert them in
                 # the data block.
+                return_data_block = sql_execute2(query_for_teachers)
+                if return_data_block.get('status', None) == 1 and return_data_block.get('data', None) is not None:
+                    data_block['teachers'] = return_data_block['data']
 
-                query_for_teachers = 'select t.teacherId as \'teacherId\', t.name as \'teacherName\', t.surname as' \
-                                     ' \'teacherSurname\' from impart i inner join teacher t on ' \
-                                     '(i.teacherId = t.teacherId) where i.associationId = {} and ' \
-                                     'i.deleted = {};'.format(entity_id, 0)
-
-                status_value, num_elements, log = sql_execute(cursor, query_for_teachers)
-
-                if status_value == 1 and num_elements >= 1:
-                    row = cursor.fetchone()
-                    teachers = []
-                    while row is not None:
-                        row = dict((k, v) for k, v in row.iteritems() if v)  # To delete None values
-                        teachers.append(row)
-                        row = cursor.fetchone()
-
-                    data_block['teachers'] = teachers
-
-                    query_for_students = 'select s.studentId as \'studentId\', s.name as \'studentName\', s.surname as' \
-                                         ' \'studentSurname\' from enrollment e inner join student s on ' \
-                                         '(e.studentId = s.studentId) where e.associationId = {} ' \
-                                         'and e.deleted = {};'.format(entity_id, 0)
-
-                    status_value, num_elements, log = sql_execute(cursor, query_for_students)
-
-                    if status_value == 1 and num_elements >= 1:
-                        row = cursor.fetchone()
-                        students = []
-                        while row is not None:
-                            row = dict((k, v) for k, v in row.iteritems() if v)  # To delete None values
-                            students.append(row)
-                            row = cursor.fetchone()
-
-                        data_block['students'] = students
+                # we do the same with students:
+                return_data_block = sql_execute2(query_for_students)
+                if return_data_block.get('status', None) == 1 and return_data_block.get('data', None) is not None:
+                    data_block['students'] = return_data_block['data']
 
             return_dic['data'] = data_block
-            return_dic['status'] = status_value
+            return_dic['status'] = return_data_block['status']
 
             return return_dic
 
@@ -399,12 +353,6 @@ class EntitiesManager:
             # Is returned directly the block returned from sql_execute2
             return sql_execute2(query)
 
-        db.commit()
-        cursor.close()
-        db.close()
-
-        return return_dic
-
     @classmethod
     def update(cls, kind, entity_id, data):
         """
@@ -431,25 +379,23 @@ class EntitiesManager:
         else:
             control_fields = {'modifiedBy': 1, 'modifiedAt': mynow}
 
-        query = 'UPDATE ' + str(kind) + ' SET '
+        query = 'UPDATE {} SET '.format(kind)
 
         for key, value in data.iteritems():
             if isinstance(value, int):
                 value = str(value)
             if value == 'NULL':
-                query += str(key) + ' = ' + value + ' ,'
+                query += '{} = {} ,'.format(key, value)
             else:
-                query += str(key) + ' = \'' + value + '\','
+                query += '{} = \'{}\','.format(key, value)
 
         # The same with control_fields values
         for key, value in control_fields.iteritems():
-            query += str(key) + ' = \'' + str(value) + '\','
+            query += '{} = \'{}\','.format(key, value)
 
         query = query[:-1]
 
-        query += ' WHERE ' + str(kind) + 'Id = ' + str(entity_id) + ';'
-
-        print colored(query, 'yellow')
+        query += ' WHERE {}Id = {};'.format(kind, entity_id)
 
         cursor = db.cursor()
 
