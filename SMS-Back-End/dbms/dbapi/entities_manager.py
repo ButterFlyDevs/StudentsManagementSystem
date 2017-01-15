@@ -21,6 +21,62 @@ import pytz
 # Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
 
+def sql_execute2(query):  # References
+
+    print colored(query, 'yellow')
+
+    db = db_params.conecta()
+    cursor = db.cursor()
+
+    status = 1  # By default is success.
+    num_elements = 0  # By default any entity is retrieved.
+    log = None
+
+    return_dic = {}
+
+    try:
+        num_elements = cursor.execute(query)
+
+    except db_params.MySQLdb.Error, e:
+        try:
+            error = "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
+            print error
+            log = error
+            status = e.args[0]
+        except IndexError:
+            print "MySQL Error: %s" % str(e)
+
+    print 'status: ' + colored(status, 'red')
+    print 'num_elements: ' + colored(num_elements, 'red')
+
+
+    if status == 1:
+
+        if num_elements == 1:
+            row = dict((k, v) for k, v in cursor.fetchone().iteritems() if v)  # To delete None values
+            return_dic['data'] = row
+
+        if num_elements > 1:
+            entities_list = []
+            row = cursor.fetchone()
+            while row is not None:
+                row = dict((k, v) for k, v in row.iteritems() if v)  # To delete None values
+                entities_list.append(row)
+                row = cursor.fetchone()
+            return_dic['data'] = entities_list
+
+    return_dic['status'] = status
+    return_dic['log'] = log
+
+    db.commit()
+    cursor.close()
+    db.close()
+
+    print 'HERE sql_execute_2'
+    print return_dic
+
+    return return_dic
+
 
 def sql_execute(cursor, query):  # References
 
@@ -29,7 +85,8 @@ def sql_execute(cursor, query):  # References
     log = None
 
     try:
-        num_elements = cursor.execute(query);
+        num_elements = cursor.execute(query)
+
     except db_params.MySQLdb.Error, e:
         try:
             error = "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
@@ -52,6 +109,12 @@ class EntitiesManager:
 
     @classmethod
     def multiple_enrollment(cls, kind, data):
+        """
+        Special method to make multiple enrollments in the same call.
+        :param kind:
+        :param data:
+        :return:
+        """
 
         return_dic = {}
         data_list = []
@@ -159,6 +222,7 @@ class EntitiesManager:
         num_elements = 0  # By default any entity is retrieved.
         log = None
 
+
         try:
             num_elements = cursor.execute(query);
             entity_id = cursor.lastrowid
@@ -212,7 +276,7 @@ class EntitiesManager:
         :param params: When we want retrieve a list with specific data from entities we pass here.
         :return: A dict with all info about one or a list with dict with the format: [status][data][log]
 
-        An exception is when the kind of the query is 'association' because is will builded a
+        An exception is when the kind of the query is 'association' because it will build a
         special kind of response.
 
         """
@@ -231,6 +295,8 @@ class EntitiesManager:
                     'where a.associationId = {} and a.deleted = {};'.format(entity_id, 0)
 
             status_value, num_elements, log = sql_execute(cursor, query)
+
+
 
             print 'HERE'
             print status_value
@@ -314,18 +380,11 @@ class EntitiesManager:
             # We need all entities of specify kind from database that haven't the column delete to true or 1,
             # and whe don't want all info, only the most relevant, name and id.
             if entity_id is None:
-
                 if params is not None:
-
                     # It always included entity id.
                     query += str(kind) + 'Id, '
-
-                    print colored(params, 'red')
-                    list_params = str(params).split(',')
-                    print list_params
-                    for param in list_params:
+                    for param in str(params).split(','):
                         query += param + ', '
-
                     query = query[:-2]
 
                 else:
@@ -337,45 +396,8 @@ class EntitiesManager:
             else:
                 query += '* from {} where {}Id = {} and deleted = 0;'.format(kind, kind, entity_id)
 
-            print colored(query, 'yellow')
-
-            cursor = db.cursor()
-
-            status_value, num_elements, log = sql_execute(cursor, query)
-
-            # If the query execute has success we are going to retrieve all data saved in database about this item.
-            if status_value == 1:
-
-                # Info about all
-                if entity_id is None:
-
-                    print entity_id
-
-                    row = cursor.fetchone()
-                    entities_list = []
-                    while row is not None:
-                        row = dict((k, v) for k, v in row.iteritems() if v)  # To delete None values
-                        entities_list.append(row)
-                        row = cursor.fetchone()
-
-                    print entities_list
-                    return_dic['data'] = entities_list
-
-
-
-                # All info about one
-                else:
-
-                    if num_elements != 0:  # If the element exists in database.
-
-                        row = dict((k, v) for k, v in cursor.fetchone().iteritems() if v)  # To delete None values
-                        return_dic['data'] = row
-
-                    else:  # If doesn't exists.
-                        status_value = -1
-
-            return_dic['status'] = status_value
-            return_dic['log'] = log
+            # Is returned directly the block returned from sql_execute2
+            return sql_execute2(query)
 
         db.commit()
         cursor.close()
