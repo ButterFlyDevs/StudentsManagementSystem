@@ -780,6 +780,7 @@ class TestClass:
 
         # Now we delete the association relation:
         response = requests.delete('{}/association/{}'.format(url, item.get('associationId')))
+        print response
         assert response.status_code == 200
         assert len(response.text) == 0
 
@@ -1105,6 +1106,7 @@ class TestClass:
 
         association = requests.get(url='{}/association/{}'.format(url, 1)).json()  # Check the data block.
         assert len(association.get('teachers', None)) == 1 and association['teachers'][0]['teacherId'] == 1
+
         assert association.get('students', None) is None
         assert association['subject']['subjectId'] == 1
         assert association['class']['classId'] == 1
@@ -1185,6 +1187,7 @@ class TestClass:
         for item in items:
             for element in basic_list:
                 res = requests.get(url='{}/{}/{}/{}'.format(url, item, 1, element))
+                print res.url
                 assert res.status_code == 400 and 'is not a valid nested resource.' in res.text
 
         # There are a lot of test that we could be do still.

@@ -21,32 +21,50 @@ import pytz
 # Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
 
-def sql_execute2(query):  # References
+
+def sql_executor(query, expected_kind=None, last_row_id=False):  # References
     """
     :param query:
+    :param expected_kind: Is the type of data expected, if they can be returned.
+    For example: list, if there are elements, even one, is returned like a list, not like a element.
+    list
+    item
+    :param last_row_id: If you want retrieve in the info data_block the id achieve from cursor.lastrowid
+
+    Example of use:
+
+        sql_execute('select * from student', list)
+        sql_execute('select * from student where studentId = 4', item)
+
+    Both are dicts, alone or list of they.
+
     :return:
 
      return_dic['data'] = entities_list
      return_dic['status'] = status
      return_dic['log'] = log
+     return_dic['last_row_id'] = 3
+
 
     """
 
-    print colored(query, 'yellow')
+    print colored('sql_executor IN: {}'.format(locals()), 'red')
 
     db = db_params.conecta()
     cursor = db.cursor()
 
     status = 1  # By default is success.
     num_elements = 0  # By default any entity is retrieved.
-    last_row_id = 0
+    lr_id = 0 # Last row id
     log = None
 
     return_dic = {}
 
     try:
         num_elements = cursor.execute(query)
-        last_row_id = cursor.lastrowid
+        lr_id = cursor.lastrowid
+
+        print(num_elements)
 
     except db_params.MySQLdb.Error, e:
         try:
@@ -57,18 +75,22 @@ def sql_execute2(query):  # References
         except IndexError:
             print "MySQL Error: %s" % str(e)
 
-    print 'status: ' + colored(status, 'red')
-    print 'num_elements: ' + colored(num_elements, 'red')
-    print 'last_row_id:' + colored(last_row_id, 'red')
-
+    if last_row_id:
+        print 'last_row_id:' + colored(lr_id, 'red')
 
     if status == 1:
 
         if num_elements == 1:
+            if expected_kind == 'list':
+                entities_list = []
             row = cursor.fetchone() # When is POST fetchone return None.
             if row is not None:
                 row = dict((k, v) for k, v in row.iteritems() if v is not None)  # To delete None values
-                return_dic['data'] = row
+                if expected_kind == 'list':
+                    entities_list.append(row)
+                    return_dic['data'] = entities_list
+                else:
+                    return_dic['data'] = row
 
         if num_elements > 1:
             entities_list = []
@@ -80,46 +102,23 @@ def sql_execute2(query):  # References
             return_dic['data'] = entities_list
 
         if num_elements == 0:
-            status = -1 # Code for element not found.
+            if expected_kind == 'item':
+                status = -1  # Code for element not found.
+            else:
+                return_dic['data'] = []  # Code for element found, but without content.
 
-    return_dic['status'] = status
-    return_dic['log'] = log
-    return_dic['last_row_id'] = last_row_id
-
-    #TODO: opción para que devuelva el último id en cualquier consulta:
+    if last_row_id:
+        return_dic['last_row_id'] = lr_id
 
     db.commit()
     cursor.close()
     db.close()
 
-    print 'HERE sql_execute_2'
-    print return_dic
+    return_dic['status'] = status
+    return_dic['log'] = log
 
+    print colored('sql_executor OUT: {}'.format(return_dic), 'red')
     return return_dic
-
-
-def sql_execute(cursor, query):  # References
-
-    status = 1  # By default is success.
-    num_elements = 0  # By default any entity is retrieved.
-    log = None
-
-    try:
-        num_elements = cursor.execute(query)
-
-    except db_params.MySQLdb.Error, e:
-        try:
-            error = "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-            print error
-            log = error
-            status = e.args[0]
-        except IndexError:
-            print "MySQL Error: %s" % str(e)
-
-    print 'status: ' + colored(status, 'red')
-    print 'num_elements: ' + colored(num_elements, 'red')
-
-    return status, num_elements, log
 
 
 class EntitiesManager:
@@ -228,14 +227,14 @@ class EntitiesManager:
         query = query[:-2]
         query += ');'
 
-        data_block = sql_execute2(query)
+        data_block = sql_executor(query=query, expected_kind='item', last_row_id=True)
 
         # If the query execute has success we are going to retrieve all data saved in database about this item.
         if data_block.get('status') == 1:
 
             retrieve_query = 'select * from {0} where {0}Id = {1};'.format(kind, data_block.get('last_row_id'))
 
-            data_block_2 = sql_execute2(retrieve_query)
+            data_block_2 = sql_executor(retrieve_query, 'item')
             entity_data = data_block_2.get('data', None)
             if entity_data.get('deleted') is not None:
                 del entity_data['deleted']
@@ -244,7 +243,10 @@ class EntitiesManager:
             return_dic['status'] = data_block['status']
             return_dic['log'] = data_block['log']
 
-        return return_dic
+            return return_dic
+
+        else:
+            return data_block # With possibles errors.
 
     @classmethod
     def get(cls, kind, entity_id=None, params=None):
@@ -283,7 +285,7 @@ class EntitiesManager:
                                  '(e.studentId = s.studentId) where e.associationId = {} ' \
                                  'and e.deleted = {};'.format(entity_id, 0)
 
-            return_data_block = sql_execute2(query)
+            return_data_block = sql_executor(query)
 
             if return_data_block['status'] == -1:
                 # The associations doesn't exists and we return the same response from sql_execute2
@@ -310,18 +312,19 @@ class EntitiesManager:
                 # Update with the rest of data without special format.
                 data_block.update(data)
 
-                print colored(data_block, 'red')
 
                 # Now we search all teachers and students related with this association and we will insert them in
                 # the data block.
-                return_data_block = sql_execute2(query_for_teachers)
-                if return_data_block.get('status', None) == 1 and return_data_block.get('data', None) is not None:
-                    data_block['teachers'] = return_data_block['data']
+                return_data_block = sql_executor(query_for_teachers, 'list')
+                data = return_data_block.get('data', None)
+                if return_data_block.get('status', None) == 1 and data is not None and len(data) > 0:
+                    data_block['teachers'] = data
 
                 # we do the same with students:
-                return_data_block = sql_execute2(query_for_students)
-                if return_data_block.get('status', None) == 1 and return_data_block.get('data', None) is not None:
-                    data_block['students'] = return_data_block['data']
+                return_data_block = sql_executor(query_for_students, 'list')
+                data = return_data_block.get('data', None)
+                if return_data_block.get('status', None) == 1 and data is not None and len(data) >0:
+                    data_block['students'] = data
 
             return_dic['data'] = data_block
             return_dic['status'] = return_data_block['status']
@@ -330,6 +333,7 @@ class EntitiesManager:
 
         else:
             query = 'select '
+            expected_kind = None
 
             # We need all entities of specify kind from database that haven't the column delete to true or 1,
             # and whe don't want all info, only the most relevant, name and id.
@@ -344,14 +348,16 @@ class EntitiesManager:
                 else:
                     query += ' * '
 
-                query += ' from {} where deleted = 0;'.format(kind)
+                query += ' from {} where deleted = 0;'.format(kind) # '#' is a special character, means that there aren't a entity_id
+                expected_kind = 'list'
 
             # We want all info about one entity.
             else:
                 query += '* from {} where {}Id = {} and deleted = 0;'.format(kind, kind, entity_id)
+                expected_kind = 'item'
 
             # Is returned directly the block returned from sql_execute2
-            return sql_execute2(query)
+            return sql_executor(query, expected_kind)
 
     @classmethod
     def update(cls, kind, entity_id, data):
@@ -397,43 +403,21 @@ class EntitiesManager:
 
         query += ' WHERE {}Id = {};'.format(kind, entity_id)
 
-        cursor = db.cursor()
-
-        status_value, num_elements, log = sql_execute(cursor, query)
-
-        print colored(status_value, 'yellow')
-        print colored(num_elements, 'yellow')
-
-        db.commit()
+        data_block = sql_executor(query)
 
         # If the query execute has success we are going to retrieve all data saved in database about this item.
-        if status_value == 1:
+        if data_block['status'] == 1:
 
-            retrieve_query = 'select * from ' + str(kind) + ' where ' + str(kind) + 'Id = ' + str(entity_id) + ';'
+            retrieve_query = 'select * from {0} where {0}Id = {1};'.format(kind, entity_id)
             print colored('Populating item', 'green')
             print colored(retrieve_query, 'green')
 
-            if cursor.execute(retrieve_query) == 1:  # If query obtain one element.
-                row = cursor.fetchone()
-                # None values are not necessary.
-                row = dict((k, v) for k, v in row.iteritems() if v)
+            item_data_block = sql_executor(retrieve_query, 'item')
 
-                print colored(row, 'magenta')
+            if item_data_block['status'] == 1:
+                return item_data_block
 
-                return_dic['data'] = row
-
-        return_dic['status'] = status_value
-        return_dic['log'] = log
-
-        if 'deleted = NULL' in query and num_elements == 0 and status_value != 1644:
-            return_dic['log'] = 'not found element to del'
-
-        # Confirm the changes
-        db.commit()
-        cursor.close()
-        db.close()
-
-        return return_dic
+        return data_block
 
     @classmethod
     def nested_delete(cls, kind, entity_id, optional_nested_kind, onk_entity_id):
@@ -509,6 +493,8 @@ class EntitiesManager:
                 response = cls.get(kind='enrollment', params='studentId, enrollmentId')
                 if response.get('status') == 1:
                     enrollments_list = response.get('data', None)
+                    if not isinstance(enrollments_list, list): # If the data isn't a list because is only one, we convert it.
+                        enrollments_list = [enrollments_list]
                     if len(enrollments_list) > 0:  # If the student haven't relation, stop here.
                         for item in enrollments_list:
                             if item.get('studentId', None) == entity_id:
@@ -648,7 +634,7 @@ class EntitiesManager:
                 return return_dic
 
         if kind in ['association', 'impart', 'enrollment'] and related_kind in ['impart', 'association', 'enrollment',
-                                                                                'teacher', 'class',
+                                                                                'teacher', 'student', 'class',
                                                                                 'subject'] and internal_call == False:
             return_dic['status'] = 1048  # Bad requests with log.
             return_dic['log'] = '{} is not a valid nested resource.'.format(related_kind)
@@ -683,19 +669,27 @@ class EntitiesManager:
         print query
         exists = 0;
 
-        status_value, num_elements, log = sql_execute(cursor, query)
-        # If the query execute has success we are going to retrieve all data saved in database about this item.
-        if status_value == 1:
-            result = cursor.fetchone()
-            exists = result.items()[0][1]  # Because with our way to get data we have a dict.
+        #status_value, num_elements, log = sql_execute(cursor, query)
 
-        db.commit()
+        data_block = sql_executor(query)
+
+        if data_block['status'] == 1:
+            count = data_block['data']['COUNT(*)']
+
+
+
+        # If the query execute has success we are going to retrieve all data saved in database about this item.
+        #if status_value == 1:
+        #    result = cursor.fetchone()
+        #    exists = result.items()[0][1]  # Because with our way to get data we have a dict.
+
+        #db.commit()
 
         # IF element doesn't exists we need abort here.
-        if not exists:
+        if count != 1:
             return_dic['status'] = -1
-            cursor.close()
-            db.close()
+            #cursor.close()
+            #db.close()
             return return_dic
 
         query = ''
@@ -738,6 +732,11 @@ class EntitiesManager:
                         'FROM enrollment JOIN association WHERE enrollment.associationId = association.associationId ' \
                         'AND enrollment.studentId = ' + entity_id + ' AND enrollment.deleted = 0) e JOIN class c JOIN subject s on (e.classId = c.classId ' \
                                                                     'AND e.subjectId = s.subjectId);'
+            else:
+                log = '   {}    is not a valid nested resource to student. There are the valid options: teacher,' \
+                      ' class, subject, enrollment'.format(related_kind)
+                status = 1054 # Bad request
+                return ({'status': status, 'log': log})
 
         elif kind == 'teacher':  # Queremos buscar entidades relacionadas con una entidad de tipo teacher
             if related_kind == 'student':  # Todos los alumnos a los que da clase ese profesor.
@@ -753,6 +752,12 @@ class EntitiesManager:
                         'FROM impart JOIN association WHERE impart.associationId = association.associationId ' \
                         'AND impart.teacherId = ' + entity_id + ' AND impart.deleted = 0) i JOIN class c JOIN subject s on (i.classId = c.classId ' \
                                                                 'AND i.subjectId = s.subjectId);'
+            else:
+                log = '   {}    is not a valid nested resource to teacher. There are the valid options: student, ' \
+                      'class, subject, impart'.format(related_kind)
+                status = 1054 # Bad request
+                return ({'status': status, 'log': log})
+
 
         elif kind == 'association':
             if related_kind == 'student':
@@ -760,6 +765,12 @@ class EntitiesManager:
 
                 # TODO: review to avoid e.studentId in the response.
                 query = 'select {0} from student s join (select enrollmentId, studentId from enrollment where associationId = {1} and deleted = {2}) e where s.studentId = e.studentId and s.deleted = {2};'.format(query_params, entity_id, 0)
+
+            else:
+                log = '   {}    is not a valid nested resource to association. There are the valid options: ' \
+                      'student'.format(related_kind)
+                status = 1054  # Bad request
+                return ({'status': status, 'log': log})
 
 
         elif kind == 'class': # Info about entities related with the class kind entity.
@@ -780,8 +791,16 @@ class EntitiesManager:
             elif related_kind == 'subject':  # Todas las asignaturas que se imparten en esa clase.
                 query = 'select sbs.subjectId, sbs.name as \'subjectName\', t.name as \'teacherName\', t.surname as \'teacherSurname\', t.teacherId, i.impartId, sbs.associationId from impart i JOIN (select name, s.subjectId, a.associationId from (select name, subjectId from subject) s JOIN ' \
                         '(select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a where s.subjectId = a.subjectId) sbs JOIN teacher t where i.associationId = sbs.associationId and i.teacherId = t.teacherId AND i.deleted = 0 union  select s.subjectId, ' \
-                                                                                                         's.name, null, null, null, null,  a.associationId   from (select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a JOIN subject s where a.subjectId = s.subjectId;'
-            # Only for inernal calls:
+                        's.name, null, null, null, null,  a.associationId   from (select subjectId, associationId from association where classId=' + entity_id + ' AND association.deleted = 0) a JOIN subject s where a.subjectId = s.subjectId;'
+
+
+            else:
+                log = '   {}    is not a valid nested resource to class. There are the valid options: ' \
+                      'student, teacher, subject'.format(related_kind)
+                status = 1054  # Bad request
+                return ({'status': status, 'log': log})
+
+            # Only for internal calls:
             if internal_call:
 
                 if related_kind == 'association':
@@ -793,6 +812,7 @@ class EntitiesManager:
                 elif related_kind == 'enrollment':
                     query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
                         0, 0, entity_id)
+
 
 
 
@@ -812,18 +832,26 @@ class EntitiesManager:
                 query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and subjectId = {});'.format(
                     0, 0, entity_id)
 
-
             elif related_kind == 'class':
                 # An especial case, it needed info in special format to show in the view.
                 query = 'select cls.classId, cls.course, cls.word, cls.level, t.name, t.surname, t.teacherId, i.impartId, cls.associationId from (select * from impart where impart.deleted = 0) i JOIN (select course, word, level, c.classId, a.associationId from (select course, word, level, classId from class) c ' \
                         'JOIN (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a where c.classId = a.classId) cls JOIN teacher t where i.associationId = cls.associationId and i.teacherId = t.teacherId union select c.classId, c.course, c.word, c.level, null, null, null, null,  a.associationId   ' \
-                                                                                                              'from (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a JOIN class c where a.classId = c.classId;'
+                        'from (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a JOIN class c where a.classId = c.classId;'
 
-        if v:
-            print colored(query, 'yellow')
+            # TODO: La gestión de este error como en las llamadas anteriores puede reducirse en código:
 
-        status_value, num_elements, log = sql_execute(cursor, query)
+            else:
+                log = '   {}    is not a valid nested resource to subject. There are the valid options: ' \
+                      'student, teacher, association, impart, enrollment, class'.format(related_kind)
+                status = 1054  # Bad request
+                return ({'status': status, 'log': log})
 
+
+
+        #status_value, num_elements, log = sql_executor(cursor, query)
+        return_dic = sql_executor(query, 'list')
+
+        """
         if status_value == 1:
 
             entities_list = []
@@ -844,21 +872,22 @@ class EntitiesManager:
         db.commit()
         cursor.close()
         db.close()
+        """
 
         # Optional SORTERS CALLs
 
         if with_special_sorter:
 
-            if kind == 'teacher' and related_kind == 'impart' and status_value == 1:
+            if kind == 'teacher' and related_kind == 'impart' and return_dic['status'] == 1:
                 return_dic['data'] = sorters.special_sort(return_dic['data'])
 
-            if kind == 'student' and related_kind == 'enrollment' and status_value == 1:
+            if kind == 'student' and related_kind == 'enrollment' and return_dic['status'] == 1:
                 return_dic['data'] = sorters.special_sort_2(return_dic['data'])
 
-            if kind == 'subject' and related_kind == 'class':
+            if kind == 'subject' and related_kind == 'class' and return_dic['status'] == 1:
                 return_dic['data'] = sorters.special_sort_3(return_dic['data'])
 
-            if kind == 'class' and related_kind == 'subject':
+            if kind == 'class' and related_kind == 'subject' and return_dic['status'] == 1:
                 return_dic['data'] = sorters.special_sort_4(return_dic['data'])
 
         return return_dic
