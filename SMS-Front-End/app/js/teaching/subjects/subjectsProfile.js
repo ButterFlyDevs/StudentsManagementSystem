@@ -1,5 +1,5 @@
 angular.module('subjects')
-    .controller('subjectsProfileController', function ($scope, $resource, $q, $state, $stateParams, $mdDialog, SubjectsService, AssociationsService, ImpartsService, toastService) {
+    .controller('subjectsProfileController', function ($scope, $resource, $q, $state, $stateParams, $mdDialog, SubjectsService, EnrollmentsService, ClassesService, AssociationsService, ImpartsService, toastService) {
 
         var vm = this;
 
@@ -14,8 +14,20 @@ angular.module('subjects')
 
         vm.showDeleteSubjectClassImpartConfirm = showDeleteSubjectClassImpartConfirm;
         vm.showDeleteClassConfirm = showDeleteClassConfirm;
+        vm.showDeleteStudentConfirm = showDeleteStudentConfirm
+
+        vm.showDeleteTeacherFromClassConfirm = showDeleteTeacherFromClassConfirm;
 
         vm.addRelation = addRelation;
+
+        vm.loadStudents = loadStudents;
+        vm.loadTeaching = loadTeaching;
+        vm.loadReports = loadReports;
+
+
+
+        vm.modValues = modValues;
+        vm.cancelModValues = cancelModValues;
 
         vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
 
@@ -30,6 +42,41 @@ angular.module('subjects')
             loadData()
 
 
+        }
+
+
+        /**
+         * Load only the teaching info about this class.
+         */
+        function loadTeaching() {
+            vm.subjectTeaching = SubjectsService.getTeaching({id: vm.subjectId},
+                function () {
+                    console.log('Subject Teaching Data Block');
+                    console.log(vm.subjectTeaching);
+                }, function (error) {
+                    console.log('Get subject teaching process fail.');
+                    console.log(error);
+                    toastService.showToast('Error obteniendo las asignaturas que se imparten en la clase.')
+                }
+            );
+        }
+
+        function loadReports() {
+            vm.subjectReport = SubjectsService.getReport({id: vm.subjectId},
+                function () {
+                    console.log('Subject Report Data Block');
+                    console.log(vm.subjectReport);
+                    if (vm.subjectReport.report_log != null) {
+                        vm.chartConfig['series'][0]['data'][0]['y'] = vm.subjectReport['students']['gender_percentage']['M']
+                        vm.chartConfig['series'][0]['data'][1]['y'] = vm.subjectReport['students']['gender_percentage']['F'];
+                        console.log(vm.chartConfig);
+                    }
+
+                }, function (error) {
+                    console.log('Get class report process fail.');
+                    console.log(error);
+                    toastService.showToast('Error obteniendo los reports de la asingatura.')
+                })
         }
 
         function loadData() {
@@ -56,29 +103,19 @@ angular.module('subjects')
                 vm.subject = null;  //Maybe useful.
             });
 
-            vm.subjectClasses = SubjectsService.getClasses({id: vm.subjectId},
-                function () {
-                    console.log('Subject Classes');
-                    console.log(vm.subjectClasses);
+            loadTeaching();
 
-                    // ### Do a copy to save process. ###
-                    vm.subjectClassesOriginalCopy = angular.copy(vm.subjectClasses);
+        }
 
-                    $scope.subjectClassesModelHasChanged = false;
+        function modValues() {
+            vm.editValuesEnabled = true;
+        }
 
-                    $scope.$watch('vm.subjectClasses', function (newValue, oldValue) {
-                        if (newValue != oldValue) {
-                            $scope.subjectClassesModelHasChanged = !angular.equals(vm.subjectClasses, vm.subjectClassesOriginalCopy);
-                        }
-                        compare()
-                    }, true);
+        function cancelModValues() {
+            vm.editValuesEnabled = false;
 
-                }, function (error) {
-                    console.log('Get subject classes process fail.')
-                    console.log(error)
-                    toastService.showToast('Error obteniendo las clases donde se imparte la asignatura.')
-                }
-            )
+            vm.subject = angular.copy(vm.subjectOriginalCopy);
+
 
         }
 
@@ -89,6 +126,173 @@ angular.module('subjects')
                 vm.updateButtonEnable = false;
             }
         }
+
+
+        /**
+         * Which actually delete the class selected related with the subject in the view.
+         * @param associationId The id of association that represent the link between the class and the subject.
+         * This come from subjectTeaching data block.
+         */
+        function deleteClass(associationId) {
+
+            AssociationsService.delete({id: associationId},
+                function () { // Success
+                    loadTeaching(); // Reload the specific section.
+                    toastService.showToast('Relación eliminada con éxito.')
+                },
+                function (error) { // Fail
+                    console.log('Class deleted process fail.');
+                    console.log(error)
+                    toastService.showToast('Error eliminando la relación.')
+                });
+
+        }
+
+        /**
+         * Show the floating dialog to ask user if it actually want to delete the relation.
+         * @param associationId The id of the association that come from subjectTeaching data block.
+         */
+        function showDeleteClassConfirm(associationId) {
+            var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere eliminar esta grupo?')
+                .textContent('Si lo hace, también eliminará las matrículas de los estudiantes matriculados a esta.')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteClass(associationId);
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        }
+
+
+        function deleteTeacherFromClass(impartId) {
+
+            ImpartsService.delete({id: impartId},
+                function () { // Success
+                    console.log('Class deleted successfully.');
+                    loadTeaching(); // Reload the specific section.
+                    toastService.showToast('Relación eliminada con éxito.')
+                },
+                function (error) { // Fail
+                    console.log('Class deleted process fail.');
+                    console.log(error)
+                    toastService.showToast('Error eliminando la relación.')
+                });
+
+        }
+
+        function showDeleteTeacherFromClassConfirm(impartId) {
+            var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere que este profesor deje de impartir la asingatura en esta clase?')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteTeacherFromClass(impartId);
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        }
+
+
+        /**
+         * Load the list of students
+         * @param associationId
+         */
+        function loadStudents(associationId) {
+
+            console.log('loadStudents associationId')
+            console.log(associationId)
+
+            if (!associationId) {
+
+                // We want all students that is related with this subject, independently of the class from which come.
+
+                vm.subjectStudents = SubjectsService.getStudents({id: vm.subjectId},
+                    function () {
+                        console.log('Subject Students');
+                        console.log(vm.subjectStudents);
+                    },
+                    function (error) {
+                        console.log('Get subject students process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos matriculados.');
+                    }
+                );
+            }
+            else {
+                vm.subjectStudents = AssociationsService.getStudents({id: associationId},
+                    function () {
+                        console.log('Subject Students');
+                        console.log(vm.subjectStudents);
+                    },
+                    function (error) {
+                        console.log('Get Class- subject students process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos matriculados en este grupo.');
+                    }
+                );
+            }
+        }
+
+
+        function deleteStudent(enrollmentId, kind) {
+            console.log('Deleting student from class.');
+            console.log(enrollmentId);
+            console.log(kind);
+
+            if (kind == 'enrollment')
+                EnrollmentsService.delete({id: enrollmentId},
+                    function () { // Success
+                        loadStudents(vm.associationIdSelected); // Reload the specific section.
+                        toastService.showToast('Relación eliminada con éxito.')
+                    },
+                    function (error) { // Fail
+                        console.log('Relation deleted process fail.');
+                        console.log(error)
+                        toastService.showToast('Error eliminando la relación.')
+                    });
+            else if (kind == 'student') {
+
+                SubjectsService.nested_delete({id: vm.subjectId, a: 'student', b: enrollmentId}, //nested_kind_plus_id Because the behaviour of $resource we pass the nested element this way.
+                    function () { // Success
+                        loadStudents(vm.associationIdSelected); // Reload the specific section.
+                        toastService.showToast('Relación múltiple eliminada con éxito.')
+                    },
+                    function (error) { // Fail
+                        console.log('Multiple relation deleted process fail.');
+                        console.log(error)
+                        toastService.showToast('Error eliminando la relación múltiple.')
+                    });
+            }
+        }
+
+        /** Show the previous step to delete item, a confirm message */
+        function showDeleteStudentConfirm(enrollmentId, kind) {
+
+            var message = ''
+            console.log(vm.associationIdSelected);
+            if (vm.associationIdSelected)
+                message = '¿Está seguro de querer eliminar al estudiante de la asignatura?'
+            else
+                message = '¿Está seguro de querer eliminar al estudiante de TODAS las asignaturas de esta clase?'
+
+            var confirm = $mdDialog.confirm()
+                .title(message)
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteStudent(enrollmentId, kind);
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        };
 
 
         /** Delete subject in server.
@@ -111,18 +315,7 @@ angular.module('subjects')
         }
 
 
-        function deleteClass(classId) {
-
-            console.log('deleteTeacherFromClass');
-            console.log(vm.subjectClasses);
-            // We need delete from data block copy the item selected:
-            for (var i = 0; i < vm.subjectClasses.length; i++)
-                if (vm.subjectClasses[i].class.classId == classId)
-                    vm.subjectClasses.splice(i, 1);
-            console.log(vm.subjectClasses);
-        }
-
-        /** Show the previous step to delete item, a confirm message */
+        /** Show the previous step to delete item (method just above): a confirm message */
         function showDeleteSubjectConfirm() {
 
             var confirm = $mdDialog.confirm()
@@ -139,47 +332,6 @@ angular.module('subjects')
             });
 
         };
-
-
-        function showDeleteClassConfirm(classId) {
-            var confirm = $mdDialog.confirm()
-                .title('¿Está seguro de que quiere dejar de impartir esta asignatura en este grupo?')
-                //.textContent('If you do, you will be erased from all project which you are and you can not access to app.')
-                //.ariaLabel('Lucky day')
-                .ok('Estoy seguro')
-                .cancel('Cancelar');
-
-            $mdDialog.show(confirm).then(function () {
-                deleteClass(classId);
-            }, function () {
-                console.log('Operacion cancelada.')
-            });
-
-        }
-
-
-        // We delete a teacher from a class
-        function deleteTeacherFromClass(classId, teacherId) {
-
-            console.log('deleteTeacherFromClass');
-            console.log(vm.subjectClasses);
-            // We need delete from data block copy the item selected:
-            for (var i = 0; i < vm.subjectClasses.length; i++)
-                if (vm.subjectClasses[i].class.classId == classId) {
-                    var classIndex = -1;
-                    for (var j = 0; j < vm.subjectClasses[i].teachers.length; j++)
-                        if (vm.subjectClasses[i].teachers[j].teacherId == teacherId)
-                            classIndex = j;
-                    vm.subjectClasses[i].teachers.splice(classIndex, 1);
-                    if (vm.subjectClasses[i].teachers.length == 0) {
-                        delete vm.subjectClasses[i].teachers;
-                    }
-
-                }
-
-
-            console.log(vm.subjectClasses);
-        }
 
 
         /** Show the previous step to delete item, a confirm message */
@@ -207,52 +359,20 @@ angular.module('subjects')
          * Call to server with PUT method ($update = PUT) using vm.subject that is
          * a instance of SubjectsService.*/
         function updateSubject() {
-            console.log('Calling updateSubject() function.')
+            console.log('Calling updateSubject() function.');
+            vm.subject.$update(
+                function () { // Success
+                    console.log('Subject updated successfully.')
+                    toastService.showToast('Asignatura actualizada con éxito.')
+                    vm.editValuesEnabled = false;
+                    vm.updateButtonEnable = false;
+                },
+                function (error) { // Fail
+                    console.log('Error updating the subject.')
+                    console.log(error)
+                    toastService.showToast('Error actualizando la asignatura.')
+                });
 
-            // We check if the CHANGES are in the SUBJECT-MODEL and in this case we add this call to
-            // queue.
-            if ($scope.subjectModelHasChanged) {
-
-                var deferred = $q.defer();
-
-                var promise = vm.subject.$update(
-                    function () { // Success
-                        deferred.resolve('Success updating the subject with vm.subject.$update.');
-                    },
-                    function (error) { // Fail
-                        deferred.reject('Error updating the subject with vm.subject.$update, error: ' + error)
-                    });
-                promises.push(deferred.promise)
-            }
-
-
-            if ($scope.subjectClassesModelHasChanged) { // We update the teacher imparts info.
-
-                // Algorithm that compare both data blocks and save or delete accordingly.
-                processDiferences(vm.subjectClassesOriginalCopy, vm.subjectClasses)
-
-            }
-
-
-            // After check the models and put the calls in the queue we process this queue:
-            $q.all(promises).then(
-                function (value) {
-                    console.log('Resolving all promises, SUCCESS,  value: ')
-                    console.log(value);
-                    toastService.showToast('Asignatura actualizado con éxito.');
-
-                    // It reloaded all data to avoid problems.
-                    // How wait to exit from teacher.$update
-                    loadData();
-
-                    promises = [];
-
-                }, function (reason) {
-                    console.log('Resolving all promises, FAIL, reason: ')
-                    console.log(reason);
-                    toastService.showToast('Error actualizando la asignatura.');
-                }
-            )
         }
 
 
@@ -380,21 +500,21 @@ angular.module('subjects')
             console.log('teacherId: ' + teacherId);
 
 
-                console.log('Creating a new Imparts relation');
-                var newImpart = new ImpartsService({
-                    data: {
-                        associationId: associationId,
-                        teacherId: teacherId
-                    }
+            console.log('Creating a new Imparts relation');
+            var newImpart = new ImpartsService({
+                data: {
+                    associationId: associationId,
+                    teacherId: teacherId
+                }
+            });
+            newImpart.$save(
+                function () { // Success
+                    deferred.resolve('Success saving the impart relation with newImpart.$save');
+                },
+                function (error) { // Fail
+                    deferred.reject('Error saving the the impart relation with newImpart.$save, error: ' + error)
                 });
-                newImpart.$save(
-                    function () { // Success
-                        deferred.resolve('Success saving the impart relation with newImpart.$save');
-                    },
-                    function (error) { // Fail
-                        deferred.reject('Error saving the the impart relation with newImpart.$save, error: ' + error)
-                    });
-                promises.push(deferred.promise)
+            promises.push(deferred.promise)
 
         }
 
@@ -515,13 +635,19 @@ angular.module('subjects')
         }
 
         /*
-         * Open the dialog to add a relation to this teacher.
-         * The add action is done in addUserToProjectController
+         * Open the dialog to add a relation to this class.
+         * The add action is done in addRelationController in addRelation.js
          */
-        function addRelation() {
+        function addRelation(itemTypeToAdd, secondaryItem) {
 
             $mdDialog.show({
-                locals: {parentScope: $scope, parentController: vm},
+                locals: {
+                    parentScope: $scope,
+                    parentController: vm,
+                    itemTypeToAdd: itemTypeToAdd,
+                    secondaryItem: secondaryItem
+                },
+                // We use the same basic controller.
                 controller: 'addRelationController',
                 controllerAs: 'vm',
                 templateUrl: 'app/views/teaching/utils/addRelationTemplate.html'
@@ -532,6 +658,43 @@ angular.module('subjects')
 
                 });
         }
+
+        vm.chartConfig = {
+            xAxis: {
+                type: 'category'
+            },
+            title: {
+                text: 'Porcentaje por género.'
+            },
+            yAxis: {
+                allowDecimals: false,
+                title: {
+                    text: 'Porcentaje'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+            },
+            legend: {enabled: false},
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y:.1f}%'
+                    }
+                }
+            },
+            series: [{
+                name: 'Genero',
+                colorByPoint: true,
+                type: 'column',
+                data: [
+                    {name: 'Chicos', y: 0},
+                    {name: 'Chicas', y: 1}]
+            }]
+        };
 
 
     });

@@ -39,10 +39,11 @@ def run_back_end():
 
     local('google_appengine/dev_appserver.py '
           ' --port=' + SMS_Back_End_default_port +
-          ' --admin_port=' + SMS_Back_End_default_admin_port +
+          ' --host=0.0.0.0 --admin_port=' + SMS_Back_End_default_admin_port +
           ' SMS-Back-End/apigms/apigms.yaml '
           'SMS-Back-End/dbms/dbms.yaml '
           'SMS-Back-End/sce/sce.yaml &')
+
 
     print (red('Thanks for your contribution!'))
 
@@ -139,7 +140,7 @@ def run_front_end():
 
     local('google_appengine/dev_appserver.py '
           ' --port=' + SMS_Front_End_default_port +
-          ' --admin_port=' + SMS_Front_End_default_admin_port +
+          ' --host=0.0.0.0 --admin_port=' + SMS_Front_End_default_admin_port +
           ' SMS-Front-End/app.yaml &')
 
     print (red('Thanks for your contribution!'))

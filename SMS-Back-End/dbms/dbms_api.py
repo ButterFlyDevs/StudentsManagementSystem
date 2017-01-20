@@ -268,7 +268,8 @@ def delete_entity(kind, entity_id, optional_nested_kind = None, onk_entity_id = 
     curl  -i -X  DELETE localhost:8002/entities/subject/1?action=dd
     """
 
-    if kind == 'class' and optional_nested_kind is not None and onk_entity_id is not None:
+    # When we want delete a student from a all class in which is enrollment or in all subjects.
+    if kind in ['class', 'subject'] and optional_nested_kind is not None and onk_entity_id is not None:
         response = EntitiesManager.nested_delete(kind, entity_id, optional_nested_kind, onk_entity_id)
     else:
         response = EntitiesManager.delete(kind, entity_id, request.args.get('action', None))

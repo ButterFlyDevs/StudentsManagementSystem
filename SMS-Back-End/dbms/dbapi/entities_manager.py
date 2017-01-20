@@ -422,7 +422,7 @@ class EntitiesManager:
     @classmethod
     def nested_delete(cls, kind, entity_id, optional_nested_kind, onk_entity_id):
         """
-        Attention: For now only works for class kind with student nested kind!
+        Attention: For now only works for [class, subject] as kind and student as optional_nested_kind!
         :param kind:
         :param entity_id:
         :param optional_nested_kind:
@@ -432,7 +432,7 @@ class EntitiesManager:
 
         return_dic = {}
 
-        if kind == 'class' and entity_id != 0 and optional_nested_kind == 'student' and onk_entity_id != 0:
+        if kind in ['class', 'subject'] and entity_id != 0 and optional_nested_kind == 'student' and onk_entity_id != 0:
             data_block = cls.get_related(kind='student', entity_id=onk_entity_id, related_kind='teaching', internal_call=True)
             data_block = data_block.get('data',None)
 
@@ -467,6 +467,7 @@ class EntitiesManager:
                 return_dic['status'] = -1
                 #TODO: Maybe we can insert a more specific message ;)
                 return return_dic
+
 
         else:
             # Los parámetros no son los correctos.
@@ -634,7 +635,7 @@ class EntitiesManager:
                 return return_dic
 
         if kind in ['association', 'impart', 'enrollment'] and related_kind in ['impart', 'association', 'enrollment',
-                                                                                'teacher', 'student', 'class',
+                                                                                'teacher', 'class',
                                                                                 'subject'] and internal_call == False:
             return_dic['status'] = 1048  # Bad requests with log.
             return_dic['log'] = '{} is not a valid nested resource.'.format(related_kind)
@@ -818,7 +819,9 @@ class EntitiesManager:
 
         elif kind == 'subject':  # Queremos buscar entidades relacionadas con una entidad de tipo subject.
             if related_kind == 'student':
-                query = 'SELECT studentId, name, surname from student where deleted = 0 and studentId in (SELECT studentId from enrollment where associationId IN ( select associationId from association where subjectId=' + entity_id + '));'
+                query = 'SELECT studentId, name, surname from student where deleted = {1} and studentId in ' \
+                        '(SELECT studentId from enrollment where associationId IN ( select associationId ' \
+                        'from association where subjectId={0} and deleted = {1}) and deleted = {1});'.format(entity_id, 0)
             elif related_kind == 'teacher':
                 query = 'SELECT teacherId, name, surname from teacher where deleted = 0 and teacherId in (select teacherId from impart where associationId IN ( select associationId from association where subjectId=' + entity_id + '));'
 
@@ -899,11 +902,9 @@ class EntitiesManager:
         return_dic = {}
         set_lack_data_message = False
 
-        if kind == 'class':  # We will made the reports of this kind of item.
+        if kind in ['class', 'subject']:  # We will made the reports of this kind of item.
 
             data_block = {}
-
-
 
             # Students analysis:
             #students = cls.get(kind='student', params='birthdate,gender').get('data', None)
@@ -978,5 +979,7 @@ class EntitiesManager:
             return_dic['status'] = 1
 
             return return_dic
+
+
 
         pass

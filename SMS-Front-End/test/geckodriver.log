@@ -202,3 +202,11 @@ JavaScript warning: https://normandy.cdn.mozilla.net/static/bundles/selfrepair-1
 
 (process:3823): GLib-CRITICAL **: g_path_get_basename: assertion 'file_name != NULL' failed
 JavaScript warning: https://normandy.cdn.mozilla.net/static/bundles/selfrepair-133d4d7c9de72117ee8e.24ec5279eef1.js, line 7: mutating the [[Prototype]] of an object will cause your code to run very slowly; instead create the object with the correct initial [[Prototype]] value using Object.create
+1484855310581	geckodriver	INFO	Listening on 127.0.0.1:34582
+1484855311582	mozprofile::profile	INFO	Using profile path /tmp/rust_mozprofile.ghWcisXfTZxH
+1484855311583	geckodriver::marionette	INFO	Starting browser /usr/bin/firefox
+1484855311604	geckodriver::marionette	INFO	Connecting to Marionette on localhost:44443
+1484855313599	Marionette	INFO	Listening on port 44443
+
+(process:1996): GLib-CRITICAL **: g_path_get_basename: assertion 'file_name != NULL' failed
+JavaScript warning: https://normandy.cdn.mozilla.net/static/bundles/selfrepair-133d4d7c9de72117ee8e.24ec5279eef1.js, line 7: mutating the [[Prototype]] of an object will cause your code to run very slowly; instead create the object with the correct initial [[Prototype]] value using Object.create

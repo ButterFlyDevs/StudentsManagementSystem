@@ -22,8 +22,7 @@ angular.module('classes')
              },
              'nested_delete':{
                  method: 'DELETE',
-                 url: restPath + ':id/:a/:b'
-
+                 url: restPath + ':id/:a/:b'  // Example: /entities/class/1/student/1
              },
              'getStudents': {
                  method: 'GET',

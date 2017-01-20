@@ -46,7 +46,8 @@ angular.module('classes')
         }
 
         /**
-         * Load students
+         * Load the list of students
+         * @param associationId
          */
         function loadStudents(associationId) {
 
@@ -54,6 +55,8 @@ angular.module('classes')
             console.log(associationId)
 
             if (!associationId) {
+
+                // We want all students that is related with this class, independently of the subject from which come.
 
                 vm.classStudents = ClassesService.getStudents({id: vm.classId},
                     function () {
@@ -83,27 +86,13 @@ angular.module('classes')
         }
 
         /**
-         * Load only the teaching info about thsi class.
+         * Load only the teaching info about this class.
          */
         function loadTeaching() {
             vm.classTeaching = ClassesService.getTeaching({id: vm.classId},
                 function () {
                     console.log('Class Teaching Data Block');
                     console.log(vm.classTeaching);
-                    /*
-                     // ### Do a copy to save process. ###
-                     vm.classTeachingOriginalCopy = angular.copy(vm.classTeaching);
-
-                     $scope.classTeachingModelHasChanged = false;
-
-                     $scope.$watch('vm.classTeaching', function (newValue, oldValue) {
-                     if (newValue != oldValue) {
-                     $scope.classTeachingModelHasChanged = !angular.equals(vm.classTeaching, vm.classTeachingOriginalCopy);
-                     }
-                     compare()
-                     }, true);
-                     */
-
                 }, function (error) {
                     console.log('Get class subjects process fail.');
                     console.log(error);
@@ -126,7 +115,7 @@ angular.module('classes')
                 }, function (error) {
                     console.log('Get class report process fail.');
                     console.log(error);
-                    toastService.showToast('Error obteniendo las asignaturas que se imparten en la clase.')
+                    toastService.showToast('Error obteniendo los reports de la clase.')
                 })
         }
 
