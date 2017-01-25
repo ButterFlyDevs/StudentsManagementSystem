@@ -55,6 +55,7 @@ The list of params always together with a colon between: ::
 If the kind haven't the param passed it will return a ``400 Bad Request``.
 It means that the model haven't this attribute in his definition.
 
+
 Post
 ****
 
@@ -142,8 +143,8 @@ case of the it doesn't exists yet a `204` code without content in body.
     GET .../teacher/n/subject
     List of subject that impart the teacher n.
 
-Special case
-*************
+Special case A
+**************
 
 There are a special resource to teacher resources, it is ``teaching`` ::
 
@@ -173,6 +174,16 @@ The JSON received is a list of subjects that the teacher impart when a list nest
 This resource is thinking to retrieve the maximal academic info about one teacher in a only call.
 
 If the resource exists, but it hasn't teaching related this call will return a ``204`` status code that means *Success Call without content*.       
+
+Special case B
+**************
+
+Besides this, it has a special method to know the list of students in a entire subject:
+
+    curl -i -X GET localhost:8002/entities/teacher/1/subject/1/student
+
+Note that this will return all student which this teacher impart class to this subject, maybe
+only in a class o a lot of them.
 
 
 **Student** Resource
@@ -390,8 +401,7 @@ This is the aspect of the common response:
 **Enrollment** Resource
 ------------------------
 
-An enrollment item is a relation between a subject and an association between a  class and a subject.
-
+An enrollment item is a relation between an student and an association (association between a class and a subject).
 
 
 PUT

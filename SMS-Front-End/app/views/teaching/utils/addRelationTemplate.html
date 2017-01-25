@@ -26,6 +26,14 @@
                     Añadir estudiante
                 </div>
 
+                <!-- IT'S ABOUT TEACHER -->
+                <div ng-if="vm.itsAboutTeacher && vm.itemTypeToAdd == 'subject' ">
+                    Añadir asignatura
+                </div>
+                <div ng-if="vm.itsAboutTeacher && vm.itemTypeToAdd == 'class' ">
+                    Añadir grupo
+                </div>
+
             </h2>
             <span flex></span>
             <md-button class="md-icon-button" ng-click="vm.closeDialog()">
@@ -38,12 +46,12 @@
         <div class="md-dialog-content">
 
             <!-- Fields when the dialog is over subject teacher or student, view and process: SUBJECT - CLASS -->
-            <div ng-if="vm.itsAboutTeacher || vm.itsAboutStudent">
+            <div ng-if="vm.itsAboutTeacher && vm.itemTypeToAdd == 'subject'">
 
                 <md-input-container class="md-block" flex-gt-sm>
                     <label>Asignatura</label>
                     <md-select ng-model="vm.subjectSelected"
-                               ng-change="vm.checkRelationSelected_Subject_Class(vm.subjectSelected, vm.classSelected)">
+                               ng-change="vm.checkSelectedItem(vm.subjectSelected, vm.classSelected)">
                         <md-option
                                 ng-repeat="item in vm.subjectsList"
                                 value="{{item.subjectId}}">
@@ -55,7 +63,7 @@
                 <md-input-container class="md-block" flex-gt-sm>
                     <label>Grupo</label>
                     <md-select ng-model="vm.classSelected"
-                               ng-change="vm.checkRelationSelected_Subject_Class(vm.subjectSelected, vm.classSelected)">
+                               ng-change="vm.checkSelectedItem(vm.subjectSelected, vm.classSelected)">
                         <md-option
                                 ng-repeat="item in vm.classesList"
                                 value="{{item.classId}}">
@@ -67,7 +75,22 @@
                 </md-input-container>
 
             </div>
+            <div ng-if="vm.itsAboutTeacher && vm.itemTypeToAdd == 'class'">
 
+                <!-- CLASS -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Grupo</label>
+                    <md-select ng-model="vm.classSelected"
+                               ng-change="vm.checkSelectedItem(vm.classSelected)">
+                        <md-option
+                                ng-repeat="item in vm.classesList"
+                                value="{{item.classId}}">
+                            {{item.course}}º {{item.word}} - {{item.level}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
 
             <div ng-if="vm.itsAboutSubject && vm.itemTypeToAdd == 'class'">
 
@@ -210,9 +233,9 @@
 
         </div>
 
-        <!-- Messages and options when is about teacher or student view -->
+        <!-- MESSAGES and OPTIONS when is about teacher or student view -->
 
-        <div ng-if="vm.itsAboutTeacher || vm.itsAboutStudent">
+        <div ng-if=" vm.itsAboutStudent">
             <div ng-if="vm.associationRelationExists">
                 <p>La relación entre la asignatura y la clase no existe.</p>
                 ¿Deséa crearla al mismo tiempo que asignas a un profesor?
@@ -246,8 +269,8 @@
         </div>
 
 
-        <!-- ITS ABOUT CLASS -->
-        <div ng-if="vm.itsAboutClass || vm.itsAboutSubject">
+        <!-- ITS ABOUT CLASS, SUBJECT or TEACHEr-->
+        <div ng-if="vm.itsAboutClass || vm.itsAboutSubject || vm.itsAboutTeacher">
             <div ng-if="vm.errorExists">
                 <!-- warn is red -->
                 <span md-colors="{color:'warn'}">{{vm.errorMessage}}</span>

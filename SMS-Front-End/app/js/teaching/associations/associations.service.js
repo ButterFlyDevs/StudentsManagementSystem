@@ -6,7 +6,7 @@ angular.module('associations')
 
                 'delete': {
                     method: 'DELETE',
-                    url: restPath + ':id' + '?action=dd' // Delete dependencies also.
+                    url: restPath + ':id' + '?action=dd' // Delete dependencies also by default.
                 },
                 'getStudents': {
                     method: 'GET',

@@ -281,7 +281,9 @@ def delete_entity(kind, entity_id, optional_nested_kind = None, onk_entity_id = 
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>', methods=['GET'])
-def get_related_entities(kind, entity_id, related_kind):
+@app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>/<int:rk_entity_id>/<string:subrelated_kind>', methods=['GET'])
+def get_related_entities(kind, entity_id, related_kind, rk_entity_id=None, subrelated_kind=None):
+
     """
     curl -i -X GET localhost:8002/entities/student/1/teacher
 
@@ -291,7 +293,15 @@ def get_related_entities(kind, entity_id, related_kind):
     curl -X GET localhost:8002/entities/teacher/4/imparts | python -mjson.tool
 
     """
-    return process_response(EntitiesManager.get_related(kind, entity_id, related_kind, request.args.get('params', None)))
+    print locals()
+    return process_response(EntitiesManager.get_related(kind=kind,
+                                                        entity_id=entity_id,
+                                                        related_kind=related_kind,
+                                                        rk_entity_id=rk_entity_id,
+                                                        subrelated_kind=subrelated_kind,
+                                                        params=request.args.get('params', None)))
+
+
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>/report', methods=['GET'])

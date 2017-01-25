@@ -16,16 +16,28 @@ angular.module('teachers')
         // References to functions.
         vm.addRelation = addRelation;
         vm.updateTeacher = updateTeacher;
+
+        vm.showDeleteClassConfirm = showDeleteClassConfirm;
+        vm.showDeleteSubjectConfirm = showDeleteSubjectConfirm;
         vm.showDeleteTeacherConfirm = showDeleteTeacherConfirm;
         vm.showDeleteTeacherImpartConfirm = showDeleteTeacherImpartConfirm;
 
+
+        vm.loadStudents = loadStudents;
+        vm.loadTeaching = loadTeaching;
+        //vm.loadReports = loadReports;
+
+        // Vars to control entity values edition.
+        vm.editValuesEnabled = false;
+        vm.updateButtonEnable = false;
+        // Functions references to control entity values edition.
+        vm.modValues = modValues;
+        vm.cancelModValues = cancelModValues;
 
         vm.defaultAvatar = globalService.defaultAvatar;
 
         // An array of promises from calls.
         var promises = [];
-
-
 
 
         activate();
@@ -35,6 +47,23 @@ angular.module('teachers')
             console.log('Activating teachersProfileController controller.');
             vm.addButtonEnable = false;
             loadData();
+        }
+
+
+        /**
+         * Load only the teaching info about this teacher.
+         */
+        function loadTeaching() {
+            vm.teacherTeaching = TeachersService.getTeaching({id: vm.teacherId},
+                function () {
+                    console.log('Teacher Teaching Data Block');
+                    console.log(vm.teacherTeaching);
+                }, function (error) {
+                    console.log('Get teacher teaching process fail.');
+                    console.log(error);
+                    toastService.showToast('Error obteniendo los datos de docencia del profesor.')
+                }
+            );
         }
 
         function loadData() {
@@ -64,11 +93,13 @@ angular.module('teachers')
                 $scope.teacherModelHasChanged = false;
 
                 $scope.$watch('vm.teacher', function (newValue, oldValue) {
-                    if (newValue != oldValue) {
-                        $scope.teacherModelHasChanged = !angular.equals(vm.teacher, vm.teacherOriginalCopy);
-                    }
-                    compare()
+                    $scope.teacherModelHasChanged = !angular.equals(vm.class, vm.teacherOriginalCopy);
+                    if ($scope.teacherModelHasChanged)
+                        vm.updateButtonEnable = true;
+                    else
+                        vm.updateButtonEnable = false;
                 }, true);
+
 
 
             }, function (error) {
@@ -102,6 +133,9 @@ angular.module('teachers')
                     toastService.showToast('Error obteniendo la docencia del profesor.')
                 }
             )
+
+            loadTeaching();
+
         }
 
         function formUpdated() {
@@ -129,14 +163,20 @@ angular.module('teachers')
             }
         }
 
-        /**
-         * Open the dialog to add a relation to this teacher.
-         * The add action is done in addUserToProjectController
+        /*
+         * Open the dialog to add a relation to this class.
+         * The add action is done in addRelationController in addRelation.js
          */
-        function addRelation() {
+        function addRelation(itemTypeToAdd, secondaryItem) {
 
             $mdDialog.show({
-                locals: {parentScope: $scope, parentController: vm},
+                locals: {
+                    parentScope: $scope,
+                    parentController: vm,
+                    itemTypeToAdd: itemTypeToAdd,
+                    secondaryItem: secondaryItem
+                },
+                // We use the same basic controller.
                 controller: 'addRelationController',
                 controllerAs: 'vm',
                 templateUrl: 'app/views/teaching/utils/addRelationTemplate.html'
@@ -168,7 +208,7 @@ angular.module('teachers')
 
         }
 
-        function deleteTeacherImpart(subjectId, classId){
+        function deleteTeacherImpart(subjectId, classId) {
 
             // We need delete from data block copy the item selected:
             for (var i = 0; i < vm.teacherImparts.length; i++)
@@ -176,7 +216,7 @@ angular.module('teachers')
                     var numClasses = vm.teacherImparts[i].classes.length;
                     if (numClasses == 1)
                         vm.teacherImparts.splice(i, 1);
-                    else{
+                    else {
                         var classIndex = -1;
                         for (var j = 0; j < numClasses; j++)
                             if (vm.teacherImparts[i].classes[j].classId == classId)
@@ -227,72 +267,189 @@ angular.module('teachers')
         };
 
 
-        /** Update teacher data in server.
-         * Call to server with PUT method ($update = PUT) using vm.teacher that is
-         * a instance of TeachersService.*/
-        function updateTeacher() {
-            console.log('Calling updateTeacher() function.')
+        /** Delete class related with a the subject that the teacher impart, is a impart entity.
+         * Call to server with DELETE method ($delete= DELETE) using vm.class that is
+         * a instance of ClassesService.*/
+        function deleteClass(impartId) {
+
+            ImpartsService.delete({id: impartId},
+                function () { // Success
+                    console.log('Impart relation deleted successfully.')
+                    toastService.showToast('Relación imparte eliminada con éxito.')
+                    loadTeaching();
+                },
+                function (error) { // Fail
+                    console.log('Impart deleted process fail.')
+                    console.log(error)
+                    toastService.showToast('Error eliminando la relación imparte.')
+                });
+
+        }
+
+        /** Show the previous step to delete item, a confirm message */
+        function showDeleteClassConfirm(impartId) {
+
+            var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere eliminar este grupo?')
+                //.textContent('Si lo hace todos los alumnos quedarán ')
+                //.ariaLabel('Lucky day')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteClass(impartId);
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        };
 
 
-            // El array de promises está decalrado arriba.
+        function deleteSubject(teachingItem) {
 
-            //Introduzco en el array todas las llamadas que se van a realizar.
+            // We have a lot of class where the teacher impart this subject, so we look at in teachingItem
+            // which are this classes and which are the impartId identificator to delete this in a list of deletions.
 
-            if ($scope.teacherModelHasChanged) { // We update teacher data.
-                // A dirty solution to problem that does that the date is saved with a day minus.
-                vm.teacher.birthdate.setDate(vm.teacher.birthdate.getDate() + 1);
+            var promises = [];
+            var deferred = $q.defer();
 
-                var deferred = $q.defer();
-
-                var promise = vm.teacher.$update(
-                    function () { // Success
-                        deferred.resolve('Success updating the teacher with vm.teacher.$update.');
+            for (var i = 0; i < teachingItem.classes.length; i++) {
+                ImpartsService.delete({id: teachingItem.classes[i].impartId},
+                    function () {
+                        deferred.resolve('Success deleting the impart relation with ImpartService.$delete');
                     },
-                    function (error) { // Fail
-                        deferred.reject('Error updating the teacher with vm.teacher.$update, error: ' + error)
+                    function (error) {
+                        deferred.reject('Error deleting the the impart relation with ImpartService.$delete, error: ' + error)
                     });
-                promises.push(deferred.promise)
+                promises.push(deferred.promise);
             }
 
-
-            if ($scope.teacherImpartsModelHasChanged) { // We update the teacher imparts info.
-
-                console.log('teacherImpartsOriginalCopy')
-                console.log(vm.teacherImpartsOriginalCopy)
-                console.log('teacherImparts')
-                console.log(vm.teacherImparts)
-                // Algorithm that compare both data blocks and save or delete accordingly.
-                processDiferences(vm.teacherImpartsOriginalCopy, vm.teacherImparts)
-
-
-            }
-
-
-            // Ejecuto el array de llamadas y en controlo si existe algún error para mostrarselo al usuario de forma general
-            // y si all ha funcionado recargar los datos y mostrar tb mensaje de confirmación.
-            console.log('Promises')
-            console.log(promises)
 
             $q.all(promises).then(
                 function (value) {
                     console.log('Resolving all promises, SUCCESS,  value: ')
                     console.log(value);
-                    toastService.showToast('Profesor actualizado con éxito.');
+                    toastService.showToast('Asignatura eliminada con exito.');
 
-                    // It reloaded all data to avoid problems.
-                    // How wait to exit from teacher.$update
-                    loadData();
-
-                    promises = [];
+                    loadTeaching();
 
                 }, function (reason) {
                     console.log('Resolving all promises, FAIL, reason: ')
                     console.log(reason);
-                    toastService.showToast('Error actualizando al profesor.');
+                    toastService.showToast('Error eliminando la asignatura.');
                 }
-            )
+            );
+
+        }
+
+        function showDeleteSubjectConfirm(teachingItem) {
+            var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere eliminar esta asignatura? Si lo hace, también eliminará las matrículas' +
+                    'de los estudiantes matriculados a esta.')
+                //.textContent('Si lo hace todos los alumnos quedarán ')
+                //.ariaLabel('Lucky day')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteSubject(teachingItem);
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        }
 
 
+        /** Update teacher data in server.
+         * Call to server with PUT method ($update = PUT) using vm.teacher that is
+         * a instance of TeachersService.*/
+        function updateTeacher() {
+            console.log('Calling updateTeacher() function.')
+            // A dirty solution to problem that does that the date is saved with a day minus.
+            vm.teacher.birthdate.setDate(vm.teacher.birthdate.getDate() + 1);
+
+            vm.teacher.$update(
+                function () { // Success
+                    console.log('Teacher updated successfully.')
+                    toastService.showToast('Profesor actualizado con éxito.')
+                    vm.editValuesEnabled = false;
+                    vm.updateButtonEnable = false;
+                },
+                function (error) { // Fail
+                    console.log('Error updating teacher.')
+                    console.log(error)
+                    toastService.showToast('Error actualizando el profesor.')
+                });
+
+
+        }
+
+        function modValues() {
+            vm.editValuesEnabled = true;
+        }
+
+        function cancelModValues() {
+            vm.editValuesEnabled = false;
+            vm.teacher = angular.copy(vm.teacherOriginalCopy);
+        }
+
+        /**
+         * Load the list of students
+         * @param associationId
+         */
+        function loadStudents(subjectId, classId) {
+
+
+            // To show the classes of the subject we charge the list of it when the subjectId is passed
+            if (subjectId) {
+
+                for (var a = 0; a < vm.teacherTeaching.length; a++) {
+                    if (vm.teacherTeaching[a].subject.subjectId == subjectId) {
+                        vm.classes = vm.teacherTeaching[a].classes
+                    }
+                }
+
+                console.log('CLASSES')
+                console.log(vm.classes)
+
+            }
+
+
+            console.log('loadStudents subjectId')
+            console.log(subjectId)
+
+            if (!subjectId && !classId) {
+
+                console.log('No hay ni asignaturas ni clases');
+
+                // We want all students that is related with this class, independently of the subject from which come.
+
+                vm.teacherStudents = TeachersService.getStudents({id: vm.teacherId},
+                    function () {
+                        console.log('Teacher Students');
+                        console.log(vm.teacherStudents);
+                    },
+                    function (error) {
+                        console.log('Get teacher students process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos a los que da clase el profesor.');
+                    }
+                );
+            }
+            if (subjectId && !classId) {
+                console.log('Solo la clase');
+                vm.teacherStudents = TeachersService.getStudentsFromSubject({id: vm.teacherId, idSubject: subjectId},
+                    function () {
+                        console.log('Teacher Students from subject call sucess.');
+                        console.log(vm.teacherStudents);
+                    },
+                    function (error) {
+                        console.log('Get teacher students from subject process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos a los que da clase el profesor para la asignatura.');
+                    }
+                );
+            }
         }
 
 
@@ -373,7 +530,7 @@ angular.module('teachers')
                                 nestedDeferred.resolve('Success saving the impart relation with ImpartService $save');
                             },
                             function (error) { // Fail
-                               nestedDeferred.reject('Error saving the the impart relation with ImpartService $save, error: ' + error)
+                                nestedDeferred.reject('Error saving the the impart relation with ImpartService $save, error: ' + error)
                             })
                     },
                     function (error) { // Fail

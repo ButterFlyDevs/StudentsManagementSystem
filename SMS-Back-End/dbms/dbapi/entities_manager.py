@@ -473,9 +473,6 @@ class EntitiesManager:
             # Los parámetros no son los correctos.
             print 'ERROR'
 
-
-
-
     @classmethod
     def delete(cls, kind, entity_id, actions=None):
         # If the update is delete an item, we not want send the erased data.
@@ -606,8 +603,58 @@ class EntitiesManager:
 
         return item_dict
 
+    # TODO: review this code and improve!
     @classmethod
-    def get_related(cls, kind, entity_id, related_kind, params=None, with_special_sorter=True, internal_call=False):
+    def get_special_related(cls, kind, entity_id, related_kind, rk_entity_id, subrelated_kind, params):
+
+        return_dic = {}
+
+        if rk_entity_id is not None and subrelated_kind is not None:
+            if rk_entity_id <= 0 or kind != 'teacher' or related_kind != 'subject' or subrelated_kind != 'student':
+
+                return_dic['status'] = 1048  # Bad requests with log.
+                return_dic['log'] = 'special teacher/n/subject/m/stduent is malformed nested build.'.format(related_kind)
+
+                return return_dic
+
+            else:
+
+                #  We are going to build a bit more complex response.
+                #  First of all we are going to get the teaching of teacher, before we will search the subject passed
+                #  and try to get all students related with the classes inside of the subject, and withour repating
+                #  it would be inserted in a list to be returned.
+                data_block = cls.get_related(kind, entity_id, 'teaching')
+                print colored(data_block, 'green')
+
+                classes = []
+
+                for item in data_block.get('data'):
+                    if item.get('subject').get('subjectId') == rk_entity_id:
+                        classes = item.get('classes')
+                print colored(classes, 'blue')
+                associations = []
+                for item in classes:
+                    associations.append((cls.get('impart', item.get('impartId')).get('data')).get('associationId'))
+
+                #print colored(associations, 'green')
+
+                # We call impart resource, and from it call to associations and from it the students (is a heavy way but
+                # we don't need add new complex queries.
+                students = []
+                for asso in associations:
+                    sub_students_list = (cls.get_related('association', asso, 'student')).get('data')
+                    for student in sub_students_list:
+                        students.append(student)
+
+                print colored(students, 'green')
+                students = [dict(t) for t in set([tuple(d.items()) for d in students])]
+                print colored(students, 'blue')
+
+            return {'status':1, 'data': students}
+
+
+    @classmethod
+    def get_related(cls, kind, entity_id, related_kind, rk_entity_id=None, subrelated_kind=None, params=None, with_special_sorter=True, internal_call=False):
         """Devuelve una lista de diccionarios con la información pedida."""
 
         print 'get_related'
@@ -619,6 +666,10 @@ class EntitiesManager:
         return_dic = {}
 
         # Avoiding errors with nested resources :
+
+        if rk_entity_id is not None and subrelated_kind is not None:
+            return cls.get_special_related(kind, entity_id, related_kind, rk_entity_id, subrelated_kind, params)
+
 
         if kind == related_kind:
             return_dic['status'] = 1048  # Bad requests with log.
@@ -666,7 +717,7 @@ class EntitiesManager:
         num_elements = 0  # By default any entity is retrieved.
         log = None
 
-        query = "SELECT COUNT(*) FROM {} where {}Id = {};".format(kind, kind, entity_id)
+        query = 'SELECT COUNT(*) FROM {} where {}Id = {};'.format(kind, kind, entity_id)
         print query
         exists = 0;
 
@@ -677,24 +728,12 @@ class EntitiesManager:
         if data_block['status'] == 1:
             count = data_block['data']['COUNT(*)']
 
-
-
-        # If the query execute has success we are going to retrieve all data saved in database about this item.
-        #if status_value == 1:
-        #    result = cursor.fetchone()
-        #    exists = result.items()[0][1]  # Because with our way to get data we have a dict.
-
-        #db.commit()
-
         # IF element doesn't exists we need abort here.
         if count != 1:
             return_dic['status'] = -1
-            #cursor.close()
-            #db.close()
             return return_dic
 
         query = ''
-
 
         # Preparation of params passed if they exists:
         query_params = ''
@@ -715,8 +754,6 @@ class EntitiesManager:
 
         else:
             query_params += ' * '
-
-
 
         if kind == 'student':  # Queremos buscar entidades relacionadas con una entidad de tipo student
 
@@ -759,7 +796,6 @@ class EntitiesManager:
                 status = 1054 # Bad request
                 return ({'status': status, 'log': log})
 
-
         elif kind == 'association':
             if related_kind == 'student':
                 #query = 'select {0} from student where studentId IN (SELECT studentId, enrollmentId FROM enrollment where associationId={1} and deleted={2});'.format(query_params, entity_id, 0)
@@ -772,7 +808,6 @@ class EntitiesManager:
                       'student'.format(related_kind)
                 status = 1054  # Bad request
                 return ({'status': status, 'log': log})
-
 
         elif kind == 'class': # Info about entities related with the class kind entity.
 
@@ -814,9 +849,6 @@ class EntitiesManager:
                     query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
                         0, 0, entity_id)
 
-
-
-
         elif kind == 'subject':  # Queremos buscar entidades relacionadas con una entidad de tipo subject.
             if related_kind == 'student':
                 query = 'SELECT studentId, name, surname from student where deleted = {1} and studentId in ' \
@@ -847,35 +879,9 @@ class EntitiesManager:
                 log = '   {}    is not a valid nested resource to subject. There are the valid options: ' \
                       'student, teacher, association, impart, enrollment, class'.format(related_kind)
                 status = 1054  # Bad request
-                return ({'status': status, 'log': log})
+                return {'status': status, 'log': log}
 
-
-
-        #status_value, num_elements, log = sql_executor(cursor, query)
         return_dic = sql_executor(query, 'list')
-
-        """
-        if status_value == 1:
-
-            entities_list = []
-
-            if num_elements > 0:
-
-                row = cursor.fetchone()
-                while row is not None:
-                    row = dict((k, v) for k, v in row.iteritems() if v)  # To delete None values
-                    entities_list.append(row)
-                    row = cursor.fetchone()
-
-            return_dic['data'] = entities_list
-
-        return_dic['status'] = status_value
-        return_dic['log'] = log
-
-        db.commit()
-        cursor.close()
-        db.close()
-        """
 
         # Optional SORTERS CALLs
 

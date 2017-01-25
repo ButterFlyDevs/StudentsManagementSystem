@@ -201,8 +201,10 @@ def delete_entity(kind, entity_id, optional_nested_kind = None, onk_entity_id = 
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
+
 @app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>', methods=['GET'])
-def get_related_entities(kind, entity_id, related_kind):
+@app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>/<int:rk_entity_id>/<string:subrelated_kind>', methods=['GET'])
+def get_related_entities(kind, entity_id, related_kind, rk_entity_id=None, subrelated_kind=None):
     """
 
     :param kind:
@@ -214,7 +216,10 @@ def get_related_entities(kind, entity_id, related_kind):
        curl -i -X GET localhost:8001/entities/student/1/teacher
     """
 
-    url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id) + '/' + str(related_kind)
+    url = 'http://{}/entities/{}/{}/{}'.format(modules.get_hostname(module='dbms'),kind,entity_id, related_kind)
+
+    if rk_entity_id and subrelated_kind:
+        url += '/{}/{}'.format(rk_entity_id, subrelated_kind)
 
     response = requests.get(url)
     response = make_response(response.content, response.status_code)

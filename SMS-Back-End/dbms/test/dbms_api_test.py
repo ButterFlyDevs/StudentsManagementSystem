@@ -1188,6 +1188,7 @@ class TestClass:
             for element in basic_list:
                 res = requests.get(url='{}/{}/{}/{}'.format(url, item, 1, element))
                 print res.url
-                assert res.status_code == 400 and 'is not a valid nested resource.' in res.text
+                if item != 'enrollment' and element != 'student':
+                    assert res.status_code == 400 and 'is not a valid nested resource.' in res.text
 
         # There are a lot of test that we could be do still.

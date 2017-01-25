@@ -1,17 +1,14 @@
 angular.module('classes')
     .directive('chart', chartDirective)
-    .controller('classesProfileController', function ($scope, $resource, $state, $stateParams, $mdDialog, ClassesService, AssociationsService, EnrollmentsService, ImpartsService, toastService) {
+    .controller('classesProfileController', function ($scope, $resource, $state, $stateParams, $mdDialog, ClassesService, AssociationsService, EnrollmentsService, ImpartsService, toastService, globalService) {
 
         var vm = this;
 
-        // Vars:
         vm.controllerName = 'classesProfileController';
         vm.classId = $stateParams.classId;
 
-        vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g';
-
-        vm.editValuesEnabled = false;
-        vm.updateButtonEnable = false; // To control when the update button could be enabled.
+        // Default img to users without it
+        vm.defaultAvatar = globalService.defaultAvatar;
 
         // References to functions.
         vm.updateClass = updateClass;
@@ -25,6 +22,10 @@ angular.module('classes')
         vm.loadTeaching = loadTeaching;
         vm.loadReports = loadReports;
 
+        // Vars to control entity values edition.
+        vm.editValuesEnabled = false;
+        vm.updateButtonEnable = false;
+        // Functions references to control entity values edition.
         vm.modValues = modValues;
         vm.cancelModValues = cancelModValues;
 
@@ -156,17 +157,9 @@ angular.module('classes')
         }
 
 
-        function modValues() {
-            vm.editValuesEnabled = true;
-        }
+        function modValues() { vm.editValuesEnabled = true; }
+        function cancelModValues() { vm.editValuesEnabled = false; vm.class = angular.copy(vm.classOriginalCopy); }
 
-        function cancelModValues() {
-            vm.editValuesEnabled = false;
-
-            vm.class = angular.copy(vm.classOriginalCopy);
-
-
-        }
 
         /** Delete class in server.
          * Call to server with DELETE method ($delete= DELETE) using vm.class that is
