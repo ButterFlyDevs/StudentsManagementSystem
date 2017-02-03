@@ -26,7 +26,7 @@ import productionCloudSQLInstanceINFO as psqlinfo
 def conecta():
 
     if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):
-        return MySQLdb.connect(unix_socket='/cloudsql/' + psqlinfo._INSTANCE_NAME, db=db, user='root', charset='utf8', cursorclass=MySQLdb.cursors.DictCursor)
+        return MySQLdb.connect(unix_socket='/cloudsql/' + 'sms-back-end:dbms-db', db=db, user='root', passwd='root', charset='utf8', cursorclass=MySQLdb.cursors.DictCursor)
     else:
         return MySQLdb.connect(host, user, password, db, charset='utf8', cursorclass=MySQLdb.cursors.DictCursor);
 

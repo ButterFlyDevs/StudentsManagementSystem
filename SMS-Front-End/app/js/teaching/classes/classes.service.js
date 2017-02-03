@@ -1,8 +1,10 @@
 angular.module('classes')
     .factory("ClassesService",
-        function($resource) {
+        function($resource, globalService) {
 
-         var restPath = 'http://localhost:8001/entities/class/';
+
+
+         var restPath = 'http://'+globalService.defaultMicroServicesURL+'/entities/class/';
 
          return $resource(restPath + ':id', {id: '@classId'}, {
 
@@ -11,7 +13,6 @@ angular.module('classes')
                  url: restPath + ':id' + '/teaching',
                  isArray: true
              },
-
              'getReport': {
                  method: 'GET',
                  url: restPath + ':id' + '/report'

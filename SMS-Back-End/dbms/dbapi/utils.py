@@ -1,3 +1,14 @@
+from termcolor import colored
+import inspect
+
+def logger(func):
+    def real_loger(*args, **kwargs):
+        print colored('LOGGER')
+        print colored('Function: '+func.__name__, 'green')
+        print colored(args[1:], 'green')
+
+    return real_loger
+
 class sorters(object):
 
     @classmethod

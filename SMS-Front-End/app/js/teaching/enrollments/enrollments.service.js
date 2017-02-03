@@ -1,8 +1,8 @@
 angular.module('enrollments')
     .factory("EnrollmentsService",
-        function($resource) {
+        function($resource, globalService) {
 
-         var restPath = 'http://localhost:8001/entities/enrollment/';
+         var restPath = 'http://'+globalService.defaultMicroServicesURL+'/entities/enrollment/';
 
          return $resource(restPath + ':id', {}, {
                  'multiple_save': {

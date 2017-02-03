@@ -21,7 +21,15 @@ General considerations
 **Teacher** Resource
 --------------------
 
-A teacher is a person that impart class to students and with our model it is possible only when is related with a subject that is associated with a class. This are the basic operations with their methods:
+A teacher entity represent a person that impart class to students and with our model it is possible only when
+is related with a subject that is associated with a class.
+
+A teacher entity have a lot of values but thete are one that is always necessary: the name. You can't save a new
+item without it. For other hands can be exists some entities with the same name but never with the same 'dni' (Spanish
+National Document).
+
+
+These are the basic operations with the entity:
 
 
 GET
@@ -56,7 +64,7 @@ If the kind haven't the param passed it will return a ``400 Bad Request``.
 It means that the model haven't this attribute in his definition.
 
 
-Post
+POST
 ****
 
 You can insert a new item in the data base of microservice using the same resource with ``POST`` method. The data is needed to pass in JSON format.
@@ -77,8 +85,8 @@ There are some **errors** that you can see in some cases:
 - If you pass an empty dictionary or one without the require values or some on attributes name are wrong you will receive an ``400 Bad Request``
 - If the name of resource is write wrong, like 'teachsk' instead of teacher the response will be ``404 Not found``
 
-Put
-******
+PUT
+***
 
 To *update* a resource only is necessary call itself with ``PUT`` method. For example: ::
 
@@ -89,7 +97,7 @@ The update of this resource retrieve all data from this item, now including the 
 
 The erros that this method can be produce with this resource are the same that with ``POST``.
 
-Delete
+DELETE
 ******
 
 We can delete a resource using the DELETE HTTP method, for example: ::
@@ -127,7 +135,7 @@ Related resources
 *****************
 
 Teacher like another resources have a nested/related resources, in this case
-the basic are: *subject*, *class*, *student*. Each one give a list of 
+the basic are: **subject**, **class** and **student**. Each one give a list of
 the items of the kind related with the teacher with `200` status code or in
 case of the it doesn't exists yet a `204` code without content in body.
 
@@ -146,7 +154,7 @@ case of the it doesn't exists yet a `204` code without content in body.
 Special case A
 **************
 
-There are a special resource to teacher resources, it is ``teaching`` ::
+There is a special resource to teacher resources, it is ``teaching`` ::
 
     GET .../teacher/n/teaching  
  

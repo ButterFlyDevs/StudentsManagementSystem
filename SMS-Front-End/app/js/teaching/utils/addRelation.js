@@ -129,7 +129,36 @@ angular.module('teachers')
             }
             if (parentController.controllerName == 'studentsProfileController') {
                 vm.itsAboutStudent = true;
-                console.log('Its about student')
+                console.log('Its about student');
+                vm.studentId = parentController.studentId;
+                vm.studentTeaching = parentController.studentTeaching;
+
+                // From student profile view we want add a new relatión with it and a association relation between
+                // a subject and a class.
+                if (vm.itemTypeToAdd == 'class-subject') {
+
+                    vm.associationsList = AssociationsService.query({}, function () {
+                        console.log('List of associations retrieved.');
+                        console.log(vm.associationsList);
+                    }, function () {
+                        console.log('Any problem found when was retrieved the associations list.');
+                    });
+
+                    vm.classesList = ClassesService.query({}, function () {
+                        console.log('List of clases retrieved.');
+                        console.log(vm.classesList);
+                    }, function () {
+                        console.log('Any problem found when was retrieved the classes list.');
+                    });
+
+                    vm.subjectsList = SubjectsService.query({}, function () {
+                        console.log('List of subjects retrieved.');
+                        console.log(vm.subjectsList);
+                    }, function () {
+                        console.log('Any problem found when was retrieved the subjects list.');
+                    });
+
+                }
             }
             if (parentController.controllerName == 'subjectsProfileController') {
 
@@ -324,7 +353,6 @@ angular.module('teachers')
                  */
             }
 
-
             if (vm.itsAboutSubject && vm.itemTypeToAdd == 'class') {
                 var newAssociation = new AssociationsService({classId: vm.itemSelected, subjectId: vm.subjectId});
                 newAssociation.$save(
@@ -438,15 +466,15 @@ angular.module('teachers')
                 var associationExists = false;
                 var associationId = null;
 
-                for (var a=0; a<vm.associationsList.length; a++)
+                for (var a = 0; a < vm.associationsList.length; a++)
                     if (vm.associationsList[a].classId == vm.exchangeVar.classId && vm.associationsList[a].subjectId == vm.exchangeVar.subjectId) {
                         associationExists = true;
                         associationId = vm.associationsList[a].associationId;
                     }
 
 
-                 // If exists we only need associate the teacher with it.
-                 if (associationExists) {
+                // If exists we only need associate the teacher with it.
+                if (associationExists) {
                     var newImpart = new ImpartsService({
                         teacherId: vm.teacherId,
                         associationId: associationId
@@ -460,38 +488,90 @@ angular.module('teachers')
                             toastService.showToast('Error creando la relación.')
                         });
 
-                // If not exists we need to do two steps.
+                    // If not exists we need to do two steps.
                 } else {
 
-                     // First: create the association between the class selected in the dialog and the subject selected in the teacher view.
-                     var newAssociation = new AssociationsService({
-                         // Using the values in the exchange variable, from checkSelectedItem
-                         subjectId: vm.exchangeVar.subjectId,
-                         classId: vm.exchangeVar.classId
-                     });
-                     newAssociation.$save(
-                         function () { // Success
+                    // First: create the association between the class selected in the dialog and the subject selected in the teacher view.
+                    var newAssociation = new AssociationsService({
+                        // Using the values in the exchange variable, from checkSelectedItem
+                        subjectId: vm.exchangeVar.subjectId,
+                        classId: vm.exchangeVar.classId
+                    });
+                    newAssociation.$save(
+                        function () { // Success
 
-                             // Second: Create the relation between the teacher and this.
-                             var newImpart = new ImpartsService({
-                                 teacherId: vm.teacherId,
-                                 associationId: newAssociation.associationId
-                             });
-                             newImpart.$save(
-                                 function () { // Success
-                                     toastService.showToast('Relación entre asignatura, grupo y profesor.creada con éxito.')
-                                     parentController.loadTeaching();  // Reload the teaching data block.
-                                 },
-                                 function (error) { // Fail
-                                     toastService.showToast('Error creando la relación multiple..')
-                                 });
+                            // Second: Create the relation between the teacher and this.
+                            var newImpart = new ImpartsService({
+                                teacherId: vm.teacherId,
+                                associationId: newAssociation.associationId
+                            });
+                            newImpart.$save(
+                                function () { // Success
+                                    toastService.showToast('Relación entre asignatura, grupo y profesor.creada con éxito.')
+                                    parentController.loadTeaching();  // Reload the teaching data block.
+                                },
+                                function (error) { // Fail
+                                    toastService.showToast('Error creando la relación multiple..')
+                                });
 
 
-                         },
-                         function (error) { // Fail
-                             toastService.showToast('Error asociando la asignatura a este grupo.')
-                         });
-                 }
+                        },
+                        function (error) { // Fail
+                            toastService.showToast('Error asociando la asignatura a este grupo.')
+                        });
+                }
+
+            }
+
+            if (vm.itsAboutStudent && vm.itemTypeToAdd == 'class-subject') {
+                // When we do that one teacher impart to an association between a class and subject.
+
+                if (vm.associationExists) {
+                    var newEnrollment = new EnrollmentsService({
+                        studentId: vm.studentId,
+                        associationId: vm.selectedAssociationId
+                    });
+                    newEnrollment.$save(
+                        function () { // Success
+                            toastService.showToast('Relación creada con éxito.')
+                            parentController.loadTeaching();  // Reload the teaching data block.
+                        },
+                        function (error) { // Fail
+                            toastService.showToast('Error creando la relación.')
+                        });
+
+
+                } else {
+
+                    // First: create the association.
+                    var newAssociation = new AssociationsService({
+                        subjectId: vm.subjectSelected,
+                        classId: vm.classSelected
+                    });
+                    newAssociation.$save(
+                        function () { // Success
+                            toastService.showToast('Asignatura asociada con éxito.');
+
+                            var newEnrollment = new EnrollmentsService({
+                                studentId: vm.studentId,
+                                associationId: newAssociation.associationId
+                            });
+                            newEnrollment.$save(
+                                function () { // Success
+                                    toastService.showToast('Relación creada con éxito.')
+                                    parentController.loadTeaching();  // Reload the teaching data block.
+                                },
+                                function (error) { // Fail
+                                    toastService.showToast('Error creando la relación.')
+                                });
+
+
+                        },
+                        function (error) { // Fail
+                            toastService.showToast('Error asociando la asignatura a este grupo.')
+                        });
+
+                }
 
             }
 
@@ -734,7 +814,7 @@ angular.module('teachers')
                     var teachingItem = secondaryItem;
 
                     // To use when we execute saveRelation function.
-                    vm.exchangeVar = {classId: classId, subjectId: teachingItem.subject.subjectId }
+                    vm.exchangeVar = {classId: classId, subjectId: teachingItem.subject.subjectId}
 
                     for (var i = 0; i < teachingItem.classes.length; i++)
                         if (classId == teachingItem.classes[i].classId) {
@@ -743,6 +823,49 @@ angular.module('teachers')
                         }
 
                 }
+            }
+
+            if (vm.itsAboutStudent && vm.itemTypeToAdd == 'class-subject') {
+
+                if (firstItemSelected && secondItemSelected != -1) {
+
+                    console.log(vm.teacherTeaching)
+                    console.log(firstItemSelected)
+                    console.log(secondItemSelected)
+
+                    /* In this case firstItemSelected is the subjectSelect (subjectId).
+                     For other hand secondItemSelected is classSelected (classId)*/
+
+                    // We check first if the pair subjectId - classId exists already in the teacherTeaching  data block.
+                    for (var i = 0; i < vm.studentTeaching.length; i++)
+                        if (vm.studentTeaching[i].class.classId == secondItemSelected)
+                            if (vm.studentTeaching[i].subjects)
+                                for (var j = 0; j < vm.studentTeaching[i].subjects.length; j++)
+                                    if (vm.studentTeaching[i].subjects[j].subjectId == firstItemSelected) {
+                                        vm.errorExists = true;
+                                        vm.errorMessage = "El alumno ya esta matriculado en esta asignatura en este grupo.";
+                                    }
+
+
+                    // After we check if this relation exists or must be created in this instant.
+                    vm.associationExists = false;
+                    console.log(vm.associationsList);
+                    for (var i = 0; i < vm.associationsList.length; i++)
+                        if (vm.associationsList[i].subjectId == firstItemSelected && vm.associationsList[i].classId == secondItemSelected) {
+                            vm.associationExists = true;
+                            vm.selectedAssociationId = vm.associationsList[i].associationId;
+                        }
+
+                    if (!vm.associationExists) {
+                        vm.infoExists = true;
+                        vm.infoMessage = 'La relación entre la clase y la asignatura seleccionada no existe aun. ' +
+                            'Si acepta la creara al mismo tiempo que matricula al alumno.';
+                    }
+
+
+                } else
+                // A subject and a class must be select. In this case isn't necessary show any message.
+                    vm.errorExists = true;
             }
 
         }

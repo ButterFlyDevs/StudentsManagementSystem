@@ -1,5 +1,5 @@
 angular.module('subjects')
-    .controller('subjectsProfileController', function ($scope, $resource, $q, $state, $stateParams, $mdDialog, SubjectsService, EnrollmentsService, ClassesService, AssociationsService, ImpartsService, toastService) {
+    .controller('subjectsProfileController', function ($scope, $resource, $q, $state, $stateParams, $mdDialog, SubjectsService, EnrollmentsService, ClassesService, AssociationsService, ImpartsService, toastService, globalService) {
 
         var vm = this;
 
@@ -25,14 +25,16 @@ angular.module('subjects')
         vm.loadReports = loadReports;
 
 
-
         vm.modValues = modValues;
         vm.cancelModValues = cancelModValues;
 
-        vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
+        vm.defaultAvatar = globalService.defaultAvatar;
 
-        // An array of promises from calls.
-        var promises = [];
+        // To control the loading spinner.
+        vm.dataIsReady = false;
+        vm.studentDataIsReady = false;
+        vm.teachingDataIsReady = false;
+
 
         activate();
 
@@ -40,25 +42,91 @@ angular.module('subjects')
         function activate() {
             console.log('Activating subjectsProfileController controller.')
             loadData()
-
-
         }
-
 
         /**
          * Load only the teaching info about this class.
          */
         function loadTeaching() {
+            vm.teachingDataIsReady = false;
             vm.subjectTeaching = SubjectsService.getTeaching({id: vm.subjectId},
                 function () {
-                    console.log('Subject Teaching Data Block');
-                    console.log(vm.subjectTeaching);
+                    vm.dataIsReady = true;
+                    vm.teachingDataIsReady = true;
                 }, function (error) {
                     console.log('Get subject teaching process fail.');
                     console.log(error);
                     toastService.showToast('Error obteniendo las asignaturas que se imparten en la clase.')
-                }
-            );
+                });
+        }
+
+        /**
+         * Load the list of students
+         * @param associationId
+         */
+        function loadStudents(associationId) {
+
+            vm.studentDataIsReady = false;
+
+            if (!associationId) {
+
+                // We want all students that is related with this subject, independently of the class from which come.
+
+                vm.subjectStudents = SubjectsService.getStudents({id: vm.subjectId},
+                    function () {
+                        vm.studentDataIsReady = true;
+                    },
+                    function (error) {
+                        console.log('Get subject students process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos matriculados.');
+                    }
+                );
+            }
+            else {
+                vm.subjectStudents = AssociationsService.getStudents({id: associationId},
+                    function () {
+                        vm.studentDataIsReady = true;
+                    },
+                    function (error) {
+                        console.log('Get Class- subject students process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos matriculados en este grupo.');
+                    }
+                );
+            }
+        }
+
+
+        function deleteStudent(enrollmentId, kind) {
+            console.log('Deleting student from class.');
+            console.log(enrollmentId);
+            console.log(kind);
+
+            if (kind == 'enrollment')
+                EnrollmentsService.delete({id: enrollmentId},
+                    function () { // Success
+                        loadStudents(vm.associationIdSelected); // Reload the specific section.
+                        toastService.showToast('Relación eliminada con éxito.')
+                    },
+                    function (error) { // Fail
+                        console.log('Relation deleted process fail.');
+                        console.log(error)
+                        toastService.showToast('Error eliminando la relación.')
+                    });
+            else if (kind == 'student') {
+
+                SubjectsService.nested_delete({id: vm.subjectId, a: 'student', b: enrollmentId}, //nested_kind_plus_id Because the behaviour of $resource we pass the nested element this way.
+                    function () { // Success
+                        loadStudents(vm.associationIdSelected); // Reload the specific section.
+                        toastService.showToast('Relación múltiple eliminada con éxito.')
+                    },
+                    function (error) { // Fail
+                        console.log('Multiple relation deleted process fail.');
+                        console.log(error)
+                        toastService.showToast('Error eliminando la relación múltiple.')
+                    });
+            }
         }
 
         function loadReports() {
@@ -66,11 +134,11 @@ angular.module('subjects')
                 function () {
                     console.log('Subject Report Data Block');
                     console.log(vm.subjectReport);
-                    if (vm.subjectReport.report_log != null) {
-                        vm.chartConfig['series'][0]['data'][0]['y'] = vm.subjectReport['students']['gender_percentage']['M']
-                        vm.chartConfig['series'][0]['data'][1]['y'] = vm.subjectReport['students']['gender_percentage']['F'];
-                        console.log(vm.chartConfig);
-                    }
+                    //if (vm.subjectReport.report_log != null) {
+                    vm.chartConfig2['series'][0]['data'][0]['y'] = vm.subjectReport['students']['gender_percentage']['M']
+                    vm.chartConfig2['series'][0]['data'][1]['y'] = vm.subjectReport['students']['gender_percentage']['F'];
+                    console.log(vm.chartConfig2);
+                    //}
 
                 }, function (error) {
                     console.log('Get class report process fail.');
@@ -113,10 +181,7 @@ angular.module('subjects')
 
         function cancelModValues() {
             vm.editValuesEnabled = false;
-
             vm.subject = angular.copy(vm.subjectOriginalCopy);
-
-
         }
 
         function compare() {
@@ -167,7 +232,6 @@ angular.module('subjects')
 
         }
 
-
         function deleteTeacherFromClass(impartId) {
 
             ImpartsService.delete({id: impartId},
@@ -198,78 +262,6 @@ angular.module('subjects')
 
         }
 
-
-        /**
-         * Load the list of students
-         * @param associationId
-         */
-        function loadStudents(associationId) {
-
-            console.log('loadStudents associationId')
-            console.log(associationId)
-
-            if (!associationId) {
-
-                // We want all students that is related with this subject, independently of the class from which come.
-
-                vm.subjectStudents = SubjectsService.getStudents({id: vm.subjectId},
-                    function () {
-                        console.log('Subject Students');
-                        console.log(vm.subjectStudents);
-                    },
-                    function (error) {
-                        console.log('Get subject students process fail.');
-                        console.log(error);
-                        toastService.showToast('Error obteniendo los alumnos matriculados.');
-                    }
-                );
-            }
-            else {
-                vm.subjectStudents = AssociationsService.getStudents({id: associationId},
-                    function () {
-                        console.log('Subject Students');
-                        console.log(vm.subjectStudents);
-                    },
-                    function (error) {
-                        console.log('Get Class- subject students process fail.');
-                        console.log(error);
-                        toastService.showToast('Error obteniendo los alumnos matriculados en este grupo.');
-                    }
-                );
-            }
-        }
-
-
-        function deleteStudent(enrollmentId, kind) {
-            console.log('Deleting student from class.');
-            console.log(enrollmentId);
-            console.log(kind);
-
-            if (kind == 'enrollment')
-                EnrollmentsService.delete({id: enrollmentId},
-                    function () { // Success
-                        loadStudents(vm.associationIdSelected); // Reload the specific section.
-                        toastService.showToast('Relación eliminada con éxito.')
-                    },
-                    function (error) { // Fail
-                        console.log('Relation deleted process fail.');
-                        console.log(error)
-                        toastService.showToast('Error eliminando la relación.')
-                    });
-            else if (kind == 'student') {
-
-                SubjectsService.nested_delete({id: vm.subjectId, a: 'student', b: enrollmentId}, //nested_kind_plus_id Because the behaviour of $resource we pass the nested element this way.
-                    function () { // Success
-                        loadStudents(vm.associationIdSelected); // Reload the specific section.
-                        toastService.showToast('Relación múltiple eliminada con éxito.')
-                    },
-                    function (error) { // Fail
-                        console.log('Multiple relation deleted process fail.');
-                        console.log(error)
-                        toastService.showToast('Error eliminando la relación múltiple.')
-                    });
-            }
-        }
 
         /** Show the previous step to delete item, a confirm message */
         function showDeleteStudentConfirm(enrollmentId, kind) {
@@ -366,6 +358,9 @@ angular.module('subjects')
                     toastService.showToast('Asignatura actualizada con éxito.')
                     vm.editValuesEnabled = false;
                     vm.updateButtonEnable = false;
+
+                    // ### Do a copy to save process. ###
+                    vm.subjectOriginalCopy = angular.copy(vm.subject);
                 },
                 function (error) { // Fail
                     console.log('Error updating the subject.')
@@ -375,264 +370,6 @@ angular.module('subjects')
 
         }
 
-
-        function delImpart(impartId) {
-            console.log('Deleting impart relation ' + impartId)
-
-            var deferred = $q.defer();
-
-            ImpartsService.delete({id: impartId},
-                function () {
-                    deferred.resolve('Success deleting the impart relation with ImpartService.$delete');
-                },
-                function (error) {
-                    deferred.reject('Error deleting the the impart relation with ImpartService.$delete, error: ' + error)
-                });
-
-            promises.push(deferred.promise)
-        }
-
-        function delAssociation(associationId) {
-            console.log('Deleting association relation ' + associationId)
-
-            var deferred = $q.defer();
-
-            AssociationsService.delete({id: associationId},
-                function () {
-                    deferred.resolve('Success deleting the association relation with AssociationService.$delete');
-                },
-                function (error) {
-                    deferred.reject('Error deleting the the association relation with AssociaitonService.$delete, error: ' + error)
-                });
-
-            promises.push(deferred.promise)
-        }
-
-
-        // Esta función será la que crea la relación entre la asignatura y las nuevas clases, tengan o no profesores. en el proceso de GUARDADO.
-        function newClass(classId, teachersIds) {
-
-            console.log('Creating newClass relation:')
-            console.log('classId: ' + classId)
-            console.log('teacherIds: ' + teachersIds)
-
-            // If the class has teachers inside
-            if (classId && teachersIds) {
-
-                var deferred = $q.defer();
-
-                //Creamos un vector de referencias anidadas:
-                var nestedsDeferreds = [];
-                var indices = [];
-                for (var i = 0; i < teachersIds.length; i++) {
-                    nestedsDeferreds.push($q.defer());
-                    indices.push(i);
-                }
-                console.log(nestedsDeferreds)
-
-                function prueba() {
-                    console.log('Hola soy una funcion.');
-                }
-
-                var newAssociation = new AssociationsService({data: {classId: classId, subjectId: vm.subjectId}});
-                newAssociation.$save(
-                    function () { // Success
-                        deferred.resolve('Success saving the association relation with AssociationsService $save');
-
-                        for (var a = 0; a < teachersIds.length; a++) {
-
-                            console.log('AQUIIIIII')
-                            console.log(a)
-
-                            // Now we save the impart with this associationId
-                            var newImpart = new ImpartsService({
-                                data: {
-                                    associationId: newAssociation.associationId,
-                                    teacherId: teachersIds[a]
-                                }
-                            })
-
-                            newImpart.$save(
-                                function (a) { // Success
-                                    console.log(nestedsDeferreds);
-                                    console.log(a);
-                                    console.log('success, got data: ', a);
-                                    nestedsDeferreds[a].resolve('Success saving the impart relation with ImpartService $save');
-
-                                },
-                                function (error) { // Fail
-                                    nestedsDeferreds[a].reject('Error saving the the impart relation with ImpartService $save, error: ' + error)
-                                })
-
-                        }
-
-                    },
-                    function (error) { // Fail
-                        deferred.reject('Error saving the the association relation with AssociationsService $save, error: ' + error)
-                    });
-                promises.push(deferred.promise);
-                for (var i = 0; i < teachersIds.length; i++)
-                    promises.push(nestedsDeferreds[i].promise)
-
-
-            } else if (classId && teachersIds == undefined) { // The class hasn't teachers inside, only a association relation is needed to create.
-                var deferred = $q.defer();
-                var newAssociation = new AssociationsService({data: {classId: classId, subjectId: vm.subjectId}});
-                newAssociation.$save(
-                    function () { // Success
-                        deferred.resolve('Success saving the association relation with AssociationsService $save');
-                    },
-                    function (error) { // Fail
-                        deferred.reject('Error saving the the association relation with AssociationsService $save, error: ' + error)
-                    });
-                promises.push(deferred.promise);
-            }
-
-        }
-
-        //ASOCIATION - TEACHER
-        function newImpart(associationId, teacherId) {
-
-            var deferred = $q.defer();
-
-            console.log('Creating newImpart relation:');
-            console.log('associationdId: ' + associationId);
-            console.log('teacherId: ' + teacherId);
-
-
-            console.log('Creating a new Imparts relation');
-            var newImpart = new ImpartsService({
-                data: {
-                    associationId: associationId,
-                    teacherId: teacherId
-                }
-            });
-            newImpart.$save(
-                function () { // Success
-                    deferred.resolve('Success saving the impart relation with newImpart.$save');
-                },
-                function (error) { // Fail
-                    deferred.reject('Error saving the the impart relation with newImpart.$save, error: ' + error)
-                });
-            promises.push(deferred.promise)
-
-        }
-
-
-        // Función que procesa los bloques de datos y realiza las llamadas a las funciones que realmente modifican datos.
-        function processDiferences(original, modified) {
-            console.log('ProcessDiferences')
-            console.log(original)
-            console.log(modified)
-
-            // DELETED REVIEW, in this case unlike teachersProfile of studentProfile is  possible delImpart and delAssociation.
-
-            if (original.length != 0)
-
-                for (var i = 0; i < original.length; i++) {
-                    var index = -1;
-                    for (var j = 0; j < modified.length; j++)
-                        if (modified[j].class.classId == original[i].class.classId)
-                            index = j;
-                    if (index == -1) {
-                        // If the item have teachers list.
-                        if (original[i].teachers !== undefined)
-                            for (var c = 0; c < original[i].teachers.length; c++)
-                                delImpart(original[i].teachers[c].impartId)
-                        // In any case the association between subject and class is deleted:
-                        delAssociation(original[i].class.associationId);
-                    }
-                    else
-
-                    // Que pasa cuando alguno o ambos no tienen teachers.
-
-
-                    //Ninguno de los dos tiene profesores
-                    if (original[i].teachers == undefined && modified[index].teachers == undefined) {
-                        console.log('Ninguno de los dos tiene profesores, no se hace nada.')
-                    } else {
-
-                        if (original[i].teachers !== undefined) {
-                            for (var c2 = 0; c2 < original[i].teachers.length; c2++) {
-                                var indexC = -1;
-                                for (var d = 0; d < modified[index].teachers.length; d++)
-                                    if (original[i].teachers[c2].teacherId == modified[index].teachers[d].teacherId)
-                                        indexC = d;
-                                if (indexC == -1)
-                                // We delete the relation between the teacher with subject-class
-                                    delImpart(original[i].teachers[c2].impartId)
-                            }
-                        }
-
-
-                    }
-
-
-                    // HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE //
-
-
-                }
-
-
-            // CREATE REVIEW, in this case unlike teachersProfile of studentProfile is  possible newImpart and newAssociation.
-
-            if (modified.lenght !== 0)
-
-
-                for (var a = 0; a < modified.length; a++) {
-                    console.log('working with ' + a)
-                    var index3 = -1;
-                    // Search if the class exists
-                    for (var b = 0; b < original.length; b++)
-                        if (original[b].class.classId == modified[a].class.classId)
-                            index3 = b;
-
-                    console.log(index3);
-                    //If not exists THE CLASS has been created:
-                    if (index3 == -1) {
-                        console.log('creating the class');
-
-                        // If there aren't teachers:
-                        if (modified[a].teachers == undefined) {
-
-                            newClass(modified[a].class.classId)
-                            //newAssociation(modified[a].class.classId, vm.subjectId);
-                        } else {  // If there are:
-
-                            teachersIds = [];
-                            for (var h = 0; h < modified[a].teachers.length; h++)
-                                //If a association is needed to be created would be decission to newImpart
-                                //newImpart(modified[a].class.classId, modified[a].teachers[h].teacherId);
-                                teachersIds.push(modified[a].teachers[h].teacherId)
-
-                            //
-                            newClass(modified[a].class.classId, teachersIds)
-                        }
-
-                        //If exists, we need only add a new teacher if this case appear.
-                    } else {
-                        //If the block teachers in original doesn't exists we created one.
-                        if (original[index3].teachers == undefined) {
-                            original[index3].teachers = [];
-                        }
-
-                        for (var m = 0; m < modified[a].teachers.length; m++) {
-
-
-                            var index4 = -1;
-                            for (var n = 0; n < original[index3].teachers.length; n++)
-                                if (original[index3].teachers[n].teacherId == modified[a].teachers[m].teacherId)
-                                    index4 = n;
-                            if (index4 == -1)
-                                newImpart(modified[a].class.associationId, modified[a].teachers[m].teacherId);
-
-
-                        }
-                    }
-                }
-
-
-        }
 
         /*
          * Open the dialog to add a relation to this class.
@@ -659,12 +396,19 @@ angular.module('subjects')
                 });
         }
 
-        vm.chartConfig = {
+        vm.chartConfig2 = {
+
             xAxis: {
                 type: 'category'
             },
             title: {
-                text: 'Porcentaje por género.'
+                text: 'Genero',
+                align: 'center',
+                verticalAlign: 'middle',
+                y: 60
+            },
+            credits: {
+                enabled: false
             },
             yAxis: {
                 allowDecimals: false,
@@ -677,22 +421,33 @@ angular.module('subjects')
                 pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
             },
             legend: {enabled: false},
+            exporting: {
+                enabled: false
+            },
             plotOptions: {
-                series: {
-                    borderWidth: 0,
+                pie: {
                     dataLabels: {
                         enabled: true,
-                        format: '{point.y:.1f}%'
-                    }
+                        distance: -50,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'white'
+                        }
+                    },
+                    startAngle: -90,
+                    endAngle: 90,
+                    center: ['50%', '75%']
                 }
             },
+            colors: ['#5EA6DD', '#F09FFF'],
             series: [{
                 name: 'Genero',
                 colorByPoint: true,
-                type: 'column',
+                type: 'pie',
+                innerSize: '50%',
                 data: [
                     {name: 'Chicos', y: 0},
-                    {name: 'Chicas', y: 1}]
+                    {name: 'Chicas', y: 0}]
             }]
         };
 

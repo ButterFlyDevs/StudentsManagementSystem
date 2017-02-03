@@ -1,8 +1,8 @@
 angular.module('students')
     .factory("StudentsService",
-        function ($resource) {
+        function ($resource, globalService) {
 
-            var restPath = 'http://localhost:8001/entities/student/';
+            var restPath = 'http://'+globalService.defaultMicroServicesURL+'/entities/student/';
 
             return $resource(restPath + ':id', {id: '@studentId'}, {
                 'getSubjects': {
@@ -16,6 +16,10 @@ angular.module('students')
                     isArray: true
                 },
                 'update': {method: 'PUT'},
+                'delete': {
+                    method: 'DELETE',
+                    url: restPath + ':id' + '?action=dd' // Delete dependencies also.
+                },
                 'getTeaching': {
                     method: 'GET',
                     url: restPath + ':id' + '/teaching',
@@ -24,6 +28,11 @@ angular.module('students')
                 'getClasses': {
                     method: 'GET',
                     url: restPath + ':id' + '/class',
+                    isArray: true
+                },
+                'getTeachers': {
+                    method: 'GET',
+                    url: restPath + ':id' + '/teacher',
                     isArray: true
                 }
             });

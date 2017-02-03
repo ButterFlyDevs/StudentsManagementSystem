@@ -1,22 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Prueba de unión de métodos de entidades.
 
-DATOS:
-
-Si se trata de enteros: enteros
-Si se trata de texto: en unicode
-Si se trata de booleanos : boolean
-
-"""
-
-# Uso de variables generales par la conexión a la BD.
-import db_params
 import datetime
-from termcolor import colored
-from utils import *
-
 import pytz
+
+import db_params
+from utils import *
 
 # Variable global de para act/desactivar el modo verbose para imprimir mensajes en terminal.
 v = 1
@@ -69,7 +57,6 @@ def sql_executor(query, expected_kind=None, last_row_id=False):  # References
     except db_params.MySQLdb.Error, e:
         try:
             error = "MySQL Error [%d]: %s" % (e.args[0], e.args[1])
-            print error
             log = error
             status = e.args[0]
         except IndexError:
@@ -123,7 +110,7 @@ def sql_executor(query, expected_kind=None, last_row_id=False):  # References
 
 class EntitiesManager:
     """
-    Gestor de entidades de la base de datos, que abstrae el funcionamiento de MySQL y que añade muchísima funcionalidad.
+    Database entities management's, that abstract the work of MySQL and add a lot of functionality.
     """
 
     @classmethod
@@ -169,9 +156,13 @@ class EntitiesManager:
         :param kind: Type of data, student, teacher, class, etc. Any table of database.
         :param data: A dict with the data, like : {"name": "Jhon", "dni": 9999999}
         :return: A dict with three fields:
+
+            { 'status': <>, 'data': <>, 'log': <> }
+
             data: A dict with the item updated as it has been saved in the database.
             status: MySQL status code to debug and customize the return of queries.
             log: String with info about the query result, like detail about errors.
+
         """
         if v:
             print colored(locals(), 'blue')
@@ -246,7 +237,9 @@ class EntitiesManager:
             return return_dic
 
         else:
-            return data_block # With possibles errors.
+            return {'status': data_block['status'],
+                    'log': data_block['log'],
+                    'data': None} # With possibles errors.
 
     @classmethod
     def get(cls, kind, entity_id=None, params=None):
@@ -652,13 +645,9 @@ class EntitiesManager:
 
             return {'status':1, 'data': students}
 
-
     @classmethod
     def get_related(cls, kind, entity_id, related_kind, rk_entity_id=None, subrelated_kind=None, params=None, with_special_sorter=True, internal_call=False):
         """Devuelve una lista de diccionarios con la información pedida."""
-
-        print 'get_related'
-        print locals()
 
         kind = str(kind)
         entity_id = str(entity_id)
@@ -755,22 +744,34 @@ class EntitiesManager:
         else:
             query_params += ' * '
 
-        if kind == 'student':  # Queremos buscar entidades relacionadas con una entidad de tipo student
+        if kind == 'student':  # Searching entities related with a student.
 
-            if related_kind == 'teacher':  # Todos los profesores que dan clase al alumno.
-                query = 'SELECT teacherId, name, surname FROM teacher WHERE deleted = 0 and teacherId IN (SELECT teacherId FROM impart, enrollment WHERE impart.associationId=enrollment.associationId and enrollment.studentId=' + entity_id + ');'
+            if related_kind == 'teacher':  # All teachers that impart class to this student.
+
+                query = 'SELECT teacherId, name, surname FROM teacher WHERE deleted = {1} and teacherId IN ' \
+                        '(SELECT teacherId FROM impart, enrollment WHERE impart.associationId=enrollment.associationId ' \
+                        'and impart.deleted = {1} and enrollment.deleted = {1} and enrollment.studentId={0});'.format(entity_id, 0)
+
             elif related_kind == 'class':  # Todos las clases en las que está matriculado el alumno.
-                query = 'SELECT classId, course, word, level FROM class WHERE deleted = 0 and classId IN (SELECT classId FROM association WHERE associationId IN (SELECT associationId FROM enrollment WHERE studentId=' + entity_id + '));'
+
+                query = 'SELECT classId, course, word, level FROM class WHERE deleted = 0 and classId ' \
+                        'IN (SELECT classId FROM association WHERE associationId IN (SELECT associationId ' \
+                        'FROM enrollment WHERE studentId=' + entity_id + '));'
+
             elif related_kind == 'subject':  # Todas las asignaturas en la que está matriculado el alumno.
+
                 query = 'SELECT subjectId, name FROM subject WHERE deleted = 0 and subjectId IN (SELECT subjectId FROM association WHERE associationId IN (SELECT associationId FROM enrollment WHERE studentId=' + entity_id + '));'
+
             elif related_kind == 'enrollment':
+
                 # More bit complex query:
                 query = 'SELECT e.enrollmentId, c.classId, c.course, c.word, c.level, s.subjectId, s.name FROM ' \
                         '( SELECT enrollment.associationId, enrollmentId , association.subjectId, association.classId ' \
                         'FROM enrollment JOIN association WHERE enrollment.associationId = association.associationId ' \
-                        'AND enrollment.studentId = ' + entity_id + ' AND enrollment.deleted = 0) e JOIN class c JOIN subject s on (e.classId = c.classId ' \
-                                                                    'AND e.subjectId = s.subjectId);'
+                        'AND enrollment.studentId = ' + entity_id + ' AND enrollment.deleted = 0) e JOIN class c ' \
+                        'JOIN subject s on (e.classId = c.classId AND e.subjectId = s.subjectId);'
             else:
+
                 log = '   {}    is not a valid nested resource to student. There are the valid options: teacher,' \
                       ' class, subject, enrollment'.format(related_kind)
                 status = 1054 # Bad request
@@ -778,7 +779,9 @@ class EntitiesManager:
 
         elif kind == 'teacher':  # Queremos buscar entidades relacionadas con una entidad de tipo teacher
             if related_kind == 'student':  # Todos los alumnos a los que da clase ese profesor.
-                query = 'SELECT studentId, name, surname  FROM student WHERE deleted = 0 and studentId IN (SELECT studentId FROM impart, enrollment WHERE impart.associationId=enrollment.associationId AND impart.teacherId=' + entity_id + ');'
+                query = 'SELECT {0}  FROM student WHERE deleted = {2} and studentId IN ' \
+                        '(SELECT studentId FROM impart, enrollment WHERE impart.associationId=enrollment.associationId ' \
+                        'AND impart.teacherId={1} AND impart.deleted = {2} and enrollment.deleted={2});'.format(query_params, entity_id, 0)
             elif related_kind == 'class':  # Todos las clases en las que el profesor imparte.
                 query = 'SELECT classId, course, word, level FROM class WHERE deleted = 0 and classId IN (SELECT classId FROM association where associationId IN(SELECT associationId FROM impart WHERE teacherId=' + entity_id + '));'
             elif related_kind == 'subject':  # Todas las asignaturas que el profesor imparte.
@@ -849,13 +852,18 @@ class EntitiesManager:
                     query = 'SELECT enrollmentId, associationId, studentId FROM enrollment WHERE deleted = {} AND associationId IN (SELECT associationId FROM association where deleted = {} and classId = {});'.format(
                         0, 0, entity_id)
 
-        elif kind == 'subject':  # Queremos buscar entidades relacionadas con una entidad de tipo subject.
+        elif kind == 'subject':
+
             if related_kind == 'student':
-                query = 'SELECT studentId, name, surname from student where deleted = {1} and studentId in ' \
+                query = 'SELECT {0} from student where deleted = {2} and studentId in ' \
                         '(SELECT studentId from enrollment where associationId IN ( select associationId ' \
-                        'from association where subjectId={0} and deleted = {1}) and deleted = {1});'.format(entity_id, 0)
+                        'from association where subjectId={1} and deleted = {2}) ' \
+                        'and deleted = {2});'.format(query_params, entity_id, 0)
+
             elif related_kind == 'teacher':
-                query = 'SELECT teacherId, name, surname from teacher where deleted = 0 and teacherId in (select teacherId from impart where associationId IN ( select associationId from association where subjectId=' + entity_id + '));'
+                query = 'SELECT teacherId, name, surname from teacher where deleted = 0 and teacherId in ' \
+                        '(select teacherId from impart where associationId IN ( select associationId ' \
+                        'from association where subjectId=' + entity_id + '));'
 
             elif related_kind == 'association':
                 query = 'SELECT associationId, subjectId, classId FROM association WHERE deleted = {} and subjectId = {};'.format(
@@ -908,14 +916,13 @@ class EntitiesManager:
         return_dic = {}
         set_lack_data_message = False
 
-        if kind in ['class', 'subject']:  # We will made the reports of this kind of item.
+        if kind in ['class', 'subject', 'teacher']:  # We will made the reports of this kind of item.
 
             data_block = {}
 
             # Students analysis:
-            #students = cls.get(kind='student', params='birthdate,gender').get('data', None)
             students = cls.get_related(kind=kind, entity_id=entity_id, related_kind='student').get('data', None)
-
+            print colored(students, 'yellow')
 
             # Count:
             num_students = len(students)
@@ -979,13 +986,22 @@ class EntitiesManager:
             data_block['students']['medium_age'] = medium_age
 
             if set_lack_data_message:
-                data_block['report_log'] = 'data lack'  # Meaning that some data is missing .
+                # Meaning that some data is missing and the report could has errors.
+                data_block['report_log'] = 'data lack'
 
             return_dic['data'] = data_block
             return_dic['status'] = 1
 
             return return_dic
 
+        else:
 
+            return_dic['status'] = 1054
+            return_dic['log'] = 'The kind {} haven\'t \'report\' nested resource associated'.format(kind)
+            return return_dic
 
-        pass
+    @classmethod
+    def test(cls):
+        return_data_block = sql_executor('SHOW TABLES;')
+        return return_data_block
+

@@ -1,112 +1,113 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
 <div flex ng-controller="classesListController as vm">
 
-
-
     <h1 class="md-display-1">Grupos</h1>
-    <p class="md-body-1">Todos los grupos del sistema.</p>
+    <p class="md-body-3">Todos los grupos del sistema.</p>
 
-    <div ng-if="vm.classesList.length != 0" >
-
-        <div  layout="row" layout-align="space-between start">
-            <md-button class="md-primary md-raised"
-                       ng-click="vm.openNewClassDialog()">
-                <md-icon>add</md-icon>
-                Nuevo
-            </md-button>
-        </div>
-
+    <div ng-if="!vm.dataIsReady">
+        <spinner></spinner>
     </div>
 
+    <div ng-if="vm.dataIsReady">
+        <div ng-if="vm.classesList.length != 0">
 
-                <!-- table wrapper -->
-                <md-card style="background-color: #FFFFFF;">
+            <div layout="row" layout-align="space-between start">
+                <md-button class="md-primary md-raised"
+                           ng-click="vm.openNewClassDialog()">
+                    <md-icon>add</md-icon>
+                    Nuevo
+                </md-button>
+            </div>
 
+        </div>
 
+        <!-- table wrapper -->
+        <md-card style="background-color: #FFFFFF;">
 
+            <div ng-if="vm.classesList.length == 0">
 
-                    <div ng-if="vm.classesList.length == 0" >
+                <h3 class="md-headline"> Aún no se ha creado ningun grupo.</h3>
+                <h3 class="md-headline"> ¿Desea crear uno? </h3>
 
-                        <h3 class="md-headline"> Aún no se ha creado ningun grupo.</h3>
-                        <h3 class="md-headline"> ¿Desea crear uno? </h3>
+                <div access='admin' layout="row" layout-align="center" layout-margin>
+                    <md-button ng-click="vm.openNewClassDialog()" class="md-primary md-raised">
+                        <md-icon>add</md-icon>
+                        Crear
+                    </md-button>
+                </div>
 
-                        <div access='admin' layout="row" layout-align="center" layout-margin>
-                            <md-button ng-click="vm.openNewClassDialog()" class="md-primary md-raised">
-                                <md-icon>add</md-icon>
-                                Crear</md-button>
-                        </div>
-
-                    </div>
-
-
-                    <div ng-if="vm.classesList.length > 0" >
-
-
-                    <!-- toolbar for the table -->
-                    <md-toolbar class="md-table-toolbar md-default">
-
-                        <!-- search -->
-                        <md-card-title>
-                            <md-card-title-text>
-
-                                <md-input-container>
-                                    <md-icon>search</md-icon>
-                                    <!-- layout="" to avoid parent layout -->
-                                    <label layout="">"Buscar"</label>
-                                    <input type="text" ng-model="vm.query">
-                                </md-input-container>
+            </div>
 
 
-                            </md-card-title-text>
-                        </md-card-title>
-                    </md-toolbar>
+            <div ng-if="vm.classesList.length > 0">
 
 
-                    <!-- Students list table -->
-                    <md-table-container>
+                <!-- toolbar for the table -->
+                <md-toolbar class="md-table-toolbar md-default">
 
-                        <table md-table md-progress="vm.promise">
-                            <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
-                            <tr md-row>
-                                <th md-column><span>Nivel</span></th>
-                                <th md-column md-order-by="name"><span>Curso</span></th>
-                                <th md-column><span>Grupo</span></th>
-                                <th md-column><span>Perfil</span></th>
-                            </tr>
-                            </thead>
+                    <!-- search -->
+                    <md-card-title>
+                        <md-card-title-text>
 
-                            <tbody md-body>
-
-                                <!-- Where we iterate through items list -->
-                                <tr md-row ng-repeat="item in vm.classesList">
-
-                                    <td md-cell>{{ item.level }}</td>
-
-                                    <td md-cell>{{ item.course }}</td>
-
-                                    <td md-cell>{{ item.word }}</td>
-
-                                    <td md-cell>
-                                        <md-button ui-sref="classesProfile({classId: item.classId})" class="md-fab md-mini md-primary">
-                                            <md-icon>forward</md-icon>
-                                        </md-button>
-                                    </td>
-
-                                </tr>
-                            </tbody>
-
-                        </table>
-                    </md-table-container>
-
-                    <md-table-pagination md-limit="vm.limit"
-                                         md-page="vm.page" md-total="{{vm.data.total}}"
-                                         md-page-select md-boundary-links md-on-paginate="vm.onPaginate">
-                    </md-table-pagination>
+                            <md-input-container>
+                                <md-icon>search</md-icon>
+                                <!-- layout="" to avoid parent layout -->
+                                <label layout="">"Buscar"</label>
+                                <input type="text" ng-model="vm.query">
+                            </md-input-container>
 
 
-                        </div>
+                        </md-card-title-text>
+                    </md-card-title>
+                </md-toolbar>
 
-                </md-card>
 
+                <!-- Students list table -->
+                <md-table-container>
+
+                    <table md-table md-progress="vm.promise">
+                        <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
+                        <tr md-row>
+                            <th md-column><span>Nivel</span></th>
+                            <th md-column md-order-by="name"><span>Curso</span></th>
+                            <th md-column><span>Grupo</span></th>
+                            <th md-column><span>Perfil</span></th>
+                        </tr>
+                        </thead>
+
+                        <tbody md-body>
+
+                        <!-- Where we iterate through items list -->
+                        <tr md-row ng-repeat="item in vm.classesList">
+
+                            <td md-cell>{{ item.level }}</td>
+
+                            <td md-cell>{{ item.course }}</td>
+
+                            <td md-cell>{{ item.word }}</td>
+
+                            <td md-cell>
+                                <md-button ui-sref="classesProfile({classId: item.classId})"
+                                           class="md-fab md-mini md-primary">
+                                    <md-icon>forward</md-icon>
+                                </md-button>
+                            </td>
+
+                        </tr>
+                        </tbody>
+
+                    </table>
+                </md-table-container>
+
+                <md-table-pagination md-limit="vm.limit"
+                                     md-page="vm.page" md-total="{{vm.data.total}}"
+                                     md-page-select md-boundary-links md-on-paginate="vm.onPaginate">
+                </md-table-pagination>
+
+
+            </div>
+
+        </md-card>
+    </div>
 
 </div>

@@ -11,6 +11,7 @@ import requests
 import requests_toolbelt.adapters.appengine
 
 
+
 from datetime import timedelta
 from flask import make_response, request, current_app
 from functools import update_wrapper
@@ -75,7 +76,7 @@ def call_after_request_callbacks(response):
 """
 
 
-@app.route('/test', methods=['GET'])
+@app.route('/testdbms', methods=['GET'])
 def test():
     """
      Test resource.
@@ -85,9 +86,22 @@ def test():
      Example of use:
         curl -i -X GET localhost:8001/test
     """
+
     response = requests.get("http://%s/test" % modules.get_hostname(module='dbms'))
     return make_response(response.content, response.status_code)
 
+
+@app.route('/test', methods=['GET'])
+def test2():
+    """
+     Test resource.
+
+    :return:
+
+     Example of use:
+        curl -i -X GET localhost:8001/test
+    """
+    return ('OK')
 
 
 
@@ -129,6 +143,7 @@ def get_entities(kind, entity_id=None):
 
     See more info in dbms_apy.py
     """
+
 
     url = 'http://' + str(modules.get_hostname(module='dbms')) + '/' + 'entities/' + str(kind)
     if entity_id is not None:

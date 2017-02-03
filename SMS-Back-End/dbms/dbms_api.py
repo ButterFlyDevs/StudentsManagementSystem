@@ -137,6 +137,17 @@ def test():
     """
     return json.dumps({'dbms_api_test_status': 'ok'})
 
+
+@app.route('/test_mysql',methods=['GET'])
+def test_mysql():
+    """
+    Test resource.
+
+    Example of use:
+        curl -i -X GET localhost:8002/test
+    """
+    return json.dumps(EntitiesManager.test().get('data'))
+
 #################################
 #   Resources about entities    #
 #################################
@@ -294,6 +305,9 @@ def get_related_entities(kind, entity_id, related_kind, rk_entity_id=None, subre
 
     """
     print locals()
+
+    #from time import sleep
+    #sleep(4)
     return process_response(EntitiesManager.get_related(kind=kind,
                                                         entity_id=entity_id,
                                                         related_kind=related_kind,

@@ -1,8 +1,8 @@
-from fabric.api import local # to run local commands.
+from fabric.api import local  # to run local commands.
 from fabric.colors import red
 from provisioner import example_data_provisioner
 import time
-from fabric.api import local, lcd, run # to run local commands.
+from fabric.api import local, lcd, run  # to run local commands.
 from fabric.colors import red, blue
 from provisioner import example_data_provisioner
 import time
@@ -22,7 +22,7 @@ import time
 
 ##########################
 
-SMS_Back_End_default_port = '8001' # api gateway microservice default port
+SMS_Back_End_default_port = '8001'  # api gateway microservice default port
 SMS_Back_End_default_admin_port = '8083'
 
 SMS_Front_End_default_port = '8080'  # Web default port
@@ -37,13 +37,11 @@ def run_back_end():
     print (red('Please look at the list below to know the microservices ports.'))
     print (red('Note that default is apigms microservice.'))
 
-    local('google_appengine/dev_appserver.py '
+    local('google_appengine/dev_appserver.py'
           ' --port=' + SMS_Back_End_default_port +
           ' --host=0.0.0.0 --admin_port=' + SMS_Back_End_default_admin_port +
           ' SMS-Back-End/apigms/apigms.yaml '
-          'SMS-Back-End/dbms/dbms.yaml '
-          'SMS-Back-End/sce/sce.yaml &')
-
+          'SMS-Back-End/dbms/dbms.yaml &')
 
     print (red('Thanks for your contribution!'))
 
@@ -55,10 +53,20 @@ def test(ms):
 
     Example: fab test:'tdbms'
 
+    If something fail maybe it could be the pythonpath system.
+    export PYTHONPATH="${PYTHONPATH}:/home/.../StudentsManagementSystem/SMS-Back-End/dbms/dbapi"
+
+
     """
-    # All microservice.
+    # All [[ Teaching Data Base microService ]].
     if ms == 'tdbms':
         print (blue('## Runnig Teaching Daba Base microService entire Test Suite. ## '))
+        print (blue('## Runnig Teaching Daba Base microService dbapi library test. ## '))
+        with lcd("SMS-Back-End/dbms/dbapi"):
+            local("pytest test/ -vv")
+        print (blue('## Runnig Teaching Daba Base microService apiRest test. ## '))
+        with lcd("SMS-Back-End/dbms"):
+            local("pytest test/ -vv")
 
     # Only the apiRest.
     if ms == 'tdbms.api':
@@ -69,9 +77,8 @@ def test(ms):
     # It fail yet:
     if ms == 'tdbms.dbapi':
         print (blue('## Runnig Teaching Daba Base microService dbapi library test. ## '))
-        with lcd("SMS-Back-End/dbms"):
-            local('pwd')
-            local("pytest test/")
+        with lcd("SMS-Back-End/dbms/dbapi"):
+            local("pytest test/ -vv")
 
 
 def doc(ms):
@@ -99,17 +106,6 @@ def doc(ms):
         local('firefox SMS-Back-End/docs/build/html/index.html')
 
 
-
-
-
-
-
-
-
-
-
-
-
 def run_dbms_api_test():
     """
     Run dbms api test
@@ -123,6 +119,7 @@ def doc_dbms():
     """
     local('make -C SMS-Back-End/dbms/docs html')
     local('firefox SMS-Back-End/dbms/docs/build/html/index.html')
+
 
 def run_apigms_api_test():
     """
@@ -167,7 +164,6 @@ def data_provision(kind='Simple'):
         print 'yeah'
 
 
-
 def requirements(ms=None):
     """
     Install all requirements for all or for some microservice.
@@ -193,12 +189,10 @@ def requirements(ms=None):
         for command in commands:
             local(command)
 
-
     available_options = ['dbms', 'apigms', 'uims', 'local']
     if ms is not None:
         if ms in available_options:
             if ms == available_options[0] or ms == available_options[1]:
-
                 path = 'SMS-Back-End/' + ms + '/'
 
                 command = 'pip install -r ' + path + 'requirements.txt -t ' + path + 'lib/'
@@ -209,8 +203,7 @@ def requirements(ms=None):
                 local(command)
 
             if ms == 'local':
-
-              local_requirements()
+                local_requirements()
 
         else:
             print ms + ' microservice doesn\'t exists.'
@@ -220,7 +213,7 @@ def requirements(ms=None):
 
         print 'Requirements in entire project.'
 
-        for a in range(0,2):
+        for a in range(0, 2):
             path = 'SMS-Back-End/' + available_options[a] + '/'
             command = 'pip install -r ' + path + 'requirements.txt -t ' + path + 'lib/'
             local(command)
@@ -231,7 +224,8 @@ def requirements(ms=None):
         # Run local requirements.
         local_requirements()
 
-def run2(provision=False, kind='Simple'):
+
+def run(provision=False, kind='Simple'):
     """
     Run entire project, included MySQL daemon, SMS Front-End dev_server and Back-End dev_server.
 
@@ -248,11 +242,9 @@ def run2(provision=False, kind='Simple'):
         data_provision(kind)
 
 
-
 def kill():
     """
     Kill all processes that is related with google dev servers.
     """
     print (red("Kill all processes that are related with google dev server."))
     local("kill -9 $(ps -aux | grep google | awk '{ print $2 }' | head -n -1)")
-

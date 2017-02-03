@@ -3,41 +3,33 @@ angular.module('teachers')
 
         var vm = this;
 
-        // References to functions.
+        vm.defaultAvatar = globalService.defaultAvatar;
         vm.openNewTeacherDialog = openNewTeacherDialog;
 
-        vm.defaultAvatar = globalService.defaultAvatar;
-
+        // To control the loading spinner.
+        vm.dataIsReady = false;
 
         activate();
 
         ///////////////////////////////////////////////////////////
         function activate() {
             console.log('Activating teachersListController controller.')
-
             vm.teachersList = TeachersService.query({}, function () {
-                console.log(vm.teachersList)
-            }, function () {
-                console.log('Any problem found when was retrieved the teachers list.')
+                vm.dataIsReady = true;
+            }, function (error) {
+                console.log('Any problem found when was retrieved the teachers list.');
+                console.log(error);
             })
-
         }
 
+        /**
+         * Open the floating dialog to create a new class.
+         */
         function openNewTeacherDialog() {
-            console.log('Open new Teacher Dialog')
-
             $mdDialog.show({
-                locals: {parentScope: $scope, parentController: vm},
-                controller: 'newTeacherDialogController',
-                controllerAs: 'vm',
-                templateUrl: 'app/views/teaching/teachers/newTeacherDialog.html'
-            })
-                .then(function () {
-
-                }, function () {
-
-                });
+                locals: {parentScope: $scope, parentController: vm}, controller: 'newTeacherDialogController',
+                controllerAs: 'vm', templateUrl: 'app/views/teaching/teachers/newTeacherDialog.html'
+            }).then(function () {}, function () {});
         }
-
 
     });

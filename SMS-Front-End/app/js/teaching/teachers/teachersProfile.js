@@ -5,12 +5,17 @@ angular.module('teachers')
 
         vm.controllerName = 'teachersProfileController';
 
-        vm.teacherId = $stateParams.teacherId
+        vm.teacherId = $stateParams.teacherId;
+
+        vm.defaultAvatar = globalService.defaultAvatar;
+
+        // To control the loading spinner.
+        vm.dataIsReady = false;
+        vm.studentDataIsReady = false;
+        vm.teachingDataIsReady = false;
+
         vm.updateButtonEnable = false; // To control when the update button could be enabled.
         vm.associationsList = null;
-
-
-        vm.formUpdated = formUpdated
 
 
         // References to functions.
@@ -20,12 +25,11 @@ angular.module('teachers')
         vm.showDeleteClassConfirm = showDeleteClassConfirm;
         vm.showDeleteSubjectConfirm = showDeleteSubjectConfirm;
         vm.showDeleteTeacherConfirm = showDeleteTeacherConfirm;
-        vm.showDeleteTeacherImpartConfirm = showDeleteTeacherImpartConfirm;
 
 
         vm.loadStudents = loadStudents;
         vm.loadTeaching = loadTeaching;
-        //vm.loadReports = loadReports;
+        vm.loadReports = loadReports;
 
         // Vars to control entity values edition.
         vm.editValuesEnabled = false;
@@ -34,11 +38,47 @@ angular.module('teachers')
         vm.modValues = modValues;
         vm.cancelModValues = cancelModValues;
 
-        vm.defaultAvatar = globalService.defaultAvatar;
+
 
         // An array of promises from calls.
         var promises = [];
 
+        vm.chartConfig = {
+            xAxis: {
+                type: 'category'
+            },
+            title: {
+                text: 'Porcentaje por género.'
+            },
+            yAxis: {
+                allowDecimals: false,
+                title: {
+                    text: 'Porcentaje'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+            },
+            legend: {enabled: false},
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y:.1f}%'
+                    }
+                }
+            },
+            series: [{
+                name: 'Genero',
+                colorByPoint: true,
+                type: 'column',
+                data: [
+                    {name: 'Chicos', y: 0},
+                    {name: 'Chicas', y: 1}]
+            }]
+        };
 
         activate();
 
@@ -54,10 +94,11 @@ angular.module('teachers')
          * Load only the teaching info about this teacher.
          */
         function loadTeaching() {
+            vm.teachingDataIsReady = false;
             vm.teacherTeaching = TeachersService.getTeaching({id: vm.teacherId},
                 function () {
-                    console.log('Teacher Teaching Data Block');
-                    console.log(vm.teacherTeaching);
+                    vm.dataIsReady = true;
+                    vm.teachingDataIsReady = true;
                 }, function (error) {
                     console.log('Get teacher teaching process fail.');
                     console.log(error);
@@ -93,7 +134,7 @@ angular.module('teachers')
                 $scope.teacherModelHasChanged = false;
 
                 $scope.$watch('vm.teacher', function (newValue, oldValue) {
-                    $scope.teacherModelHasChanged = !angular.equals(vm.class, vm.teacherOriginalCopy);
+                    $scope.teacherModelHasChanged = !angular.equals(vm.teacher, vm.teacherOriginalCopy);
                     if ($scope.teacherModelHasChanged)
                         vm.updateButtonEnable = true;
                     else
@@ -109,58 +150,68 @@ angular.module('teachers')
                 vm.teacher = null;
             })
 
-
-            vm.teacherImparts = TeachersService.getImparts({id: vm.teacherId},
-                function () {
-                    console.log('Teachers imparts')
-                    console.log(vm.teacherImparts)
-
-                    // ### Do a copy to save process. ###
-                    vm.teacherImpartsOriginalCopy = angular.copy(vm.teacherImparts);
-
-                    $scope.teacherImpartsModelHasChanged = false;
-
-                    $scope.$watch('vm.teacherImparts', function (newValue, oldValue) {
-                        if (newValue != oldValue) {
-                            $scope.teacherImpartsModelHasChanged = !angular.equals(vm.teacherImparts, vm.teacherImpartsOriginalCopy);
-                        }
-                        compare()
-                    }, true);
-
-                }, function (error) {
-                    console.log('Get teacher imparts process fail.')
-                    console.log(error)
-                    toastService.showToast('Error obteniendo la docencia del profesor.')
-                }
-            )
-
             loadTeaching();
 
         }
 
-        function formUpdated() {
-            console.log('formUpdated')
+
+        /**
+         * Load the list of students
+         * @param associationId
+         */
+        function loadStudents(subjectId, classId) {
+
+            vm.studentDataIsReady = false;
+
+            // To show the classes of the subject we charge the list of it when the subjectId is passed
+            if (subjectId)
+                for (var a = 0; a < vm.teacherTeaching.length; a++)
+                    if (vm.teacherTeaching[a].subject.subjectId == subjectId)
+                        vm.classes = vm.teacherTeaching[a].classes
+
+            if (!subjectId && !classId) {
+                // We want all students that is related with this class, independently of the subject from which come.
+                vm.teacherStudents = TeachersService.getStudents({id: vm.teacherId},
+                    function () {
+                        vm.studentDataIsReady = true;
+                    },
+                    function (error) {
+                        console.log('Get teacher students process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos a los que da clase el profesor.');
+                    }
+                );
+            }
+            if (subjectId && !classId) {
+                vm.teacherStudents = TeachersService.getStudentsFromSubject({id: vm.teacherId, idSubject: subjectId},
+                    function () {
+                        vm.studentDataIsReady = true;
+                    },
+                    function (error) {
+                        console.log('Get teacher students from subject process fail.');
+                        console.log(error);
+                        toastService.showToast('Error obteniendo los alumnos a los que da clase el profesor para la asignatura.');
+                    }
+                );
+            }
         }
 
-        function compare() {
-            console.log('comparing changes ');
 
-            if ($scope.teacherModelHasChanged) {
-                console.log("teacher Model has changed.")
-            } else {
-                console.log("teacher Model is equal.")
-            }
-            if ($scope.teacherImpartsModelHasChanged) {
-                console.log("teacher Imparts Model has changed.")
-            } else {
-                console.log("teacher Imparts Model is equal.")
-            }
+        function loadReports() {
+            vm.teacherReport = TeachersService.getReport({id: vm.teacherId},
+                function () {
+                    console.log('Teacher Report Data Block');
+                    console.log(vm.teacherReport);
+                    if (vm.teacherReport.report_log != null) {
+                        vm.chartConfig['series'][0]['data'][0]['y'] = vm.teacherReport['students']['gender_percentage']['M']
+                        vm.chartConfig['series'][0]['data'][1]['y'] = vm.teacherReport['students']['gender_percentage']['F'];
+                    }
 
-            if ($scope.teacherModelHasChanged || $scope.teacherImpartsModelHasChanged) {
-                vm.updateButtonEnable = true;
-            } else {
-                vm.updateButtonEnable = false;
-            }
+                }, function (error) {
+                    console.log('Get teacher report process fail.');
+                    console.log(error);
+                    toastService.showToast('Error obteniendo los reports del profesor.')
+                })
         }
 
         /*
@@ -192,7 +243,7 @@ angular.module('teachers')
         /** Delete teacher in server.
          * Call to server with DELETE method ($delete= DELETE) using vm.teacher that is
          * a instance of TeachersService.*/
-        function deleteUser() {
+        function deleteTeacher() {
 
             vm.teacher.$delete(
                 function () { // Success
@@ -208,23 +259,7 @@ angular.module('teachers')
 
         }
 
-        function deleteTeacherImpart(subjectId, classId) {
 
-            // We need delete from data block copy the item selected:
-            for (var i = 0; i < vm.teacherImparts.length; i++)
-                if (vm.teacherImparts[i].subject.subjectId == subjectId) {
-                    var numClasses = vm.teacherImparts[i].classes.length;
-                    if (numClasses == 1)
-                        vm.teacherImparts.splice(i, 1);
-                    else {
-                        var classIndex = -1;
-                        for (var j = 0; j < numClasses; j++)
-                            if (vm.teacherImparts[i].classes[j].classId == classId)
-                                classIndex = j;
-                        vm.teacherImparts[i].classes.splice(classIndex, 1);
-                    }
-                }
-        }
 
         /** Show the previous step to delete item, a confirm message */
         function showDeleteTeacherConfirm() {
@@ -238,7 +273,7 @@ angular.module('teachers')
 
             $mdDialog.show(confirm).then(
                 function () {
-                    deleteUser();
+                    deleteTeacher();
                 },
                 function () {
                     console.log('Del teacher operation canceled.')
@@ -246,25 +281,7 @@ angular.module('teachers')
             );
         };
 
-        /** Show the previous step to delete item, a confirm message */
-        function showDeleteTeacherImpartConfirm(subjectId, classId) {
 
-            var confirm = $mdDialog.confirm()
-                .title('¿Está seguro de que quiere eliminar la relación?')
-                //.textContent('If you do, you will be erased from all project which you are and you can not access to app.')
-                //.ariaLabel('Lucky day')
-                .ok('Estoy seguro')
-                .cancel('Cancelar');
-
-            $mdDialog.show(confirm).then(
-                function () {
-                    deleteTeacherImpart(subjectId, classId);
-                },
-                function () {
-                    console.log('Del teacher Impart relation operation canceled.')
-                }
-            );
-        };
 
 
         /** Delete class related with a the subject that the teacher impart, is a impart entity.
@@ -380,219 +397,11 @@ angular.module('teachers')
                     console.log(error)
                     toastService.showToast('Error actualizando el profesor.')
                 });
-
-
         }
 
-        function modValues() {
-            vm.editValuesEnabled = true;
-        }
+        function modValues() { vm.editValuesEnabled = true;}
+        function cancelModValues() { vm.editValuesEnabled = false; vm.teacher = angular.copy(vm.teacherOriginalCopy);}
 
-        function cancelModValues() {
-            vm.editValuesEnabled = false;
-            vm.teacher = angular.copy(vm.teacherOriginalCopy);
-        }
-
-        /**
-         * Load the list of students
-         * @param associationId
-         */
-        function loadStudents(subjectId, classId) {
-
-
-            // To show the classes of the subject we charge the list of it when the subjectId is passed
-            if (subjectId) {
-
-                for (var a = 0; a < vm.teacherTeaching.length; a++) {
-                    if (vm.teacherTeaching[a].subject.subjectId == subjectId) {
-                        vm.classes = vm.teacherTeaching[a].classes
-                    }
-                }
-
-                console.log('CLASSES')
-                console.log(vm.classes)
-
-            }
-
-
-            console.log('loadStudents subjectId')
-            console.log(subjectId)
-
-            if (!subjectId && !classId) {
-
-                console.log('No hay ni asignaturas ni clases');
-
-                // We want all students that is related with this class, independently of the subject from which come.
-
-                vm.teacherStudents = TeachersService.getStudents({id: vm.teacherId},
-                    function () {
-                        console.log('Teacher Students');
-                        console.log(vm.teacherStudents);
-                    },
-                    function (error) {
-                        console.log('Get teacher students process fail.');
-                        console.log(error);
-                        toastService.showToast('Error obteniendo los alumnos a los que da clase el profesor.');
-                    }
-                );
-            }
-            if (subjectId && !classId) {
-                console.log('Solo la clase');
-                vm.teacherStudents = TeachersService.getStudentsFromSubject({id: vm.teacherId, idSubject: subjectId},
-                    function () {
-                        console.log('Teacher Students from subject call sucess.');
-                        console.log(vm.teacherStudents);
-                    },
-                    function (error) {
-                        console.log('Get teacher students from subject process fail.');
-                        console.log(error);
-                        toastService.showToast('Error obteniendo los alumnos a los que da clase el profesor para la asignatura.');
-                    }
-                );
-            }
-        }
-
-
-        function delImpart(impartId) {
-            console.log('Deleting impart relation ' + impartId)
-
-            var deferred = $q.defer();
-
-            ImpartsService.delete({id: impartId},
-                function () {
-                    deferred.resolve('Success deleting the impart relation with ImpartService.$delete');
-                },
-                function (error) {
-                    deferred.reject('Error deleting the the impart relation with ImpartService.$delete, error: ' + error)
-                });
-
-            promises.push(deferred.promise)
-        }
-
-        function newImpart(classId, subjectId) {
-
-            var deferred = $q.defer();
-
-            // This function will decide if it need create a new A
-            // relation before to create new I relation with the teacher related.
-
-            console.log('Creating new impart relation:')
-            console.log('classId: ' + classId)
-            console.log('subjectId: ' + subjectId)
-
-            var exists = false;
-            var index = -1;
-            for (var i = 0; i < vm.associationsList.length; i++)
-                if (vm.associationsList[i].classId == classId &&
-                    vm.associationsList[i].subjectId == subjectId) {
-                    exists = true;
-                    index = i;
-                }
-
-            if (exists) { //We need create only a new Imparts relation.
-
-                console.log('Creating a new Imparts relation');
-                var newImpart = new ImpartsService({
-                    data: {
-                        associationId: vm.associationsList[index].associationId,
-                        teacherId: vm.teacherId
-                    }
-                });
-                newImpart.$save(
-                    function () { // Success
-                        deferred.resolve('Success saving the impart relation with newImpart.$save');
-                    },
-                    function (error) { // Fail
-                        deferred.reject('Error saving the the impart relation with newImpart.$save, error: ' + error)
-                    });
-                promises.push(deferred.promise)
-
-            } else { // We need create a new Association relation and before a new Imparts relation.
-                console.log('Creating a new Association relation and Imparts relation.');
-
-                var nestedDeferred = $q.defer();
-
-                var newAssociation = new AssociationsService({data: {classId: classId, subjectId: subjectId}});
-                newAssociation.$save(
-                    function () { // Success
-                        deferred.resolve('Success saving the association relation with AssociationsService $save');
-
-                        // Now we save the impart with this associationId
-
-                        var newImpart = new ImpartsService({
-                            data: {
-                                associationId: newAssociation.associationId,
-                                teacherId: vm.teacherId
-                            }
-                        })
-                        newImpart.$save(
-                            function () { // Success
-                                nestedDeferred.resolve('Success saving the impart relation with ImpartService $save');
-                            },
-                            function (error) { // Fail
-                                nestedDeferred.reject('Error saving the the impart relation with ImpartService $save, error: ' + error)
-                            })
-                    },
-                    function (error) { // Fail
-                        deferred.reject('Error saving the the association relation with AssociationsService $save, error: ' + error)
-                    });
-                promises.push(deferred.promise)
-                promises.push(nestedDeferred.promise)
-
-            }
-
-        }
-
-        function processDiferences(original, modified) {
-            // console.log(original)
-            // console.log(modified)
-
-            // Deleted review
-
-            if (original.length !== 0)
-                for (var i = 0; i < original.length; i++) {
-                    var index = -1;
-                    for (var j = 0; j < modified.length; j++)
-                        if (modified[j].subject.subjectId == original[i].subject.subjectId)
-                            index = j;
-                    if (index == -1)
-                        for (var c = 0; c < original[i].classes.length; c++)
-                            delImpart(original[i].classes[c].impartId)
-                    else
-                        for (var c2 = 0; c2 < original[i].classes.length; c2++) {
-                            var indexC = -1;
-                            for (var d = 0; d < modified[index].classes.length; d++)
-                                if (original[i].classes[c2].classId == modified[index].classes[d].classId)
-                                    indexC = d;
-                            if (indexC == -1)
-                                delImpart(original[i].classes[c2].impartId)
-                        }
-
-                }
-
-            // Created item review
-
-            if (modified.lenght !== 0)
-                for (var a = 0; a < modified.length; a++) {
-                    var index3 = -1;
-                    for (var b = 0; b < original.length; b++)
-                        if (original[b].subject.subjectId == modified[a].subject.subjectId)
-                            index3 = b;
-                    if (index3 == -1)
-                        for (var h = 0; h < modified[a].classes.length; h++)
-                            newImpart(modified[a].classes[h].classId, modified[a].subject.subjectId);
-                    else
-                        for (var m = 0; m < modified[a].classes.length; m++) {
-                            var index4 = -1;
-                            for (var n = 0; n < original[index3].classes.length; n++)
-                                if (original[index3].classes[n].classId == modified[a].classes[m].classId)
-                                    index4 = n;
-                            if (index4 == -1)
-                                newImpart(modified[a].classes[m].classId, modified[a].subject.subjectId);
-                        }
-                }
-
-        }
 
 
     })

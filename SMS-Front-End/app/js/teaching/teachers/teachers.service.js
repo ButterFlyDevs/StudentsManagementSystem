@@ -1,8 +1,8 @@
 angular.module('teachers')
     .factory("TeachersService",
-        function ($resource) {
+        function ($resource, globalService) {
 
-            var restPath = 'http://localhost:8001/entities/teacher/';
+            var restPath = 'http://'+globalService.defaultMicroServicesURL+'/entities/teacher/';
 
 
             // The second param is [paramDefaults] to pass param to URL
@@ -20,6 +20,14 @@ angular.module('teachers')
                 },
                 'update': {
                     method: 'PUT'
+                },
+                'getReport': {
+                    method: 'GET',
+                    url: restPath + ':id' + '/report'
+                },
+                'delete': {
+                    method: 'DELETE',
+                    url: restPath + ':id' + '?action=dd' // Delete dependencies also.
                 },
                 'getTeaching': {
                     method: 'GET',

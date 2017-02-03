@@ -5,52 +5,181 @@
 # > pytest --cov=entities_manager test/test_entities_manager.py  -vv -s
 # > pytest --cov-report term-missing --cov=entities_manager test/test_entities_manager.py
 
+# export PYTHONPATH="${PYTHONPATH}:/home/.../StudentsManagementSystem/SMS-Back-End/dbms/dbapi"
+
+
 import sys, os
 from entities_manager import EntitiesManager
 from termcolor import colored
 import datetime
-
-
-tests = [
-        {'kind': 'student',
-         'data': {'name': u'súperNombre'}
-         },
-        {'kind': 'student',
-         'data': {'name': u'Juan'}
-         },
-        {'kind': 'teacher',
-         'data': {'name': u'súperNombre'}
-         },
-        {'kind': 'subject',
-         'data': {'name': u'Francés'}
-         },
-        {'kind': 'class',
-         'data': {'course': 1, 'word': u'B', 'level': u'ESO'}
-         },
-        {
-            'kind': 'association',
-            'data': {'subjectId': 1, 'classId': 1}  # Last subject and class created
-        },
-        {
-            'kind': 'impart',
-            'data': {'teacherId': 1, 'associationId': 1}  # Last association with a teacher with id=1
-        },
-        {'kind': 'enrollment',
-         'data': {'studentId': 1, 'associationId': 1}
-         }
-    ]
-
 
 class TestEntitiesManager:
 
     def setup_method(self):
         os.system('mysql -u root -p\'root\' < DBCreator.sql >/dev/null 2>&1')
 
-    def test_1_inserctions_with_put_method(self):
+    def test_1_post_method(self):
 
+        ##################
+        # STUDENT ENTITY #
+        ##################
+
+        entity = EntitiesManager.post(kind='student', data={'name': 'Juan'})
+
+        # When we insert a entity must be returned a list with status, data and log.
+        status = entity.get('status', None)
+        assert status is not None and status == 1
+        assert entity.get('data', None) is not None
+        assert entity.get('log', 1) is None
+
+        # Is the data received correct?
+        data = entity['data']
+
+        # The values saved plus 3 control field: [createdAt], [createdBy] and [<entity>Id]
+        assert len(data) == 4
+
+        # The control values expected have been saved?
+        for item in ['createdAt', 'createdBy', 'studentId']:
+            assert data.get(item, None) is not None
+
+        # We can't save without the value 'name'.
+        response = EntitiesManager.post(kind='student', data={'locality': 'UGR'})
+
+        # Status error: 1048: Column can 't be null.
+        assert response.get('status', None) == 1048
+        assert response.get('data', 1) is None
+        assert 'Column \'name\' cannot be null' in response.get('log', None)
+
+        # We can't save two students with the same DNI.
+        assert EntitiesManager.post(kind='student', data={'name': 'Juan', 'dni': 4545}).get('status') == 1
+        response = EntitiesManager.post(kind='student', data={'name': 'Juan', 'dni': 4545})
+
+        # Status error: 1062: Duplicate entry
+        assert response.get('status', None) == 1062
+        assert response.get('data', 1) is None
+        assert 'Duplicate entry \'4545' in response.get('log', None)
+
+
+        ##################
+        # TEACHER ENTITY #
+        ##################
+
+        entity = EntitiesManager.post(kind='teacher', data={'name': 'Juan'})
+
+        # When we insert a entity must be returned a list with status, data and log.
+        status = entity.get('status', None)
+        assert status is not None and status == 1
+        assert entity.get('data', None) is not None
+        assert entity.get('log', 1) is None
+
+        # Is the data received correct?
+        data = entity['data']
+
+        # The values saved plus 3 control field: [createdAt], [createdBy] and [<entity>Id]
+        assert len(data) == 4
+
+        # The control values expected have been saved?
+        for item in ['createdAt', 'createdBy', 'teacherId']:
+            assert data.get(item, None) is not None
+
+        # We can't save without the value 'name'.
+        response = EntitiesManager.post(kind='teacher', data={'locality': 'UGR'})
+
+        # Status error: 1048: Column can 't be null.
+        assert response.get('status', None) == 1048
+        assert response.get('data', 1) is None
+        assert 'Column \'name\' cannot be null' in response.get('log', None)
+
+        # We can't save two teachers with the same DNI.
+        assert EntitiesManager.post(kind='teacher', data={'name': 'Juan', 'dni': 4545}).get('status') == 1
+        response = EntitiesManager.post(kind='teacher', data={'name': 'Juan', 'dni': 4545})
+
+        # Status error: 1062: Duplicate entry
+        assert response.get('status', None) == 1062
+        assert response.get('data', 1) is None
+        assert 'Duplicate entry \'4545' in response.get('log', None)
+
+        ##################
+        # SUBJECT ENTITY #
+        ##################
+
+        entity = EntitiesManager.post(kind='subject', data={'name': 'Space Science'})
+
+        # When we insert a entity must be returned a list with status, data and log.
+        status = entity.get('status', None)
+        assert status is not None and status == 1
+        assert entity.get('data', None) is not None
+        assert entity.get('log', 1) is None
+
+        # Is the data received correct?
+        data = entity['data']
+
+        # The values saved plus 3 control field: [createdAt], [createdBy] and [<entity>Id]
+        assert len(data) == 4
+
+        # The control values expected have been saved?
+        for item in ['createdAt', 'createdBy', 'subjectId']:
+            assert data.get(item, None) is not None
+
+        # We can't save without the value 'name'.
+        response = EntitiesManager.post(kind='subject', data={'description': 'a cool subject'})
+
+        # Status error: 1048: Column can 't be null.
+        assert response.get('status', None) == 1048
+        assert response.get('data', 1) is None
+        assert 'Column \'name\' cannot be null' in response.get('log', None)
+
+        # We can't save two subjects with the same name.
+        response = EntitiesManager.post(kind='subject', data={'name': 'Space Science'})
+
+        # Status error: 1062: Duplicate entry
+        assert response.get('status', None) == 1062
+        assert response.get('data', 1) is None
+        assert 'Duplicate entry \'Space Science' in response.get('log', None)
+
+
+        ##################
+        # CLASS ENTITY #
+        ##################
+
+        entity = EntitiesManager.post(kind='class', data={'course': 1, 'word': 'A', 'level': 'Elementary'})
+
+        # When we insert a entity must be returned a list with status, data and log.
+        status = entity.get('status', None)
+        assert status is not None and status == 1
+        assert entity.get('data', None) is not None
+        assert entity.get('log', 1) is None
+
+        # Is the data received correct?
+        data = entity['data']
+
+        # The values saved plus 3 control field: [createdAt], [createdBy] and [<entity>Id]
+        assert len(data) == 6
+
+        # The control values expected have been saved?
+        for item in ['createdAt', 'createdBy', 'classId']:
+            assert data.get(item, None) is not None
+
+        # We can't save without the value 'course', 'word' or 'level.
+        response = EntitiesManager.post(kind='class', data={'description': 'a cool class'})
+        print response
+        # Status error: 1048: Column can 't be null.
+        assert response.get('status', None) == 1048
+        assert response.get('data', 1) is None
+        assert 'Column \'course\' cannot be null' in response.get('log', None)
+
+        # We can't save two subjects with the same name.
+        response = EntitiesManager.post(kind='class', data={'course': 1, 'word': 'A', 'level': 'Elementary'})
+
+        # Status error: 1062: Duplicate entry
+        assert response.get('status', None) == 1062
+        assert response.get('data', 1) is None
+        assert 'Duplicate entry \'1-A-Elementary' in response.get('log', None)
+
+    """
         for item in tests:
 
-            entity = EntitiesManager.put(kind=item['kind'], data=item['data'])
+            entity = EntitiesManager.post(kind=item['kind'], data=item['data'])
             print colored(entity, 'yellow')
 
             for i in ['status', 'data', 'log']:
@@ -202,7 +331,7 @@ class TestEntitiesManager:
         # Impart "special relations" of a teacher.
         response = EntitiesManager.get_related(kind='teacher', entity_id=1, related_kind='impart')
         assert response['status'] == 1 and len(response['data']) == 1
-        assert len(response['data']) == 1
+
         assert len(response['data'][0]['classes']) == 1
         assert response['data'][0]['classes'][0]['classId'] == 1
         assert response['data'][0]['subject']['subjectId'] == 1
@@ -358,3 +487,4 @@ class TestEntitiesManager:
         assert len(result['data']) == 2
 
         # although we have three elements in the db
+    """

@@ -10,7 +10,7 @@ var chartDirective = function () {
                 var chart;
                 var process = function () {
                     var defaultOptions = {
-                        chart: {renderTo: element[0]},
+                        chart: {backgroundColor: null, renderTo: element[0]},
                     };
                     var config = angular.extend(defaultOptions, scope.config);
                     chart = new Highcharts.Chart(config);

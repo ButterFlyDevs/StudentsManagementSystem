@@ -1,8 +1,8 @@
 angular.module('subjects')
     .factory("SubjectsService",
-        function ($resource) {
+        function ($resource, globalService) {
 
-            var restPath = 'http://localhost:8001/entities/subject/';
+            var restPath = 'http://'+globalService.defaultMicroServicesURL+'/entities/subject/';
 
             return $resource(restPath + ':id', {id: '@subjectId'}, {
                 'getTeachers': {

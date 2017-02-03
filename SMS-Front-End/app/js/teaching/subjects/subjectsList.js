@@ -1,41 +1,38 @@
 angular.module('subjects')
-    .controller('subjectsListController',function($scope, $mdDialog, SubjectsService){
+    .controller('subjectsListController', function ($scope, $mdDialog, SubjectsService) {
 
-            var vm = this;
+        var vm = this;
 
-            vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
-            vm.openNewSubjectDialog = openNewSubjectDialog;
+        vm.openNewSubjectDialog = openNewSubjectDialog;
 
-            activate();
+        // To control the loading spinner.
+        vm.dataIsReady = false;
 
-            ///////////////////////////////////////////////////////////
-            function activate() {
-                console.log('Activating subjectsListController controller.')
+        activate();
 
-                vm.subjectsList = SubjectsService.query({}, function(){
-                    console.log(vm.subjectsList)
-                }, function(){
-                    console.log('Any problem found when was retrieved the subjects list.')
-                })
+        ///////////////////////////////////////////////////////////
+        function activate() {
 
-            }
+            console.log('Activating subjectsListController controller.')
 
-            function openNewSubjectDialog(){
-                console.log('Open new Subject Dialog')
+            vm.subjectsList = SubjectsService.query({}, function () {
+                vm.dataIsReady = true;
+            }, function (error) {
+                console.log('Any problem found when was retrieved the subjects list.');
+                console.log(error);
+            })
 
-                $mdDialog.show({
-                    locals: {parentScope: $scope, parentController: vm},
-                    controller: 'newSubjectDialogController',
-                    controllerAs: 'vm',
-                    templateUrl: 'app/views/teaching/subjects/newSubjectDialog.html'
-                })
-                    .then(function () {
+        }
 
-                    }, function () {
-
-                    });
-            }
+        /**
+         * Open the floating dialog to create a new subject.
+         */
+        function openNewSubjectDialog() {
+            $mdDialog.show({
+                locals: {parentScope: $scope, parentController: vm}, controller: 'newSubjectDialogController',
+                controllerAs: 'vm', templateUrl: 'app/views/teaching/subjects/newSubjectDialog.html'
+            }).then(function () {}, function () {});
+        }
 
 
-
-});
+    });

@@ -1,7 +1,7 @@
 angular.module('associations')
     .factory("AssociationsService",
-        function ($resource) {
-            var restPath = 'http://localhost:8001/entities/association/';
+        function ($resource, globalService) {
+            var restPath = 'http://'+globalService.defaultMicroServicesURL+'/entities/association/';
             return $resource(restPath + ':id', {id: '@_id'}, {
 
                 'delete': {

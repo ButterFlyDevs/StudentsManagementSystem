@@ -1,1 +1,1 @@
-_INTANCE_NAME='your-project-id:your-instance-name'
+_INSTANCE_NAME='sms-back-end:dbms-db'

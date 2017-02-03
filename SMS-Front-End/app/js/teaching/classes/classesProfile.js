@@ -10,6 +10,11 @@ angular.module('classes')
         // Default img to users without it
         vm.defaultAvatar = globalService.defaultAvatar;
 
+        // To control the loading spinner.
+        vm.dataIsReady = false;
+        vm.studentDataIsReady = false;
+        vm.teachingDataIsReady = false;
+
         // References to functions.
         vm.updateClass = updateClass;
 
@@ -52,8 +57,7 @@ angular.module('classes')
          */
         function loadStudents(associationId) {
 
-            console.log('loadStudents associationId')
-            console.log(associationId)
+            vm.studentDataIsReady = false;
 
             if (!associationId) {
 
@@ -61,8 +65,7 @@ angular.module('classes')
 
                 vm.classStudents = ClassesService.getStudents({id: vm.classId},
                     function () {
-                        console.log('Class Students');
-                        console.log(vm.classStudents);
+                        vm.studentDataIsReady = true;
                     },
                     function (error) {
                         console.log('Get class students process fail.');
@@ -74,8 +77,7 @@ angular.module('classes')
             else {
                 vm.classStudents = AssociationsService.getStudents({id: associationId},
                     function () {
-                        console.log('Class Students');
-                        console.log(vm.classStudents);
+                        vm.studentDataIsReady = true;
                     },
                     function (error) {
                         console.log('Get SUBJECT- class students process fail.');
@@ -90,10 +92,11 @@ angular.module('classes')
          * Load only the teaching info about this class.
          */
         function loadTeaching() {
+            vm.teachingDataIsReady = false;
             vm.classTeaching = ClassesService.getTeaching({id: vm.classId},
                 function () {
-                    console.log('Class Teaching Data Block');
-                    console.log(vm.classTeaching);
+                    vm.dataIsReady = true;
+                    vm.teachingDataIsReady = true;
                 }, function (error) {
                     console.log('Get class subjects process fail.');
                     console.log(error);
@@ -150,15 +153,18 @@ angular.module('classes')
                 vm.class = null;
             });
 
-
             loadTeaching();
-
-
         }
 
 
-        function modValues() { vm.editValuesEnabled = true; }
-        function cancelModValues() { vm.editValuesEnabled = false; vm.class = angular.copy(vm.classOriginalCopy); }
+        function modValues() {
+            vm.editValuesEnabled = true;
+        }
+
+        function cancelModValues() {
+            vm.editValuesEnabled = false;
+            vm.class = angular.copy(vm.classOriginalCopy);
+        }
 
 
         /** Delete class in server.
@@ -179,6 +185,7 @@ angular.module('classes')
                 });
 
         }
+
         /** Show the previous step to delete item, a confirm message */
         function showDeleteClassConfirm() {
 
@@ -278,7 +285,7 @@ angular.module('classes')
                     });
             else if (kind == 'student')
 
-                ClassesService.nested_delete({id: vm.classId, a:'student', b:enrollmentId}, //nested_kind_plus_id Because the behaviour of $resource we pass the nested element this way.
+                ClassesService.nested_delete({id: vm.classId, a: 'student', b: enrollmentId}, //nested_kind_plus_id Because the behaviour of $resource we pass the nested element this way.
                     function () { // Success
                         loadStudents(vm.associationIdSelected); // Reload the specific section.
                         toastService.showToast('Relación múltiple eliminada con éxito.')
@@ -313,9 +320,6 @@ angular.module('classes')
             });
 
         };
-
-
-
 
 
         /** Update class data in server.

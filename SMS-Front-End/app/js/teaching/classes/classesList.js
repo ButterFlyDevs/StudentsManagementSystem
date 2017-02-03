@@ -1,41 +1,36 @@
 angular.module('classes')
-    .controller('classesListController',function($scope, $mdDialog, ClassesService){
+    .controller('classesListController', function ($scope, $mdDialog, ClassesService, globalService) {
 
-            var vm = this;
+        var vm = this;
 
-            vm.defaultAvatar = 'https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcThQiJ2fHMyU37Z0NCgLVwgv46BHfuTApr973sY7mao_C8Hx_CDPrq02g'
-            vm.openNewClassDialog = openNewClassDialog;
+        vm.defaultAvatar = globalService.defaultAvatar;
+        vm.openNewClassDialog = openNewClassDialog;
 
-            activate();
+        // To control the loading spinner.
+        vm.dataIsReady = false;
 
-            ///////////////////////////////////////////////////////////
-            function activate() {
-                console.log('Activating classesListController controller.')
+        activate();
 
-                vm.classesList = ClassesService.query({}, function(){
-                    console.log(vm.classesList)
-                }, function(){
-                    console.log('Any problem found when was retrieved the classes list.')
-                })
+        ///////////////////////////////////////////////////////////
+        function activate() {
+            console.log('Activating classesListController controller.')
+            vm.classesList = ClassesService.query({}, function () {
+                vm.dataIsReady = true;
+            }, function (error) {
+                console.log('Any problem found when was retrieved the classes list.');
+                console.log(error);
+            })
+        }
 
-            }
-
-            function openNewClassDialog(){
-                console.log('Open new Class Dialog')
-
-                $mdDialog.show({
-                    locals: {parentScope: $scope, parentController: vm},
-                    controller: 'newClassDialogController',
-                    controllerAs: 'vm',
-                    templateUrl: 'app/views/teaching/classes/newClassDialog.html'
-                })
-                    .then(function () {
-
-                    }, function () {
-
-                    });
-            }
+        /**
+         * Open the floating dialog to create a new class.
+         */
+        function openNewClassDialog() {
+            $mdDialog.show({
+                locals: {parentScope: $scope, parentController: vm}, controller: 'newClassDialogController',
+                controllerAs: 'vm', templateUrl: 'app/views/teaching/classes/newClassDialog.html'
+            }).then(function () {}, function () {});
+        }
 
 
-
-});
+    });
