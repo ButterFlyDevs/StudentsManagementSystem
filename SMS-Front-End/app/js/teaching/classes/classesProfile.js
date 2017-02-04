@@ -368,11 +368,18 @@ angular.module('classes')
         }
 
         vm.chartConfig = {
+
             xAxis: {
                 type: 'category'
             },
             title: {
-                text: 'Porcentaje por género.'
+                text: 'Genero',
+                align: 'center',
+                verticalAlign: 'middle',
+                y: 60
+            },
+            credits: {
+                enabled: false
             },
             yAxis: {
                 allowDecimals: false,
@@ -385,22 +392,33 @@ angular.module('classes')
                 pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
             },
             legend: {enabled: false},
+            exporting: {
+                enabled: false
+            },
             plotOptions: {
-                series: {
-                    borderWidth: 0,
+                pie: {
                     dataLabels: {
                         enabled: true,
-                        format: '{point.y:.1f}%'
-                    }
+                        distance: -50,
+                        style: {
+                            fontWeight: 'bold',
+                            color: 'white'
+                        }
+                    },
+                    startAngle: -90,
+                    endAngle: 90,
+                    center: ['50%', '75%']
                 }
             },
+            colors: ['#5EA6DD', '#F09FFF'],
             series: [{
                 name: 'Genero',
                 colorByPoint: true,
-                type: 'column',
+                type: 'pie',
+                innerSize: '50%',
                 data: [
                     {name: 'Chicos', y: 0},
-                    {name: 'Chicas', y: 1}]
+                    {name: 'Chicas', y: 0}]
             }]
         };
 

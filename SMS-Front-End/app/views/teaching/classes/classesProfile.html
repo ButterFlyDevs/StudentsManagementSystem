@@ -473,27 +473,25 @@
                         <!-- GRAPHICS SECTION -->
                         <md-tab label="Gráficas" ng-click="vm.loadReports()">
                             <md-content class="md-padding">
-                                <div ng-if="vm.classReport.report_log == null">
-                                    No hay datos para analizar.
-                                </div>
 
-                                <div layout="row" ng-if="vm.classReport.report_log != null">
-                                    <div flex>
+                                <div layout="column">
+
+                                     <div flex>
+                                        <!-- Using chartDirective.js -->
                                         <chart config="vm.chartConfig"></chart>
                                     </div>
-                                    <div layout="row" layout-align="center center">
 
-                                        <p class="md-body-2">
-                                            Total: {{ vm.classReport.students.count }}
+                                    <div flex>
+
+                                        <p class="md-subhead">
+                                            Numero total de estudiantes: {{ vm.subjectReport.students.count }}
                                         </p>
-                                        <br>
-                                        <p class="me-body-2">
-                                            Edad media: {{ vm.classReport.students.medium_age }}
+
+                                        <p class="md-subhead">
+                                            Edad media: {{ vm.subjectReport.students.medium_age }} años.
                                         </p>
 
                                     </div>
-                                </div>
-
 
                             </md-content>
                         </md-tab>

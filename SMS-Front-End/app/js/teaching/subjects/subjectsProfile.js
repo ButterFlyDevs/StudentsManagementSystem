@@ -135,9 +135,8 @@ angular.module('subjects')
                     console.log('Subject Report Data Block');
                     console.log(vm.subjectReport);
                     //if (vm.subjectReport.report_log != null) {
-                    vm.chartConfig2['series'][0]['data'][0]['y'] = vm.subjectReport['students']['gender_percentage']['M']
-                    vm.chartConfig2['series'][0]['data'][1]['y'] = vm.subjectReport['students']['gender_percentage']['F'];
-                    console.log(vm.chartConfig2);
+                    vm.chartConfig['series'][0]['data'][0]['y'] = vm.subjectReport['students']['gender_percentage']['M']
+                    vm.chartConfig['series'][0]['data'][1]['y'] = vm.subjectReport['students']['gender_percentage']['F'];
                     //}
 
                 }, function (error) {
@@ -396,7 +395,7 @@ angular.module('subjects')
                 });
         }
 
-        vm.chartConfig2 = {
+        vm.chartConfig = {
 
             xAxis: {
                 type: 'category'
