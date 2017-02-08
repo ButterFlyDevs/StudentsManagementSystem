@@ -1,5 +1,5 @@
 application: 65748238734626
-module: sce
+module: scms
 version: uno
 runtime: python27
 api_version: 1
@@ -11,4 +11,6 @@ automatic_scaling:
 
 handlers:
 - url: /.*
-  script: api.app
+  script: scms_api_rest.app
+
+

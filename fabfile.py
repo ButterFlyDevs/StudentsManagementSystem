@@ -29,21 +29,33 @@ SMS_Front_End_default_port = '8080'  # Web default port
 SMS_Front_End_default_admin_port = '8082'
 
 
-def run_back_end():
+def run_back_end(ms=None):
     """
     Running SMS Back-End
     """
-    print (red('### Running SMS Back-End in localhost in background. ###'))
-    print (red('Please look at the list below to know the microservices ports.'))
-    print (red('Note that default is apigms microservice.'))
 
-    local('google_appengine/dev_appserver.py'
-          ' --port=' + SMS_Back_End_default_port +
-          ' --host=0.0.0.0 --admin_port=' + SMS_Back_End_default_admin_port +
-          ' SMS-Back-End/apigms/apigms.yaml '
-          'SMS-Back-End/dbms/dbms.yaml &')
+    # Run only scms (Students Control micro Service)
+    if ms == 'scms':
+        local('google_appengine/dev_appserver.py' +
+              ' --port=8003 --host=0.0.0.0 --admin_port=8083 ' +
+              'SMS-Back-End/scms/scms.yaml &')
+        pass
 
-    print (red('Thanks for your contribution!'))
+    if ms == None:
+
+
+        print (red('### Running SMS Back-End in localhost in background. ###'))
+        print (red('Please look at the list below to know the microservices ports.'))
+        print (red('Note that default is apigms microservice.'))
+
+        local('google_appengine/dev_appserver.py'
+              ' --port=' + SMS_Back_End_default_port +
+              ' --host=0.0.0.0 --admin_port=' + SMS_Back_End_default_admin_port +
+              ' SMS-Back-End/apigms/apigms.yaml '
+              'SMS-Back-End/dbms/dbms.yaml '
+              'SMS-Back-End/scms/scms.yaml &')
+
+        print (red('Thanks for your contribution!'))
 
 
 def test(ms):
@@ -81,6 +93,12 @@ def test(ms):
             local("pytest test/ -vv")
 
 
+    if ms == 'scms':
+        print (blue('## Runnig Students Control microService entire Test Suite. ## '))
+        with lcd("SMS-Back-End/scms"):
+            local("pytest test/ -vv")
+
+
 def doc(ms):
     """
     Doc generator.
@@ -97,6 +115,10 @@ def doc(ms):
         local('make -C SMS-Back-End/dbms/docs html')
         local('firefox SMS-Back-End/dbms/docs/build/html/index.html')
 
+    if ms == 'scms':
+        local('make -C SMS-Back-End/scms/docs html')
+        local('firefox SMS-Back-End/scms/docs/build/html/index.html')
+
     if ms == 'apigms':
         local('make -C SMS-Back-End/apigms/docs html')
         local('firefox SMS-Back-End/apigms/docs/build/html/index.html')
@@ -111,14 +133,6 @@ def run_dbms_api_test():
     Run dbms api test
     """
     local('pytest -s SMS-Back-End/dbms/test')
-
-
-def doc_dbms():
-    """
-    Generate and open the documentation of DataBase microService
-    """
-    local('make -C SMS-Back-End/dbms/docs html')
-    local('firefox SMS-Back-End/dbms/docs/build/html/index.html')
 
 
 def run_apigms_api_test():

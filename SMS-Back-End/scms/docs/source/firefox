@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.11: http://docutils.sourceforge.net/" />
+<title>API Restful</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 7614 2013-02-21 15:55:51Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title, .code .error {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: inherit }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block, pre.math, pre.code {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+pre.code .ln { color: grey; } /* line numbers */
+pre.code, code { background-color: #eeeeee }
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+/* "booktabs" style (no vertical lines) */
+table.docutils.booktabs {
+  border: 0px;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+  border-collapse: collapse;
+}
+table.docutils.booktabs * {
+  border: 0px;
+}
+table.docutils.booktabs th {
+  border-bottom: thin solid;
+  text-align: left;
+}
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="api-restful">
+<h1 class="title"><strong>API Restful</strong></h1>
+
+<p>This API try to offer a good and simple way to interact with the microservice, doing possible a lot of this more than the basic CRUD with the items of this with simple and powerful idiomatic calls based on HTTP verbs.</p>
+<div class="section" id="general-considerations">
+<h1>General considerations</h1>
+<blockquote>
+<ul>
+<li><p class="first">This API Rest work only with JSON data format, to send and receive data.</p>
+</li>
+<li><p class="first">In spite of exists another tables in data model like <em>Impart</em>, <em>Association</em>, and <em>Enrollment</em> that represent different kinds of relations between entities this aren't accessible directly like nested resources from the API, but yes like unique.</p>
+<pre class="literal-block">
+    ../teacher/n/impart
+    ...
+    400 Bad Request
+    ...
+
+
+To see examples of use and chcking please review the code of test in dbms_api_test.py
+</pre>
+</li>
+</ul>
+</blockquote>
+</div>
+<div class="section" id="teacher-resource">
+<h1><strong>Teacher</strong> Resource</h1>
+<p>A teacher is a person that impart class to students and with our model it is possible only when is related with a subject that is associated with a class. This are the basic operations with their methods:</p>
+<div class="section" id="get">
+<h2>GET</h2>
+<p>To get all info about a teacher::</p>
+<pre class="literal-block">
+GET ../teacher/n
+</pre>
+<p>It will return all info about this item, included the metadata like
+the user that created the resource or when happens this.</p>
+<p>To get list of teachers::</p>
+<pre class="literal-block">
+GET ../teacher
+</pre>
+<p>It will return all info about all teachers saved, but if we don't
+want all info, and for example only want the names we can pass
+params::</p>
+<pre class="literal-block">
+GET ../teacher?params=name
+</pre>
+<p>That return only the names of teachers. Take a look that always will
+be returned the id of item in all request, in this case teacherId, this
+isn't optional.</p>
+<p>The list of params always together with a colon between:</p>
+<pre class="literal-block">
+GET ../teacher?params=name,surname
+</pre>
+<p>If the kind haven't the param passed it will return a <tt class="docutils literal">400 Bad Request</tt>.
+It means that the model haven't this attribute in his definition.</p>
+<p>Getting related items</p>
+<p>If you want to get a related resources to this resource you only need call them in the url:</p>
+<blockquote>
+../teacher/n/subject Give the list of all subjects related with the teacher.
+../teacher/n/class Give the list of all classes related with the teacher.
+../teacher/n/student Give the list of all students related with the teacher.</blockquote>
+<p>The rest of resources like: association, enrollment or impart are not valid nested resources.</p>
+<p>Besides this, it has a special method to know the list of studetns in a entire subject:</p>
+<blockquote>
+curl -i -X GET localhost:8002/entities/teacher/1/subject/1/student</blockquote>
+</div>
+<div class="section" id="post">
+<h2>Post</h2>
+<p>You can insert a new item in the data base of microservice using the same resource with <tt class="docutils literal">POST</tt> method. The data is needed to pass in JSON format.</p>
+<p>An example with curl would be:</p>
+<pre class="literal-block">
+curl -H &quot;Content-Type: application/json&quot; -X POST -d '{&quot;name&quot;: &quot;Martha&quot;}' localhost:8002/entities/teacher
+</pre>
+<p>A post call with <cite>success</cite> always return the data that have been saved, with some metadata values, the response that last call will be:</p>
+<pre class="literal-block">
+{&quot;name&quot;: &quot;Martha&quot;, &quot;createdBy&quot;: 1, &quot;createdAt&quot;: &quot;2016-12-13T13:02:41&quot;, &quot;teacherId&quot;: 6}
+</pre>
+<p>Here the important metadata are the values <tt class="docutils literal">createdBy</tt> and <tt class="docutils literal">createdAt</tt> that show <em>who</em> and <em>when</em> the item was created. The minimal params that the method require depend of the kind on entity, in this case the only required params is <tt class="docutils literal">name</tt>.</p>
+<p>There are some <strong>errors</strong> that you can see in some cases:</p>
+<ul class="simple">
+<li>If you pass an empty dictionary or one without the require values or some on attributes name are wrong you will receive an <tt class="docutils literal">400 Bad Request</tt></li>
+<li>If the name of resource is write wrong, like 'teachsk' instead of teacher the response will be <tt class="docutils literal">404 Not found</tt></li>
+</ul>
+</div>
+<div class="section" id="put">
+<h2>Put</h2>
+<p>To <em>update</em> a resource only is necessary call itself with <tt class="docutils literal">PUT</tt> method. For example:</p>
+<pre class="literal-block">
+curl -H &quot;Content-Type: application/json&quot; -X PUT -d '{&quot;name&quot;: &quot;Eduard&quot;}' localhost:8002/entities/teacher/25
+{&quot;modifiedBy&quot;: 1, &quot;createdBy&quot;: 1, &quot;teacherId&quot;: 6, &quot;modifiedAt&quot;: &quot;2016-12-13T18:26:55&quot;, &quot;name&quot;: &quot;Eduard&quot;, &quot;createdAt&quot;: &quot;2016-12-13T13:02:41&quot;}
+</pre>
+<p>The update of this resource retrieve all data from this item, now including the <tt class="docutils literal">modifiedAt</tt> and <tt class="docutils literal">modifiedBy</tt>.</p>
+<p>The erros that this method can be produce with this resource are the same that with <tt class="docutils literal">POST</tt>.</p>
+</div>
+<div class="section" id="delete">
+<h2>Delete</h2>
+<p>We can delete a resource using the DELETE HTTP method, for example:</p>
+<pre class="literal-block">
+curl  -i -X  DELETE localhost:8002/entities/teacher/1
+</pre>
+<p>If the call have success always return a <tt class="docutils literal">200</tt> status code without body content.</p>
+<p>This way to proceed can present a problem, on the one hand if we delete a item that are related with other in another table (like a student with a pair subject-class) we can broke the consistency of the model but on the other hand if we want erase all dependencies of a item we need search them in all tables.
+To solve we can delete item with the default way, but the api implements another option to <strong>delete the dependencies</strong> in cascade:</p>
+<pre class="literal-block">
+curl  -i -X  DELETE localhost:8002/entities/subject/1?action=dd
+</pre>
+<p>We only need specific the param <strong>action</strong> set to <em>dd</em> (delete dependencies) in the call to say to system that delete the item and all relations that exists with others items.</p>
+<p>Even so if we use the traditional way we can see errors if we try to do something that broke the consistency of data relations:</p>
+<p>This is an example:</p>
+<pre class="literal-block">
+curl  -i -X  DELETE localhost:8002/entities/subject/1
+</pre>
+<p>With the body response:</p>
+<pre class="literal-block">
+&lt;title&gt;409 Conflict&lt;/title&gt;
+&lt;h1&gt;Conflict&lt;/h1&gt;
+&lt;p&gt;Impossible delete the subject, this is related with some class , and this broke the consistency.&lt;/p&gt;
+</pre>
+<p>If we execute the same with <tt class="docutils literal"><span class="pre">?action=dd</span></tt> the system will retrieve a <tt class="docutils literal">200 OK</tt> status code.</p>
+</div>
+<div class="section" id="related-resources">
+<h2>Related resources</h2>
+<p>Teacher like another resources have a nested/related resources, in this case
+the basic are: <em>subject</em>, <em>class</em>, <em>student</em>. Each one give a list of
+the items of the kind related with the teacher with <cite>200</cite> status code or in
+case of the it doesn't exists yet a <cite>204</cite> code without content in body.</p>
+<blockquote>
+<p>Related resources calls examples:</p>
+<pre class="literal-block">
+GET .../teacher/n/student
+List of student which the teacher n impart class.
+
+GET .../teacher/n/class
+List of class where the teacher n impart class.
+
+GET .../teacher/n/subject
+List of subject that impart the teacher n.
+</pre>
+</blockquote>
+</div>
+<div class="section" id="special-case">
+<h2>Special case</h2>
+<p>There are a special resource to teacher resources, it is <tt class="docutils literal">teaching</tt></p>
+<pre class="literal-block">
+GET .../teacher/n/teaching
+</pre>
+<p>It return a list with the teaching related with this teacher, perfect to build his profile in the UI. The data retrieved have the follow format:</p>
+<pre class="literal-block">
+[{&quot;subject&quot;:{&quot;subjectId&quot;: n, &quot;name&quot;: &quot;...&quot;},
+  &quot;classes&quot;: [
+              {&quot;classId&quot;: n,
+               &quot;impartId&quot;: n,
+               &quot;level&quot;: &quot;...&quot;,
+               &quot;course&quot;: &quot;...&quot;,
+               &quot;word&quot;: &quot;...&quot;},
+               {...},
+               {...}
+              ]
+ },
+ {&quot;subject&quot;: {......},
+  &quot;classes&quot;: [{...},{...}...]
+ },
+ ...
+ ]
+</pre>
+<p>The JSON received is a list of subjects that the teacher impart when a list nested with the classes when each subject is imparted, with the basic info (ids) to jump to anyplace, subject, class, etc.</p>
+<p>This resource is thinking to retrieve the maximal academic info about one teacher in a only call.</p>
+<p>If the resource exists, but it hasn't teaching related this call will return a <tt class="docutils literal">204</tt> status code that means <em>Success Call without content</em>.</p>
+</div>
+</div>
+<div class="section" id="student-resource">
+<h1><strong>Student</strong> Resource</h1>
+<p>This resource has the same behaviour that teacher, with the same management of the calls and errors except the method <tt class="docutils literal">teaching</tt>.</p>
+<div class="section" id="id1">
+<h2>Special case</h2>
+<p>The call is similar</p>
+<pre class="literal-block">
+GET ../student/n/teaching
+</pre>
+<p>It return a list with the teaching related with this student, perfect to build his profile in the UI. The data retrieved have the follow format: a list of  pairs <strong>class and list of subjects</strong></p>
+<pre class="literal-block">
+[
+ {&quot;subjects&quot;: [
+      {&quot;subjectId&quot;: 1, &quot;name&quot;: &quot;Special Subject&quot;, &quot;enrollmentId&quot;: 2}
+  ],
+ &quot;class&quot;: {&quot;course&quot;: 1, &quot;word&quot;: &quot;A&quot;, &quot;level&quot;: &quot;Primary&quot;, &quot;classId&quot;: 1}
+ },
+
+ {&quot;subjects&quot;: [
+      {&quot;subjectId&quot;: 1, &quot;name&quot;: &quot;Special Subject&quot;, &quot;enrollmentId&quot;: 4}
+  ],
+ &quot;class&quot;: {&quot;course&quot;: 1, &quot;word&quot;: &quot;B&quot;, &quot;level&quot;: &quot;Primary&quot;, &quot;classId&quot;: 2}
+ }
+]
+</pre>
+<p>The JSON received is class which the student are enrollment with a nested list with the subjects that are imparted in each class, with the basic info (ids) to jump to anyplace, subject, class, etc.
+This resource is thinking to retrieve the maximal academic info about one student in a only call.</p>
+</div>
+</div>
+<div class="section" id="subject-resource">
+<h1><strong>Subject</strong> Resource</h1>
+<p>This resource has the same behaviour that the rest, with the same management of the calls and errors except the method <tt class="docutils literal">teaching</tt>.</p>
+<div class="section" id="id2">
+<h2>Special case</h2>
+<p>The call is similar</p>
+<pre class="literal-block">
+GET ../subject/n/teaching
+</pre>
+<p>It return a list with the teaching related with the subject, perfect to build his profile in the UI. The data retrieved have the follow format:</p>
+<pre class="literal-block">
+[
+ {
+   &quot;class&quot;: {
+     &quot;level&quot;: &quot;Primary&quot;,
+     &quot;word&quot;: &quot;B&quot;,
+     &quot;associationId&quot;: 3,
+     &quot;course&quot;: 1,
+     &quot;classId&quot;: 2
+   },
+   &quot;teachers&quot;: [
+     {
+       &quot;name&quot;: &quot;Sophie&quot;,
+       &quot;impartId&quot;: 3,
+       &quot;teacherId&quot;: 3
+     }
+   ]
+ }
+]
+</pre>
+</div>
+</div>
+<div class="section" id="class-resource">
+<h1><strong>Class</strong> Resource</h1>
+<p>This resource has the same behaviour that the rest, with the same management of the calls and errors except the method <tt class="docutils literal">teaching</tt> and the concept of <strong>optional classes</strong>.</p>
+<div class="section" id="id3">
+<h2>Delete</h2>
+<p>We can delete a resource using the DELETE HTTP method, as in the other resoureces, for example:</p>
+<pre class="literal-block">
+curl  -i -X  DELETE localhost:8002/entities/class/1
+</pre>
+<p>But in this case we have an <strong>special delete method</strong> with entities nested, and this is the reason: must be easy
+delete an estudent fron all the subjects that are associated with this class, so we can do this:</p>
+<blockquote>
+curl  -i -X  DELETE localhost:8002/entities/class/1/student/3</blockquote>
+<p>This method will delete all the enrollements items that exists beween the student and any association of the any subject
+with the class related. <em>This special delete method with nested item is only available in **Class resource*</em> <a href="#id4"><span class="problematic" id="id5">*</span></a>.</p>
+<div class="system-message" id="id4">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 277); <em><a href="#id5">backlink</a></em></p>
+Inline emphasis start-string without end-string.</div>
+</div>
+<div class="section" id="optional-classes">
+<h2>Optional classes</h2>
+<p>This resource can be store two kind of items, a normal class that are items with three values, <em>course</em>, <em>level</em> and <em>word</em> but in some cases can be exists (because of the domain of problem) classes that are optional for all words of a course-level. For example if we have 1º Primary A, 1º Primary B and 1º Primary C but we can offer a common group 1º Primary Optional the call is made by other way with other values besides of these, see some examples:</p>
+<pre class="literal-block">
+POST  '{&quot;course&quot;: 1, &quot;word&quot;: &quot;B&quot;, &quot;level&quot;: &quot;ESO&quot;}' /entities/class
+    Insert a standard group in the system.
+
+POST  '{&quot;course&quot;: 1, &quot;level&quot;: &quot;ESO&quot;, &quot;group&quot;: 1, &quot;subgroup&quot;: 1 }' /entities/class
+</pre>
+<p>Insert a optional group to a subject that will be shared between students from some groups un the level, like 1ALevel1, 1BLevel2..
+We could be develop another implementation more implicit but we prefer that the insertions will be more explicit.</p>
+<p>The program control the numeration of groups and you can't insert a group number 3 without insert before the group 2 and in the same way win the subgroups, and return an error in the cases if not satisfy this conditions.</p>
+<p>The detele or update actions follow the same philosophy.</p>
+<p>Further of this, this kind of classes have a own rules and errors due his own nature.</p>
+</div>
+<div class="section" id="id6">
+<h2>Special case</h2>
+<p>The call is similar</p>
+<pre class="literal-block">
+GET ../class/n/teaching
+</pre>
+<p>It return a list with the teaching related with the subject, perfect to build his profile in the UI. The data retrieved have the follow format:</p>
+<pre class="literal-block">
+[
+ {
+   &quot;subject&quot;: {
+     &quot;subjectId&quot;: 1,
+     &quot;associationId&quot;: 2,
+     &quot;subjectName&quot;: &quot;Special Subject&quot;
+   },
+   &quot;teachers&quot;: [
+     {
+       &quot;teacherName&quot;: &quot;Andrew&quot;,
+       &quot;impartId&quot;: 2,
+       &quot;teacherId&quot;: 2
+     }
+   ]
+ },
+ {
+   &quot;subject&quot;: {
+     &quot;subjectId&quot;: 2,
+     &quot;associationId&quot;: 3,
+     &quot;subjectName&quot;: &quot;Super Special Subject&quot;
+   },
+   &quot;teachers&quot;: [
+     {
+       &quot;teacherName&quot;: &quot;Sophie&quot;,
+       &quot;impartId&quot;: 3,
+       &quot;teacherId&quot;: 3
+     }
+   ]
+ }
+]
+</pre>
+<p>All the block of data of this special <em>teaching</em> resources have all identifiers needed to make any action, to jump to other info or to delete some item.</p>
+</div>
+</div>
+<div class="section" id="association-resource">
+<h1><strong>Association</strong> Resource</h1>
+<p>An association is a relation between a subject and a class in the domain of
+the problem:</p>
+<p>This resource has a special GET response to a specific item, `` GET ../association/n <a href="#id7"><span class="problematic" id="id8">``</span></a>. This return a special
+data block with all info about this pair of subject-class, like the name and id of subject and class and two list with
+the teachers that imparts this couple and another list with the students that are enrollment in this pair, in spite of
+the own data of the association entity, like metadata and id.</p>
+<div class="system-message" id="id7">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 353); <em><a href="#id8">backlink</a></em></p>
+Inline literal start-string without end-string.</div>
+<p><strong>This resource hasn't related resources</strong>, for example:</p>
+<pre class="literal-block">
+curl -i -X GET localhost:8002/entities/association/1/class
+...
+400 Bad Request
+...
+&lt;h1&gt;Bad Request&lt;/h1&gt;
+&lt;p&gt;class is not a valid nested resource.&lt;/p&gt;
+</pre>
+<div class="section" id="id9">
+<h2>GET</h2>
+<p>To get all info about a association::</p>
+<pre class="literal-block">
+GET .../association/n
+</pre>
+<p>This is the aspect of the common response:</p>
+<blockquote>
+<dl class="docutils">
+<dt>{</dt>
+<dd><p class="first">&quot;createdAt&quot;: &quot;2016-12-15T10:51:12&quot;,
+&quot;createdBy&quot;: 1,
+&quot;subject&quot;: {</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 381)</p>
+Unexpected indentation.</div>
+<blockquote>
+&quot;name&quot;: &quot;1&quot;,
+&quot;subjectId&quot;: 1</blockquote>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 383)</p>
+Block quote ends without a blank line; unexpected unindent.</div>
+<p>},
+&quot;associationId&quot;: 2,
+&quot;teachers&quot;: [</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 386)</p>
+Unexpected indentation.</div>
+<blockquote>
+<dl class="docutils">
+<dt>{</dt>
+<dd>&quot;teacherId&quot;: 1,
+&quot;teacherName&quot;: &quot;1&quot;</dd>
+</dl>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 389)</p>
+Definition list ends without a blank line; unexpected unindent.</div>
+<p>}</p>
+</blockquote>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 390)</p>
+Block quote ends without a blank line; unexpected unindent.</div>
+<p>],
+&quot;students&quot;: [</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 392)</p>
+Unexpected indentation.</div>
+<blockquote>
+<dl class="docutils">
+<dt>{</dt>
+<dd>&quot;studentName&quot;: &quot;3&quot;,
+&quot;studentId&quot;: 3</dd>
+</dl>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 395)</p>
+Definition list ends without a blank line; unexpected unindent.</div>
+<p>}</p>
+</blockquote>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 396)</p>
+Block quote ends without a blank line; unexpected unindent.</div>
+<p>],
+&quot;class&quot;: {</p>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 398)</p>
+Unexpected indentation.</div>
+<blockquote>
+&quot;classId&quot;: 2,
+&quot;course&quot;: 2,
+&quot;word&quot;: &quot;B&quot;,
+&quot;level&quot;: &quot;2&quot;</blockquote>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 402)</p>
+Block quote ends without a blank line; unexpected unindent.</div>
+<p class="last">}</p>
+</dd>
+</dl>
+<div class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 403)</p>
+Definition list ends without a blank line; unexpected unindent.</div>
+<p>}</p>
+</blockquote>
+</div>
+</div>
+<div class="section" id="enrollment-resource">
+<h1><strong>Enrollment</strong> Resource</h1>
+<p>An enrollment item is a relation between an student and an association (association between a class and a subject).</p>
+<div class="section" id="id10">
+<h2>PUT</h2>
+<p>To put a new enrollment relation in the sistem you need use the PUT method, and it can be used
+two diferents ways.</p>
+<blockquote>
+curl -H &quot;Content-Type: application/json&quot; -X POST -d '{&quot;associationId&quot;: 16, &quot;studentId&quot;: 1}' localhost:8002/entities/enrollment</blockquote>
+<p>But is easy to need save mulitple relations with the same student, when it is enrolled to all subject of
+a class or in any other process that we can imagine, because of this you can pass, instead of <em>associationId</em>,
+<em>associationsIds</em> where the value must be an array of identificators of associations.</p>
+<p>Something like this:</p>
+<blockquote>
+'{&quot;associationsIds&quot;: [16,17,18,19], &quot;studentId&quot;: 1}'</blockquote>
+<p>To this way we focus the complexity of this kind of  processes in the server.</p>
+</div>
+</div>
+<div class="section" id="flask-apirest">
+<h1>Flask APIRest</h1>
+<div class="system-message">
+<p class="system-message-title">System Message: ERROR/3 (<tt class="docutils">tdbms_api_rest.rst</tt>, line 441)</p>
+<p>Unknown directive type &quot;toctree&quot;.</p>
+<pre class="literal-block">
+.. toctree::
+   :maxdepth: 2
+
+   dbms_api
+
+
+
+
+
+
+
+</pre>
+</div>
+</div>
+</div>
+</body>
+</html>

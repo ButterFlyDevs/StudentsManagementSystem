@@ -1,0 +1,34 @@
+{
+  "association": {
+    "associationId": 13,
+    "class": {
+      "classId": 283,
+      "classWord": "A",
+      "classCourse": 2,
+      "classLevel": "Elementary"
+    },
+    "subject": {
+      "subjectId": 24,
+      "subjectName": "Pruebas"
+    }
+  },
+  "teacher": {
+    "teacherId": 213,
+    "teacherName": "asdk",
+    "teacherSurname": "sdlkfjs",
+    "teacherImgProfile": "www.google.es"
+  },
+  "students": [
+    {
+      "studentId": 213,
+      "studentName": "asdk",
+      "studentImgProfile": "www.google.es"
+    },
+    {
+      "studentId": 213,
+      "studentName": "asdk",
+      "studentSurname": "sdlkfjs",
+      "studentImgProfile": "www.google.es"
+    }
+  ]
+}
