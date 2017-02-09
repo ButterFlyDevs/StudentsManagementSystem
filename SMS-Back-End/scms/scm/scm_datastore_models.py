@@ -12,30 +12,62 @@ from google.appengine.ext import ndb
 
 class Class(ndb.Model):
     classId = ndb.IntegerProperty()
-    classWord = ndb.StringProperty()
-    classCourse = ndb.IntegerProperty()
-    classLevel = ndb.StringProperty()
+    word = ndb.StringProperty()
+    course = ndb.IntegerProperty()
+    level = ndb.StringProperty()
+
 
 class Subject(ndb.Model):
     subjectId = ndb.IntegerProperty()
-    subjectName = ndb.StringProperty()
+    name = ndb.StringProperty()
+
 
 class Association(ndb.Model):
     associationId = ndb.IntegerProperty()
     classs = ndb.StructuredProperty(Class)
     subject = ndb.StructuredProperty(Subject)
 
+
+class ACAssociation(ndb.Model):
+
+    associationDataBlockId = ndb.IntegerProperty()
+    associationId = ndb.IntegerProperty()
+    classs = ndb.StructuredProperty(Class)
+    subject = ndb.StructuredProperty(Subject)
+
+
+class CKS(ndb.Model):
+
+    assistance = ndb.BooleanProperty()
+    delay = ndb.IntegerProperty()
+    justifiedDelay = ndb.BooleanProperty()
+    uniform = ndb.BooleanProperty()
+
+
+class ACStudent(ndb.Model):
+
+    studentId = ndb.IntegerProperty()
+    name = ndb.StringProperty()
+    surname = ndb.StringProperty()
+
+    control = ndb.StructuredProperty(CKS)
+
+
 class Student(ndb.Model):
     studentId = ndb.IntegerProperty()
     name = ndb.StringProperty()
     surname = ndb.StringProperty()
+
 
 class Teacher(ndb.Model):
     teacherId = ndb.IntegerProperty()
     name = ndb.StringProperty()
     surname = ndb.StringProperty()
 
-# Association Data Block
+
+##########################################
+# Association Data Block DataStore Model #
+##########################################
 class ADB(ndb.Model):
     """A main model for representing an individual Guestbook entry.
 
@@ -86,3 +118,49 @@ class ADB(ndb.Model):
 
         return item
 
+
+#################################################
+# Attendance Control Data Block DataStore Model #
+#################################################
+class AC(ndb.Model):
+
+    association = ndb.StructuredProperty(ACAssociation)
+    teacher = ndb.StructuredProperty(Teacher)
+    students = ndb.StructuredProperty(ACStudent, repeated=True)
+
+    createdBy = ndb.IntegerProperty()
+    createdAt = ndb.DateTimeProperty()
+
+    modifiedBy = ndb.IntegerProperty(default=None)
+    modifiedAt = ndb.DateTimeProperty(default=None)
+
+    deletedBy = ndb.IntegerProperty(default=None)
+    deletedAt = ndb.DateTimeProperty(default=None)
+
+    deleted = ndb.BooleanProperty(default=False)
+
+
+#################################################
+# Record Data Block DataStore Model #
+#################################################
+class Record(ndb.Model):
+
+    # Student Identification and properties
+    studentId = ndb.IntegerProperty()
+    # age = ndb.IntegerProperty()
+
+    # CKS Base
+    assistance = ndb.BooleanProperty()
+    delay = ndb.IntegerProperty()
+    justifiedDelay = ndb.BooleanProperty()
+    uniform = ndb.BooleanProperty()
+
+    # Related Items Metadata
+    associationId = ndb.IntegerProperty()
+    subjectId = ndb.IntegerProperty()
+    classId = ndb.IntegerProperty()
+    teacherId = ndb.IntegerProperty()
+
+    # Time Metadata
+    recordDate = ndb.DateTimeProperty()
+    recordWeekday = ndb.IntegerProperty()

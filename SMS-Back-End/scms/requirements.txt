@@ -10,3 +10,8 @@ unittest2>=0.5
 jsonpickle
 termcolor
 pytz
+
+# For data science
+scipy
+numpy
+pandas

@@ -3,32 +3,33 @@
     "associationId": 13,
     "class": {
       "classId": 283,
-      "classWord": "A",
-      "classCourse": 2,
-      "classLevel": "Elementary"
+      "word": "A",
+      "course": 2,
+      "level": "Elementary"
     },
     "subject": {
       "subjectId": 24,
-      "subjectName": "Pruebas"
+      "name": "Pruebas"
     }
   },
   "teacher": {
-    "teacherId": 213,
-    "teacherName": "asdk",
-    "teacherSurname": "sdlkfjs",
-    "teacherImgProfile": "www.google.es"
+    "teacherId": 23,
+    "name": "teacherA",
+    "surname": "teacherB",
+    "imgProfile": "picTeacher"
   },
   "students": [
     {
-      "studentId": 213,
-      "studentName": "asdk",
-      "studentImgProfile": "www.google.es"
+      "studentId": 113,
+      "name": "nameA",
+      "surname": "surnameA",
+      "imgProfile": "pic2"
     },
     {
       "studentId": 213,
-      "studentName": "asdk",
-      "studentSurname": "sdlkfjs",
-      "studentImgProfile": "www.google.es"
+      "name": "nameB",
+      "surname": "surnameB",
+      "imgProfile": "pic1"
     }
   ]
 }

@@ -12,6 +12,8 @@ import json
 from termcolor import colored
 
 from scm.scm import Association_Manager
+from scm.scm import Attendance_Controls_Manager as ACM
+from das.das import *
 
 
 app = Flask(__name__)
@@ -37,7 +39,7 @@ v = 1
 microservice_name = '\n ## scms Students Control micro Service ##'
 
 
-def process_association_response(response):
+def process_response(response):
     """
     Process the response of Association_Manager to adapt to a api rest response, with
     HTTP status code instead of library status code.
@@ -79,6 +81,9 @@ def test():
     """
     return json.dumps({'scms_api_rest_test_status': 'ok'})
 
+#########################
+# Association Resources #
+#########################
 
 @app.route('/association', methods=['POST'])
 def post_association():
@@ -92,7 +97,7 @@ def post_association():
     """
 
     # return Association_Manager.post2(request.get_json())
-    return process_association_response(Association_Manager.post(request.get_json()))
+    return process_response(Association_Manager.post(request.get_json()))
 
 
 @app.route('/association', methods=['GET'])
@@ -109,7 +114,7 @@ def get_association(entity_id = None, teacher_id = None):
     :return:
     """
 
-    return process_association_response(Association_Manager.get(entity_id, teacher_id))
+    return process_response(Association_Manager.get(entity_id, teacher_id))
 
 
 @app.route('/association/<int:entity_id>', methods=['DELETE'])
@@ -125,7 +130,7 @@ def delete_association(entity_id):
 
     """
 
-    return process_association_response(Association_Manager.delete(entity_id))
+    return process_response(Association_Manager.delete(entity_id))
 
 
 @app.route('/association/<int:entity_id>', methods=['PUT'])
@@ -136,7 +141,58 @@ def put_entities(entity_id):
     :return:
     """
 
-    return process_association_response(Association_Manager.put(entity_id, request.get_json()))
+    return process_response(Association_Manager.put(entity_id, request.get_json()))
+
+################################
+# Attendance Control Resources #
+################################
+
+
+@app.route('/acbase/<int:association_id>', methods=['GET'])
+def get_ac_base(association_id):
+    """
+    Get the Attendance Control Base to the association with id passed in url.
+    :param association_id:
+    :return:
+
+    curl -i -X GET localhost:8003/acb/<id>
+    curl -i -X GET localhost:8003/acb/5629499534213120
+    """
+
+    #TODO: Debería devolver tb el CKS para ver como se construye y cuales son las opciones del formulario en la UI.
+
+    return process_response(ACM.get_ac_base(association_id))
+
+
+@app.route('/ac', methods=['POST'])
+def post_ac():
+    """
+    curl -H "Content-Type: application/json" -X POST -d '...' localhost:8003/association
+
+    Post with example file:
+    curl -H "Content-Type: application/json" -X POST -d @SMS-Back-End/scms/test/AC_example_1.json localhost:8003/ac
+
+    :return:
+    """
+
+    # return Association_Manager.post2(request.get_json())
+    return process_response(ACM.post_ac(request.get_json()))
+
+
+
+##################################
+# Data Analysis System Resources #
+##################################
+
+
+@app.route('/das/attendances/general', methods=['GET'])
+def get_attendances_general():
+    """
+    curl -i -X GET localhost:8003/das/attendances/general
+
+    :return:
+    """
+    return process_response(get_general_attendance_report())
 
 if __name__ == '__main__':
     app.run(debug=True)
