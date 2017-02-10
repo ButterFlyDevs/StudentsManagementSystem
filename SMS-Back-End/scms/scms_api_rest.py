@@ -85,6 +85,7 @@ def test():
 # Association Resources #
 #########################
 
+
 @app.route('/association', methods=['POST'])
 def post_association():
     """
@@ -134,7 +135,7 @@ def delete_association(entity_id):
 
 
 @app.route('/association/<int:entity_id>', methods=['PUT'])
-def put_entities(entity_id):
+def put_association(entity_id):
     """
     curl -H "Content-Type: application/json" -X PUT -d @test/ADB_example_2.json localhost:8003/association/5629499534213120
     :param entity_id:
@@ -146,6 +147,17 @@ def put_entities(entity_id):
 ################################
 # Attendance Control Resources #
 ################################
+
+
+@app.route('/ac', methods=['GET'])
+@app.route('/ac/<int:ac_id>', methods=['GET'])
+def get_ac(ac_id=None):
+    """
+    Get a list of acs or a specific ac from datastore.
+    :param ac_id:
+    :return:
+    """
+    return process_response(ACM.get_ac(ac_id))
 
 
 @app.route('/acbase/<int:association_id>', methods=['GET'])

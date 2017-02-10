@@ -13,6 +13,4 @@ handlers:
 - url: /.*
   script: scms_api_rest.app
 
-libraries:
-- name: pandas
 

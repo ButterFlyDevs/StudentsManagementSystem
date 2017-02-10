@@ -5,8 +5,8 @@ SMS-Back-End/dbms/lib
 SMS-Back-End/dbms/dbapi/productionCloudSQLInstanceINFO.py
 SMS-Back-End/dbms/docs/build/
 
-SMS-Back-End/sce/lib/
-SMS-Back-End/sce/docs/build
+SMS-Back-End/scms/lib/
+SMS-Back-End/scms/docs/build
 
 SMS-Back-End/apigms/lib/
 SMS-Back-End/apigms/docs/build/
@@ -18,3 +18,5 @@ SMS-Front-End/app/vendor/
 _site/
 
 lines.txt
+
+*.csv

@@ -4,7 +4,7 @@
 
 from termcolor import colored
 from scm_datastore_models import *
-from datetime import datetime
+import datetime
 import pytz
 import copy
 
@@ -316,6 +316,50 @@ class Association_Manager:
 
 class Attendance_Controls_Manager:
 
+    @classmethod
+    def get_ac(cls, ac_id=None):
+
+
+
+        if ac_id is None:
+
+            q = AC.query()
+            items = []
+
+            for item in q.iter():
+                key_id = item._key.id()
+                dict_tmp = item.to_dict()
+
+                dict_tmp = dict((k, v) for k, v in dict_tmp.iteritems() if v)
+
+                if dict_tmp.get('deleted', None) is not True:
+                    dict_tmp['students'] = len(dict_tmp['students'])
+                    items.append(dict_tmp)
+                    dict_tmp['acId'] = key_id
+
+            return {'status': 1, 'data': items, 'log': None}
+
+        else:
+
+            query = AC.get_ac(ac_id)
+
+            item = query.get()
+
+            if item:
+
+                key_id = item._key.id()
+                item = item.to_dict()
+                # Previous deleting of keys with values to null to reduce the size of response.
+                item = dict((k, v) for k, v in item.iteritems() if v)
+                item['acId'] = key_id
+
+                if query.count() == 1 and item.get('deleted', None) is not True:
+                    return {'status': 1, 'data': item, 'log': None}
+                else:
+                    return {'status': -1, 'data': None, 'log': None}
+
+            else:
+                return {'status': -1, 'data': None, 'log': None}
 
     @classmethod
     def get_ac_base(cls, association_id):
@@ -458,7 +502,7 @@ class Attendance_Controls_Manager:
                                                  surname=student.get('surname'), control=control_tmp))
 
             if ac.get('provisionerDateTime',None) is not None:
-                date = datetime.strptime(ac['provisionerDateTime'], "%Y-%m-%d %H:%M")
+                date = datetime.datetime.strptime(ac['provisionerDateTime'], "%Y-%m-%d %H:%M")
 
             else:
                 date = time_now()

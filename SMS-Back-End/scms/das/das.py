@@ -10,9 +10,9 @@ from termcolor import colored
 from scm import scm_datastore_models as models
 
 
-import numpy
-import scipy
-import pandas as pd
+#import numpy
+#import scipy
+#import pandas as pd
 
 
 def get_general_attendance_report():
@@ -24,9 +24,9 @@ def get_general_attendance_report():
         items.append(result.to_dict())
 
     # Convert the list of dict in a pandas dataframe.
-    data_frame = pd.DataFrame(items)
+    #data_frame = pd.DataFrame(items)
     # We extract the result of group like Series object.
-    data_frame.groupby(['recordWeekday', 'assistance']).size()
+    #data_frame.groupby(['recordWeekday', 'assistance']).size()
 
     print items
     return {'status': 1, 'data': items, 'log': None}

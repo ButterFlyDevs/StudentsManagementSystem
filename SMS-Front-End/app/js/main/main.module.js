@@ -7,7 +7,9 @@
 //teaching -> Teaching module
 
 
-angular.module('main', ['ngMaterial', 'ui.router', 'teachers', 'students', 'subjects', 'classes', 'associations', 'imparts', 'enrollments', 'ngResource', 'angularMoment']);
+angular.module('main', ['ngMaterial', 'ui.router', 'teachers',
+  'students', 'subjects', 'classes', 'associations', 'imparts', 'enrollments',
+   'attendanceControls', 'ngResource', 'angularMoment']);
 
 
 
@@ -18,6 +20,10 @@ angular.module('main').config(function($stateProvider, $urlRouterProvider){
     $stateProvider
 
         .state('home', { url: '/home', templateUrl: 'app/views/home.html'})
+
+        /*####################
+        ## Teaching  Module ##
+        ####################*/
 
         .state('teachers', { url: '/teachers', templateUrl: 'app/views/teaching/teachers/teachersList.html'})
         .state('teachersProfile', {url: '/teachers/:teacherId', templateUrl: 'app/views/teaching/teachers/teachersProfile.html'})
@@ -30,6 +36,14 @@ angular.module('main').config(function($stateProvider, $urlRouterProvider){
 
         .state('classes', { url: '/grupos', templateUrl: 'app/views/teaching/classes/classesList.html'})
         .state('classesProfile', {url: '/grupos/:classId', templateUrl: 'app/views/teaching/classes/classesProfile.html'})
+
+
+        /*###########################
+        ## Students Control Module ##
+        ###########################*/
+
+        .state('attendanceControls', { url: '/controles_asistencia', templateUrl: 'app/views/studentsControl/attendanceControls/attendanceControlsList.html'})
+        .state('attendanceControlProfile', {url: '/controles_asistencia/:acId', templateUrl: 'app/views/studentsControl/attendanceControls/attendanceControlProfile.html'})
 
   })
 
@@ -125,9 +139,9 @@ angular.module('main').controller('AppCtrl', function($scope, $mdSidenav, $mdMed
         name: 'Control Estudiantes',
         expand: false,
         actions: [{
-          name: 'Action 3',
+          name: 'Control Asistencia',
           icon: 'settings',
-          link: 'Action 3'
+          link: '.attendanceControls'
         }]
       }]
     },

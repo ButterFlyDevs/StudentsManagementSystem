@@ -66,16 +66,6 @@ def ping(url, payload=None, method=None):
     return response
 
 
-
-# Function that is called after that any request
-
-"""
-@app.after_request
-def call_after_request_callbacks(response):
-    print ('LA RESPUESTA ES: ' + str(response))
-"""
-
-
 @app.route('/testdbms', methods=['GET'])
 def test():
     """
@@ -103,8 +93,9 @@ def test2():
     """
     return ('OK')
 
-
-
+###############################################################
+# Teaching DataBase micro Service (TDmS) Resources Connection #
+###############################################################
 
 @app.route('/entities/<string:kind>', methods=['POST'])
 def post_entity(kind):
@@ -124,7 +115,6 @@ def post_entity(kind):
                              json=request.get_json())
     response.headers['Access-Control-Allow-Origin'] = "*"
     return make_response(response.content, response.status_code)
-
 
 
 @app.route('/entities/<string:kind>', methods=['GET'])
@@ -158,7 +148,6 @@ def get_entities(kind, entity_id=None):
     response = make_response(response.content, response.status_code)
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
-
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
@@ -242,6 +231,61 @@ def get_related_entities(kind, entity_id, related_kind, rk_entity_id=None, subre
     return response
 
 
+##############################################################
+# Students Control micro Service (SCmS) Resources Connection #
+##############################################################
+
+@app.route('/association', methods=['POST'])
+def post_association():
+    """
+    curl -H "Content-Type: application/json" -X POST -d '{"name": "María"}' localhost:8003/association
+
+    Post with example file:
+    curl -H "Content-Type: application/json" -X POST -d @SMS-Back-End/scms/test/ADB_example_1.json localhost:8001/association
+
+    :return:
+
+    """
+
+    response = requests.post(url = 'http://{}/{}'.format(modules.get_hostname(module='scms'), 'association'),
+                             json=request.get_json())
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return make_response(response.content, response.status_code)
+
+
+@app.route('/association', methods=['GET'])
+@app.route('/association/<int:entity_id>', methods=['GET'])
+@app.route('/association/teacher/<int:teacher_id>', methods=['GET'])
+def get_association(entity_id = None, teacher_id = None):
+
+    url = 'http://{}/{}'.format(modules.get_hostname(module='scms'), 'association')
+
+    if entity_id is not None:
+        url += '/{}'.format(entity_id)
+
+    if teacher_id is not None:
+        url += '/teacher/{}'.format(teacher_id)
+
+    response = requests.get(url)
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
+
+
+@app.route('/ac', methods=['GET'])
+@app.route('/ac/<int:ac_id>', methods=['GET'])
+def get_ac(ac_id=None):
+    """
+    Get a list of acs or a specific ac from datastore.
+    :param ac_id:
+    :return:
+    """
+
+    url = 'http://{}/{}'.format(modules.get_hostname(module='scms'), 'ac')
+    response = requests.get(url)
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
 
 
 if __name__ == '__main__':

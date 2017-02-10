@@ -140,6 +140,12 @@ class AC(ndb.Model):
     deleted = ndb.BooleanProperty(default=False)
 
 
+    @classmethod
+    def get_ac(cls, ac_id):
+        key = ndb.Key('AC', long(ac_id))
+        query = AC.query(AC.key == key)
+        return query
+
 #################################################
 # Record Data Block DataStore Model #
 #################################################
