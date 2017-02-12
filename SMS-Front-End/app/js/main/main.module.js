@@ -43,7 +43,8 @@ angular.module('main').config(function($stateProvider, $urlRouterProvider){
         ###########################*/
 
         .state('attendanceControls', { url: '/controles_asistencia', templateUrl: 'app/views/studentsControl/attendanceControls/attendanceControlsList.html'})
-        .state('attendanceControlProfile', {url: '/controles_asistencia/:acId', templateUrl: 'app/views/studentsControl/attendanceControls/attendanceControlProfile.html'})
+        .state('attendanceControlProfile', {url: '/controles_asistencia/:acId', templateUrl: 'app/views/studentsControl/attendanceControls/attendanceControl.html'})
+        .state('newAttendanceControl', {url: '/controles_asistencia/nuevo', templateUrl: 'app/views/studentsControl/attendanceControls/attendanceControl.html'})
 
   })
 

@@ -1,0 +1,93 @@
+<md-dialog ng-cloak>
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>
+                <md-icon>add</md-icon>
+                Nuevo Control de Asistencia
+            </h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="vm.closeDialog()">
+                <md-icon>close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content>
+        <div class="md-dialog-content">
+
+            <md-autocomplete
+                    ng-disabled="vm.isDisabled"
+                    md-no-cache="vm.noCache"
+                    md-selected-item="vm.selectedItem"
+                    md-search-text-change="vm.searchTextChange(vm.searchText)"
+                    md-search-text="vm.searchText"
+                    md-selected-item-change="vm.selectedItemChange(item)"
+                    md-items="item in vm.querySearch(vm.searchText)"
+                    md-item-text="item.name"
+                    md-min-length="0"
+                    placeholder="Profesor"
+                    md-menu-class="autocomplete-custom-template">
+
+                <md-item-template>
+                      <span>
+                          <!--
+                        <div ng-switch="item.profileImageUrl || '_undefined_'">
+                            <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
+                            <img ng-switch-default class="img-profile" src="{{ item.profileImageUrl }}">
+                        </div>-->
+                        <img class="img-profile" src="{{ vm.defaultAvatar }}">
+                        <span> {{item.name}}  {{item.surname}}</span>
+
+                      </span>
+                </md-item-template>
+
+            </md-autocomplete>
+
+            </br>
+
+            <md-autocomplete
+                    ng-disabled="vm.isDisabled"
+                    md-no-cache="vm.noCache"
+                    md-selected-item="vm.selectedItem"
+                    md-search-text-change="vm.searchTextChange(vm.searchText)"
+                    md-search-text="vm.searchText"
+                    md-selected-item-change="vm.selectedItemChange(item)"
+                    md-items="item in vm.querySearch(vm.searchText)"
+                    md-item-text="item.name"
+                    md-min-length="0"
+                    placeholder="Grupo"
+                    md-menu-class="autocomplete-custom-template">
+
+                <md-item-template>
+                      <span>
+                          <!--
+                        <div ng-switch="item.profileImageUrl || '_undefined_'">
+                            <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
+                            <img ng-switch-default class="img-profile" src="{{ item.profileImageUrl }}">
+                        </div>-->
+                        <img class="img-profile" src="{{ vm.defaultAvatar }}">
+                        <span> {{item.name}}  {{item.surname}}</span>
+
+                      </span>
+                </md-item-template>
+
+            </md-autocomplete>
+
+
+        </div>
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+        <span flex></span>
+        <md-button class="" ng-click="vm.closeDialog()">
+            Cancelar
+        </md-button>
+        <md-button class="md-primary md-raised" ng-disabled="newTeacherForm.$invalid" ng-click="vm.saveTeacher()"
+                   style="margin-right:20px;">
+            Realizar
+        </md-button>
+    </md-dialog-actions>
+
+
+</md-dialog>

@@ -15,7 +15,7 @@
 
             <div layout="row" layout-align="space-between start">
                 <md-button class="md-primary md-raised"
-                           ng-click="vm.openNewTeacherDialog()">
+                           ng-click="vm.openNewAttendanceControlDialog()">
                     <md-icon>add</md-icon>
                     Nuevo
                 </md-button>
@@ -114,7 +114,7 @@
 
                             <!-- 4. Num of students. -->
                             <td md-cell>
-                                {{ ac.association.subject.name }}
+                                {{ ac.students }}
                             </td>
 
                             <!-- 5. Date. -->

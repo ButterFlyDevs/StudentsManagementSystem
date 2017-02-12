@@ -4,7 +4,7 @@ angular.module('attendanceControls')
         var vm = this;
 
         vm.defaultAvatar = globalService.defaultAvatar;
-        vm.openNewTeacherDialog = openNewTeacherDialog;
+        vm.openNewAttendanceControlDialog = openNewAttendanceControlDialog;
 
         // To control the loading spinner.
         vm.dataIsReady = false;
@@ -24,12 +24,12 @@ angular.module('attendanceControls')
         }
 
         /**
-         * Open the floating dialog to create a new class.
+         * Open the floating dialog to create a new attendance control.
          */
-        function openNewTeacherDialog() {
+        function openNewAttendanceControlDialog() {
             $mdDialog.show({
-                locals: {parentScope: $scope, parentController: vm}, controller: 'newTeacherDialogController',
-                controllerAs: 'vm', templateUrl: 'app/views/teaching/teachers/newTeacherDialog.html'
+                locals: {parentScope: $scope, parentController: vm}, controller: 'newAttendanceControlDialogController',
+                controllerAs: 'vm', templateUrl: 'app/views/studentsControl/attendanceControls/newAttendanceControlDialog.html'
             }).then(function () {}, function () {});
         }
 
