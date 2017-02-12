@@ -81,7 +81,8 @@ def test(ms):
             local("pytest test/ -vv")
 
 
-def doc(ms):
+
+def doc(ms=None):
     """
     Doc generator.
     Build the documentation to the microservice passed.
@@ -97,13 +98,17 @@ def doc(ms):
         local('make -C SMS-Back-End/dbms/docs html')
         local('firefox SMS-Back-End/dbms/docs/build/html/index.html')
 
-    if ms == 'apigms':
+    elif ms == 'apigms':
         local('make -C SMS-Back-End/apigms/docs html')
         local('firefox SMS-Back-End/apigms/docs/build/html/index.html')
 
-    if ms == 'back-end':
+    elif ms == 'back-end':
         local('make -C SMS-Back-End/docs html')
         local('firefox SMS-Back-End/docs/build/html/index.html')
+
+    elif not ms:
+        local('make -C docs html')
+
 
 
 def run_dbms_api_test():
