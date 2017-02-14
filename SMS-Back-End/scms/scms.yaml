@@ -2,6 +2,7 @@ application: 65748238734626
 module: scms
 version: uno
 runtime: python27
+env: flex
 api_version: 1
 threadsafe: true
 
@@ -12,5 +13,7 @@ automatic_scaling:
 handlers:
 - url: /.*
   script: scms_api_rest.app
+
+
 
 

@@ -29,13 +29,12 @@
 
             <div layout-margin layout-padding ng-if="vm.acList.length == 0">
 
-                <h3 class="md-headline"> Aún no se ha dado de alta a ningún profesor.</h3>
-                <h3 class="md-subhead"> ¿Desea insertar uno? </h3>
+                <h3 class="md-headline"> Aún no se ha realizado ningún control de asistencia.</h3>
+                <h3 class="md-subhead"> ¿Desea realizar uno? </h3>
 
                 <div access='admin' layout="row" layout-align="center" layout-margin>
                     <md-button ng-click="vm.openNewTeacherDialog()" class="md-primary md-raised">
-                        <md-icon>add</md-icon>
-                        Insertar
+                        Realizar
                     </md-button>
                 </div>
 

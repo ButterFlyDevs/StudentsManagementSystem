@@ -14,7 +14,7 @@ angular.module('attendanceControls')
         ///////////////////////////////////////////////////////////
         function activate() {
             console.log('Activating attendanceControlsListController controller.')
-            vm.acList = attendanceControlsService.query({}, function () {
+            vm.acList = attendanceControlsService.getAll(function () {
                 vm.dataIsReady = true;
                 console.log(vm.acList);
             }, function (error) {

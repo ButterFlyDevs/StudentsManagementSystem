@@ -153,6 +153,8 @@ def put_association(entity_id):
 @app.route('/ac/<int:ac_id>', methods=['GET'])
 def get_ac(ac_id=None):
     """
+    > curl -i -X GET localhost:8003/ac
+
     Get a list of acs or a specific ac from datastore.
     :param ac_id:
     :return:
@@ -167,11 +169,9 @@ def get_ac_base(association_id):
     :param association_id:
     :return:
 
-    curl -i -X GET localhost:8003/acb/<id>
-    curl -i -X GET localhost:8003/acb/5629499534213120
+    curl -i -X GET localhost:8003/acbase/<id>
+    curl -i -X GET localhost:8003/acbase/5629499534213120
     """
-
-    #TODO: Debería devolver tb el CKS para ver como se construye y cuales son las opciones del formulario en la UI.
 
     return process_response(ACM.get_ac_base(association_id))
 

@@ -12,6 +12,6 @@ termcolor
 pytz
 
 # For data science
-scipy
-numpy
+#scipy
+#numpy
 pandas

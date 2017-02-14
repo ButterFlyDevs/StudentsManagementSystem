@@ -77,7 +77,7 @@ angular.module('main').controller('AppCtrl', function($scope, $mdSidenav, $mdMed
     else list.push(item);
   };
   $scope.data = {
-    title: 'Dashboard',
+    title: 'SMS',
     user: {
       name: 'Susana',
       icon: 'face'

@@ -271,6 +271,9 @@ def get_association(entity_id = None, teacher_id = None):
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
+################################
+# Attendance Control Resources #
+################################
 
 @app.route('/ac', methods=['GET'])
 @app.route('/ac/<int:ac_id>', methods=['GET'])
@@ -287,6 +290,23 @@ def get_ac(ac_id=None):
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
+
+@app.route('/acbase/<int:association_id>', methods=['GET'])
+def get_ac_base(association_id):
+    """
+    Get the Attendance Control Base to the association with id passed in url.
+    :param association_id:
+    :return:
+
+    curl -i -X GET localhost:8003/acbase/<id>
+    curl -i -X GET localhost:8003/acbase/5629499534213120
+    """
+
+    url = 'http://{}/{}/{}'.format(modules.get_hostname(module='scms'), 'acbase', association_id)
+    response = requests.get(url)
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
