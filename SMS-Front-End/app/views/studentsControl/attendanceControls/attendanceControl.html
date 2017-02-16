@@ -56,94 +56,55 @@
                                 <h4>{{student.surname}}</h4>
                             </div>
 
-                            <div layout="row" layout-margin>
+                            <div layout="row" layout-margin md-theme="specialtheme">
+
                                 <!-- Assistance -->
                                 <md-button
-                                           ng-if="student.control.assistance"
-                                           title="Launch Google.com in new window"
-                                           target="_blank"
-                                           ng-disabled="false"
-                                           ng-click="vm.changeAssistanceForStudent(student.studentId)"
-                                           aria-label="Google.com"
-                                           class="md-icon-button launch">
-                                    <md-icon style="font-size:40px; color:greenyellow;"> check_circle </md-icon>
-                                </md-button>
-                                <md-button
-                                           ng-if="!student.control.assistance"
-                                           title="Launch Google.com in new window"
-                                           target="_blank"
-                                           ng-disabled="false"
-                                           ng-click="vm.changeAssistanceForStudent(student.studentId)"
-                                           aria-label="Google.com"
-                                           class="md-icon-button launch">
-                                    <md-icon style="font-size:40px; color:red;"> check_circle </md-icon>
-                                </md-button>
-                                <!-- Delay -->
-                                <md-button
-                                           ng-if="student.control.assistance"
-                                           title="Launch Google.com in new window"
-                                           target="_blank"
-                                           ng-disabled="false"
-                                           ng-click="vm.changeAssistanceForStudent(student.studentId)"
-                                           aria-label="Google.com"
-                                           class="md-icon-button launch">
-                                    <md-icon style="font-size:40px; color:greenyellow;"> query_builder </md-icon>
-                                </md-button>
-                                <md-button
-                                           ng-if="!student.control.assistance"
-                                           title="Launch Google.com in new window"
-                                           target="_blank"
-                                           ng-disabled="false"
-                                           ng-click="vm.changeAssistanceForStudent(student.studentId)"
-                                           aria-label="Google.com"
-                                           class="md-icon-button launch">
-                                    <md-icon style="font-size:40px; color:red;"> query_builder </md-icon>
-                                </md-button>
-                                15'
-                                <!-- Justified Delay -->
-                                <md-button
-                                           ng-if="student.control.assistance"
-                                           title="Launch Google.com in new window"
-                                           target="_blank"
-                                           ng-disabled="true"
-                                           ng-click="vm.changeAssistanceForStudent(student.studentId)"
-                                           aria-label="Google.com"
-                                           class="md-icon-button launch">
-                                    <md-icon style="font-size:40px; color:greenyellow;"> verified_user </md-icon>
-                                </md-button>
-                                <md-button
-                                           ng-if="!student.control.assistance"
-                                           title="Launch Google.com in new window"
-                                           target="_blank"
-                                           ng-disabled="false"
-                                           ng-click="vm.changeAssistanceForStudent(student.studentId)"
-                                           aria-label="Google.com"
-                                           class="md-icon-button launch">
-                                    <md-icon style="font-size:40px; color:red;"> verified_user </md-icon>
+                                        ng-disabled="true"
+                                        ng-click="vm.changeAssistanceForStudent(student.studentId)"
+                                        class="md-icon-button">
+                                    <md-icon ng-if="student.control.assistance == true"
+                                             md-colors="{'color': 'specialpalette-pastelGreen'}">
+                                        check_circle
+                                    </md-icon>
+                                    <md-icon ng-if="!student.control.assistance"
+                                             md-colors="{'color': 'specialpalette-pastelRed'}">
+                                        cancel
+                                    </md-icon>
+
                                 </md-button>
 
                                 <!-- Uniform -->
                                 <md-button
-                                           ng-if="student.control.assistance"
-                                           title="Launch Google.com in new window"
-                                           target="_blank"
-                                           ng-disabled="true"
-                                           ng-click="vm.changeAssistanceForStudent(student.studentId)"
-                                           aria-label="Google.com"
-                                           class="md-icon-button launch">
-                                    <md-icon style="font-size:40px; color:greenyellow;"> visibility </md-icon>
+                                        ng-disabled="!vm.checkIfJustifiedDelayIsEnabled(student.control.uniform)"
+                                        ng-click="vm.changeUniformForStudent(student.studentId)"
+                                        class="md-icon-button">
+                                    <md-icon ng-if="student.control.uniform || student.control.uniform == null"
+                                             md-colors="{'color': 'specialpalette-pastelGreen'}">
+                                        visibility
+                                    </md-icon>
+                                    <md-icon ng-if="student.control.uniform == false "
+                                             md-colors="{'color': 'specialpalette-pastelRed'}">
+                                        visibility_off
+                                    </md-icon>
                                 </md-button>
 
+                                <!-- Delay -->
                                 <md-button
-                                           ng-if="!student.control.assistance"
-                                           title="Launch Google.com in new window"
-                                           target="_blank"
-                                           ng-disabled="false"
-                                           ng-click="vm.changeAssistanceForStudent(student.studentId)"
-                                           aria-label="Google.com"
-                                           class="md-icon-button launch">
-                                    <md-icon style="font-size:40px; color:red;"> visibility_off </md-icon>
+                                        ng-disabled="!vm.checkIfDelayIsEnabled(student.control.delay)"
+                                        ng-click="vm.changeDelayForStudent(student.studentId)"
+                                        class="md-icon-button">
+                                    <md-icon class="md-primary"> query_builder</md-icon>
                                 </md-button>
+
+                                <!-- Justified Delay -->
+                                <md-button
+                                        ng-disabled="!vm.checkIfJustifiedDelayIsEnabled(student.control.justifiedDelay)"
+                                        ng-click="vm.changeAssistanceForStudent(student.studentId)"
+                                        class="md-icon-button md-primary">
+                                    <md-icon> verified_user</md-icon>
+                                </md-button>
+
 
                             </div>
 

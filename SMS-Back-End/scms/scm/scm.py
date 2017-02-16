@@ -372,7 +372,7 @@ class Attendance_Controls_Manager:
         # Definition of basic CKS (Control Kind Specification)
         cks = {"assistance": True,
                "delay": 0,
-               "justifiedDelay": True,
+               "justifiedDelay": None,
                "uniform": True}
 
         # 1. First, we extract the association data block related.

@@ -3,17 +3,15 @@
 ############################
 
 #import numpy as np
-#import pandas as pd
+import pandas as pd
+
+
 import sys
 # Add the ptdraft folder path to the sys.path list
 sys.path.append('../scm/')
 from termcolor import colored
 
 from scm import scm_datastore_models as models
-
-#import numpy
-#import scipy
-
 
 
 def get_general_attendance_report():
@@ -33,3 +31,10 @@ def get_general_attendance_report():
 
     print items
     return {'status': 1, 'data': items, 'log': None}
+
+def test():
+    return 'TEST'
+
+if __name__ == "__main__":
+
+    print (test())

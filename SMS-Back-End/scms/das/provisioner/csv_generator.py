@@ -6,7 +6,7 @@ like an approach to the real scenario.
 
 Example:
 
-    python csv_generator.py --filename hola --lines 5 --generator 1
+    python csv_generator.py --filename hola --generator 1
 
 
 """
@@ -27,7 +27,8 @@ args = parser.parse_args()
 
 
 
-def generator1(file, lines):
+
+def generator1(file, lines=None):
 
     days = 60
     students_per_clase = 30
@@ -35,7 +36,6 @@ def generator1(file, lines):
     classes = 2
 
     # Total of lines: 30 students per 2 classes = 60 per 8 subjects = 480 items per 60 days = 28.800 records
-
 
     # We write the description of generator schema:
     item = ['studentId', 'classId', 'subjectId', 'teacherId',
@@ -58,12 +58,16 @@ def generator1(file, lines):
         times = [0,5,10,20,30]
 
 
-
         for class_num in range(1, classes+1):
             for subject_num in range(1, subjects+1):
                 for student_num in range(1, students_per_clase+1):
 
-                    asistencia = randint(0,1)
+                    #We are going to comple a bit more the random generator
+                    asistencia = None
+                    if randint(0, 100) <= 60:
+                        asistencia = 1
+                    else:
+                        asistencia = 0
 
                     if asistencia == 1:
                         retraso = times[randint(0,4)]
@@ -97,7 +101,7 @@ if int(args.generator) == 1:
     with open('{}.csv'.format(args.filename), 'wb') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=';')
 
-        generator1(spamwriter, int(args.lines))
+        generator1(spamwriter)
 
 
 
