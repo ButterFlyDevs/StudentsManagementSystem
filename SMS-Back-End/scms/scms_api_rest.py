@@ -92,7 +92,7 @@ def post_association():
     curl -H "Content-Type: application/json" -X POST -d '{"name": "María"}' localhost:8003/association
 
     Post with example file:
-    curl -H "Content-Type: application/json" -X POST -d @SMS-Back-End/scms/test/ADB_example_1.json localhost:8003/association
+    curl -i -H "Content-Type: application/json" -X POST -d @SMS-Back-End/scms/test/ADB_example_1.json localhost:8003/association
 
     :return:
     """
@@ -182,7 +182,7 @@ def post_ac():
     curl -H "Content-Type: application/json" -X POST -d '...' localhost:8003/association
 
     Post with example file:
-    curl -H "Content-Type: application/json" -X POST -d @SMS-Back-End/scms/test/AC_example_1.json localhost:8003/ac
+    curl -i -H "Content-Type: application/json" -X POST -d @SMS-Back-End/scms/test/AC_example_1.json localhost:8003/ac
 
     :return:
     """

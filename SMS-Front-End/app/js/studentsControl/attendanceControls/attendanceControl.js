@@ -21,13 +21,16 @@ angular.module('attendanceControls')
 
             activate();
 
+
             ///////////////////////////////////////////////////////////////////
             function activate() {
                 console.log('Activating attendanceControlController controller.');
 
-                vm.acBase = attendanceControlsService.getBase({id: 5629499534213120},
+                vm.acBase =  new attendanceControlsService();
+                // Using $ like prefix to use own methods
+                vm.acBase.$getBase({id: 5629499534213120},
                     function () {
-                        console.log('Attendance Control Base Data Block');
+                        console.log('Attendance Control Base Data Block received:');
                         console.log(vm.acBase);
                         vm.dataIsReady = true;
 
@@ -39,16 +42,20 @@ angular.module('attendanceControls')
 
             }
 
+
+
             function changeDelayForStudent(studentId) {
                 console.log('DELAY CHANGED')
             }
 
             function checkIfDelayIsEnabled(delayValue) {
                 console.log('checkIfDelayIsEnable')
+                console.log(delayValue)
 
-                if (delayValue == null)
+                if (delayValue == null) {
+                    console.log('false')
                     return false;
-                else
+                }else
                     return true;
 
             }
@@ -56,13 +63,48 @@ angular.module('attendanceControls')
             function checkIfJustifiedDelayIsEnabled(delayValue) {
                 console.log('checkIfJustifiedDelayIsEnable')
 
-                if (delayValue == null)
+              if (delayValue == null) {
+                    console.log('false')
                     return false;
-                else
+                }else
                     return true;
 
             }
 
+
+            vm.changeDelay = function changeDelay(studentId, delay){
+
+                console.log('CHANGE DELAY');
+
+                 if (delay == 'Sin retraso'){
+                     delay = 0;
+                 }
+                 for (var a = 0; a < vm.acBase.students.length; a++) {
+                    if (vm.acBase.students[a].studentId == studentId) {
+                            vm.acBase.students[a].control.delay = delay;
+                            console.log(vm.acBase.students[a].control.delay);
+                            if (delay !=0)
+                                vm.acBase.students[a].control.justifiedDelay = 0;
+                            else
+                                vm.acBase.students[a].control.justifiedDelay = null;
+                    }
+                }
+            }
+
+            vm.changeJustifiedDelay = function changeJustifiedDelay(studentId){
+
+                console.log('PUTAAAAAAAAAAAAAAAAAAAAAAAAAA')
+
+                for (var a = 0; a < vm.acBase.students.length; a++) {
+                    if (vm.acBase.students[a].studentId == studentId) {
+                        if (vm.acBase.students[a].control.justifiedDelay == true) {
+                            vm.acBase.students[a].control.justifiedDelay = false;
+                        } else {
+                            vm.acBase.students[a].control.justifiedDelay = true;
+                        }
+                    }
+                }
+            }
 
             function changeUniformForStudent(studentId) {
                 for (var a = 0; a < vm.acBase.students.length; a++) {
@@ -84,14 +126,16 @@ angular.module('attendanceControls')
                 for (var a = 0; a < vm.acBase.students.length; a++) {
                     if (vm.acBase.students[a].studentId == studentId) {
                         if (vm.acBase.students[a].control.assistance == true) {
-                            vm.acBase.students[a].control.assistance = false;
 
+                            // Set the student to fault.
+                            vm.acBase.students[a].control.assistance = false;
                             // It changed to null the rest of values:
                             vm.acBase.students[a].control.delay = null;
-                            vm.acBase.students[a].control.justifiedDelay = null;
+                            vm.acBase.students[a].control.justifiedDelay = 0;
                             vm.acBase.students[a].control.uniform = null;
 
                             console.log(vm.acBase.students[a].control);
+
 
                         } else {
                             vm.acBase.students[a].control.assistance = true;
@@ -102,6 +146,24 @@ angular.module('attendanceControls')
                     }
                 }
 
+            }
+
+            vm.saveCA = function saveCA(){
+                console.log('Saving CA');
+                console.log(vm.acBase)
+
+                vm.acBase.$save(
+                    function(){ // Success
+                        console.log('ac saved successfully');
+                        $mdDialog.cancel();
+                        $state.reload();
+                        toastService.showToast('Control de asistencia realizado con éxito.')
+                    },
+                    function(error){ // Fail
+                        toastService.showToast('Error al enviar control de asistencia.')
+                        console.log('Error while ac was saved.')
+                        console.log(error)
+                    });
             }
 
         }

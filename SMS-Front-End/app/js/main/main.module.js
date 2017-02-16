@@ -54,6 +54,8 @@ angular.module('main').config(function($mdThemingProvider) {
   $mdThemingProvider.definePalette('specialpalette', {
     'pastelGreen': 'A7FF84',
     'pastelRed': 'EB7B78',
+    'gray': '9e9e9e',
+    'pastelOrange': 'EBA534',
     '50': 'ffebee',
     '100': 'ffcdd2',
     '200': 'ef9a9a',

@@ -3,7 +3,7 @@
 ############################
 
 #import numpy as np
-import pandas as pd
+#import pandas as pd
 
 
 import sys
@@ -32,9 +32,3 @@ def get_general_attendance_report():
     print items
     return {'status': 1, 'data': items, 'log': None}
 
-def test():
-    return 'TEST'
-
-if __name__ == "__main__":
-
-    print (test())

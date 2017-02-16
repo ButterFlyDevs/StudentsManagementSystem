@@ -308,5 +308,15 @@ def get_ac_base(association_id):
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
+
+@app.route('/ac', methods=['POST'])
+def post_ac():
+
+    response = requests.post(url = 'http://{}/{}'.format(modules.get_hostname(module='scms'), 'ac'),
+                             json=request.get_json())
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return make_response(response.content, response.status_code)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

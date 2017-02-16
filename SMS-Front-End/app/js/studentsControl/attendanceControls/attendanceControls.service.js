@@ -2,7 +2,7 @@ angular.module('attendanceControls')
     .factory("attendanceControlsService",
         function ($resource, globalService) {
 
-            var restPath = 'http://'+globalService.defaultMicroServicesURL;
+            var restPath = 'http://'+globalService.defaultMicroServicesURL + '/ac';
 
 
             // The second param is [paramDefaults] to pass param to URL
@@ -10,12 +10,12 @@ angular.module('attendanceControls')
 
                 'getAll': {
                     method: 'GET',
-                    url: restPath + '/ac',
+                    url: restPath,
                     isArray: true
                 },
                 'getBase': {
                     method: 'GET',
-                    url: restPath + '/acbase/' + ':id'
+                    url: restPath + 'base/' + ':id'
                 }
 
             });
