@@ -352,6 +352,7 @@ class Attendance_Controls_Manager:
                 # Previous deleting of keys with values to null to reduce the size of response.
                 item = dict((k, v) for k, v in item.iteritems() if v)
                 item['acId'] = key_id
+                item['association']['class'] = item['association'].pop('classs')
 
                 if query.count() == 1 and item.get('deleted', None) is not True:
                     return {'status': 1, 'data': item, 'log': None}
@@ -387,6 +388,7 @@ class Attendance_Controls_Manager:
         item = dict((k, v) for k, v in item.iteritems() if v)
 
         item['association']['associationDataBlockId'] = item_id
+        item['association']['class'] = item['association'].pop('classs')
 
         # 2. After, We add cks to each student.
         students = item.get('students', None)
@@ -403,33 +405,37 @@ class Attendance_Controls_Manager:
             return {'status': -1, 'data': None, 'log': None}
 
     @classmethod
-    def post_ac(cls, ac):
+    def post_ac(cls, received_ac):
         """
         Save all info in AC database and extract the records to save in records database.
-        :param ac:
+        :param received_ac:
         :return:
         """
+
+        print colored(received_ac, 'blue')
+        print colored('-------', 'red')
 
         # 1. First, we must be check that the association passed is correct, it means that it exists
         # in the database and all fields are correct.
 
         ac_is_correct = True
 
-        association = ac.get('association', None)
+        association = received_ac.get('association', None)
         ADB_id = association.get('associationDataBlockId', None)
-        del ac['association']['associationDataBlockId']
+        del received_ac['association']['associationDataBlockId']
 
         query = ADB.get_adb(ADB_id)
 
-        item = query.get()
+        adb = query.get()
 
-        item_id = item._key.id()
+        item_id = adb._key.id()
 
-        item = item.to_dict()
-        item = dict((k, v) for k, v in item.iteritems() if v)
+        adb = adb.to_dict()
+        adb = dict((k, v) for k, v in adb.iteritems() if v)
 
-        print colored(item, 'blue')
-        print colored(ac, 'green')
+        print colored(adb, 'blue')
+        print colored('-------', 'red')
+
 
         # The id
         if item_id != ADB_id:
@@ -437,34 +443,39 @@ class Attendance_Controls_Manager:
         else:
             print 'item_id correct'
 
-
         # Correct the name of class from the database.
-        item['association']['class'] = item['association'].pop('classs')
+        adb['association']['class'] = adb['association'].pop('classs')
+
 
         # Association Check
-        if ac['association'] != item['association']:
+        if received_ac['association'] != adb['association']:
             ac_is_correct = False
+            print 'association incorrect'
+            print received_ac['association']
+            print adb['association']
         else:
             print 'association correct'
 
         # Teacher Check
-        if ac['teacher'] != item['teacher']:
+        if received_ac['teacher'] != adb['teacher']:
             ac_is_correct = False
 
         # Students Check
-        print colored(ac['students'], 'red')
+        print colored(received_ac['students'], 'red')
 
-        ac_students = copy.deepcopy(ac['students'])
+        ac_students = copy.deepcopy(received_ac['students'])
 
         for student in ac_students:
             del student['control']
 
-        print colored(ac['students'], 'green')
+        print colored(received_ac['students'], 'green')
 
-        item_students = item['students']
+        item_students = adb['students']
 
         if ac_students != item_students:
             ac_is_correct = False
+        else:
+            print 'FALSE'
 
         # 2. Before if is correct we save data in AC table.
 
@@ -473,19 +484,19 @@ class Attendance_Controls_Manager:
 
             # Saving the AC object in data store
 
-            classs = ac['association']['class']
+            classs = received_ac['association']['class']
             datastore_classs = Class(classId=classs['classId'], word=classs['word'], course=classs['course'], level=classs['level'])
 
-            subject = ac['association']['subject']
+            subject = received_ac['association']['subject']
             datastore_subject = Subject(subjectId=subject['subjectId'], name=subject['name'])
 
-            asso = ACAssociation(associationDataBlockId=ADB_id, associationId=ac['association']['associationId'],
+            asso = ACAssociation(associationDataBlockId=ADB_id, associationId=received_ac['association']['associationId'],
                                  classs=datastore_classs, subject=datastore_subject)
 
-            teacher = ac['teacher']
+            teacher = received_ac['teacher']
             datastore_teacher = Teacher(teacherId=teacher['teacherId'], name=teacher['name'], surname=teacher.get('surname', None))
 
-            students = ac['students']
+            students = received_ac['students']
 
             students_list = []
 
@@ -494,6 +505,9 @@ class Attendance_Controls_Manager:
 
                 control = student.get('control', None)
 
+                if control['delay'] != None:
+                    control['delay'] = int(control['delay'])
+
                 if control:
                     control_tmp = CKS(assistance=control['assistance'], delay=control['delay'],
                                       justifiedDelay=control['justifiedDelay'], uniform=control['uniform'])
@@ -501,8 +515,8 @@ class Attendance_Controls_Manager:
                     students_list.append(ACStudent(studentId=student['studentId'], name=student['name'],
                                                  surname=student.get('surname'), control=control_tmp))
 
-            if ac.get('provisionerDateTime',None) is not None:
-                date = datetime.datetime.strptime(ac['provisionerDateTime'], "%Y-%m-%d %H:%M")
+            if received_ac.get('provisionerDateTime',None) is not None:
+                date = datetime.datetime.strptime(received_ac['provisionerDateTime'], "%Y-%m-%d %H:%M")
 
             else:
                 date = time_now()
@@ -527,7 +541,7 @@ class Attendance_Controls_Manager:
                     record = Record(studentId=student['studentId'],
                                     assistance=control['assistance'], delay=control['delay'],
                                     justifiedDelay=control['justifiedDelay'], uniform=control['uniform'],
-                                    associationId=ac['association']['associationId'],
+                                    associationId=received_ac['association']['associationId'],
                                     subjectId=subject['subjectId'],
                                     classId=classs['classId'],
                                     teacherId=teacher['teacherId'],

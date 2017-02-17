@@ -4,13 +4,15 @@
         <div flex="90" layout-padding>
             <div layout="row" layout-align="space-between start">
                 <md-button class="md-primary md-raised"
-                           ui-sref="teachers">
+                           ui-sref="attendanceControls">
                     <md-icon>keyboard_arrow_left</md-icon>
                     Atras
                 </md-button>
             </div>
 
-            <p class="md-headline">Controles de Asistencia / <strong>Nuevo</strong></p>
+            <p class="md-headline">Controles de Asistencia  <strong ng-if="vm.action == 'new'"> -> Nuevo</strong></p>
+            <p ng-if="vm.action == 'loaded' "> control {{ vm.acId }}  {{vm.acBase.createdAt}}</p>
+
 
 
             <div ng-if="!vm.dataIsReady">
@@ -42,9 +44,9 @@
                         <!--Association info-->
                         <div flex="70">
                             <p>Asignatura: {{ vm.acBase.association.subject.name }}</p>
-                            <p>Grupo: {{ vm.acBase.association.classs.course }} {{ vm.acBase.association.classs.word }}
+                            <p>Grupo: {{ vm.acBase.association.class.course }} {{ vm.acBase.association.class.word }}
                                 {{
-                                vm.acBase.association.classs.level }}</p>
+                                vm.acBase.association.class.level }}</p>
                         </div>
 
                     </div>
@@ -89,7 +91,7 @@
                                         </md-icon>
 
                                         <md-icon ng-if="!vm.checkIfJustifiedDelayIsEnabled(student.control.uniform)"
-                                                 md-colors="{'color': 'specialpalette-grey'}">
+                                                 >
                                             visibility
                                         </md-icon>
                                         <md-icon ng-if="student.control.uniform == false "
@@ -116,7 +118,7 @@
                                             </md-icon>
 
                                             <md-icon ng-if="!vm.checkIfJustifiedDelayIsEnabled(student.control.delay)"
-                                                     md-colors="{'color': 'specialpalette-grey'}">
+                                                     >
                                                 query_builder
                                             </md-icon>
 
@@ -154,7 +156,7 @@
                                         </md-icon>
 
                                         <md-icon ng-if="student.control.justifiedDelay == null"
-                                                 md-colors="{'color': 'specialpalette-grey'}">
+                                                 >
                                             verified_user
                                         </md-icon>
 
@@ -176,7 +178,7 @@
 
                    <div layout="row">
 
-                        <md-button class="md-primary md-raised" ng-click="vm.saveCA()">
+                        <md-button ng-if="vm.action == 'new'" class="md-primary md-raised" ng-click="vm.saveCA()">
                             <md-icon>save</md-icon>
                             Guardar
                         </md-button>

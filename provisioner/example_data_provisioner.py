@@ -17,10 +17,11 @@ from faker import Factory
 import logging
 from random import randint
 import progressbar
+import argparse
 
 fake = Factory.create('es_ES')  # Set the language from the data in spanish.
 
-logging.basicConfig(filename='provisioner/provisioner.log', filemode='w', level=logging.INFO)
+logging.basicConfig(filename='provisioner.log', filemode='w', level=logging.INFO)
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 url_base = 'http://localhost:8001'
@@ -201,3 +202,32 @@ def run():
     else:
         print colored('\nProvision FAIL!', 'red')
         print '### There seems to be something wrong, please revise provisioner/provisioner.log to debug. ###'
+
+def provision_scms_simple():
+
+    print colored('### Provisioning example data to SCmS. ###', 'red')
+    """
+    import requests
+    import json
+    with open('../SMS-Back-End/scms/test/ADB_example_1.json') as json_data:
+        d = json.load(json_data)
+        response = requests.post(url='localhost:8003/association', json=d)
+    print response
+    """
+
+
+    a = os.system("curl -i -H \"Content-Type: application/json\" -X POST -d @../SMS-Back-End/scms/test/ADB_example_1.json localhost:8003/association")
+    b = os.system("curl -i -H \"Content-Type: application/json\" -X POST -d @../SMS-Back-End/scms/test/AC_example_1.json localhost:8003/ac")
+
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Insert data in the system.')
+    parser.add_argument('-ms', type=str, help = 'The microservice selected')
+    args = parser.parse_args()
+
+    if args.ms == 'scms':
+        provision_scms_simple()
+
+if __name__ == "__main__":
+    main()

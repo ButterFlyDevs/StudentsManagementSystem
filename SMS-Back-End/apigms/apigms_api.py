@@ -23,7 +23,7 @@ app = Flask(__name__)
 
 # With this we get that the requests (in terminal) show the method DELETE instead of OPTIONS.
 #CORS(app)
-cors = CORS(app, resources={r"/entities/*": {"origins": "*"}})
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 # Activating verbose mode
@@ -285,13 +285,17 @@ def get_ac(ac_id=None):
     """
 
     url = 'http://{}/{}'.format(modules.get_hostname(module='scms'), 'ac')
+
+    if ac_id is not None:
+        url += '/{}'.format(ac_id)
+
     response = requests.get(url)
     response = make_response(response.content, response.status_code)
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
 
-@app.route('/acbase/<int:association_id>', methods=['GET'])
+@app.route('/ac/base/<int:association_id>', methods=['GET'])
 def get_ac_base(association_id):
     """
     Get the Attendance Control Base to the association with id passed in url.

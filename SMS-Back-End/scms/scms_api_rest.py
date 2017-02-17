@@ -47,6 +47,9 @@ def process_response(response):
     :return:
     """
 
+    print 'RESPONSE'
+    print response
+
 
     if response.get('status', None) == 1: # 200: OK STATUS.
 

@@ -3,7 +3,15 @@ angular.module('attendanceControls')
 
             var vm = this;
 
-            // vm.teacherId = $stateParams.teacherId;
+            vm.acId = $stateParams.acId;
+            console.log('ACID');
+            console.log(vm.acId);
+            vm.action = null;
+            if (vm.acId == 'nuevo')
+                vm.action = 'new';
+            else
+                vm.action = 'loaded';
+            console.log(vm.action);
 
             vm.defaultAvatar = globalService.defaultAvatar;
 
@@ -12,7 +20,6 @@ angular.module('attendanceControls')
             vm.changeUniformForStudent = changeUniformForStudent;
             vm.checkIfDelayIsEnabled = checkIfDelayIsEnabled;
             vm.checkIfJustifiedDelayIsEnabled = checkIfJustifiedDelayIsEnabled;
-            vm.changeDelayForStudent = changeDelayForStudent;
 
             // To control the loading spinner.
             vm.dataIsReady = false;
@@ -26,55 +33,59 @@ angular.module('attendanceControls')
             function activate() {
                 console.log('Activating attendanceControlController controller.');
 
-                vm.acBase =  new attendanceControlsService();
-                // Using $ like prefix to use own methods
-                vm.acBase.$getBase({id: 5629499534213120},
-                    function () {
-                        console.log('Attendance Control Base Data Block received:');
-                        console.log(vm.acBase);
-                        vm.dataIsReady = true;
+                // We want charge base to do the AC
+                if (vm.action == 'new') {
+                    vm.acBase = new attendanceControlsService();
+                    // Using $ like prefix to use own methods
+                    vm.acBase.$getBase({id: 5629499534213120},
+                        function () {
+                            console.log('Attendance Control Base Data Block received:');
+                            console.log(vm.acBase);
+                            vm.dataIsReady = true;
 
-                    }, function (error) {
-                        console.log('Get ac base process fail.');
-                        console.log(error);
-                        toastService.showToast('Error obteniendo la base para el control de asistencia.')
-                    })
+                        }, function (error) {
+                            console.log('Get ac base process fail.');
+                            console.log(error);
+                            toastService.showToast('Error obteniendo la base para el control de asistencia.')
+                        });
+                }
+                // We want to see a existing ac.
+                if (vm.action == 'loaded'){
+                    console.log('Loading existing');
 
+                    vm.ac = attendanceControlsService.get({id: vm.acId},
+                        function () {
+                            console.log('Attendance Control Base Data Block received:');
+                            console.log(vm.ac);
+                            vm.dataIsReady = true;
+
+                            vm.acBase = vm.ac;
+
+                        }, function (error) {
+                            console.log('Get ac base process fail.');
+                            console.log(error);
+                            toastService.showToast('Error obteniendo la base para el control de asistencia.')
+                        })
+                }
             }
 
-
-
-            function changeDelayForStudent(studentId) {
-                console.log('DELAY CHANGED')
-            }
 
             function checkIfDelayIsEnabled(delayValue) {
-                console.log('checkIfDelayIsEnable')
-                console.log(delayValue)
-
-                if (delayValue == null) {
-                    console.log('false')
+                if (delayValue == null)
                     return false;
-                }else
+                else
                     return true;
-
             }
 
             function checkIfJustifiedDelayIsEnabled(delayValue) {
-                console.log('checkIfJustifiedDelayIsEnable')
-
-              if (delayValue == null) {
-                    console.log('false')
+              if (delayValue == null)
                     return false;
-                }else
+              else
                     return true;
-
             }
 
 
             vm.changeDelay = function changeDelay(studentId, delay){
-
-                console.log('CHANGE DELAY');
 
                  if (delay == 'Sin retraso'){
                      delay = 0;
@@ -92,9 +103,6 @@ angular.module('attendanceControls')
             }
 
             vm.changeJustifiedDelay = function changeJustifiedDelay(studentId){
-
-                console.log('PUTAAAAAAAAAAAAAAAAAAAAAAAAAA')
-
                 for (var a = 0; a < vm.acBase.students.length; a++) {
                     if (vm.acBase.students[a].studentId == studentId) {
                         if (vm.acBase.students[a].control.justifiedDelay == true) {
@@ -119,9 +127,6 @@ angular.module('attendanceControls')
             }
 
             function changeAssistanceForStudent(studentId) {
-                console.log('changing');
-                console.log(studentId);
-
 
                 for (var a = 0; a < vm.acBase.students.length; a++) {
                     if (vm.acBase.students[a].studentId == studentId) {
@@ -131,7 +136,7 @@ angular.module('attendanceControls')
                             vm.acBase.students[a].control.assistance = false;
                             // It changed to null the rest of values:
                             vm.acBase.students[a].control.delay = null;
-                            vm.acBase.students[a].control.justifiedDelay = 0;
+                            vm.acBase.students[a].control.justifiedDelay = false;
                             vm.acBase.students[a].control.uniform = null;
 
                             console.log(vm.acBase.students[a].control);
@@ -149,20 +154,20 @@ angular.module('attendanceControls')
             }
 
             vm.saveCA = function saveCA(){
+
                 console.log('Saving CA');
-                console.log(vm.acBase)
+                console.log(vm.acBase);
 
                 vm.acBase.$save(
                     function(){ // Success
                         console.log('ac saved successfully');
-                        $mdDialog.cancel();
-                        $state.reload();
-                        toastService.showToast('Control de asistencia realizado con éxito.')
+                        $state.go('attendanceControls');
+                        toastService.showToast('Control de asistencia realizado con éxito.');
                     },
                     function(error){ // Fail
-                        toastService.showToast('Error al enviar control de asistencia.')
-                        console.log('Error while ac was saved.')
-                        console.log(error)
+                        toastService.showToast('Error al enviar control de asistencia.');
+                        console.log('Error while ac was saved.');
+                        console.log(error);
                     });
             }
 
