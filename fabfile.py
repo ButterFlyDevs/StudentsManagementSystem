@@ -7,8 +7,8 @@ from fabric.colors import red, blue
 from provisioner import example_data_provisioner
 import time
 
-##########################
-#  FABRIC Fabfile.  <http://www.fabfile.org/>
+#####################################################################
+# FABRIC Fabfile.  <http://www.fabfile.org/>
 # This is the file to configure Fabric Python Library to admin tasks
 
 # Use:
@@ -20,7 +20,7 @@ import time
 # Info about command:
 # fab -d <command>
 
-##########################
+#####################################################################
 
 SMS_Back_End_default_port = '8001'  # api gateway microservice default port
 SMS_Back_End_default_admin_port = '8083'
@@ -60,10 +60,15 @@ def run_back_end(ms=None):
 
 def test(ms):
     """
-    Tests runner.
-    Execute the test over specific microservice, part ot it of over all system.
+    Tests task runner.
+    Execute the test over specific microservice (part of it of over all) or over entire system.
 
-    Example: fab test:'tdbms'
+    Examples:
+        fab test:tdbms
+        fab test:scms  -> Execute all test of this microservice.
+        fab test:scms.api  -> Execute all test over the Api Rest
+        fab test:scms.api.marks -> Execute all test over the Marks segment in API
+
 
     If something fail maybe it could be the pythonpath system.
     export PYTHONPATH="${PYTHONPATH}:/home/.../StudentsManagementSystem/SMS-Back-End/dbms/dbapi"
@@ -92,12 +97,28 @@ def test(ms):
         with lcd("SMS-Back-End/dbms/dbapi"):
             local("pytest test/ -vv")
 
+    ############################
+    #   SCmS Testing Options   #
+    ############################
 
     if ms == 'scms':
         print (blue('## Runnig Students Control microService entire Test Suite. ## '))
         with lcd("SMS-Back-End/scms"):
             local("pytest test/ -vv")
 
+    # To run test over scms.api marks segment.
+    # Use:  fab test:scms.api.marks
+    if ms == 'scms.api.marks':
+        print (blue('## Runnig Students Control microService APIG - Mark segment TEST . ## '))
+        with lcd("SMS-Back-End/scms"):
+            local("pytest test/scms_api_rest_marks_segment_test.py -vv -s")
+
+    # To run test over scms.api discipline notes segment.
+    # Use:  fab test:scms.api.disciplinarynotes
+    if ms == 'scms.api.disciplinarynotes':
+        print (blue('## Runnig Students Control microService APIG - Disciplinary Notes segment TEST . ## '))
+        with lcd("SMS-Back-End/scms"):
+            local("pytest test/scms_api_rest_disciplinary_notes_segment_test.py -vv -s")
 
 def doc(ms):
     """
@@ -203,10 +224,10 @@ def requirements(ms=None):
         for command in commands:
             local(command)
 
-    available_options = ['dbms', 'apigms', 'uims', 'local']
+    available_options = ['dbms', 'apigms', 'scms', 'uims', 'local']
     if ms is not None:
         if ms in available_options:
-            if ms == available_options[0] or ms == available_options[1]:
+            if ms in available_options[0:3]:
                 path = 'SMS-Back-End/' + ms + '/'
 
                 command = 'pip install -r ' + path + 'requirements.txt -t ' + path + 'lib/'

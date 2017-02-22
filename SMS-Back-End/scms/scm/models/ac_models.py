@@ -5,10 +5,12 @@ uso de los `tipos NDB <https://cloud.google.com/appengine/docs/python/ndb/entity
 
 https://cloud.google.com/appengine/docs/python/datastore/typesandpropertyclasses
 
+# Attention: We don't respect PEP-8 style guide because we use camelCase in the JSON files that
+# the apis manage and the conversion to json is directly using the same name used here.
+
 """
 
 from google.appengine.ext import ndb
-
 
 class Class(ndb.Model):
     classId = ndb.IntegerProperty()
@@ -91,8 +93,8 @@ class ADB(ndb.Model):
 
     @classmethod
     def get_adb(cls, association_id):
-        key = ndb.Key('ADB', long(association_id))
-        query = ADB.query(ADB.key == key)
+        # key = ndb.Key('ADB', long(association_id))
+        query = ADB.query(ADB.association.associationId == association_id)
         return query
 
     @classmethod
@@ -125,7 +127,7 @@ class ADB(ndb.Model):
 class AC(ndb.Model):
 
     association = ndb.StructuredProperty(ACAssociation)
-    teacher = ndb.StructuredProperty(Teacher)
+    teachers = ndb.StructuredProperty(Teacher, repeated=True)
     students = ndb.StructuredProperty(ACStudent, repeated=True)
 
     createdBy = ndb.IntegerProperty()

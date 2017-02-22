@@ -1,0 +1,10 @@
+{
+  "studentId": 5,
+  "enrollmentId": 3,
+  "preFirstEv": 3,
+  "firstEv": 5,
+  "preSecondEv": 8,
+  "secondEv": 9,
+  "thirdEv": 10,
+  "final": 9
+}

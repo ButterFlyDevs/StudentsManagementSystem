@@ -2,11 +2,36 @@
 # Students Control Manager #
 ############################
 
+# NOTICE #
+
+# This mService uses the same error status code that HTML to try if this way is clearer that use a own error
+# code numbers. This way is used only here.
+
 from termcolor import colored
-from scm_datastore_models import *
+
+from models.marks_models import *
+from models.ac_models import *
+from models.discipline_models import *
+
 import datetime
 import pytz
 import copy
+
+
+from flask import Flask, Response
+
+import json
+from google.appengine.api import modules
+
+import requests
+import requests_toolbelt.adapters.appengine
+requests_toolbelt.adapters.appengine.monkeypatch()
+
+from google.appengine.ext import ndb
+
+import json
+
+
 
 
 def check_association_data_block(data_block):
@@ -18,8 +43,6 @@ def check_association_data_block(data_block):
 
     log = ''
     its_ok = True
-
-    print colored(data_block,'green')
 
     association = data_block.get('association', None)
 
@@ -36,7 +59,7 @@ def check_association_data_block(data_block):
             return {'log': log}
 
         if association.get('associationId', None) is None:
-            log = '\'associationId\' key fault.'
+            log = '\'associationId\' id fault.'
             return {'log': log}
 
         _class = association.get('class', None)
@@ -86,7 +109,7 @@ class Association_Manager:
     @classmethod
     def post(cls, data_block):
         """
-        Insert a kind of item "Association Data Block" in the database.
+        Insert a kind of item "Association Data Block" in the database from an association datablock .
         :param data_block:
         :return: Standard response data block. See above.
         """
@@ -121,15 +144,13 @@ class Association_Manager:
                       createdBy=1,
                       createdAt=time_now())
 
-
-
             # put() returns a key object.
             key = adb.put()
 
-            return {'status': 1, 'log': None, 'data': {'key':key.id(), 'kind': key.kind()}}
+            return {'status': 200, 'log': None, 'data': {'key':key.id(), 'kind': key.kind()}}
 
         else:
-            return 0
+            return {'status': 400, 'log': 'Bad format', 'data': None}
 
     @classmethod
     def get(cls, association_id = None, teacher_id = None):
@@ -313,6 +334,35 @@ class Association_Manager:
         else:
             return {'status': -1, 'data': None, 'log': check.get('log', None)}
 
+    @classmethod
+    def updateAssociations(cls, n):
+        print 'updateASSociaton'+str(n)
+
+        url = 'http://{}/{}/{}'.format(modules.get_hostname(module='dbms'), 'entities/association', n)
+        response = requests.get(url)
+        data = json.loads(response.content)
+        status = response.status_code
+
+        # If the call to TDBmS to get association info is correct:
+        if status == 200:
+
+            # Try to save the association received in our database. [TDBmS] --> [SCmS]
+            response = cls.post(data)
+
+            """
+            If we received a 400 error from post method is because the data received from the TDBmS is incorrect or with
+            bad format:
+            ## 400 Bad Request. The request could not be understood by the server due to malformed syntax. ##
+            We translate this internal error in the communication between microservices in 500 Internal Error Server
+            with a simple explanation.
+            """
+
+            if response['status'] == 400:
+                return {'status': 500, 'data': None, 'log': 'Communication between microservices failed! Maybe bad format.'}
+
+            if response['status'] == 200:
+                return response
+
 
 class Attendance_Controls_Manager:
 
@@ -378,31 +428,61 @@ class Attendance_Controls_Manager:
 
         # 1. First, we extract the association data block related.
 
+        """
+        Second way: WHEN WE HAVE A INTERMEDIE DATABASE AVAILABLE
         query = ADB.get_adb(association_id)
 
         item = query.get()
+        print colored(item, 'blue')
+        if not item:
+            print 'NO HAY ASOCIACION, La BUSCO'
+            response = Association_Manager.updateAssociations(association_id)
+
+            if response['status'] == 500:
+                print colored(response, 'red')
+                return response
+
+            if response['status'] == 200:
+                print 'OK'
 
         item_id = item._key.id()
 
         item = item.to_dict()
         item = dict((k, v) for k, v in item.iteritems() if v)
+        """
 
-        item['association']['associationDataBlockId'] = item_id
-        item['association']['class'] = item['association'].pop('classs')
 
-        # 2. After, We add cks to each student.
-        students = item.get('students', None)
-        if students:
-            for student in students:
-                student['control'] = cks
+        """
+        Like a first approach we search the association directly from TDBmS
+        """
 
-        if item:
-            print item
+        url = 'http://{}/{}/{}'.format(modules.get_hostname(module='dbms'), 'entities/association', association_id)
+        response = requests.get(url)
+        status = response.status_code
 
-            return {'status': 1, 'data': item, 'log': None}
+        # If the call to TDBmS to get association info is correct:
+        if status == 200:
+            association = json.loads(response.content)
+            print colored('Association from TDBmS', 'red')
+            print colored(json.dumps(association, indent=2), 'red')
 
-        else:
-            return {'status': -1, 'data': None, 'log': None}
+            # Check if the info received has the correct format.
+            check = check_association_data_block(association)
+
+            if check['status'] == 1:
+
+                # 2. After, We add cks to each student.
+                for student in association['students']:
+                    student['control'] = cks
+
+                return {'status': 1, 'data': association, 'log': None}
+
+            else:
+                return {'status': -1, 'data': None, 'log': None}
+
+        elif status == 204:
+            print status
+            return {'status': status, 'data': None, 'log': None}
 
     @classmethod
     def post_ac(cls, received_ac):
@@ -415,6 +495,7 @@ class Attendance_Controls_Manager:
         print colored(received_ac, 'blue')
         print colored('-------', 'red')
 
+        """
         # 1. First, we must be check that the association passed is correct, it means that it exists
         # in the database and all fields are correct.
 
@@ -477,10 +558,11 @@ class Attendance_Controls_Manager:
         else:
             print 'FALSE'
 
+        """
         # 2. Before if is correct we save data in AC table.
 
-        if ac_is_correct:
-            print 'IS CORRECT'
+        #if ac_is_correct:
+        if True:
 
             # Saving the AC object in data store
 
@@ -490,11 +572,13 @@ class Attendance_Controls_Manager:
             subject = received_ac['association']['subject']
             datastore_subject = Subject(subjectId=subject['subjectId'], name=subject['name'])
 
-            asso = ACAssociation(associationDataBlockId=ADB_id, associationId=received_ac['association']['associationId'],
+            asso = ACAssociation(associationDataBlockId=None, associationId=received_ac['association']['associationId'],
                                  classs=datastore_classs, subject=datastore_subject)
 
-            teacher = received_ac['teacher']
-            datastore_teacher = Teacher(teacherId=teacher['teacherId'], name=teacher['name'], surname=teacher.get('surname', None))
+            teachers = received_ac['teachers']
+            teachers_list = []
+            for teacher in teachers:
+                teachers_list.append(Teacher(teacherId=teacher['teacherId'], name=teacher['name'], surname=teacher.get('surname', None)))
 
             students = received_ac['students']
 
@@ -513,7 +597,7 @@ class Attendance_Controls_Manager:
                                       justifiedDelay=control['justifiedDelay'], uniform=control['uniform'])
 
                     students_list.append(ACStudent(studentId=student['studentId'], name=student['name'],
-                                                 surname=student.get('surname'), control=control_tmp))
+                                                   surname=student.get('surname'), control=control_tmp))
 
             if received_ac.get('provisionerDateTime',None) is not None:
                 date = datetime.datetime.strptime(received_ac['provisionerDateTime'], "%Y-%m-%d %H:%M")
@@ -522,7 +606,7 @@ class Attendance_Controls_Manager:
                 date = time_now()
 
             datastore_ac = AC(association=asso,
-                      teacher=datastore_teacher,
+                      teachers=teachers_list,
                       students=students_list,
                       createdBy=1,
                       createdAt=date)
@@ -531,8 +615,6 @@ class Attendance_Controls_Manager:
 
             # 3. To end, we extract all records from AC saved and save them in massive records table,
             # that will be used by Analysis Sub System in other processes.
-
-
 
             for student in students:
 
@@ -548,10 +630,215 @@ class Attendance_Controls_Manager:
                                     recordDate=date, recordWeekday=date.weekday())
 
                     key = record.put()
-                    print 'Record key: {}'.format(key)
 
             return {'status': 1}
 
-
         else:
             return {'status': -1, 'data': None, 'log': None}
+
+
+class Marks_Manager:
+
+    @classmethod
+    def mark_format_is_ok(self, mark):
+        return True
+
+    @classmethod
+    def get(cls, mark_id):
+
+        # If isn't passed mark_id is requests all marks from the data store.
+        if mark_id is None:
+
+            # Query without params: the simplest way to get all items.
+            query = Mark.query()
+
+            marks = []  # Used to return all marks at end.
+
+            for mark in query.iter():
+
+                # Extract the key and the data (dict format) from the mark
+                key_id = mark._key.id()
+                dict_tmp = mark.to_dict()
+
+                # Better if we delete all useless keys with None as value to simplify the response.
+                dict_tmp = dict((k, v) for k, v in dict_tmp.iteritems() if v)
+
+                # If the item hasn't deleted is added to marks list
+                if dict_tmp.get('deleted', None) is not True:
+                    dict_tmp['markId'] = key_id
+                    marks.append(dict_tmp)
+
+            if len(marks) == 0:
+                return {'status': 204, 'data': None, 'log': None}
+            else:
+                return {'status': 200, 'data': marks, 'log': None}
+
+        else:
+
+            key = ndb.Key('Mark', long(mark_id))
+
+            mark = Mark.query(Mark.key == key, Mark.deleted == False).get()
+
+            if mark:
+
+                mark_id = mark._key.id()
+
+                # Simplify
+                mark = dict((k, v) for k, v in mark.to_dict().iteritems() if v)
+                mark['markId'] = mark_id
+
+                return {'status': 200, 'data': mark, 'log': None}
+
+            else:
+
+                return {'status': 404, 'data': None, 'log': None}
+
+    @classmethod
+    def post(cls, mark):
+
+        # If mark has the required format:
+        if cls.mark_format_is_ok(mark):
+
+            # Is created the object
+            mark_to_save = Mark(studentId = mark.get('studentId'), enrollmentId = mark.get('enrollmentId'),
+                                preFirstEv = mark.get('preFirstEv', None),firstEv = mark.get('firstEv', None),
+                                preSecondEv = mark.get('preSecondEv', None),secondEv = mark.get('secondEv', None),
+                                thirdEv = mark.get('thirdEv', None),
+                                final = mark.get('final',None),
+                                createdBy=1, createdAt=time_now())
+
+            # And save using himself
+            key = mark_to_save.put()
+            mark_saved = key.get().to_dict()
+            mark_saved = dict((k, v) for k, v in mark_saved.iteritems() if v)
+            mark_saved['markId'] = key.id()
+
+            return {'status': 200, 'log': None, 'data': mark_saved}
+
+    @classmethod
+    def put(cls, mark):
+        pass
+
+    @classmethod
+    def delete(cls, mark_id):
+
+        key = ndb.Key('Mark', long(mark_id))
+        item = key.get()
+
+        # Check if the item doesn't exists becuause never was create or because was logically deleted:
+        if item is not None and item.to_dict().get('deleted',None) is not True:  # If exists:
+
+            item.deletedAt = time_now()
+            item.deletedBy = 1
+            item.deleted = True
+            item.put()
+
+            return {'status': 200, 'data': None, 'log': None}
+
+        else:  # If it doesn't exists:
+            return {'status': 404, 'data': None, 'log': 'Mark required seem like doesn\'t exists or was deleted.'}
+
+
+class Disciplinary_Notes_Manager:
+
+    @classmethod
+    def disciplinary_notes_format_is_ok(self, disciplinary_note):
+        return True
+
+    @classmethod
+    def get(cls, disciplinary_note_id):
+
+        # If isn't passed disciplinary_note_id is requests all marks from the data store.
+        if disciplinary_note_id is None:
+
+            # Query without params: the simplest way to get all items.
+            query = DisciplinaryNote.query()
+
+            disciplinary_notes = []  # Used to return all disciplinary notes at end.
+
+            for disciplinary_note in query.iter():
+
+                # Extract the key and the data (dict format) from the disciplinary_note
+                key_id = disciplinary_note._key.id()
+                dict_tmp = disciplinary_note.to_dict()
+
+                # Better if we delete all useless keys with None as value to simplify the response.
+                dict_tmp = dict((k, v) for k, v in dict_tmp.iteritems() if v)
+
+                # If the item hasn't deleted is added to disciplinary notes list
+                if dict_tmp.get('deleted', None) is not True:
+                    dict_tmp['disciplinaryNoteId'] = key_id
+                    disciplinary_notes.append(dict_tmp)
+
+            if len(disciplinary_notes) == 0:
+                return {'status': 204, 'data': None, 'log': None}
+            else:
+                return {'status': 200, 'data': disciplinary_notes, 'log': None}
+
+        else:
+
+            key = ndb.Key('DisciplinaryNote', long(disciplinary_note_id))
+
+            disciplinary_note = DisciplinaryNote.query(DisciplinaryNote.key == key, DisciplinaryNote.deleted == False).get()
+
+            if disciplinary_note:
+
+                disciplinary_note_id = disciplinary_note._key.id()
+
+                # Simplify
+                disciplinary_note = dict((k, v) for k, v in disciplinary_note.to_dict().iteritems() if v)
+                disciplinary_note['disciplinaryNoteId'] = disciplinary_note_id
+
+                return {'status': 200, 'data': disciplinary_note, 'log': None}
+
+            else:
+
+                return {'status': 404, 'data': None, 'log': None}
+
+    @classmethod
+    def post(cls, disciplinary_note):
+
+        # If disciplinary note has the required format:
+        if cls.disciplinary_notes_format_is_ok(disciplinary_note):
+
+            # Is created the object
+            dn_to_save = DisciplinaryNote(studentId=disciplinary_note.get('studentId'),
+                              studentsIdsRelated=disciplinary_note.get('studentsIdsRelated'),
+                              date=datetime.datetime.strptime(disciplinary_note.get('date'),"%Y-%m-%d %H:%M"),
+                              kind=disciplinary_note.get('kind'),
+                              gravity=disciplinary_note.get('gravity'),
+                              description=disciplinary_note.get('description'),
+                              createdBy=1, createdAt=time_now())
+
+            # And save using himself
+
+            key = dn_to_save.put()
+            dn_saved = key.get().to_dict()
+            dn_saved = dict((k, v) for k, v in dn_saved.iteritems() if v)
+            dn_saved['disciplinaryNoteId'] = key.id()
+            print colored(dn_saved, 'red')
+
+            return {'status': 200, 'log': None, 'data': dn_saved}
+
+    @classmethod
+    def put(cls, disciplinary_note):
+        pass
+
+    @classmethod
+    def delete(cls, disciplinary_note):
+
+        key = ndb.Key('DisciplinaryNote', long(disciplinary_note))
+        item = key.get()
+
+        # Check if the item doesn't exists because never was create or because was logically deleted:
+        if item is not None and item.to_dict().get('deleted',None) is not True:  # If exists:
+
+            item.deletedAt = time_now()
+            item.deletedBy = 1
+            item.deleted = True
+            item.put()
+
+            return {'status': 200, 'data': None, 'log': None}
+
+        else:  # If it doesn't exists:
+            return {'status': 404, 'data': None, 'log': 'Disciplinary Note required seem like doesn\'t exists or was deleted.'}

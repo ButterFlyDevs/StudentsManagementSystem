@@ -19,7 +19,6 @@ class sorters(object):
         :return:
         See example in newTest.py test file.
         """
-
         sorted_list = []
 
         for list_element in list:
@@ -32,7 +31,9 @@ class sorters(object):
                              'course': list_element.get('course'),
                              'level': list_element.get('level'),
                              'word': list_element.get('word'),
-                             'impartId': list_element.get('impartId')}
+                             'impartId': list_element.get('impartId'),
+                             'associationId': list_element.get('associationId')
+                             }
 
                 sorted_list.append({'subject': new_subject, 'classes': [new_class]})
 
@@ -47,7 +48,9 @@ class sorters(object):
                                  'course': list_element.get('course'),
                                  'level': list_element.get('level'),
                                  'word': list_element.get('word'),
-                                 'impartId': list_element.get('impartId')}
+                                 'impartId': list_element.get('impartId'),
+                                 'associationId': list_element.get('associationId')
+                                 }
 
                     sorted_list[index]["classes"].append(new_class)
 
@@ -59,7 +62,9 @@ class sorters(object):
                                  'course': list_element.get('course'),
                                  'level': list_element.get('level'),
                                  'word': list_element.get('word'),
-                                 'impartId': list_element.get('impartId')}
+                                 'impartId': list_element.get('impartId'),
+                                 'associationId': list_element.get('associationId')
+                                 }
 
                     sorted_list.append({'subject': new_subject, 'classes': [new_class]})
 

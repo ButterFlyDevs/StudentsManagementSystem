@@ -256,54 +256,54 @@ class EntitiesManager:
 
         """
 
-        if v:
-            print colored(locals(), 'blue')
-
+        # association/n return all info about a association like class, subject, teachers and students list.
         if kind == 'association' and entity_id is not None:
 
             return_dic = {}
 
-            query = 'select a.*, c.course as \'classCourse\', c.level as \'classLevel\', c.word as \'classWord\', ' \
+            association_query = 'select a.*, c.course as \'classCourse\', c.level as \'classLevel\', c.word as \'classWord\', ' \
                     's.name as \'subjectName\' from association a INNER JOIN subject s ' \
                     'ON (a.subjectId = s.subjectId) INNER JOIN class c ON (a.classId = c.classId) ' \
-                    'where a.associationId = {} and a.deleted = {};'.format(entity_id, 0)
+                    'where a.associationId = {0} and a.deleted = {1};'.format(entity_id, 0)
 
-            query_for_teachers = 'select t.teacherId as \'teacherId\', t.name as \'teacherName\', t.surname as' \
-                                 ' \'teacherSurname\' from impart i inner join teacher t on ' \
+            query_for_teachers = 'select t.teacherId as \'teacherId\', t.name as \'name\', t.surname as' \
+                                 ' \'surname\' from impart i inner join teacher t on ' \
                                  '(i.teacherId = t.teacherId) where i.associationId = {} and ' \
                                  'i.deleted = {};'.format(entity_id, 0)
 
-            query_for_students = 'select s.studentId as \'studentId\', s.name as \'studentName\', s.surname as' \
-                                 ' \'studentSurname\' from enrollment e inner join student s on ' \
+            query_for_students = 'select s.studentId as \'studentId\', s.name as \'name\', s.surname as' \
+                                 ' \'surname\' from enrollment e inner join student s on ' \
                                  '(e.studentId = s.studentId) where e.associationId = {} ' \
                                  'and e.deleted = {};'.format(entity_id, 0)
 
-            return_data_block = sql_executor(query)
+            return_data_block = sql_executor(association_query)
 
-            if return_data_block['status'] == -1:
+
+            if return_data_block['status'] == 1 and len(return_data_block.get('data', None)) == 0:
                 # The associations doesn't exists and we return the same response from sql_execute2
                 return return_data_block
 
             elif return_data_block['status'] == 1 and return_data_block.get('data', None) is not None:
+
                 data = return_data_block['data']
                 # The composition of the special data block:
-                data_block = {
-                    'class': {'classId': data.get('classId', None),
-                              'course': data.get('classCourse', None),
-                              'level': data.get('classLevel', None),
-                              'word': data.get('classWord', None)
-                              },
-                    'subject': {'subjectId': data.get('subjectId', None),
-                                'name': data.get('subjectName', None)
-                                }
+
+                classs = {'classId': data.get('classId', None),
+                          'course': data.get('classCourse', None),
+                          'level': data.get('classLevel', None),
+                          'word': data.get('classWord', None)}
+
+                subject = {'subjectId': data.get('subjectId', None),
+                           'name': data.get('subjectName', None)}
+
+                association = {}
+                association['association'] = {
+                    'class': classs,
+                    'subject': subject,
+                    'associationId': data['associationId'],
+                    'createdBy' : data['createdBy'],
+                    'createdAt' : data['createdAt'],
                 }
-
-                for key, value in data.items():
-                    if 'class' in str(key) or 'subject' in str(key):
-                        del data[key]
-
-                # Update with the rest of data without special format.
-                data_block.update(data)
 
 
                 # Now we search all teachers and students related with this association and we will insert them in
@@ -311,18 +311,21 @@ class EntitiesManager:
                 return_data_block = sql_executor(query_for_teachers, 'list')
                 data = return_data_block.get('data', None)
                 if return_data_block.get('status', None) == 1 and data is not None and len(data) > 0:
-                    data_block['teachers'] = data
+                    association['teachers'] = data
 
                 # we do the same with students:
                 return_data_block = sql_executor(query_for_students, 'list')
                 data = return_data_block.get('data', None)
                 if return_data_block.get('status', None) == 1 and data is not None and len(data) >0:
-                    data_block['students'] = data
+                    association['students'] = data
 
-            return_dic['data'] = data_block
-            return_dic['status'] = return_data_block['status']
+                return_dic['data'] = association
+                return_dic['status'] = return_data_block['status']
 
-            return return_dic
+                return return_dic
+
+            else:
+                return return_data_block
 
         else:
             query = 'select '
@@ -402,8 +405,6 @@ class EntitiesManager:
         if data_block['status'] == 1:
 
             retrieve_query = 'select * from {0} where {0}Id = {1};'.format(kind, entity_id)
-            print colored('Populating item', 'green')
-            print colored(retrieve_query, 'green')
 
             item_data_block = sql_executor(retrieve_query, 'item')
 
@@ -440,7 +441,6 @@ class EntitiesManager:
                     if subjects:
                         for sub in subjects:
                             enrollments_ids_list.append(sub.get('enrollmentId'))
-                print enrollments_ids_list
 
                 for enrollment_id in enrollments_ids_list:
                     response = cls.delete('enrollment', enrollment_id)
@@ -788,7 +788,7 @@ class EntitiesManager:
                 query = 'SELECT subjectId, name FROM subject WHERE deleted = 0 and subjectId IN (SELECT subjectId FROM association WHERE associationId IN (SELECT associationId FROM impart WHERE teacherId=' + entity_id + '));'
             elif related_kind == 'impart':
                 # More bit complex query:
-                query = 'SELECT i.impartId, c.classId, c.course, c.word, c.level, s.subjectId, s.name FROM ' \
+                query = 'SELECT i.impartId, i.associationId, c.classId, c.course, c.word, c.level, s.subjectId, s.name FROM ' \
                         '( SELECT impart.associationId, impartId , association.subjectId, association.classId ' \
                         'FROM impart JOIN association WHERE impart.associationId = association.associationId ' \
                         'AND impart.teacherId = ' + entity_id + ' AND impart.deleted = 0) i JOIN class c JOIN subject s on (i.classId = c.classId ' \

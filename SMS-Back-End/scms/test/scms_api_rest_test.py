@@ -52,3 +52,6 @@ class TestClass:
         response = requests.post(url=url, json=association)
 
         assert response.status_code == 200  # Success but without content.
+
+
+

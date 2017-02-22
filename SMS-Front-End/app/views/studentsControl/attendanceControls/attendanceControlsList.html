@@ -33,7 +33,7 @@
                 <h3 class="md-subhead"> ¿Desea realizar uno? </h3>
 
                 <div access='admin' layout="row" layout-align="center" layout-margin>
-                    <md-button ng-click="vm.openNewTeacherDialog()" class="md-primary md-raised">
+                    <md-button ng-click="vm.openNewAttendanceControlDialog()" class="md-primary md-raised">
                         Realizar
                     </md-button>
                 </div>
@@ -118,7 +118,7 @@
 
                             <!-- 5. Date. -->
                             <td md-cell>
-                                {{ ac.createdAt}}
+                                {{ ac.createdAt | date : 'EEEE  dd-LLLL-yyyy'}}
                             </td>
 
                             <!-- 6. More info -->

@@ -13,6 +13,8 @@ from termcolor import colored
 
 from scm.scm import Association_Manager
 from scm.scm import Attendance_Controls_Manager as ACM
+from scm.scm import Marks_Manager
+from scm.scm import Disciplinary_Notes_Manager
 from das.das import *
 
 
@@ -47,28 +49,33 @@ def process_response(response):
     :return:
     """
 
-    print 'RESPONSE'
-    print response
+    if response.get('status', None) == 400:
+        if response.get('log', None):
+            abort(400, response['log'])
 
-
-    if response.get('status', None) == 1: # 200: OK STATUS.
-
-        if response.get('data', None) is not None:
-            if len(response.get('data')) == 0:
-                return ('', 204)
-            else:
-                return make_response(Response(json.dumps(response['data'],  cls=MyEncoder), mimetype='application/json'))
+    elif response.get('status', None) == 404:
+        if response.get('log', None):
+            abort(404, response['log'])
         else:
-            return ''
+            abort(404)
 
-    elif response.get('log', None) is not None:
-        abort(400, response['log'])  # 400: Bad request.
+    elif response.get('status', None) == 500:
+        if response.get('log', None):
+            abort(500, response['log'])
 
-    elif response.get('status', None) == -1:
-        # The element that it searched doesn't exists.
-        abort(404)  # Is returned standard "Not found" error.
+    elif response.get('status', None) == 204:
+        if not response.get('log', None):
+            return '', 204
 
+    elif response.get('status', None) == 200:
 
+        # Return 200 with content in boy with json format encoder.
+        if response.get('data', None):
+            return make_response(Response(json.dumps(response['data'], cls=MyEncoder), mimetype='application/json'))
+
+        # Return 200 Ok Status Code without body.
+        else:
+            return '', 200
 
 #####################################################
 #  Definition of Data Base micro Service REST API   #
@@ -169,7 +176,7 @@ def get_ac(ac_id=None):
 def get_ac_base(association_id):
     """
     Get the Attendance Control Base to the association with id passed in url.
-    :param association_id:
+    :param association_id: id of the association saved in TDBmS.
     :return:
 
     curl -i -X GET localhost:8003/acbase/<id>
@@ -194,20 +201,115 @@ def post_ac():
     return process_response(ACM.post_ac(request.get_json()))
 
 
-
 ##################################
 # Data Analysis System Resources #
 ##################################
 
-
+"""
 @app.route('/das/attendances/general', methods=['GET'])
 def get_attendances_general():
-    """
+
     curl -i -X GET localhost:8003/das/attendances/general
 
     :return:
-    """
+
     return process_response(get_general_attendance_report())
+"""
+
+################################
+#      Marks Resources         #
+################################
+
+
+@app.route('/mark', methods=['POST'])
+def post_mark():
+    """
+    Save a mark in the database.
+
+    Post with example file:
+    curl -i -H "Content-Type: application/json" -X POST -d @SMS-Back-End/scms/test/mark_example_1.json localhost:8003/mark
+
+    :return: Return HTTP status code and the mark as is saved in the data store.
+    """
+    return process_response(Marks_Manager.post(request.get_json()))
+
+
+@app.route('/mark', methods=['GET'])
+@app.route('/mark/<int:mark_id>', methods=['GET'])
+def get_mark(mark_id=None):
+    """
+    Example of use:
+
+        curl -i -X GET localhost:8003/mark
+
+    Get a list of marks or a specific mark from data store.
+    :param mark_id:
+    :return:
+    """
+    return process_response(Marks_Manager.get(mark_id))
+
+
+@app.route('/mark/<int:mark_id>', methods=['DELETE'])
+def delete_mark(mark_id):
+    """
+    Do a logic deletion of a mark in the data store.
+    :param mark_id: mark id in data store
+    :return: A 200 OK Status Code or 404 Not Found if the item doesn't exists.
+
+    Example of use:
+        curl  -i -X  DELETE localhost:8003/mark/<markId>
+        curl  -i -X  DELETE localhost:8003/mark/5629499534213120
+
+    """
+    return process_response(Marks_Manager.delete(mark_id))
+
+
+####################################
+#   Disciplinary Notes Resources   #
+####################################
+
+
+@app.route('/disciplinarynote', methods=['POST'])
+def post_disciplinary_note():
+    """
+    Save a Disciplinary Note in the database.
+
+    Post with example file:
+    curl -i -H "Content-Type: application/json" -X POST -d @SMS-Back-End/scms/test/disciplinary_note_example_1.json localhost:8003/disciplinarynote
+
+    :return: Return HTTP status code and the mark as is saved in the data store.
+    """
+    return process_response(Disciplinary_Notes_Manager.post(request.get_json()))
+
+
+@app.route('/disciplinarynote', methods=['GET'])
+@app.route('/disciplinarynote/<int:disciplinary_note_id>', methods=['GET'])
+def get_disciplinary_note(disciplinary_note_id=None):
+    """
+    Example of use:
+
+        curl -i -X GET localhost:8003/disciplinarynote
+
+    Get a list of disciplinary_notes or a specific disciplinary note from data store.
+    :param disciplinary_note_id:
+    :return:
+    """
+    return process_response(Disciplinary_Notes_Manager.get(disciplinary_note_id))
+
+
+@app.route('/disciplinarynote/<int:disciplinary_note_id>', methods=['DELETE'])
+def delete_disciplinary_note(disciplinary_note_id):
+    """
+    Do a logic deletion of a disciplinary note in the data store.
+    :param disciplinary_note_id: disciplinary note id in data store
+    :return: A 200 OK Status Code or 404 Not Found if the item doesn't exists.
+
+    Example of use:
+        curl  -i -X  DELETE localhost:8003/disciplinarynote/<disciplinary_note_Id>
+        curl  -i -X  DELETE localhost:8003/disciplinarynote/5629499534213120
+
+    """
+    return process_response(Disciplinary_Notes_Manager.delete(disciplinary_note_id))
 
 if __name__ == '__main__':
     app.run(debug=True)

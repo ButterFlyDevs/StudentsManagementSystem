@@ -1,0 +1,8 @@
+{
+    "studentId": 5,
+    "studentsIdsRelated": [3, 7, 2],
+    "date": "2000-12-03 10:30",
+    "kind": 1,
+    "gravity": 5,
+    "description": "A little problem with new boy."
+}

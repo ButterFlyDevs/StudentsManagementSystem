@@ -3,11 +3,21 @@ angular.module('attendanceControls')
 
             var vm = this;
 
+            // Param url passed to load an existing ac
             vm.acId = $stateParams.acId;
-            console.log('ACID');
+
+            // Param url passed to CREATE a new Attendance Control
+            vm.associationId = $stateParams.associationId;
+
+            console.log('acId');
             console.log(vm.acId);
+
+            console.log('associationId')
+            console.log(vm.associationId)
+
             vm.action = null;
-            if (vm.acId == 'nuevo')
+
+            if (vm.associationId)
                 vm.action = 'new';
             else
                 vm.action = 'loaded';
@@ -37,7 +47,7 @@ angular.module('attendanceControls')
                 if (vm.action == 'new') {
                     vm.acBase = new attendanceControlsService();
                     // Using $ like prefix to use own methods
-                    vm.acBase.$getBase({id: 5629499534213120},
+                    vm.acBase.$getBase({id: vm.associationId},
                         function () {
                             console.log('Attendance Control Base Data Block received:');
                             console.log(vm.acBase);

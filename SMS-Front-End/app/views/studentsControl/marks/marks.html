@@ -1,0 +1,260 @@
+<div flex ng-controller="marksController as vm">
+
+    <div layout="row" layout-align="center" ng-cloak>
+        <div flex="90" layout-padding>
+
+
+            <span class="md-headline">Notas</span>
+            <span class="md-subhead">Sección de gestión de notas.</span>
+
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="GESTION">
+                    <md-content class="md-padding">
+
+                        <md-card flex md-theme="{{ showDarkTheme ? 'dark-grey' : 'default' }}" md-theme-watch>
+                            <md-card-title>
+                                <md-card-title-text>
+                                    <span class="md-headline">Buscador</span>
+                                    <span class="md-subhead">
+                                        Seleccione todos los campos y acceda a las notas del estudiante para ver, editar
+                                        y modificarlas.
+                                    </span>
+                                </md-card-title-text>
+                            </md-card-title>
+
+
+                            <md-card-content>
+
+                                <div layout layout-sm="row">
+
+                                    <div ayout layout-margin layout-sm="column">
+                                        <!-- Subject autocomplete -->
+                                        <md-autocomplete
+                                                ng-if="true"
+                                                md-no-cache="vm.noCache"
+                                                md-selected-item="vm.subjectSelected"
+                                                md-search-text-change="vm.searchTextChange(vm.subjectSearchText)"
+                                                md-search-text="vm.subjectSearchText"
+                                                md-selected-item-change="vm.selectedItemChange(item, 'subject')"
+                                                md-items="item in vm.itemQuerySearch(vm.subjectSearchText, 'subject')"
+                                                md-item-text="item.name"
+                                                md-min-length="0"
+                                                placeholder="Asignatura"
+                                                md-menu-class="autocomplete-custom-template">
+
+                                            <md-item-template><span> {{item.name}}</span></md-item-template>
+
+                                        </md-autocomplete>
+
+                                        </br>
+
+                                        <md-autocomplete
+                                                ng-if="true"
+                                                md-no-cache="vm.noCache"
+                                                md-selected-item="vm.classSelected"
+                                                md-search-text-change="vm.searchTextChange(vm.classSearchText)"
+                                                md-search-text="vm.classSearchText"
+                                                md-selected-item-change="vm.selectedItemChange(item, 'class')"
+                                                md-items="item in vm.itemQuerySearch(vm.classSearchText, 'class')"
+                                                md-item-text="vm.itemToString(item, 'class')"
+                                                md-min-length="0"
+                                                placeholder="Grupo"
+                                                md-menu-class="autocomplete-custom-template">
+
+                                            <md-item-template>
+                                                <span> {{item.course}}  {{item.word}}  {{item.level}} </span>
+                                            </md-item-template>
+
+                                        </md-autocomplete>
+
+
+                                        </br>
+
+                                        <md-autocomplete
+                                                ng-if="true"
+                                                md-no-cache="vm.noCache"
+                                                md-selected-item="vm.classSelected"
+                                                md-search-text-change="vm.searchTextChange(vm.classSearchText)"
+                                                md-search-text="vm.classSearchText"
+                                                md-selected-item-change="vm.selectedItemChange(item, 'class')"
+                                                md-items="item in vm.itemQuerySearch(vm.classSearchText, 'class')"
+                                                md-item-text="vm.itemToString(item, 'class')"
+                                                md-min-length="0"
+                                                placeholder="Estudiante"
+                                                md-menu-class="autocomplete-custom-template">
+
+                                            <md-item-template>
+                                                <span> {{item.course}}  {{item.word}}  {{item.level}} </span>
+                                            </md-item-template>
+
+                                        </md-autocomplete>
+                                    </div>
+
+                                    <div>
+
+                                        <md-menu>
+
+                        <md-button aria-label="Open phone interactions menu"
+                                   class="md-icon-button"
+                                   ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                            <md-icon md-menu-origin>more_vert</md-icon>
+                        </md-button>
+
+                        <md-menu-content width="4">
+
+                            <md-menu-item>
+                                <md-button ng-click="vm.modValues()">
+                                    <md-icon>cached</md-icon>
+                                    Modificar
+                                </md-button>
+                            </md-menu-item>
+                                <md-menu-item>
+                                <md-button ng-click="vm.modValues()">
+                                    <md-icon>delete</md-icon>
+                                    Eliminar
+                                </md-button>
+                            </md-menu-item>
+
+                        </md-menu-content>
+
+                    </md-menu>
+
+                                        <div layout layout-margin layout-sm="row">
+
+                                            <p>1er Trimestre</p>
+
+                                            <md-input-container flex="15">
+                                                <label layout="">Pre.</label>
+                                                <input ng-model="vm.mark.preFirstEv" required>
+                                            </md-input-container>
+
+                                            <md-input-container flex="15">
+                                                <label layout="">Final</label>
+                                                <input ng-model="vm.mark.firstEv" required>
+                                            </md-input-container>
+
+                                        </div>
+
+                                        <div layout layout-margin layout-sm="row">
+
+                                        <small>2o Trimestre</small>
+
+
+                                            <md-input-container flex>
+                                                <label layout="">Preevaluación</label>
+                                                <input ng-model="vm.mark.preSecondEv" required>
+                                            </md-input-container>
+
+                                            <md-input-container flex>
+                                                <label layout="">Final</label>
+                                                <input ng-model="vm.mark.secondEv" required>
+                                            </md-input-container>
+
+                                        </div>
+
+
+
+                                        <div layout layout-margin layout-sm="row">
+
+                                            <small>3er Trimestre</small>
+
+                                            <md-input-container flex>
+                                                <label layout="">Final</label>
+                                                <input ng-model="vm.mark.thirdEv" required>
+                                            </md-input-container>
+
+                                        </div>
+
+                                        <small>Final</small>
+                                        <br>
+
+                                        <md-input-container flex>
+                                            <label layout="">Final</label>
+                                            <input ng-model="vm.mark.final" required>
+                                        </md-input-container>
+
+
+                                        <!-- Options in edition mode -->
+                    <div layout="row" flex flex="70" layout-align="center">
+
+                        <md-button
+                                ng-show="true"
+                                title="Cancelar"
+                                ng-click="vm.cancelModValues()"
+                                class="md-icon-button md-accent">
+                            <md-icon>cancel</md-icon>
+                        </md-button>
+
+                        <md-button
+                                ng-show="true"
+                                title="Guardar cambios"
+                                ng-disabled="!vm.updateButtonEnable"
+                                ng-click="vm.updateTeacher()"
+                                class="md-icon-button md-primary">
+                            <md-icon>save</md-icon>
+                        </md-button>
+
+                    </div>
+
+                                    </div>
+                                </div>
+
+                            </md-card-content>
+
+                            <md-card-actions layout="row" layout-align="end center">
+                                <md-button>Limpiar</md-button>
+                            </md-card-actions>
+
+
+                        </md-card>
+
+
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue.
+                            Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales
+                            pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies
+                            mi.</p>
+
+
+                    </md-content>
+                </md-tab>
+                <md-tab label="INFORMES">
+                    <md-content class="md-padding">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue.
+                            Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales
+                            pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies
+                            mi. Aliquam erat volutpat. Nam placerat, tortor in ultrices porttitor, orci enim rutrum
+                            enim, vel tempor sapien arcu a tellus. Vivamus convallis sodales ante varius gravida.
+                            Curabitur a purus vel augue ultrices ultricies id a nisl. Nullam malesuada consequat diam, a
+                            facilisis tortor volutpat et. Sed urna dolor, aliquet vitae posuere vulputate, euismod ac
+                            lorem. Sed felis risus, pulvinar at interdum quis, vehicula sed odio. Phasellus in enim
+                            venenatis, iaculis tortor eu, bibendum ante. Donec ac tellus dictum neque volutpat blandit.
+                            Praesent efficitur faucibus risus, ac auctor purus porttitor vitae. Phasellus ornare dui nec
+                            orci posuere, nec luctus mauris semper.</p>
+                        <p>Morbi viverra, ante vel aliquet tincidunt, leo dolor pharetra quam, at semper massa orci nec
+                            magna. Donec posuere nec sapien sed laoreet. Etiam cursus nunc in condimentum facilisis.
+                            Etiam in tempor tortor. Vivamus faucibus egestas enim, at convallis diam pulvinar vel. Cras
+                            ac orci eget nisi maximus cursus. Nunc urna libero, viverra sit amet nisl at, hendrerit
+                            tempor turpis. Maecenas facilisis convallis mi vel tempor. Nullam vitae nunc leo. Cras sed
+                            nisl consectetur, rhoncus sapien sit amet, tempus sapien.</p>
+                        <p>Integer turpis erat, porttitor vitae mi faucibus, laoreet interdum tellus. Curabitur posuere
+                            molestie dictum. Morbi eget congue risus, quis rhoncus quam. Suspendisse vitae hendrerit
+                            erat, at posuere mi. Cras eu fermentum nunc. Sed id ante eu orci commodo volutpat non ac
+                            est. Praesent ligula diam, congue eu enim scelerisque, finibus commodo lectus.</p>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+
+
+        </div>
+
+        <div layout="row" layout-align="space-between start">
+            <md-button class="md-primary md-raised"
+                       ui-sref="attendanceControls">
+                <md-icon>keyboard_arrow_left</md-icon>
+                Atras
+            </md-button>
+        </div>
+        <div>
+        </div>
+
+

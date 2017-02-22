@@ -223,7 +223,7 @@ def provision_scms_simple():
 
 def main():
     parser = argparse.ArgumentParser(description='Insert data in the system.')
-    parser.add_argument('-ms', type=str, help = 'The microservice selected')
+    parser.add_argument('-ms', type=str, help='The microservice selected')
     args = parser.parse_args()
 
     if args.ms == 'scms':

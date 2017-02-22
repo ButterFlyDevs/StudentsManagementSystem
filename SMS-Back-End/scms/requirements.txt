@@ -10,6 +10,8 @@ unittest2>=0.5
 jsonpickle
 termcolor
 pytz
+requests
+requests-toolbelt
 
 # For data science
 #scipy
