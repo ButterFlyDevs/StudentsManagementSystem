@@ -302,11 +302,11 @@ def get_ac_base(association_id):
     :param association_id:
     :return:
 
-    curl -i -X GET localhost:8003/acbase/<id>
-    curl -i -X GET localhost:8003/acbase/5629499534213120
+    curl -i -X GET localhost:8001/ac/base/<id>
+    curl -i -X GET localhost:8001/ac/base/5629499534213120
     """
 
-    url = 'http://{}/{}/{}'.format(modules.get_hostname(module='scms'), 'acbase', association_id)
+    url = 'http://{}/{}/{}'.format(modules.get_hostname(module='scms'), 'ac/base', association_id)
     response = requests.get(url)
     response = make_response(response.content, response.status_code)
     response.headers['Access-Control-Allow-Origin'] = "*"

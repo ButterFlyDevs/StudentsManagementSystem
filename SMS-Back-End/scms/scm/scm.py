@@ -100,7 +100,7 @@ def time_now():
     return mynow
 
 
-class Association_Manager:
+class AssociationManager:
     """
     Standard response data block:
         A dict with three fields, {'status': int,  'log' string, 'data': data }
@@ -338,7 +338,7 @@ class Association_Manager:
     def updateAssociations(cls, n):
         print 'updateASSociaton'+str(n)
 
-        url = 'http://{}/{}/{}'.format(modules.get_hostname(module='dbms'), 'entities/association', n)
+        url = 'http://{}/{}/{}'.format(modules.get_hostname(module='tdbms'), 'entities/association', n)
         response = requests.get(url)
         data = json.loads(response.content)
         status = response.status_code
@@ -364,30 +364,37 @@ class Association_Manager:
                 return response
 
 
-class Attendance_Controls_Manager:
+class AttendanceControlsManager:
 
     @classmethod
     def get_ac(cls, ac_id=None):
-
-
+        """
+        Get all attendance controls from data store or details of specific.
+        :param ac_id:
+        :return:
+        """
 
         if ac_id is None:
 
-            q = AC.query()
-            items = []
+            query = AC.query()
+            attendace_controls = []
 
-            for item in q.iter():
-                key_id = item._key.id()
-                dict_tmp = item.to_dict()
+            for attendance in query.iter():
 
-                dict_tmp = dict((k, v) for k, v in dict_tmp.iteritems() if v)
+                attendance_id = attendance._key.id()
+                attendance_dict = attendance.to_dict()
 
-                if dict_tmp.get('deleted', None) is not True:
-                    dict_tmp['students'] = len(dict_tmp['students'])
-                    items.append(dict_tmp)
-                    dict_tmp['acId'] = key_id
+                attendance_dict = dict((k, v) for k, v in attendance_dict.iteritems() if v)
 
-            return {'status': 1, 'data': items, 'log': None}
+                if attendance_dict.get('deleted', None) is not True:
+                    attendance_dict['students'] = len(attendance_dict['students'])
+                    attendace_controls.append(attendance_dict)
+                    attendance_dict['acId'] = attendance_id
+
+            if len(attendace_controls) != 0:
+                return {'status': 200, 'data': attendace_controls, 'log': None}
+            else:
+                return {'status': 204, 'data': None, 'log': None}
 
         else:
 
@@ -405,12 +412,12 @@ class Attendance_Controls_Manager:
                 item['association']['class'] = item['association'].pop('classs')
 
                 if query.count() == 1 and item.get('deleted', None) is not True:
-                    return {'status': 1, 'data': item, 'log': None}
+                    return {'status': 200, 'data': item, 'log': None}
                 else:
-                    return {'status': -1, 'data': None, 'log': None}
+                    return {'status': 204, 'data': None, 'log': None}
 
             else:
-                return {'status': -1, 'data': None, 'log': None}
+                return {'status': 204, 'data': None, 'log': None}
 
     @classmethod
     def get_ac_base(cls, association_id):
@@ -419,6 +426,8 @@ class Attendance_Controls_Manager:
         :param association_id:
         :return:
         """
+
+
 
         # Definition of basic CKS (Control Kind Specification)
         cks = {"assistance": True,
@@ -456,9 +465,11 @@ class Attendance_Controls_Manager:
         Like a first approach we search the association directly from TDBmS
         """
 
-        url = 'http://{}/{}/{}'.format(modules.get_hostname(module='dbms'), 'entities/association', association_id)
+        url = 'http://{}/{}/{}'.format(modules.get_hostname(module='tdbms'), 'entities/association', association_id)
         response = requests.get(url)
         status = response.status_code
+
+
 
         # If the call to TDBmS to get association info is correct:
         if status == 200:
@@ -475,10 +486,10 @@ class Attendance_Controls_Manager:
                 for student in association['students']:
                     student['control'] = cks
 
-                return {'status': 1, 'data': association, 'log': None}
+                return {'status': 200, 'data': association, 'log': None}
 
             else:
-                return {'status': -1, 'data': None, 'log': None}
+                return {'status': 400, 'data': None, 'log': None}
 
         elif status == 204:
             print status
@@ -631,13 +642,13 @@ class Attendance_Controls_Manager:
 
                     key = record.put()
 
-            return {'status': 1}
+            return {'status': 200}
 
         else:
-            return {'status': -1, 'data': None, 'log': None}
+            return {'status': 400, 'data': None, 'log': None}
 
 
-class Marks_Manager:
+class MarksManager:
 
     @classmethod
     def mark_format_is_ok(self, mark):
@@ -739,7 +750,7 @@ class Marks_Manager:
             return {'status': 404, 'data': None, 'log': 'Mark required seem like doesn\'t exists or was deleted.'}
 
 
-class Disciplinary_Notes_Manager:
+class DisciplinaryNotesManager:
 
     @classmethod
     def disciplinary_notes_format_is_ok(self, disciplinary_note):

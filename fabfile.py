@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from fabric.api import local  # to run local commands.
 from fabric.colors import red
 from provisioner import example_data_provisioner
@@ -101,20 +103,19 @@ def test(ms):
     #   SCmS Testing Options   #
     ############################
 
+    # To run all test of this micro Service.
     if ms == 'scms':
         print (blue('## Runnig Students Control microService entire Test Suite. ## '))
         with lcd("SMS-Back-End/scms"):
             local("pytest test/ -vv")
 
-    # To run test over scms.api marks segment.
-    # Use:  fab test:scms.api.marks
+    # To run test over scms.api marks segment.     Use:  fab test:scms.api.marks
     if ms == 'scms.api.marks':
         print (blue('## Runnig Students Control microService APIG - Mark segment TEST . ## '))
         with lcd("SMS-Back-End/scms"):
             local("pytest test/scms_api_rest_marks_segment_test.py -vv -s")
 
-    # To run test over scms.api discipline notes segment.
-    # Use:  fab test:scms.api.disciplinarynotes
+    # To run test over scms.api discipline notes segment.     Use:  fab test:scms.api.disciplinarynotes
     if ms == 'scms.api.disciplinarynotes':
         print (blue('## Runnig Students Control microService APIG - Disciplinary Notes segment TEST . ## '))
         with lcd("SMS-Back-End/scms"):

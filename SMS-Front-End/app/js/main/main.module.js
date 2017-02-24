@@ -9,7 +9,7 @@
 
 angular.module('main', ['ngMaterial', 'ui.router', 'teachers',
     'students', 'subjects', 'classes', 'associations', 'imparts', 'enrollments',
-    'attendanceControls', 'marks', 'ngResource', 'angularMoment']);
+    'attendanceControls', 'marks', 'discipline', 'ngResource', 'angularMoment']);
 
 angular.module('main').config(function ($stateProvider, $urlRouterProvider) {
 
@@ -72,7 +72,7 @@ angular.module('main').config(function ($stateProvider, $urlRouterProvider) {
 
         .state('discipline', {
                 url: '/discipline',
-                templateUrl: 'app/views/studentsControl/attendanceControls/attendanceControlsList.html'
+                templateUrl: 'app/views/studentsControl/discipline/discipline.html'
             })
 
 });

@@ -11,10 +11,10 @@ import datetime
 import json
 from termcolor import colored
 
-from scm.scm import Association_Manager
-from scm.scm import Attendance_Controls_Manager as ACM
-from scm.scm import Marks_Manager
-from scm.scm import Disciplinary_Notes_Manager
+from scm.scm import AssociationManager
+from scm.scm import AttendanceControlsManager as ACM
+from scm.scm import MarksManager
+from scm.scm import DisciplinaryNotesManager
 from das.das import *
 
 
@@ -43,7 +43,7 @@ microservice_name = '\n ## scms Students Control micro Service ##'
 
 def process_response(response):
     """
-    Process the response of Association_Manager to adapt to a api rest response, with
+    Process the response of AssociationManager to adapt to a api rest response, with
     HTTP status code instead of library status code.
     :param response:
     :return:
@@ -107,8 +107,8 @@ def post_association():
     :return:
     """
 
-    # return Association_Manager.post2(request.get_json())
-    return process_response(Association_Manager.post(request.get_json()))
+    # return AssociationManager.post2(request.get_json())
+    return process_response(AssociationManager.post(request.get_json()))
 
 
 @app.route('/association', methods=['GET'])
@@ -125,7 +125,7 @@ def get_association(entity_id = None, teacher_id = None):
     :return:
     """
 
-    return process_response(Association_Manager.get(entity_id, teacher_id))
+    return process_response(AssociationManager.get(entity_id, teacher_id))
 
 
 @app.route('/association/<int:entity_id>', methods=['DELETE'])
@@ -141,7 +141,7 @@ def delete_association(entity_id):
 
     """
 
-    return process_response(Association_Manager.delete(entity_id))
+    return process_response(AssociationManager.delete(entity_id))
 
 
 @app.route('/association/<int:entity_id>', methods=['PUT'])
@@ -152,7 +152,7 @@ def put_association(entity_id):
     :return:
     """
 
-    return process_response(Association_Manager.put(entity_id, request.get_json()))
+    return process_response(AssociationManager.put(entity_id, request.get_json()))
 
 ################################
 # Attendance Control Resources #
@@ -172,15 +172,15 @@ def get_ac(ac_id=None):
     return process_response(ACM.get_ac(ac_id))
 
 
-@app.route('/acbase/<int:association_id>', methods=['GET'])
+@app.route('/ac/base/<int:association_id>', methods=['GET'])
 def get_ac_base(association_id):
     """
     Get the Attendance Control Base to the association with id passed in url.
     :param association_id: id of the association saved in TDBmS.
     :return:
 
-    curl -i -X GET localhost:8003/acbase/<id>
-    curl -i -X GET localhost:8003/acbase/5629499534213120
+    curl -i -X GET localhost:8003/ac/base/<id>
+    curl -i -X GET localhost:8003/ac/base/5629499534213120
     """
 
     return process_response(ACM.get_ac_base(association_id))
@@ -197,7 +197,7 @@ def post_ac():
     :return:
     """
 
-    # return Association_Manager.post2(request.get_json())
+    # return AssociationManager.post2(request.get_json())
     return process_response(ACM.post_ac(request.get_json()))
 
 
@@ -231,7 +231,7 @@ def post_mark():
 
     :return: Return HTTP status code and the mark as is saved in the data store.
     """
-    return process_response(Marks_Manager.post(request.get_json()))
+    return process_response(MarksManager.post(request.get_json()))
 
 
 @app.route('/mark', methods=['GET'])
@@ -246,7 +246,7 @@ def get_mark(mark_id=None):
     :param mark_id:
     :return:
     """
-    return process_response(Marks_Manager.get(mark_id))
+    return process_response(MarksManager.get(mark_id))
 
 
 @app.route('/mark/<int:mark_id>', methods=['DELETE'])
@@ -261,7 +261,7 @@ def delete_mark(mark_id):
         curl  -i -X  DELETE localhost:8003/mark/5629499534213120
 
     """
-    return process_response(Marks_Manager.delete(mark_id))
+    return process_response(MarksManager.delete(mark_id))
 
 
 ####################################
@@ -279,7 +279,7 @@ def post_disciplinary_note():
 
     :return: Return HTTP status code and the mark as is saved in the data store.
     """
-    return process_response(Disciplinary_Notes_Manager.post(request.get_json()))
+    return process_response(DisciplinaryNotesManager.post(request.get_json()))
 
 
 @app.route('/disciplinarynote', methods=['GET'])
@@ -294,7 +294,7 @@ def get_disciplinary_note(disciplinary_note_id=None):
     :param disciplinary_note_id:
     :return:
     """
-    return process_response(Disciplinary_Notes_Manager.get(disciplinary_note_id))
+    return process_response(DisciplinaryNotesManager.get(disciplinary_note_id))
 
 
 @app.route('/disciplinarynote/<int:disciplinary_note_id>', methods=['DELETE'])
@@ -309,7 +309,7 @@ def delete_disciplinary_note(disciplinary_note_id):
         curl  -i -X  DELETE localhost:8003/disciplinarynote/5629499534213120
 
     """
-    return process_response(Disciplinary_Notes_Manager.delete(disciplinary_note_id))
+    return process_response(DisciplinaryNotesManager.delete(disciplinary_note_id))
 
 if __name__ == '__main__':
     app.run(debug=True)

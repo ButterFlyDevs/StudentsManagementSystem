@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 ################################################
 
 # Attention: We don't respect PEP-8 style guide because we use camelCase in the JSON files that
-# the apis manage and the conversion to json is directly using the same name used here.
+# the api manage and the conversion to json is directly using the same name used here.
 
 
 class DisciplinaryNote(ndb.Model):

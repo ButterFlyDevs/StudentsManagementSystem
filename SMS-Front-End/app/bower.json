@@ -10,7 +10,10 @@
     "angular-material-data-table": "0.9.8",
     "angular-resource": "1.4.9",
     "moment": "2.11.2",
-    "angular-moment": "^1.0.0"
+    "angular-moment": "^1.0.0",
+    "angular-i18n": "^1.6.2",
+    "angular-ui-router": "^0.4.2",
+    "highcharts": "^5.0.7"
   },
   "resolutions": {
     "angular": "1.5.8"
