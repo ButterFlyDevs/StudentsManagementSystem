@@ -1,5 +1,5 @@
 application: 65748238734626
-module: dbms
+module: tdbms
 version: uno
 runtime: python27
 api_version: 1
@@ -11,7 +11,7 @@ automatic_scaling:
 
 handlers:
 - url: /.*
-  script: dbms_api.app
+  script: tdbms_api.app
 
 #Especificamos las librerías que queremos usar de las que tienen disponibles en GAE y que no es necesario
 #añadir manualmente en /lib, como MySQLdb para la conexión con el la instancia de SQL

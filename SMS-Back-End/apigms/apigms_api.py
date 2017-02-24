@@ -31,7 +31,7 @@ v = 1
 
 # DEFAULT PORT TO THIS microService in local: 8001
 
-microservice_name = '\n ## dbms Data Base mService ##'
+microservice_name = '\n ## tdbms Data Base mService ##'
 
 module = modules.get_current_module_name()
 instance = modules.get_current_instance_id()
@@ -77,7 +77,7 @@ def test():
         curl -i -X GET localhost:8001/test
     """
 
-    response = requests.get("http://%s/test" % modules.get_hostname(module='dbms'))
+    response = requests.get("http://%s/test" % modules.get_hostname(module='tdbms'))
     return make_response(response.content, response.status_code)
 
 
@@ -111,7 +111,7 @@ def post_entity(kind):
       curl -i -H "Content-Type: application/json" -X POST -d '{ "data": {"course": 1, "word": "B", "level": "ESO"} }' localhost:8001/entities/class
 
     """
-    response = requests.post(url='http://' + str(modules.get_hostname(module='dbms')) + '/entities/' + str(kind),
+    response = requests.post(url='http://' + str(modules.get_hostname(module='tdbms')) + '/entities/' + str(kind),
                              json=request.get_json())
     response.headers['Access-Control-Allow-Origin'] = "*"
     return make_response(response.content, response.status_code)
@@ -135,7 +135,7 @@ def get_entities(kind, entity_id=None):
     """
 
 
-    url = 'http://' + str(modules.get_hostname(module='dbms')) + '/' + 'entities/' + str(kind)
+    url = 'http://' + str(modules.get_hostname(module='tdbms')) + '/' + 'entities/' + str(kind)
     if entity_id is not None:
         url += '/' + str(entity_id)
 
@@ -155,7 +155,7 @@ def update_entities(kind, entity_id):
 
     """
     Data Base micro Service Resource connector, to update all kind of entities in this mService.
-    More details in dbms.
+    More details in tdbms.
 
     :param kind: Type of element to modify.
     :param entity_id: Id of entity to modify.
@@ -170,7 +170,7 @@ def update_entities(kind, entity_id):
 
     """
 
-    response = requests.put(url='http://' + str(modules.get_hostname(module='dbms')) + '/entities/' + str(kind) + '/' + str(entity_id),
+    response = requests.put(url='http://' + str(modules.get_hostname(module='tdbms')) + '/entities/' + str(kind) + '/' + str(entity_id),
                             json=request.get_json())
 
     response = make_response(response.content, response.status_code)
@@ -187,7 +187,7 @@ def delete_entity(kind, entity_id, optional_nested_kind = None, onk_entity_id = 
     """
 
 
-    url = 'http://' + modules.get_hostname(module='dbms') + '/entities/' + str(kind) + '/' + str(entity_id)
+    url = 'http://' + modules.get_hostname(module='tdbms') + '/entities/' + str(kind) + '/' + str(entity_id)
 
     if optional_nested_kind is not None and onk_entity_id is not None:
         url += '/{}/{}'.format(optional_nested_kind, onk_entity_id)
@@ -220,7 +220,7 @@ def get_related_entities(kind, entity_id, related_kind, rk_entity_id=None, subre
        curl -i -X GET localhost:8001/entities/student/1/teacher
     """
 
-    url = 'http://{}/entities/{}/{}/{}'.format(modules.get_hostname(module='dbms'),kind,entity_id, related_kind)
+    url = 'http://{}/entities/{}/{}/{}'.format(modules.get_hostname(module='tdbms'),kind,entity_id, related_kind)
 
     if rk_entity_id and subrelated_kind:
         url += '/{}/{}'.format(rk_entity_id, subrelated_kind)

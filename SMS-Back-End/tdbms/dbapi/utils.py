@@ -1,6 +1,7 @@
 from termcolor import colored
 import inspect
 
+
 def logger(func):
     def real_loger(*args, **kwargs):
         print colored('LOGGER')
@@ -8,6 +9,7 @@ def logger(func):
         print colored(args[1:], 'green')
 
     return real_loger
+
 
 class sorters(object):
 
@@ -206,7 +208,6 @@ class sorters(object):
                         sorted_list[index]['teachers'].append(new_teacher)
 
         return sorted_list
-
 
     @classmethod
     def special_sort_4(cls, list):
