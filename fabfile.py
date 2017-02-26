@@ -109,6 +109,12 @@ def test(ms):
         with lcd("SMS-Back-End/scms"):
             local("pytest test/ -vv")
 
+    # To run test over scms.api assciations segment.     Use:  fab test:scms.api.associations
+    if ms == 'scms.api.association':
+        print (blue('## Runnig Students Control microService APIG - Association segment TEST . ## '))
+        with lcd("SMS-Back-End/scms"):
+            local("pytest test/scms_api_rest_associations_segment_test.py -vv -s")
+
     # To run test over scms.api marks segment.     Use:  fab test:scms.api.marks
     if ms == 'scms.api.marks':
         print (blue('## Runnig Students Control microService APIG - Mark segment TEST . ## '))

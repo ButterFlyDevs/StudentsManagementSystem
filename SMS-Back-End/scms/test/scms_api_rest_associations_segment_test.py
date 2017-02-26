@@ -10,18 +10,20 @@ import os
 from termcolor import colored
 import datetime
 
-urlBase = 'http://localhost:8003'
+urlBase = 'http://localhost:8003/association'
 
 
 class TestClass:
-    def setup_method(self):
-        # pytest test/dbms_api_test.py::TestClass::test_dbms_api_test -vv -s
-        pass
 
-    def test_scms_api_rest_conection_test(self):
-        url = urlBase + '/test'
-        assert requests.get(url).json().get('scms_api_rest_test_status', None) == 'ok'
+    def test_empty_data_store_and_schema(self):
+        result = requests.get(urlBase)
+        assert result.status_code == 204
 
+        result = requests.get(urlBase+'/schema')
+
+        print result
+
+    """
     def test_post_association(self):
 
         url = urlBase + '/association'
@@ -52,6 +54,6 @@ class TestClass:
         response = requests.post(url=url, json=association)
 
         assert response.status_code == 200  # Success but without content.
-
+    """
 
 

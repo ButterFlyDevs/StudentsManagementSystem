@@ -95,6 +95,10 @@ def test():
 # Association Resources #
 #########################
 
+# TODO: Cambiar el nombre al adb para que no entre en conflicto con las association del tdbms
+@app.route('/association/schema', methods=['GET'])
+def get_association_datastore_schema():
+    return process_response(AssociationManager.get_association_schema())
 
 @app.route('/association', methods=['POST'])
 def post_association():

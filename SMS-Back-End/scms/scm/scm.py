@@ -99,6 +99,20 @@ def time_now():
     mynow = now + tzoffset
     return mynow
 
+def get_schema(data_model):
+
+    elements = []
+
+    properties = ADB.__dict__.get('_properties')
+    print colored(properties, 'blue')
+
+    for k, v in properties.iteritems():
+        print type(v)
+        v = str(v)
+
+        elements.append({k: v})
+
+    return elements
 
 class AssociationManager:
     """
@@ -186,12 +200,12 @@ class AssociationManager:
                 item['scsmAssociationId'] = key_id
 
                 if query.count() == 1 and item.get('deleted', None) is not True:
-                    return {'status': 1, 'data': item, 'log': None}
+                    return {'status': 200, 'data': item, 'log': None}
                 else:
-                    return {'status': -1, 'data': None, 'log': None}
+                    return {'status': 204, 'data': None, 'log': None}
 
             else:
-                return {'status': -1, 'data': None, 'log': None}
+                return {'status': 204, 'data': None, 'log': None}
 
         elif teacher_id and association_id is None:
 
@@ -213,10 +227,9 @@ class AssociationManager:
 
                         asso_list.append(tmp_item)
 
-                return {'status': 1, 'data': asso_list, 'log': None}
+                return {'status': 200, 'data': asso_list, 'log': None}
             else:
-                return {'status': -1, 'data': None, 'log': None}
-
+                return {'status': 204, 'data': None, 'log': None}
 
         elif not association_id and not teacher_id:
 
@@ -233,7 +246,14 @@ class AssociationManager:
                     dict_tmp['scmsAssociationId'] = result._key.id()
                     items.append(dict_tmp)
 
-            return {'status': 1, 'data': items, 'log': None}
+            if len(items) == 0:
+                return {'status': 204, 'data': None, 'log': None}
+            else:
+                return {'status': 200, 'data': items, 'log': None}
+
+    @classmethod
+    def get_association_schema(cls):
+        return {'status': 200, 'data': get_schema(ADB), 'log': None}
 
     @classmethod
     def delete(cls, association_id):
