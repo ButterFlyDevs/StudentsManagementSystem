@@ -59,7 +59,14 @@
                     <md-list ng-disabled="true">
                         <md-list-item class="md-3-line" ng-repeat="student in vm.acBase.students">
 
-                            <img ng-src="{{vm.defaultAvatar}}" class="md-avatar">
+                             <div ng-switch="student.profileImageUrl || '_undefined_'">
+                            <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
+                            <img ng-switch-default class="img-profile" src="{{ student.profileImageUrl }}">
+                        </div>
+
+                            <!-- <img ng-src="{{vm.defaultAvatar}}" class="md-avatar">-->
+
+
                             <div class="md-list-item-text">
                                 <h3>{{student.name}}</h3>
                                 <h4>{{student.surname}}</h4>

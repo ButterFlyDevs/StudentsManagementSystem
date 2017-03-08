@@ -777,7 +777,17 @@ class DisciplinaryNotesManager:
         return True
 
     @classmethod
-    def get(cls, disciplinary_note_id):
+    def get(cls, disciplinary_note_id, params=None):
+        """
+        Get all disciplinary notes with a specific params o with all or a specific dNote with
+        all params.
+
+        Params only can be used when the requirements if to get all dNotes (note_id = None)
+
+        :param disciplinary_note_id:
+        :param params:
+        :return: An array of items, empty if hasn't any ([]).
+        """
 
         # If isn't passed disciplinary_note_id is requests all marks from the data store.
         if disciplinary_note_id is None:
@@ -799,6 +809,26 @@ class DisciplinaryNotesManager:
                 # If the item hasn't deleted is added to disciplinary notes list
                 if dict_tmp.get('deleted', None) is not True:
                     dict_tmp['disciplinaryNoteId'] = key_id
+
+                    # Populate student item
+                    student = {'studentId': dict_tmp.get('studentId'),
+                               'name': 'Eduardo',
+                               'surname': 'Ramirez Herrera',
+                               'urlProfilePic': 'https://www.shareicon.net/data/128x128/2016/06/25/786527_people_512x512.png'}
+
+                    # Populate teacher item
+                    teacher = {'teacherId': dict_tmp.get('teacherId'),
+                               'name': 'Marcos ',
+                               'surname': 'Ruiz Ramirez',
+                               'urlProfilePic': 'https://www.shareicon.net/data/128x128/2016/06/25/786527_people_512x512.png'}
+
+
+                    del(dict_tmp['studentId'])
+                    dict_tmp['student'] = student
+
+                    del (dict_tmp['teacherId'])
+                    dict_tmp['teacher'] = teacher
+
                     disciplinary_notes.append(dict_tmp)
 
             if len(disciplinary_notes) == 0:
@@ -833,16 +863,16 @@ class DisciplinaryNotesManager:
         if cls.disciplinary_notes_format_is_ok(disciplinary_note):
 
             # Is created the object
-            dn_to_save = DisciplinaryNote(studentId=disciplinary_note.get('studentId'),
-                              studentsIdsRelated=disciplinary_note.get('studentsIdsRelated'),
-                              date=datetime.datetime.strptime(disciplinary_note.get('date'),"%Y-%m-%d %H:%M"),
-                              kind=disciplinary_note.get('kind'),
-                              gravity=disciplinary_note.get('gravity'),
-                              description=disciplinary_note.get('description'),
-                              createdBy=1, createdAt=time_now())
+            dn_to_save = DisciplinaryNote(
+                studentId=disciplinary_note.get('studentId'),
+                teacherId=disciplinary_note.get('teacherId'),
+                enrollmentId=disciplinary_note.get('enrollmentId'),
+                studentsIdsRelated=disciplinary_note.get('studentsIdsRelated'),
+                dateTime=datetime.datetime.strptime(disciplinary_note.get('dateTime'),"%Y-%m-%d %H:%M"),
+                kind=disciplinary_note.get('kind'), gravity=disciplinary_note.get('gravity'),
+                description=disciplinary_note.get('description'), createdBy=1, createdAt=time_now())
 
             # And save using himself
-
             key = dn_to_save.put()
             dn_saved = key.get().to_dict()
             dn_saved = dict((k, v) for k, v in dn_saved.iteritems() if v)

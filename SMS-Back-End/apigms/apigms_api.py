@@ -322,5 +322,32 @@ def post_ac():
     return make_response(response.content, response.status_code)
 
 
+################################
+# Disciplinary Notes Resources #
+################################
+
+@app.route('/disciplinarynote', methods=['GET'])
+@app.route('/disciplinarynote/<int:disciplinary_note_id>', methods=['GET'])
+def get_disciplinary_note(disciplinary_note_id=None):
+    """
+    Example of use:
+
+        curl -i -X GET localhost:8001/disciplinarynote
+
+    Get a list of disciplinary_notes or a specific disciplinary note from data store.
+    :param disciplinary_note_id:
+    :return:
+    """
+
+    url = 'http://{}/{}'.format(modules.get_hostname(module='scms'), 'disciplinarynote')
+
+    if disciplinary_note_id is not None:
+        url += '/{}'.format(disciplinary_note_id)
+
+    response = requests.get(url)
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
+
 if __name__ == '__main__':
     app.run(debug=True)

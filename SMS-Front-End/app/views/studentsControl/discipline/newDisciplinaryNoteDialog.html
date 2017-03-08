@@ -1,0 +1,197 @@
+<md-dialog ng-cloak>
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>Nuevo parte disciplinario</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="vm.closeDialog()">
+                <md-icon>close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content>
+        <div class="md-dialog-content">
+            <form name="newDisciplinaryNoteForm">
+
+                <div layout="column">
+
+
+                    <div>
+                        <p>Profesor que registra el parte: </p>
+                        <div layout layout-sm="row">
+
+                            <div>
+                                <div ng-switch="item.img || '_undefined_'">
+                                    <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
+                                    <img ng-switch-default class="img-profile" src="{{ item.img }}">
+                                </div>
+                            </div>
+
+                            <div>
+                                <p>Juan Carlos</p>
+                                <small>Fernandez Guzman</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p>Principal estudiante relacionado: </p>
+                        <!-- Student autocomplete -->
+                        <md-autocomplete
+                                md-no-cache="vm.noCache"
+                                md-selected-item="vm.studentSelected"
+                                md-search-text-change="vm.searchTextChange(vm.studentSearchText)"
+                                md-search-text="vm.studentSearchText"
+                                md-selected-item-change="vm.selectedItemChange(item)"
+                                md-items="item in vm.itemQuerySearch(vm.studentdSearchText)"
+                                md-item-text="vm.itemToString(item)"
+                                md-min-length="0"
+                                placeholder="Estudiante"
+                                md-menu-class="autocomplete-custom-template">
+
+                            <md-item-template>
+                              <span>
+                                  <!--
+                                <div ng-switch="item.profileImageUrl || '_undefined_'">
+                                    <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
+                                    <img ng-switch-default class="img-profile" src="{{ item.profileImageUrl }}">
+                                </div>-->
+                                <img class="img-profile" src="{{ vm.defaultAvatar }}">
+                                <span> {{item.name}}  {{item.surname}}</span>
+
+                              </span>
+                            </md-item-template>
+
+                        </md-autocomplete>
+                    </div>
+
+                </div>
+
+                <div layout="row">
+                     <div layout="column">
+
+                    <!-- Kind -->
+                    <md-input-container flex>
+                        <label layout="">Tipo</label>
+                        <input ng-model="vm.disciplinaryNote.kind" required>
+                    </md-input-container>
+
+                    <!-- Gravity -->
+                    <md-input-container flex>
+                        <label layout="">Gravedad</label>
+                        <input ng-model="vm.disciplinaryNote.gravity" required>
+                    </md-input-container>
+                    <!-- Place -->
+                    <md-input-container flex="40">
+                        <md-icon style="color:gray;">location_on</md-icon>
+                        <label layout="">Lugar</label>
+                        <input ng-model="vm.disciplinaryNote.place" required>
+                    </md-input-container>
+
+                </div>
+
+                    <div layout="column">
+
+
+
+                    <!-- Date -->
+                    <md-input-container flex>
+
+                        <mdp-date-picker mdp-open-on-click required name="dateFormat"
+                                         mdp-placeholder="My date (dd/mm/yyyy)"
+                                         mpd-format="DD/MM/YYYY" ng-model="currentDate">
+                            <div ng-messages="demoForm.dateFormat.$error">
+                                <div ng-message="required">This is required</div>
+                                <div ng-message="format">Invalid format</div>
+                            </div>
+                        </mdp-date-picker>
+
+                        <!--
+                        <md-datepicker
+                                ng-model="vm.disciplinaryNote.date"
+                                md-placeholder="UNO">
+                        </md-datepicker>
+                        -->
+                    </md-input-container>
+
+                    <!-- Time -->
+
+                    <md-input-container flex>
+                        <!-- TODO: Change datepicker for timepicker. -->
+                        <!--
+                        <md-datepicker
+                                ng-model="vm.disciplinaryNote.time"
+                                md-placeholder="dos">
+                        </md-datepicker>
+                        -->
+
+                        <mdp-time-picker ng-model="currentDate"></mdp-time-picker>
+
+
+                    </md-input-container>
+
+
+
+                </div>
+
+                </div>
+
+
+
+
+
+                <!-- Description -->
+                <div layout layout-sm="row">
+                    <md-input-container flex>
+                        <label layout="">Descripcion de los hechos</label>
+                        <input ng-model="vm.disciplinaryNote.description" required>
+                    </md-input-container>
+                </div>
+
+
+                <p> Notificaciones</p>
+                <md-divider></md-divider>
+
+                <span>Por defecto todos los partes disciplinarios son notificados a tutores y jefatura de studios,
+                pero puede seleccionar si desea que sea con urgencia y a los padres.</span>
+
+
+                <fieldset class="demo-fieldset">
+                    <div layout="row" layout-wrap flex>
+                        <div flex-xs flex="50">
+                            <md-checkbox aria-label="Select All"
+                                         ng-checked="vm.isChecked()"
+                                         md-indeterminate="vm.isIndeterminate()"
+                                         ng-click="vm.toggleAll()">
+                                <span ng-if="vm.isChecked()">Quitar todos.-</span>
+                                <span ng-if="!vm.isChecked()">Seleccionar todos.</span>
+                            </md-checkbox>
+                        </div>
+                        <div class="demo-select-all-checkboxes" flex="100" ng-repeat="item in vm.items">
+                            <md-checkbox ng-checked="vm.exists(item, vm.selected)"
+                                         ng-click="vm.toggle(item, vm.selected)">
+                                {{ item }}
+                            </md-checkbox>
+                        </div>
+                    </div>
+                </fieldset>
+
+
+            </form>
+        </div>
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+        <span flex></span>
+        <md-button class="" ng-click="vm.closeDialog()">
+            Cancelar
+        </md-button>
+        <md-button class="md-primary md-raised" ng-disabled="newTeacherForm.$invalid" ng-click="vm.saveTeacher()"
+                   style="margin-right:20px;">
+            Guardar
+        </md-button>
+    </md-dialog-actions>
+
+
+</md-dialog>

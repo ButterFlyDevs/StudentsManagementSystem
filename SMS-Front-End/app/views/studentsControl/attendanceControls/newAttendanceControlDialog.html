@@ -35,12 +35,12 @@
 
                 <md-item-template>
                       <span>
-                          <!--
+
                         <div ng-switch="item.profileImageUrl || '_undefined_'">
                             <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
                             <img ng-switch-default class="img-profile" src="{{ item.profileImageUrl }}">
-                        </div>-->
-                        <img class="img-profile" src="{{ vm.defaultAvatar }}">
+                        </div>
+                        <img class="img-profile" src="{{ item.profileImageUrl }}">
                         <span> {{item.name}}  {{item.surname}}</span>
 
                       </span>

@@ -10,199 +10,122 @@
                 <md-tab label="GESTION">
                     <md-content class="md-padding">
 
+                                              <md-button ng-click="vm.openNewDisciplinaryNoteDialog()"
+                                                   class="md-primary md-raised">
+                                            <md-icon>add</md-icon>
+                                            Insertar
+                                        </md-button>
+
                         <md-card flex md-theme="{{ showDarkTheme ? 'dark-grey' : 'default' }}" md-theme-watch>
-                            <md-card-title>
-                                <md-card-title-text>
-                                    <span class="md-headline">Buscador</span>
-                                    <span class="md-subhead">
-                                        Seleccione todos los campos y acceda a las notas del estudiante para ver, editar
-                                        y modificarlas.
-                                    </span>
-                                </md-card-title-text>
-                            </md-card-title>
 
 
                             <md-card-content>
 
-                                <div layout layout-sm="row">
+                                <div layout-margin layout-padding ng-if="vm.disciplinaryNotes.length == 0">
 
-                                    <div ayout layout-margin layout-sm="column">
-                                        <!-- Subject autocomplete -->
-                                        <md-autocomplete
-                                                ng-if="true"
-                                                md-no-cache="vm.noCache"
-                                                md-selected-item="vm.subjectSelected"
-                                                md-search-text-change="vm.searchTextChange(vm.subjectSearchText)"
-                                                md-search-text="vm.subjectSearchText"
-                                                md-selected-item-change="vm.selectedItemChange(item, 'subject')"
-                                                md-items="item in vm.itemQuerySearch(vm.subjectSearchText, 'subject')"
-                                                md-item-text="item.name"
-                                                md-min-length="0"
-                                                placeholder="Asignatura"
-                                                md-menu-class="autocomplete-custom-template">
+                                    <p class="md-headline"> Aún no se ha registrado ningun parte disciplinario.</p>
+                                    <h3 class="md-subhead"> ¿Desea insertar uno? </h3>
 
-                                            <md-item-template><span> {{item.name}}</span></md-item-template>
+                                </div>
 
-                                        </md-autocomplete>
-
-                                        </br>
-
-                                        <md-autocomplete
-                                                ng-if="true"
-                                                md-no-cache="vm.noCache"
-                                                md-selected-item="vm.classSelected"
-                                                md-search-text-change="vm.searchTextChange(vm.classSearchText)"
-                                                md-search-text="vm.classSearchText"
-                                                md-selected-item-change="vm.selectedItemChange(item, 'class')"
-                                                md-items="item in vm.itemQuerySearch(vm.classSearchText, 'class')"
-                                                md-item-text="vm.itemToString(item, 'class')"
-                                                md-min-length="0"
-                                                placeholder="Grupo"
-                                                md-menu-class="autocomplete-custom-template">
-
-                                            <md-item-template>
-                                                <span> {{item.course}}  {{item.word}}  {{item.level}} </span>
-                                            </md-item-template>
-
-                                        </md-autocomplete>
+                                <div ng-if="vm.disciplinaryNotes.length > 0">
 
 
-                                        </br>
+                                    <md-toolbar class="md-table-toolbar md-default">
 
-                                        <md-autocomplete
-                                                ng-if="true"
-                                                md-no-cache="vm.noCache"
-                                                md-selected-item="vm.classSelected"
-                                                md-search-text-change="vm.searchTextChange(vm.classSearchText)"
-                                                md-search-text="vm.classSearchText"
-                                                md-selected-item-change="vm.selectedItemChange(item, 'class')"
-                                                md-items="item in vm.itemQuerySearch(vm.classSearchText, 'class')"
-                                                md-item-text="vm.itemToString(item, 'class')"
-                                                md-min-length="0"
-                                                placeholder="Estudiante"
-                                                md-menu-class="autocomplete-custom-template">
+                                        <!-- search -->
+                                        <md-card-title>
+                                            <md-card-title-text>
 
-                                            <md-item-template>
-                                                <span> {{item.course}}  {{item.word}}  {{item.level}} </span>
-                                            </md-item-template>
-
-                                        </md-autocomplete>
-                                    </div>
-
-                                    <div>
-
-                                        <md-menu>
-
-                        <md-button aria-label="Open phone interactions menu"
-                                   class="md-icon-button"
-                                   ng-click="originatorEv = ev; $mdOpenMenu(ev);">
-                            <md-icon md-menu-origin>more_vert</md-icon>
-                        </md-button>
-
-                        <md-menu-content width="4">
-
-                            <md-menu-item>
-                                <md-button ng-click="vm.modValues()">
-                                    <md-icon>cached</md-icon>
-                                    Modificar
-                                </md-button>
-                            </md-menu-item>
-                                <md-menu-item>
-                                <md-button ng-click="vm.modValues()">
-                                    <md-icon>delete</md-icon>
-                                    Eliminar
-                                </md-button>
-                            </md-menu-item>
-
-                        </md-menu-content>
-
-                    </md-menu>
-
-                                        <div layout layout-margin layout-sm="row">
-
-                                            <p>1er Trimestre</p>
-
-                                            <md-input-container flex="15">
-                                                <label layout="">Pre.</label>
-                                                <input ng-model="vm.mark.preFirstEv" required>
-                                            </md-input-container>
-
-                                            <md-input-container flex="15">
-                                                <label layout="">Final</label>
-                                                <input ng-model="vm.mark.firstEv" required>
-                                            </md-input-container>
-
-                                        </div>
-
-                                        <div layout layout-margin layout-sm="row">
-
-                                        <small>2o Trimestre</small>
+                                                <md-input-container>
+                                                    <md-icon>search</md-icon>
+                                                    <!-- layout="" to avoid parent layout -->
+                                                    <label layout="">"Buscar"</label>
+                                                    <input type="text" ng-model="vm.query">
+                                                </md-input-container>
 
 
-                                            <md-input-container flex>
-                                                <label layout="">Preevaluación</label>
-                                                <input ng-model="vm.mark.preSecondEv" required>
-                                            </md-input-container>
+                                            </md-card-title-text>
+                                        </md-card-title>
+                                    </md-toolbar>
 
-                                            <md-input-container flex>
-                                                <label layout="">Final</label>
-                                                <input ng-model="vm.mark.secondEv" required>
-                                            </md-input-container>
+                                    <!-- Disciplinary Notes list table -->
+                                    <md-table-container>
 
-                                        </div>
+                                        <table md-table md-progress="vm.promise">
+                                            <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
+                                            <tr md-row>
+                                                <th md-column><span>Estudiante</span></th>
+                                                <th md-column md-order-by="name"><span>Profesor</span></th>
+                                                <th md-column>Fecha</th>
+                                                <th md-column>Gravedad</th>
+                                                <th md-column>Detalles</th>
+                                            </tr>
+                                            </thead>
+
+                                            <tbody md-body>
+
+                                            <!-- Where we iterate through items list -->
+                                            <tr md-row ng-repeat="note in vm.disciplinaryNotes">
+
+                                                <!-- 1. Student info -->
+                                                <td md-cell>
+
+                                                    <div ng-switch="note.student.urlProfilePic || '_undefined_'">
+                                                        <img ng-switch-when="_undefined_" class="img-profile"
+                                                             src="{{ vm.defaultAvatar }}">
+                                                        <img ng-switch-default class="img-profile"
+                                                             src="{{ note.student.urlProfilePic }}">
+                                                    </div>
+
+                                                    {{ note.student.name }}
+                                                    {{ note.student.surname }}
 
 
+                                                </td>
 
-                                        <div layout layout-margin layout-sm="row">
+                                                <!-- 2. Teacher info -->
+                                                <td md-cell>
+                                                    <div ng-switch="note.teacher.urlProfilePic || '_undefined_'">
+                                                        <img ng-switch-when="_undefined_" class="img-profile"
+                                                             src="{{ vm.defaultAvatar }}">
+                                                        <img ng-switch-default class="img-profile"
+                                                             src="{{ note.teacher.urlProfilePic }}">
+                                                    </div>
 
-                                            <small>3er Trimestre</small>
+                                                    {{ note.teacher.name }}
+                                                    {{ note.teacher.surname }}
 
-                                            <md-input-container flex>
-                                                <label layout="">Final</label>
-                                                <input ng-model="vm.mark.thirdEv" required>
-                                            </md-input-container>
+                                                </td>
 
-                                        </div>
+                                                <!-- 3. Date -->
+                                                <td md-cell>
+                                                    {{ note.dateTime | date : 'EEEE  dd-LLLL-yyyy' }}
+                                                </td>
 
-                                        <small>Final</small>
-                                        <br>
+                                                <!-- 4. Gravity -->
+                                                <td md-cell>
+                                                    {{ note.gravity }}
+                                                </td>
 
-                                        <md-input-container flex>
-                                            <label layout="">Final</label>
-                                            <input ng-model="vm.mark.final" required>
-                                        </md-input-container>
+                                                <!-- 4. View details icon button -->
+                                                <td md-cell>
+                                                    <md-button ui-sref="teachersProfile({teacherId: item.teacherId})"
+                                                               class="md-fab md-mini md-primary">
+                                                        <md-icon>forward</md-icon>
+                                                    </md-button>
 
+                                                </td>
 
-                                        <!-- Options in edition mode -->
-                    <div layout="row" flex flex="70" layout-align="center">
+                                            </tr>
+                                            </tbody>
 
-                        <md-button
-                                ng-show="true"
-                                title="Cancelar"
-                                ng-click="vm.cancelModValues()"
-                                class="md-icon-button md-accent">
-                            <md-icon>cancel</md-icon>
-                        </md-button>
+                                        </table>
+                                    </md-table-container>
 
-                        <md-button
-                                ng-show="true"
-                                title="Guardar cambios"
-                                ng-disabled="!vm.updateButtonEnable"
-                                ng-click="vm.updateTeacher()"
-                                class="md-icon-button md-primary">
-                            <md-icon>save</md-icon>
-                        </md-button>
-
-                    </div>
-
-                                    </div>
                                 </div>
 
                             </md-card-content>
-
-                            <md-card-actions layout="row" layout-align="end center">
-                                <md-button>Limpiar</md-button>
-                            </md-card-actions>
 
 
                         </md-card>

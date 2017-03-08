@@ -26,16 +26,14 @@
 
                     <form name="teacherUpdateForm" ng-dirty="vm.formUpdated()">
                         <!-- We can see the layout like a row -->
-                        <div layout="row" flex flex="60" layout-align="center">
+                        <div layout="row" flex flex="70" layout-align="center">
 
                             <!-- First column, with a image inside. -->
-                            <div flex="60" layout="column" layout-margin layout>
-
-                                <div ng-switch="vm.teacher.profileImageUrl || '_undefined_'">
+                            <div flex="40" layout="column" layout-margin layout layout-align="center center">
+                                <div ng-switch="vm.user.img || '_undefined_'">
                                     <img ng-switch-when="_undefined_" class="img-profile-big"
                                          src="{{ vm.defaultAvatar }}">
-                                    <img ng-switch-default class="img-profile-big"
-                                         src="{{ vm.teacher.profileImageUrl }}">
+                                    <img ng-switch-default class="img-profile-big" src="{{ vm.user.img }}">
                                 </div>
 
                                 <div layout="row" ng-if="vm.editValuesEnabled">
@@ -51,7 +49,7 @@
                             </div>
 
                             <!-- Second column, with user data inside. -->
-                            <div flex="60" layout="column" layout-margin-top>
+                            <div flex="60" layout="column">
 
                                 <div layout layout-sm="column">
                                     <md-input-container flex="70">
@@ -106,7 +104,7 @@
 
                             <div layout layout-sm="row">
 
-                                <md-input-container flex="80" ng-if=" vm.editValuesEnabled">
+                                <md-input-container flex="80" ng-if="vm.teacher.birthdate || vm.editValuesEnabled">
                                     <md-datepicker
                                             ng-model="vm.teacher.birthdate"
                                             md-placeholder="Fecha de nacimiento"
@@ -227,10 +225,10 @@
 
 
                                         <md-card>
-
                                             <md-card-title>
                                                 <md-card-title-text>
                                                     <span class="md-headline">{{ item.subject.name }}</span>
+
                                                 </md-card-title-text>
                                             </md-card-title>
 
@@ -243,6 +241,7 @@
                                                         <p>
 
                                                             {{ class.course }}º {{ class.word }} {{ class.level }}</p>
+
 
                                                         <md-menu>
 
@@ -416,8 +415,8 @@
                                             <table md-table md-progress="vm.promise">
                                                 <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
                                                 <tr md-row>
-                                                    <th md-column><span>Estudiante</span></th>
-                                                    <th md-column md-order-by="name"><span></span></th>
+                                                    <th md-column><span>Imagen</span></th>
+                                                    <th md-column md-order-by="name"><span>Nombre</span></th>
                                                     <th md-column><span></span></th>
                                                 </tr>
                                                 </thead>
@@ -430,11 +429,11 @@
                                                     <!-- 1. User profile image -->
                                                     <td md-cell>
 
-                                                        <div ng-switch="item.profileImageUrl || '_undefined_'">
+                                                        <div ng-switch="item.img || '_undefined_'">
                                                             <img ng-switch-when="_undefined_" class="img-profile"
                                                                  src="{{ vm.defaultAvatar }}">
                                                             <img ng-switch-default class="img-profile"
-                                                                 src="{{ item.profileImageUrl }}">
+                                                                 src="{{ item.img }}">
                                                         </div>
 
 

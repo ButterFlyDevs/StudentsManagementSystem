@@ -161,11 +161,11 @@
                                                     <md-list-item class="md-3-line" ng-repeat="teacher in item.teachers"
                                                                   ng-click="null">
                                                         <p>
-                                                        <div ng-switch="item.img || '_undefined_'">
+                                                        <div ng-switch="teacher.profileImageUrl || '_undefined_'">
                                                             <img ng-switch-when="_undefined_" class="img-profile"
                                                                  src="{{ vm.defaultAvatar }}">
                                                             <img ng-switch-default class="img-profile"
-                                                                 src="{{ item.img }}">
+                                                                 src="{{ teacher.profileImageUrl }}">
                                                         </div>
 
                                                         {{ teacher.name }} {{ teacher.surname }}</p>
@@ -368,11 +368,11 @@
                                                     <!-- 1. User profile image -->
                                                     <td md-cell>
 
-                                                        <div ng-switch="item.img || '_undefined_'">
+                                                        <div ng-switch="item.profileImageUrl || '_undefined_'">
                                                             <img ng-switch-when="_undefined_" class="img-profile"
                                                                  src="{{ vm.defaultAvatar }}">
                                                             <img ng-switch-default class="img-profile"
-                                                                 src="{{ item.img }}">
+                                                                 src="{{ item.profileImageUrl }}">
                                                         </div>
 
 

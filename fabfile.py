@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from fabric.api import local  # to run local commands.
-from fabric.colors import red
-from provisioner import example_data_provisioner
-import time
 from fabric.api import local, lcd, run  # to run local commands.
 from fabric.colors import red, blue
 from provisioner import example_data_provisioner
 import time
+
+# TODO: REFACTOR and clean methods!!!!!
 
 #####################################################################
 # FABRIC Fabfile.  <http://www.fabfile.org/>
@@ -70,6 +68,7 @@ def test(ms):
         fab test:scms  -> Execute all test of this microservice.
         fab test:scms.api  -> Execute all test over the Api Rest
         fab test:scms.api.marks -> Execute all test over the Marks segment in API
+        scms.api.disciplinarynotes
 
 
     If something fail maybe it could be the pythonpath system.
@@ -155,7 +154,11 @@ def doc(ms):
         local('make -C SMS-Back-End/docs html')
         local('firefox SMS-Back-End/docs/build/html/index.html')
 
+
 def clean():
+
+    # TODO: Refactor and translate this to spanish!
+
     pass
     """
     echo -e "\033[32m \n\t ### SMS, un proyecto de \033[35m ButterFlyDevs \033[32m ### \033[0m"
@@ -208,6 +211,7 @@ def clean():
     echo "Si alguno de los paquetes no se ha instalado correctamente por favor inténtelo manualmente. Para conocer más
     información lea el fichero contributing.md, la sección [Entorno de desarrollo]."
     """
+
 
 def run_dbms_api_test():
     """

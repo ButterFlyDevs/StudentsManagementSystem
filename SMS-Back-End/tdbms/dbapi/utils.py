@@ -163,7 +163,8 @@ class sorters(object):
 
                     new_teacher = {'teacherId': list_element.get('teacherId'),
                                    'name': list_element.get('name'),
-                                   'impartId': list_element.get('impartId')
+                                   'impartId': list_element.get('impartId'),
+                                   'profileImageUrl': list_element.get('profileImageUrl', None)
                                    }
 
                     sorted_list.append({'class': new_class, 'teachers': [new_teacher]})

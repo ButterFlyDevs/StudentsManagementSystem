@@ -877,8 +877,8 @@ class EntitiesManager:
 
             elif related_kind == 'class':
                 # An especial case, it needed info in special format to show in the view.
-                query = 'select cls.classId, cls.course, cls.word, cls.level, t.name, t.surname, t.teacherId, i.impartId, cls.associationId from (select * from impart where impart.deleted = 0) i JOIN (select course, word, level, c.classId, a.associationId from (select course, word, level, classId from class) c ' \
-                        'JOIN (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a where c.classId = a.classId) cls JOIN teacher t where i.associationId = cls.associationId and i.teacherId = t.teacherId union select c.classId, c.course, c.word, c.level, null, null, null, null,  a.associationId   ' \
+                query = 'select cls.classId, cls.course, cls.word, cls.level, t.name, t.surname, t.teacherId, t.profileImageUrl, i.impartId, cls.associationId from (select * from impart where impart.deleted = 0) i JOIN (select course, word, level, c.classId, a.associationId from (select course, word, level, classId from class) c ' \
+                        'JOIN (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a where c.classId = a.classId) cls JOIN teacher t where i.associationId = cls.associationId and i.teacherId = t.teacherId union select c.classId, c.course, c.word, c.level, null, null, null, null, null, a.associationId   ' \
                         'from (select classId, associationId from association where subjectId=' + entity_id + ' AND association.deleted = 0 ) a JOIN class c where a.classId = c.classId;'
 
             # TODO: La gestión de este error como en las llamadas anteriores puede reducirse en código:

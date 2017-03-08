@@ -53,6 +53,7 @@ angular.module('subjects')
                 function () {
                     vm.dataIsReady = true;
                     vm.teachingDataIsReady = true;
+                    console.log(vm.subjectTeaching);
                 }, function (error) {
                     console.log('Get subject teaching process fail.');
                     console.log(error);

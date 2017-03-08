@@ -12,13 +12,17 @@ class DisciplinaryNote(ndb.Model):
 
     # Student Identification and date of facts
     studentId = ndb.IntegerProperty()
-    studentsIdsRelated = ndb.IntegerProperty(repeated=True)
-    date = ndb.DateTimeProperty()
+    enrollmentId = ndb.IntegerProperty()
+    studentsIdsRelated = ndb.IntegerProperty(repeated=True, default=None)
+
+    # Teacher
+    teacherId = ndb.IntegerProperty()
 
     # Disciplinary Note
     kind = ndb.IntegerProperty()
     gravity = ndb.IntegerProperty()
     description = ndb.StringProperty()
+    dateTime = ndb.DateTimeProperty()
 
     # Disciplinary Note Item Metadata
     createdBy = ndb.IntegerProperty()
