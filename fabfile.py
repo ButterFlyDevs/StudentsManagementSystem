@@ -427,4 +427,5 @@ def kill():
     Kill all processes that is related with google dev servers.
     """
     print (red("Kill all processes that are related with google dev server."))
-    local("kill -9 $(ps -aux | grep google | awk '{ print $2 }' | head -n -1)")
+    #local("kill -9 $(ps -aux | grep google | awk '{ print $2 }' | head -n -1)")
+    local("ps aux | grep appengine | grep -v grep | awk '{print $2}' | xargs kill")
