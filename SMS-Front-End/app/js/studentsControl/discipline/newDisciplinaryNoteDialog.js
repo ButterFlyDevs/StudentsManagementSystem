@@ -12,6 +12,8 @@ angular.module('discipline')
 
         vm.disciplinaryNote = new DisciplineService();
         vm.defaultAvatar = globalService.defaultAvatar;
+        vm.currentDate = new Date();
+        vm.thereAreStudents = false;
 
         ///////////////////////////////////////////////////////////
         function activate() {
@@ -21,6 +23,8 @@ angular.module('discipline')
             vm.studentsList = StudentsService.query({}, function () {
                 console.log('StudentsList received');
                 console.log(vm.studentsList);
+                if (vm.studentsList.length >0){
+                    vm.thereAreStudents = true;
 
                 // Transform the list (adding a field called 'value' to be used in the search process).
                 vm.studentsList = vm.studentsList.map(function (student) {
@@ -28,9 +32,13 @@ angular.module('discipline')
                         if (student.surname)
                             student.value += ' ' + student.surname.toLowerCase();
                         return student;
+
                     }
                 );
-                console.log(vm.studentsList)
+                }
+
+                console.log(vm.studentsList);
+
 
             }, function (error) {
                 console.log('Any problem found when was retrieved the students list.');

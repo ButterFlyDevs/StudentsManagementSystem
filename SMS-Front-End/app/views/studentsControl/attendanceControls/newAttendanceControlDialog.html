@@ -16,24 +16,30 @@
     <md-dialog-content>
         <div class="md-dialog-content">
 
+            <!-- If dara isn't ready is showed a spinner while the response of server is received -->
+            <div ng-if="!vm.dataIsReady">
+                <spinner></spinner>
+            </div>
 
-            <small>1. Seleccione el profesor que va a realizar el control.</small>
+            <div ng-if="vm.dataIsReady">
+                <div ng-if="vm.teachersList.length != 0">
+                    <small>1. Seleccione el profesor que va a realizar el control.</small>
 
-            <!-- Teacher autocomplete -->
-            <md-autocomplete
-                    ng-disabled="vm.isDisabled"
-                    md-no-cache="vm.noCache"
-                    md-selected-item="vm.teacherSelected"
-                    md-search-text-change="vm.searchTextChange(vm.teacherSearchText)"
-                    md-search-text="vm.teacherSearchText"
-                    md-selected-item-change="vm.selectedItemChange(item, 'teacher')"
-                    md-items="item in vm.itemQuerySearch(vm.teacherSearchText, 'teacher')"
-                    md-item-text="vm.itemToString(item, 'teacher')"
-                    md-min-length="0"
-                    placeholder="Profesor"
-                    md-menu-class="autocomplete-custom-template">
+                    <!-- Teacher autocomplete -->
+                    <md-autocomplete
+                            ng-disabled="vm.isDisabled"
+                            md-no-cache="vm.noCache"
+                            md-selected-item="vm.teacherSelected"
+                            md-search-text-change="vm.searchTextChange(vm.teacherSearchText)"
+                            md-search-text="vm.teacherSearchText"
+                            md-selected-item-change="vm.selectedItemChange(item, 'teacher')"
+                            md-items="item in vm.itemQuerySearch(vm.teacherSearchText, 'teacher')"
+                            md-item-text="vm.itemToString(item, 'teacher')"
+                            md-min-length="0"
+                            placeholder="Profesor"
+                            md-menu-class="autocomplete-custom-template">
 
-                <md-item-template>
+                        <md-item-template>
                       <span>
 
                         <div ng-switch="item.profileImageUrl || '_undefined_'">
@@ -44,56 +50,74 @@
                         <span> {{item.name}}  {{item.surname}}</span>
 
                       </span>
-                </md-item-template>
+                        </md-item-template>
 
-            </md-autocomplete>
-
-
-            </br>
+                    </md-autocomplete>
 
 
-            <small ng-if="vm.teacherSelected">2. Seleccione la asignatura.</small>
-
-            <!-- Subject autocomplete -->
-            <md-autocomplete
-                    ng-if="vm.teacherSelected"
-                    md-no-cache="vm.noCache"
-                    md-selected-item="vm.subjectSelected"
-                    md-search-text-change="vm.searchTextChange(vm.subjectSearchText)"
-                    md-search-text="vm.subjectSearchText"
-                    md-selected-item-change="vm.selectedItemChange(item, 'subject')"
-                    md-items="item in vm.itemQuerySearch(vm.subjectSearchText, 'subject')"
-                    md-item-text="item.name"
-                    md-min-length="0"
-                    placeholder="Asignatura"
-                    md-menu-class="autocomplete-custom-template">
-
-                <md-item-template><span> {{item.name}}</span></md-item-template>
-
-            </md-autocomplete>
+                    </br>
 
 
-            </br>
+                    <div ng-if="vm.subjectsList.length == 0">
+                        Parece que este profesor aún no imparte docencia y por eso no puede
+                        realizar ningún control de asistencia.
+                    </div>
 
-            <small ng-if="vm.teacherSelected && vm.subjectSelected">3. Seleccione el grupo.</small>
+                    <div ng-if="vm.subjectsList.length != 0">
+                        <small ng-if="vm.teacherSelected">2. Seleccione la asignatura.</small>
 
-            <!-- Class automplete -->
-            <md-autocomplete
-                    ng-if="vm.teacherSelected && vm.subjectSelected"
-                    md-no-cache="vm.noCache"
-                    md-selected-item="vm.classSelected"
-                    md-search-text-change="vm.searchTextChange(vm.classSearchText)"
-                    md-search-text="vm.classSearchText"
-                    md-selected-item-change="vm.selectedItemChange(item, 'class')"
-                    md-items="item in vm.itemQuerySearch(vm.classSearchText, 'class')"
-                    md-item-text="vm.itemToString(item, 'class')"
-                    md-min-length="0"
-                    placeholder="Grupo"
-                    md-menu-class="autocomplete-custom-template">
+                        <!-- Subject autocomplete -->
+                        <md-autocomplete
+                                ng-if="vm.teacherSelected"
+                                md-no-cache="vm.noCache"
+                                md-selected-item="vm.subjectSelected"
+                                md-search-text-change="vm.searchTextChange(vm.subjectSearchText)"
+                                md-search-text="vm.subjectSearchText"
+                                md-selected-item-change="vm.selectedItemChange(item, 'subject')"
+                                md-items="item in vm.itemQuerySearch(vm.subjectSearchText, 'subject')"
+                                md-item-text="item.name"
+                                md-min-length="0"
+                                placeholder="Asignatura"
+                                md-menu-class="autocomplete-custom-template">
 
-                <md-item-template> <span> {{item.course}}  {{item.word}}  {{item.level}} </span> </md-item-template>
+                            <md-item-template><span> {{item.name}}</span></md-item-template>
 
-            </md-autocomplete>
+                        </md-autocomplete>
+
+
+                        </br>
+
+                        <small ng-if="vm.teacherSelected && vm.subjectSelected">3. Seleccione el grupo.</small>
+
+                        <!-- Class automplete -->
+                        <md-autocomplete
+                                ng-if="vm.teacherSelected && vm.subjectSelected"
+                                md-no-cache="vm.noCache"
+                                md-selected-item="vm.classSelected"
+                                md-search-text-change="vm.searchTextChange(vm.classSearchText)"
+                                md-search-text="vm.classSearchText"
+                                md-selected-item-change="vm.selectedItemChange(item, 'class')"
+                                md-items="item in vm.itemQuerySearch(vm.classSearchText, 'class')"
+                                md-item-text="vm.itemToString(item, 'class')"
+                                md-min-length="0"
+                                placeholder="Grupo"
+                                md-menu-class="autocomplete-custom-template">
+
+                            <md-item-template><span> {{item.course}}  {{item.word}}  {{item.level}} </span>
+                            </md-item-template>
+
+                        </md-autocomplete>
+                    </div>
+
+
+                </div>
+                <div ng-if="vm.teachersList.length == 0">
+                    Parece que aún no hay profesores
+                </div>
+                <div ng-if="vm.teachersList.error">
+                    Parece que tenemos problemas para conseguir los datos.
+                </div>
+            </div>
 
 
         </div>

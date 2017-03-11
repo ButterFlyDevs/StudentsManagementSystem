@@ -9,6 +9,8 @@ from logging.handlers import RotatingFileHandler
 from dbapi.entities_manager import EntitiesManager
 from dbapi.GestorCredencialesSQL import GestorCredenciales
 
+from time import sleep
+
 import datetime
 
 import json
@@ -233,6 +235,7 @@ def get_entities(kind, entity_id=None):
     Mode 3: only one
     curl  -i -X GET  localhost:8002/entities/student/1  -> All data from student with id = 1
     """
+    sleep(1)
     return process_response(EntitiesManager.get(kind, entity_id, request.args.get('params', None)))
 
 

@@ -2,7 +2,6 @@
 
 from fabric.api import local, lcd, run  # to run local commands.
 from fabric.colors import red, blue
-from provisioner import example_data_provisioner
 import time
 
 # TODO: REFACTOR and clean methods!!!!!
@@ -251,6 +250,7 @@ def run_mysql():
 
 
 def data_provision(kind='Simple'):
+    from provisioner import example_data_provisioner
     """
     Run the data provisioning procedure using the APIGmS.
 
@@ -275,20 +275,33 @@ def requirements(ms=None):
 
     def local_requirements():
 
+        local('sudo chmod +x mysql_install.sh')
+        local('sudo ./mysql_install.sh')
+
         commands = [
-            'apt-get install -y unzip',
-            'apt-get install -y curl',
-            'curl -O https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.30.zip',
-            'unzip google_appengine_1.9.30.zip',
-            'rm google_appengine_1.9.30.zip',
-            'apt-get install -y python-pip',
-            'pip install -r requirements.txt ',
+            'sudo apt-get install -y unzip',
+            'sudo apt-get install -y curl',
+            'sudo curl -O https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.30.zip',
+            'sudo unzip google_appengine_1.9.30.zip',
+            'sudo rm google_appengine_1.9.30.zip',
+            'sudo curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-146.0.0-linux-x86_64.tar.gz',
+            'tar -xvzf google-cloud-sdk-146.0.0-linux-x86_64.tar.gz',
+            'sudo ./google-cloud-sdk/install.sh',
+            'sudo rm google-cloud-sdk-146.0.0-linux-x86_64.tar.gz',
+            'sudo apt-get install -y python-pip',
+            'sudo apt-get install libmysqlclient-dev',
+            'sudo pip install -r requirements.txt ',
+            'mysql -u root -p\'root\' < SMS-Back-End/tdbms/dbapi/DBCreator.sql ',
+            'sudo apt-get install nodejs',
+            'sudo apt - get install npm',
+            'sudo ln -s /usr/bin/nodejs /usr/bin/node',
+            'sudo npm install -g bower'
         ]
 
         for command in commands:
             local(command)
 
-    available_options = ['dbms', 'apigms', 'scms', 'uims', 'local']
+    available_options = ['tdbms', 'apigms', 'scms', 'uims', 'local']
     if ms is not None:
         if ms in available_options:
             if ms in available_options[0:3]:
@@ -308,20 +321,81 @@ def requirements(ms=None):
             print ms + ' microservice doesn\'t exists.'
             print 'The avilable options are: ' + str(available_options)
             print 'Example of use: fab requirements:ms=dbms'
+
+    # The user want to install ALL REQUIREMENTS of the project.
     else:
 
-        print 'Requirements in entire project.'
+        # Welcome message
+        print (blue('\n\t#############################################################'))
+        print (blue('\t### Welcome to Students Managment System Develop Project! ###'))
+        print (blue('\t#############################################################\n'))
+        print (blue('We are going to install a lot of things that you need to work with it:'))
 
-        for a in range(0, 2):
-            path = 'SMS-Back-End/' + available_options[a] + '/'
-            command = 'pip install -r ' + path + 'requirements.txt -t ' + path + 'lib/'
-            local(command)
+        raw_input(red('Do you want to continue? \nPress [ENTER] or \'Crtl+C\' to exit: '))
 
-        command = 'cd SMS-Front-End/app ; bower install'
-        local(command)
+        print (blue('\nCool! \n'
+                    'Please if any installation fails try to do this manually, to do this take a look to the '
+                    'requirements() function of fabfile.py to see details. \nIn any software have been installed '
+                    'already their step will be skipped.\n'))
+
+        print (blue('##########################\n'
+                    '## General requirements ##\n'
+                    '##########################\n\n'
+                    'Will be installed: \n'
+                    '    MySQL Server'
+                    '    curl'
+                    '    unzip'
+                    '    Google App Engine SDK v.1.9.30'
+                    '    Google Cloud SDK v.146.0.0'
+                    '    Python PIP'
+                    '    NodeJS'
+                    '    npm'
+                    '    bower'))
+
+        raw_input(red('Do you want to continue? \nPress [ENTER] or \'Crtl+C\' to exit: '))
 
         # Run local requirements.
         local_requirements()
+
+
+        print (blue('\n#####################################\n'
+                    '##  APIG microService Requirements ##\n'
+                    '#####################################\n\n'
+                    'Will be installed the dependencies related in SMS-Back-End/apigms/requirements.txt \n'))
+
+        raw_input(red('Do you want to continue? \nPress [ENTER] or \'Crtl+C\' to exit: '))
+
+        command = 'pip install -r SMS-Back-End/apigms/requirements.txt -t SMS-Back-End/apigms/lib/'
+        local(command)
+
+        print (blue('\n#####################################\n'
+                    '## TDB microService Requirements   ##\n'
+                    '#####################################\n\n'
+                    'Will be installed the dependencies related in SMS-Back-End/tdbms/requirements.txt \n'))
+
+        raw_input(red('Do you want to continue? \nPress [ENTER] or \'Crtl+C\' to exit: '))
+
+        command = 'pip install -r SMS-Back-End/tdbms/requirements.txt -t SMS-Back-End/tdbms/lib/'
+        local(command)
+
+        print (blue('\n#####################################\n'
+                    '##  SC microService Requirements   ##\n'
+                    '#####################################\n\n'
+                    'Will be installed the dependencies related in SMS-Back-End/scms/requirements.txt \n'))
+
+        raw_input(red('Do you want to continue? \nPress [ENTER] or \'Crtl+C\' to exit: '))
+
+        command = 'pip install -r SMS-Back-End/scms/requirements.txt -t SMS-Back-End/scms/lib/'
+        local(command)
+
+        print (blue('\n#######################################\n'
+                    '##  UI microService web Requirements ##\n'
+                    '#######################################\n\n'
+                    'Will be installed the dependencies related in SMS-Front-End/app/bower.json \n'))
+
+        raw_input(red('Do you want to continue? \nPress [ENTER] or \'Crtl+C\' to exit: '))
+        command = 'cd SMS-Front-End/app ; bower install'
+        local(command)
 
 
 def run(provision=False, kind='Simple', run_test=False, test_section=None):

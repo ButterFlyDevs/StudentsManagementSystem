@@ -12,6 +12,10 @@ angular.module('attendanceControls')
 
             vm.okToRealize = false;
 
+
+            // To control the loading spinner while de data is loading.
+            vm.dataIsReady = false;
+
             vm.goToDoAC = goToDoAC;
 
 
@@ -24,12 +28,14 @@ angular.module('attendanceControls')
                     console.log('TeacherList received');
                     console.log(vm.teachersList);
 
+
                     vm.teachersList = vm.teachersList.map(function (teacher) {
                             teacher.value = teacher.name.toLowerCase() + ' ' +
                                             teacher.surname.toLowerCase();
                             return teacher;
                         }
                     );
+                    vm.dataIsReady = true;
                     console.log(vm.teachersList)
 
                 }, function (error) {
@@ -91,6 +97,7 @@ angular.module('attendanceControls')
             }
 
             function loadTeaching() {
+                console.log('Loading Teaching')
                 // Using the perfect teacher teaching data block.
                 vm.teacherTeaching = TeachersService.getTeaching({id: vm.teacherSelected.teacherId},
                     function () {
@@ -103,6 +110,8 @@ angular.module('attendanceControls')
                                 return item.subject;
                             }
                         );
+
+                        console.log(vm.subjectsList);
 
                     }, function (error) {
                         console.log('Any problem found when was retrieved the teacher teaching data block.');

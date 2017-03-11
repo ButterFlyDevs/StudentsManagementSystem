@@ -30,8 +30,8 @@ CREATE TABLE student (
 
   studentId       INT NOT NULL AUTO_INCREMENT,
 
-  name            CHAR(50) NOT NULL,
-  surname         CHAR(100),
+  name            CHAR(100) NOT NULL,
+  surname         CHAR(100) NOT NULL,
   dni             INT,
   email           CHAR(120),
   address         CHAR(100),
@@ -82,8 +82,8 @@ CREATE TABLE teacher (
 
   teacherId       INT NOT NULL AUTO_INCREMENT,
 
-  name            CHAR(50) NOT NULL,
-  surname         CHAR(100),
+  name            CHAR(100) NOT NULL,
+  surname         CHAR(100) NOT NULL,
   dni             INT,
   email           CHAR(120),
   address         CHAR(100),

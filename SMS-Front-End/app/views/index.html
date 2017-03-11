@@ -176,7 +176,7 @@ http://flatlogic.github.io/angular-material-dashboard/#/table   http://codepen.i
         <md-content role="navigation">
             <md-list ng-repeat="section in data.sidenav.sections">
                 <md-list-item ng-click="section.expand = !section.expand">
-                    <p class="md-subheader md-primary">{{ section.name }}</p>
+                    <p class="md-subheader md-primary" ng-click="console.log('OH OH ')">{{ section.name }} </p>
 
                     <span flex></span>
 
