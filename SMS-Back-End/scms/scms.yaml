@@ -12,7 +12,7 @@ automatic_scaling:
 
 handlers:
 - url: /.*
-  script: scms_api_rest.app
+  script: api.scms_api_rest.app
 
 
 

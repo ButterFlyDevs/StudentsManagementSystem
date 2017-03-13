@@ -6,14 +6,16 @@
 Welcome to Students Control microService documentation!
 =======================================================
 
-This is bla bla bla
-
-Contents:
+This is amaizing service to do this stuffs.
 
 .. toctree::
    :maxdepth: 2
 
-   scms_general
+   api
+   scm
+
+
+.. warning:: This mService depends to TDBmS to populate extra info to many items that this return in some resources. Because of that there must be a consistency between of them.
 
 
 Indices and tables
@@ -22,3 +24,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+

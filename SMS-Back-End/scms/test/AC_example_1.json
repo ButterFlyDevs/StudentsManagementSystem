@@ -7,9 +7,7 @@
         "uniform": true,
         "justifiedDelay": true
       },
-      "studentId": 113,
-      "name": "nameA",
-      "surname": "surnameA"
+      "studentId": 2
     },
     {
       "control": {
@@ -18,31 +16,13 @@
         "uniform": true,
         "justifiedDelay": true
       },
-      "studentId": 213,
-      "name": "nameB",
-      "surname": "surnameB"
+      "studentId": 1
     }
   ],
-  "createdBy": 1,
-  "teacher": {
-    "teacherId": 23,
-    "name": "teacherA",
-    "surname": "teacherB"
-  },
+  "teacherId": 1,
   "association": {
-    "associationDataBlockId": 5629499534213120,
-    "associationId": 13,
-    "class": {
-      "course": 2,
-      "classId": 283,
-      "word": "A",
-      "level": "Elementary"
-    },
-    "subject": {
-      "name": "Pruebas",
-      "subjectId": 24
-    }
-  },
-  "createdAt": "2017-02-08T18:53:01.694425",
-  "provisionerDateTime": "2017-01-01 00:10"
+    "associationId": 1,
+    "classId": 1,
+    "subjectId": 1
+  }
 }

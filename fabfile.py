@@ -66,13 +66,10 @@ def test(ms):
         fab test:tdbms
         fab test:scms  -> Execute all test of this microservice.
         fab test:scms.api  -> Execute all test over the Api Rest
-        fab test:scms.api.marks -> Execute all test over the Marks segment in API
-        scms.api.disciplinarynotes
-
+        fab test:scms.api.marks -> Execute all test over the Marks segment of API
 
     If something fail maybe it could be the pythonpath system.
     export PYTHONPATH="${PYTHONPATH}:/home/.../StudentsManagementSystem/SMS-Back-End/dbms/dbapi"
-
 
     """
     # All [[ Teaching Data Base microService ]].
@@ -97,53 +94,71 @@ def test(ms):
         with lcd("SMS-Back-End/dbms/dbapi"):
             local("pytest test/ -vv")
 
-    ############################
-    #   SCmS Testing Options   #
-    ############################
+    #############################################################
+    #                   SCmS Testing Options                    #
+    #############################################################
 
-    # To run all test of this micro Service.
+    # To run all test of this micro Service (use: fab test:scms).
     if ms == 'scms':
         print (blue('## Runnig Students Control microService entire Test Suite. ## '))
         with lcd("SMS-Back-End/scms"):
             local("pytest test/ -vv")
 
-    # To run test over scms.api assciations segment.     Use:  fab test:scms.api.associations
-    if ms == 'scms.api.association':
-        print (blue('## Runnig Students Control microService APIG - Association segment TEST . ## '))
+    # To run test over auxiliary functions (use: fab test:scms.aux).
+    if ms == 'scms.aux':
+        print (blue('## Runnig Students Control microService API - aux functions TEST . ## '))
+        with lcd("SMS-Back-End/scms"):
+            local("pytest test/scms_aux_test.py -vv -s")
+
+    # To run test over all scms.api (use: fab test:scms.api).
+    if ms == 'scms.api':
+        print (blue('## Runnig Students Control microService API  TEST . ## '))
         with lcd("SMS-Back-End/scms"):
             local("pytest test/scms_api_rest_associations_segment_test.py -vv -s")
+            local("pytest test/scms_api_rest_marks_segment_test.py -vv -s")
+            local("pytest test/scms_api_rest_disciplinary_notes_segment_test.py -vv -s")
 
-    # To run test over scms.api marks segment.     Use:  fab test:scms.api.marks
+    # To run test over scms.api associations segment (use: fab test:scms.api.associations).
+    if ms == 'scms.api.attendancecontrols':
+        print (blue('## Runnig Students Control microService API - Attendance Controls segment TEST . ## '))
+        with lcd("SMS-Back-End/scms"):
+            local("pytest test/scms_api_rest_attendance_controls_segment_test.py -vv -s")
+
+    # To run test over scms.api marks segment (use: fab test:scms.api.marks).
     if ms == 'scms.api.marks':
-        print (blue('## Runnig Students Control microService APIG - Mark segment TEST . ## '))
+        print (blue('## Runnig Students Control microService API - Mark segment TEST . ## '))
         with lcd("SMS-Back-End/scms"):
             local("pytest test/scms_api_rest_marks_segment_test.py -vv -s")
 
-    # To run test over scms.api discipline notes segment.     Use:  fab test:scms.api.disciplinarynotes
+    # To run test over scms.api discipline notes segment (use: fab test:scms.api.disciplinarynotes).
     if ms == 'scms.api.disciplinarynotes':
-        print (blue('## Runnig Students Control microService APIG - Disciplinary Notes segment TEST . ## '))
+        print (blue('## Runnig Students Control microService API - Disciplinary Notes segment TEST . ## '))
         with lcd("SMS-Back-End/scms"):
             local("pytest test/scms_api_rest_disciplinary_notes_segment_test.py -vv -s")
 
-def doc(ms):
+
+def doc(ms, open=False):
     """
     Doc generator.
-    Build the documentation to the microservice passed.
+    Build the documentation to the micro service passed. By default the html
+    doc isn't open.
 
     Examples:
-        fab doc:'tdbms'
-        fab doc:'apigms'
-        fab doc:'back-end'
+        fab doc:tdbms,open=yes
+        fab doc:apigms
+        fab doc:back-end
     """
 
     # Generate and open the documentation of Teaching DataBase microService
     if ms == 'tdbms':
         local('make -C SMS-Back-End/dbms/docs html')
-        local('firefox SMS-Back-End/dbms/docs/build/html/index.html')
+        if open == 'yes':
+            local('firefox SMS-Back-End/dbms/docs/build/html/index.html')
 
     if ms == 'scms':
         local('make -C SMS-Back-End/scms/docs html')
-        local('firefox SMS-Back-End/scms/docs/build/html/index.html')
+        if open == 'yes':
+            local('firefox SMS-Back-End/scms/docs/build/html/index.html')
 
     if ms == 'apigms':
         local('make -C SMS-Back-End/apigms/docs html')
@@ -296,6 +311,7 @@ def requirements(ms=None):
             'sudo apt - get install npm',
             'sudo ln -s /usr/bin/nodejs /usr/bin/node',
             'sudo npm install -g bower'
+            'sudo apt-get install python-sphinx'
         ]
 
         for command in commands:

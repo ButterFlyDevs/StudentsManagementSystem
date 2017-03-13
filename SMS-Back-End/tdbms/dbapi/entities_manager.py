@@ -331,25 +331,28 @@ class EntitiesManager:
             query = 'select '
             expected_kind = None
 
+            if params is not None:
+                # It always included entity id.
+                query += str(kind) + 'Id, '
+                for param in str(params).split(','):
+                    query += param + ', '
+                query = query[:-2]
+
+            else:
+                query += ' * '
+
             # We need all entities of specify kind from database that haven't the column delete to true or 1,
             # and whe don't want all info, only the most relevant, name and id.
             if entity_id is None:
-                if params is not None:
-                    # It always included entity id.
-                    query += str(kind) + 'Id, '
-                    for param in str(params).split(','):
-                        query += param + ', '
-                    query = query[:-2]
 
-                else:
-                    query += ' * '
 
                 query += ' from {} where deleted = 0;'.format(kind) # '#' is a special character, means that there aren't a entity_id
+
                 expected_kind = 'list'
 
             # We want all info about one entity.
             else:
-                query += '* from {} where {}Id = {} and deleted = 0;'.format(kind, kind, entity_id)
+                query += ' from {} where {}Id = {} and deleted = 0;'.format(kind, kind, entity_id)
                 expected_kind = 'item'
 
             # Is returned directly the block returned from sql_execute2

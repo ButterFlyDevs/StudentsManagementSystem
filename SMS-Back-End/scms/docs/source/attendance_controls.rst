@@ -1,16 +1,42 @@
-**General Info**
-========================
-
-Imagen de la estructura
-
-Imagen del modelo de la base de datos.
+**AttendanceControls**
+==========================
 
 Domain
 ------------
 
 This microservice make possible the control of attendance and discipline of the students in the system.
 Using a database object oriented make very easy the data process and analysis, the core of the domain
-of this service
+of this service...
+
+
+API
+------------
+
+GET /ac/base/{id}
+
+Return a datablock with the datablock that represent the Attendance Control to be showed in the user interface.
+
+See :ref:`external-libraries`
+
+GET /ac or /ac/{id}
+
+:py:meth:`scms_api_rest.get_ac`
+:py:meth:`scm.scm.AttendanceControlsManager.get_ac`
+
+Return a dataclock with a the list with minimal info of all attendance controls realized or all details about one.
+
+POST /ac
+
+Save in database one, return a simple http status code.
+
+DEL /ac/{id}
+
+Del the item with id sended, return a scimple http status code.
+
+    - 200: Success
+    - 404: Not found
+
+
 
 Data base
 ----------
@@ -64,16 +90,20 @@ The model of this data structure is:
 *The datatype are very important and must be right.
 
 Metadata schema
---------------- 
+---------------
  - This API Rest work only with JSON data format, to send data and to receive.
  - In spite of exists another tables in data model like *Impart*, *Association*, and *Enrollment* that represent different kinds of relations between entities this aren't accessible directly like nested resources from the API, but yes like unique. ::
- 
+
         ../teacher/n/impart
         ...
         400 Bad Request
         ...
 
 
-Code:
+Code
+---------------
 
-link to files
+.. toctree::
+   :maxdepth: 1
+
+   api

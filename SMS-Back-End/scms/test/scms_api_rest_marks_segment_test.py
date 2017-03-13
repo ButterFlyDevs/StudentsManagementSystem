@@ -1,24 +1,16 @@
+"""
+##########################################################
+###         SCmS marks api segment test suite          ###
+##########################################################
+"""
 import requests
-import os
-from termcolor import colored
-import datetime
 from time import sleep
-
+import json
 
 url = 'http://localhost:8003/mark'
-original_mark = {
-    "studentId": 5,
-    "enrollmentId": 3,
-    "preFirstEv": 3,
-    "firstEv": 5,
-    "preSecondEv": 8,
-    "secondEv": 9,
-    "thirdEv": 10,
-    "final": 9
-}
 
 
-class TestClass:
+class TestClass(object):
 
     @classmethod
     def check_mark_with_original(cls, mark, mark2):
@@ -33,69 +25,67 @@ class TestClass:
         for k, v in mark2.items():
             assert mark[k] == v
 
-    def test_post_and_get_mark(self):
+    def test_empty_mark_items_in_data_store(self):
+        result = requests.get(url)
+        assert result.status_code == 204
 
-        post_response = requests.post(url=url, json=original_mark)
+        # Item doesn't exist.
+        result = requests.get(url+'/2239')
+        assert result.status_code == 404
 
-        assert post_response.status_code == 200  # Successful query.
+        # Item searched with enrollmentId doesn't exists.
+        result = requests.get(url + '?enrollmentId=423')
+        assert result.status_code == 404
 
-        # In the get a Mark returned must have all values from original mark plus
-        # the metadata 'createdBy', 'createdAt' and 'markId'
-        mr = post_response.json()
+    def test_post_and_delete(self):
 
-        TestClass.check_mark_with_original(mr, original_mark)
+        # Open JSON from file
+        with open('test/mark_example_1.json') as data_file:
+            data = json.load(data_file)
+        response = requests.post(url=url, json=data)
+        assert response.status_code == 200
 
         # Because the Asynchrony of the server.
         sleep(0.5)  # Time in seconds.
 
-        # Now we are going to check the same with the get method:
-        get_response = requests.get(url='{}/{}'.format(url, mr['markId']))
-        assert get_response.status_code == 200
+        result = requests.get(url)
+        assert result.status_code == 200
+        assert len(result.json()) == 1
 
-        mr = get_response.json()
+        # Item searched with enrollmentId doesn't exists.
+        result = requests.get(url='{}{}{}'.format(url,'?enrollmentId=',data['enrollment']['enrollmentId']))
+        assert result.status_code == 200
 
-        TestClass.check_mark_with_original(mr, original_mark)
-
-        # Check when we want all marks in the data store.
-        get_all_response = requests.get(url='{}'.format(url))
-
-        assert get_all_response.status_code == 200
-
-        # Data returned must be a list with only one element.
-        marks_list = get_all_response.json()
-
-        assert len(marks_list) == 1
-
-        # And the element it's just the waited.
-        mr = marks_list[0]
-        TestClass.check_mark_with_original(mr, original_mark)
-
-        # And if we add two more
-        post_response = requests.post(url=url, json=original_mark)
-        post_response = requests.post(url=url, json=original_mark)
-
-        sleep(0.5)
-        get_all_response = requests.get(url='{}'.format(url))
-        assert get_all_response.status_code == 200
-
-        # Data returned must be a list with three element.
-        marks_list = get_all_response.json()
-        assert len(marks_list) == 3
-
-    def test_delete_mark(self):
-
-        # Based of last three insertion, we are going to delete these items, first get the list of all:
-        get_all_response = requests.get(url='{}'.format(url))
-        assert get_all_response.status_code == 200
-        marks_list = get_all_response.json()
-
-        # After, check if deleted calls are ok.
-        for mark in marks_list:
-            delete_response = requests.delete(url='{}/{}'.format(url, mark['markId']))
-            assert delete_response.status_code == 200
+        response = requests.delete(url='{}/{}'.format(url, response.json()['markId']))
+        assert response.status_code == 200
 
         sleep(0.5)
 
-        # Finally check if the items has been deleted.
-        get_all_response = requests.get(url='{}'.format(url))
-        assert get_all_response.status_code == 204  # Status Code: No Content
+        result = requests.get(url)
+        assert result.status_code == 204
+
+    def test_update(self):
+
+        with open('test/mark_example_1.json') as data_file:
+            data = json.load(data_file)
+        response = requests.post(url=url, json=data)
+        assert response.status_code == 200
+        ac_id = response.json()['markId']
+
+        sleep(0.5)
+        # A part of data is modified.
+        data['marks']['preFirstEv'] = 7.6
+
+        response = requests.put(url='{}/{}'.format(url,ac_id), json=data)
+        assert response.status_code == 200
+
+        sleep(0.5)
+
+        # Check the update
+        response = requests.get(url='{}/{}'.format(url, ac_id))
+        assert response.status_code == 200
+        ac = response.json()
+        assert data['marks']['preFirstEv'] == 7.6
+
+        response = requests.delete(url='{}/{}'.format(url, ac_id))
+        assert response.status_code == 200

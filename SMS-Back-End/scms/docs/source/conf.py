@@ -20,8 +20,9 @@ import os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../../'))
-sys.path.insert(1, '/home/juan/Documentos/TFG/StudentsManagementSystem/google_appengine')
-sys.path.insert(1, '/home/juan/Documentos/TFG/StudentsManagementSystem/google_appengine/lib/yaml/lib')
+sys.path.insert(1, '/home/juan/Projects/StudentsManagementSystem/google_appengine')
+sys.path.insert(1, '/home/juan/Projects/StudentsManagementSystem/google_appengine/lib/yaml/lib')
+sys.path.insert(1, '/home/juan/Projects/StudentsManagementSystem/SMS-Back-End/scms/lib')
 
 if 'google' in sys.modules:
     del sys.modules['google']
@@ -53,7 +54,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'MicroServicio Base de Datos'
+project = u'Students Control mService'
 copyright = u'2016, Juan A. Fernández, Jose A. González'
 author = u'Juan A. Fernández, Jose A. González'
 
@@ -71,7 +72,7 @@ release = u'0'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = 'es'
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -207,7 +208,7 @@ html_static_path = ['_static']
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'MicroServicioBasedeDatosdoc'
+htmlhelp_basename = 'StudentsControlMicroServicedoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -229,7 +230,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'MicroServicioBasedeDatos.tex', u'MicroServicio Base de Datos Documentation',
+    (master_doc, 'StudentsControlMicroService.tex', u'MicroServicio Base de Datos Documentation',
      u'Juan A. Fernández, Jose A. González', 'manual'),
 ]
 
@@ -259,7 +260,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'microserviciobasededatos', u'MicroServicio Base de Datos Documentation',
+    (master_doc, 'StudentsControlMicroService', u'Students Control micro Service Documentation',
      [author], 1)
 ]
 
@@ -273,8 +274,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'MicroServicioBasedeDatos', u'MicroServicio Base de Datos Documentation',
-     author, 'MicroServicioBasedeDatos', 'One line description of project.',
+    (master_doc, 'StudentsControlMicroService', u'Students Control micro Service Documentation',
+     author, 'StudentsControlMicroService', 'One line description of project.',
      'Miscellaneous'),
 ]
 

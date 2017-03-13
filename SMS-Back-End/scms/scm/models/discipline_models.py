@@ -1,3 +1,9 @@
+"""
+Disciplinary Note Model
+=======================
+
+.. note:: Attention: We don't respect PEP-8 style.
+"""
 from google.appengine.ext import ndb
 
 ################################################
@@ -9,14 +15,18 @@ from google.appengine.ext import ndb
 
 
 class DisciplinaryNote(ndb.Model):
+    """
+    Model of a disciplinary note. We save only the id of students and teacher. One disciplinary note
+    is done over a student and maybe done in a class while a subject is impart, but maybe don't. Because
+    of this this attributes can be empty. We don't save enrollmentId, we prefer save directly class and
+    subject references.
+    """
 
-    # Student Identification and date of facts
+    # Related academic info.
     studentId = ndb.IntegerProperty()
-    enrollmentId = ndb.IntegerProperty()
-    studentsIdsRelated = ndb.IntegerProperty(repeated=True, default=None)
-
-    # Teacher
     teacherId = ndb.IntegerProperty()
+    classId = ndb.IntegerProperty()
+    subjectId = ndb.IntegerProperty()
 
     # Disciplinary Note
     kind = ndb.IntegerProperty()
@@ -24,7 +34,7 @@ class DisciplinaryNote(ndb.Model):
     description = ndb.StringProperty()
     dateTime = ndb.DateTimeProperty()
 
-    # Disciplinary Note Item Metadata
+    # Item Metadata
     createdBy = ndb.IntegerProperty()
     createdAt = ndb.DateTimeProperty()
     modifiedBy = ndb.IntegerProperty(default=None)

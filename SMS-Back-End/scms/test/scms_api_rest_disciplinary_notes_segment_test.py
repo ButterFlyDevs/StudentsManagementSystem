@@ -1,24 +1,80 @@
+"""
+##########################################################
+### SCmS disciplinary notes  api segment test suite    ###
+##########################################################
+"""
+
 import requests
-import os
-from termcolor import colored
 import datetime
 from time import sleep
+import json
 
 
 url = 'http://localhost:8003/disciplinarynote'
 
-original_disciplinary_note = {
-    'studentId': 5,
-    'studentsIdsRelated': [3, 7, 2],
-    'date': '2000-12-03 10:30',
 
-    'kind': 1,
-    'gravity': 5,
-    'description': 'A little problem with new boy.'
-}
+class TestClass(object):
 
-class TestClass:
+    def test_empty_mark_items_in_data_store(self):
+        result = requests.get(url)
+        assert result.status_code == 204
 
+        # Item doesn't exist.
+        result = requests.get(url+'/2239')
+        assert result.status_code == 404
+
+    def test_post_and_delete(self):
+
+        # Open JSON from file
+        with open('test/disciplinary_note_example_1.json') as data_file:
+            data = json.load(data_file)
+        response = requests.post(url=url, json=data)
+        assert response.status_code == 200
+
+        # Because the Asynchrony of the server.
+        sleep(0.5)  # Time in seconds.
+
+        result = requests.get(url)
+        assert result.status_code == 200
+        assert len(result.json()) == 1
+
+        response = requests.delete(url='{}/{}'.format(url, response.json()['disciplinaryNoteId']))
+        assert response.status_code == 200
+
+        sleep(0.5)
+
+        result = requests.get(url)
+        assert result.status_code == 204
+
+    def test_update(self):
+
+        with open('test/disciplinary_note_example_1.json') as data_file:
+            data = json.load(data_file)
+        response = requests.post(url=url, json=data)
+        assert response.status_code == 200
+        ac_id = response.json()['disciplinaryNoteId']
+
+        sleep(0.5)
+        # A part of data is modified.
+        data['kind'] = 3
+
+        response = requests.put(url='{}/{}'.format(url,ac_id), json=data)
+        assert response.status_code == 200
+
+        sleep(0.5)
+
+        # Check the update
+        response = requests.get(url='{}/{}'.format(url, ac_id))
+        assert response.status_code == 200
+        dn = response.json()
+        assert dn['kind'] == 3
+
+        response = requests.delete(url='{}/{}'.format(url, ac_id))
+        assert response.status_code == 200
+
+
+
+    """
     @classmethod
     def check_disciplinary_note_with_original(cls, disciplinary_note, disciplinary_note2):
 
@@ -102,3 +158,4 @@ class TestClass:
         # Finally check if the items has been deleted.
         get_all_response = requests.get(url='{}'.format(url))
         assert get_all_response.status_code == 204  # Status Code: No Content
+    """
