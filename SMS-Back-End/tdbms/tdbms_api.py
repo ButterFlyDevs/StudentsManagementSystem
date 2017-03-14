@@ -221,7 +221,7 @@ def post_entity(kind):
         return process_response(EntitiesManager.post(kind, received_json))
 
 
-@app.route('/entities/<string:kind>', methods=['GET']) #Si pedimos todas las entidades de un tipo
+@app.route('/entities/<string:kind>', methods=['GET'])  # Si pedimos todas las entidades de un tipo
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['GET']) #Si pedimos una entidad concreta de un tipo
 def get_entities(kind, entity_id=None):
     """

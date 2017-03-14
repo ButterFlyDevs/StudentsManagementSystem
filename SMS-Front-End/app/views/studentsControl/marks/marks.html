@@ -28,130 +28,132 @@
                                 <div layout layout-sm="row">
 
                                     <div ayout layout-margin layout-sm="column">
-                                        <!-- Subject autocomplete -->
-                                        <md-autocomplete
-                                                ng-if="true"
-                                                md-no-cache="vm.noCache"
-                                                md-selected-item="vm.subjectSelected"
-                                                md-search-text-change="vm.searchTextChange(vm.subjectSearchText)"
-                                                md-search-text="vm.subjectSearchText"
-                                                md-selected-item-change="vm.selectedItemChange(item, 'subject')"
-                                                md-items="item in vm.itemQuerySearch(vm.subjectSearchText, 'subject')"
-                                                md-item-text="item.name"
-                                                md-min-length="0"
-                                                placeholder="Asignatura"
-                                                md-menu-class="autocomplete-custom-template">
 
-                                            <md-item-template><span> {{item.name}}</span></md-item-template>
-
-                                        </md-autocomplete>
-
-                                        </br>
-
-                                        <md-autocomplete
-                                                ng-if="true"
-                                                md-no-cache="vm.noCache"
-                                                md-selected-item="vm.classSelected"
-                                                md-search-text-change="vm.searchTextChange(vm.classSearchText)"
-                                                md-search-text="vm.classSearchText"
-                                                md-selected-item-change="vm.selectedItemChange(item, 'class')"
-                                                md-items="item in vm.itemQuerySearch(vm.classSearchText, 'class')"
-                                                md-item-text="vm.itemToString(item, 'class')"
-                                                md-min-length="0"
-                                                placeholder="Grupo"
-                                                md-menu-class="autocomplete-custom-template">
-
+                                        <!-- SUBJECT selector -->
+                                        <md-autocomplete flex
+                                                         md-input-name="autocompleteField"
+                                                         md-selected-item-change="vm.selectedItemChange(item, 'subject')"
+                                                         md-no-cache="vm.noCache"
+                                                         md-selected-item="vm.subjectSelected"
+                                                         md-search-text="vm.subjectSearchText"
+                                                         md-items="item in vm.itemQuerySearch(vm.subjectSearchText, 'subject')"
+                                                         md-item-text="item.name"
+                                                         md-require-match
+                                                         md-floating-label="Asignatura">
                                             <md-item-template>
-                                                <span> {{item.course}}  {{item.word}}  {{item.level}} </span>
+                                                <span md-highlight-text="ctrl.searchText">{{item.name}}</span>
                                             </md-item-template>
-
                                         </md-autocomplete>
 
-
-                                        </br>
-
-                                        <md-autocomplete
-                                                ng-if="true"
-                                                md-no-cache="vm.noCache"
-                                                md-selected-item="vm.classSelected"
-                                                md-search-text-change="vm.searchTextChange(vm.classSearchText)"
-                                                md-search-text="vm.classSearchText"
-                                                md-selected-item-change="vm.selectedItemChange(item, 'class')"
-                                                md-items="item in vm.itemQuerySearch(vm.classSearchText, 'class')"
-                                                md-item-text="vm.itemToString(item, 'class')"
-                                                md-min-length="0"
-                                                placeholder="Estudiante"
-                                                md-menu-class="autocomplete-custom-template">
-
+                                        <!-- CLASS selector
+                                        Available only when subject has been selected and classes list related received-->
+                                        <md-autocomplete ng-if="vm.classesIsReady"
+                                                         md-input-name="autocompleteField"
+                                                         md-selected-item-change="vm.selectedItemChange(item, 'class')"
+                                                         md-no-cache="vm.noCache"
+                                                         md-selected-item="vm.classSelected"
+                                                         md-search-text="vm.classSearchText"
+                                                         md-items="item in vm.itemQuerySearch(vm.classSearchText, 'class')"
+                                                         md-item-text="vm.itemToString(item, 'class')"
+                                                         md-require-match
+                                                         md-floating-label="Grupo">
                                             <md-item-template>
-                                                <span> {{item.course}}  {{item.word}}  {{item.level}} </span>
+                                                <span md-highlight-text="ctrl.searchText">{{item.course}} {{item.word}} {{item.level}}</span>
                                             </md-item-template>
-
                                         </md-autocomplete>
+
+                                        <!-- STUDENT selector
+                                        Available only when subject has been selected and classes list related received-->
+                                        <md-autocomplete flex    ng-if="vm.studentsIsReady"
+                                                         md-input-name="autocompleteField"
+                                                         md-input-minlength="2"
+                                                         md-selected-item-change="vm.selectedItemChange(item, 'student')"
+                                                         md-input-maxlength="5"
+                                                         md-no-cache="vm.noCache"
+                                                         md-selected-item="vm.studentSelected"
+                                                         md-search-text="vm.studentSearchText"
+                                                         md-items="item in vm.itemQuerySearch(vm.studentSearchText, 'student')"
+                                                         md-item-text="vm.itemToString(item, 'student')"
+                                                         md-require-match
+                                                         md-floating-label="Estudiante">
+                                            <md-item-template>
+                                                <span md-highlight-text="ctrl.searchText">{{item.name}} {{item.surname}}</span>
+                                            </md-item-template>
+                                        </md-autocomplete>
+
+
                                     </div>
 
-                                    <div>
+
+                                    <div ng-if="vm.marksAreReady">
 
                                         <md-menu>
 
-                        <md-button aria-label="Open phone interactions menu"
-                                   class="md-icon-button"
-                                   ng-click="originatorEv = ev; $mdOpenMenu(ev);">
-                            <md-icon md-menu-origin>more_vert</md-icon>
-                        </md-button>
+                                            <md-button aria-label="Open phone interactions menu"
+                                                       class="md-icon-button"
+                                                       ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                                <md-icon md-menu-origin>more_vert</md-icon>
+                                            </md-button>
 
-                        <md-menu-content width="4">
+                                            <md-menu-content width="4">
 
-                            <md-menu-item>
-                                <md-button ng-click="vm.modValues()">
-                                    <md-icon>cached</md-icon>
-                                    Modificar
-                                </md-button>
-                            </md-menu-item>
-                                <md-menu-item>
-                                <md-button ng-click="vm.modValues()">
-                                    <md-icon>delete</md-icon>
-                                    Eliminar
-                                </md-button>
-                            </md-menu-item>
+                                                <md-menu-item>
+                                                    <md-button ng-click="vm.modValues()">
+                                                        <md-icon>cached</md-icon>
+                                                        Modificar
+                                                    </md-button>
+                                                </md-menu-item>
+                                                <md-menu-item>
+                                                    <md-button ng-click="vm.modValues()">
+                                                        <md-icon>delete</md-icon>
+                                                        Eliminar
+                                                    </md-button>
+                                                </md-menu-item>
 
-                        </md-menu-content>
+                                            </md-menu-content>
 
-                    </md-menu>
-
+                                        </md-menu>
+<form name="marksForm">
                                         <div layout layout-margin layout-sm="row">
 
-                                            <p>1er Trimestre</p>
+                                            <small>1er Trimestre</small>
 
                                             <md-input-container flex="15">
                                                 <label layout="">Pre.</label>
-                                                <input ng-model="vm.mark.preFirstEv" required>
+                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/" cast-to-integer="true"
+                                                       ng-model="vm.mark.marks.preFirstEv"
+                                                       ng-disabled="!vm.editValuesEnabled">
                                             </md-input-container>
 
                                             <md-input-container flex="15">
                                                 <label layout="">Final</label>
-                                                <input ng-model="vm.mark.firstEv" required>
+                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                       ng-model="vm.mark.marks.firstEv"
+                                                       ng-disabled="!vm.editValuesEnabled">
                                             </md-input-container>
 
                                         </div>
 
                                         <div layout layout-margin layout-sm="row">
 
-                                        <small>2o Trimestre</small>
+                                            <small>2o Trimestre</small>
 
 
                                             <md-input-container flex>
                                                 <label layout="">Preevaluación</label>
-                                                <input ng-model="vm.mark.preSecondEv" required>
+                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                       ng-model="vm.mark.marks.preSecondEv"
+                                                       ng-disabled="!vm.editValuesEnabled">
                                             </md-input-container>
 
                                             <md-input-container flex>
                                                 <label layout="">Final</label>
-                                                <input ng-model="vm.mark.secondEv" required>
+                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                       ng-model="vm.mark.marks.secondEv"
+                                                       ng-disabled="!vm.editValuesEnabled">
                                             </md-input-container>
 
                                         </div>
-
 
 
                                         <div layout layout-margin layout-sm="row">
@@ -160,41 +162,45 @@
 
                                             <md-input-container flex>
                                                 <label layout="">Final</label>
-                                                <input ng-model="vm.mark.thirdEv" required>
+                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                       ng-model="vm.mark.marks.thirdEv"
+                                                       ng-disabled="!vm.editValuesEnabled">
                                             </md-input-container>
 
                                         </div>
 
-                                        <small>Final</small>
+                                        <small>Evalucación final</small>
                                         <br>
 
                                         <md-input-container flex>
                                             <label layout="">Final</label>
-                                            <input ng-model="vm.mark.final" required>
+                                            <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                   ng-model="vm.mark.marks.final"
+                                                   ng-disabled="!vm.editValuesEnabled">
                                         </md-input-container>
-
-
+</form>
                                         <!-- Options in edition mode -->
-                    <div layout="row" flex flex="70" layout-align="center">
+                                        <div layout="row" flex flex="70" layout-align="center">
 
-                        <md-button
-                                ng-show="true"
-                                title="Cancelar"
-                                ng-click="vm.cancelModValues()"
-                                class="md-icon-button md-accent">
-                            <md-icon>cancel</md-icon>
-                        </md-button>
+                                            <md-button
+                                                    ng-show="vm.editValuesEnabled"
+                                                    title="Cancelar"
+                                                    ng-click="vm.cancelModValues()"
+                                                    class="md-icon-button md-accent">
+                                                <md-icon>cancel</md-icon>
+                                            </md-button>
 
-                        <md-button
-                                ng-show="true"
-                                title="Guardar cambios"
-                                ng-disabled="!vm.updateButtonEnable"
-                                ng-click="vm.updateTeacher()"
-                                class="md-icon-button md-primary">
-                            <md-icon>save</md-icon>
-                        </md-button>
+                                            <md-button
+                                                    ng-disabled="marksForm.$invalid"
+                                                    ng-show="vm.editValuesEnabled"
+                                                    title="Guardar cambios"
+                                                    ng-click="vm.updateMark()"
+                                                    class="md-icon-button md-primary">
+                                                <md-icon>save</md-icon>
+                                            </md-button>
 
-                    </div>
+                                        </div>
+
 
                                     </div>
                                 </div>
@@ -202,7 +208,7 @@
                             </md-card-content>
 
                             <md-card-actions layout="row" layout-align="end center">
-                                <md-button>Limpiar</md-button>
+                                <md-button ng-click="vm.clean()">Limpiar</md-button>
                             </md-card-actions>
 
 

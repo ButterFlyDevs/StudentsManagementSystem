@@ -349,5 +349,82 @@ def get_disciplinary_note(disciplinary_note_id=None):
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
+###################
+# Marks Resources #
+###################
+
+@app.route('/mark', methods=['POST'])
+def post_mark():
+    """
+    Save a mark in the database.
+
+    :return: Return HTTP status code and the mark as is saved in the data store.
+    """
+    response = requests.post(url = 'http://{}/{}'.format(modules.get_hostname(module='scms'), 'mark'),
+                             json=request.get_json())
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return make_response(response.content, response.status_code)
+
+
+@app.route('/mark', methods=['GET'])
+@app.route('/mark/<int:mark_id>', methods=['GET'])
+def get_mark(mark_id=None):
+    """
+    Get a list of marks or a specific mark from data store.
+
+    :param mark_id: The id of the mark item to searh in data store.
+    :return: A mark object
+    """
+
+    url = 'http://{}/{}'.format(modules.get_hostname(module='scms'), 'mark')
+
+    if mark_id is not None:
+        url += '/{}'.format(mark_id)
+
+    if request.args:
+        url += '?enrollmentId={}'.format(request.args['enrollmentId'])
+
+    response = requests.get(url)
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
+
+
+@app.route('/mark/<int:mark_id>', methods=['DELETE'])
+def delete_mark(mark_id):
+    """
+    Do a logic deletion of a mark in the data store.
+
+    :param mark_id: mark id in data store
+    :return: Nothing, normal status code
+    """
+
+    url = 'http://{}/{}'.format(modules.get_hostname(module='scms'), 'mark',mark_id)
+
+    response = requests.delete(url)
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
+
+    return process_response(MarksManager.delete_mark(mark_id))
+
+
+@app.route('/mark/<int:mark_id>', methods=['PUT'])
+def update_mark(mark_id):
+    """
+    Update a Mark item in the data store.
+
+    :param mark_id: Mark id which will be updated.
+    :return: Nothing
+    """
+
+    response = requests.put(
+        url='http://{}/{}/{}'.format(modules.get_hostname(module='scms'),'mark', mark_id),
+        json=request.get_json())
+
+    response = make_response(response.content, response.status_code)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
+
 if __name__ == '__main__':
     app.run(debug=True)

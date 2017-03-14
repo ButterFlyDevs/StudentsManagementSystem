@@ -40,7 +40,8 @@ This is the section of API that manage the resources related with this kind of o
 
     **GET with params**
 
-    It allows request a mark with a enrollmentId identificator.
+    It allows request a mark with a enrollmentId identification, as another way to make requests if we don't know
+    markId id.
 
     Example:
 
@@ -171,6 +172,7 @@ def get_mark(mark_id=None):
     :param mark_id: The id of the mark item to searh in data store.
     :return: A mark object
     """
+    print request.args
     return process_response(MarksManager.get_mark(mark_id, request.args))
 
 

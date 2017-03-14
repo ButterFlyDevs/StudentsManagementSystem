@@ -175,12 +175,20 @@ angular.module('subjects')
 
         }
 
+        /**
+         * Enable all fields to can change attributes of item.
+         */
         function modValues() {
             vm.editValuesEnabled = true;
         }
 
+        /**
+         * Cancel all mods over the subject attributes.
+         */
         function cancelModValues() {
+            // Do all fields not editables.
             vm.editValuesEnabled = false;
+            // Back to previous state without new request:
             vm.subject = angular.copy(vm.subjectOriginalCopy);
         }
 

@@ -444,6 +444,10 @@ class MarksManager(object):
                 else:
                     return {'status': 204, 'data': None, 'log': None}
             else:
+
+                if len(marks) == 1 and  mark_id is not None:
+                    marks = marks[0]
+
                 return {'status': 200, 'data': marks, 'log': None}
 
         else:
@@ -477,6 +481,7 @@ class MarksManager(object):
         # If mark has the required format:
         if cls.validate_mark(mark):
 
+            print colored('Posted mark')
             print colored(mark, 'red')
 
             # Is created the object
@@ -491,7 +496,8 @@ class MarksManager(object):
                                               firstEv=marks.get('firstEv', None),
                                               preSecondEv=marks.get('preSecondEv', None),
                                               secondEv=marks.get('secondEv', None),
-                                              thirdEv=marks.get('thirdEv', None)),
+                                              thirdEv=marks.get('thirdEv', None),
+                                              final=marks.get('final', None)),
                                 createdBy=1, createdAt=time_now())
 
             # And save using himself
@@ -519,6 +525,9 @@ class MarksManager(object):
 
             if cls.validate_mark(received_mark):
 
+                print colored('Posted mark')
+                print colored(received_mark, 'red')
+
                 # Is created the object
                 enrollment = received_mark['enrollment']
                 marks = received_mark['marks']
@@ -532,7 +541,8 @@ class MarksManager(object):
                                    firstEv=marks.get('firstEv', None),
                                    preSecondEv=marks.get('preSecondEv', None),
                                    secondEv=marks.get('secondEv', None),
-                                   thirdEv=marks.get('thirdEv', None))
+                                   thirdEv=marks.get('thirdEv', None),
+                                   final=marks.get('final',None))
 
                 item.modifiedAt = time_now()
                 item.modifiedBy = 1

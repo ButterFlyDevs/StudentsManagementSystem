@@ -259,6 +259,8 @@ class EntitiesManager:
         # association/n return all info about a association like class, subject, teachers and students list.
         if kind == 'association' and entity_id is not None:
 
+            print 'PETARDO'
+
             return_dic = {}
 
             association_query = 'select a.*, c.course as \'classCourse\', c.level as \'classLevel\', c.word as \'classWord\', ' \
@@ -272,7 +274,7 @@ class EntitiesManager:
                                  'i.deleted = {};'.format(entity_id, 0)
 
             query_for_students = 'select s.studentId as \'studentId\', s.name as \'name\', s.surname as' \
-                                 ' \'surname\' from enrollment e inner join student s on ' \
+                                 ' \'surname\', s.profileImageUrl as \'profileImageUrl\' , e.enrollmentId from enrollment e inner join student s on ' \
                                  '(e.studentId = s.studentId) where e.associationId = {} ' \
                                  'and e.deleted = {};'.format(entity_id, 0)
 

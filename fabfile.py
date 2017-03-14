@@ -140,8 +140,7 @@ def test(ms):
 def doc(ms, open=False):
     """
     Doc generator.
-    Build the documentation to the micro service passed. By default the html
-    doc isn't open.
+    Build the documentation to the micro service passed. By default the html doc isn't open.
 
     Examples:
         fab doc:tdbms,open=yes
@@ -149,20 +148,10 @@ def doc(ms, open=False):
         fab doc:back-end
     """
 
-    # Generate and open the documentation of Teaching DataBase microService
-    if ms == 'tdbms':
-        local('make -C SMS-Back-End/dbms/docs html')
+    if ms in ['tdbms','scms','apigms']:
+        local('make -C SMS-Back-End/{}/docs html'.format(ms))
         if open == 'yes':
-            local('firefox SMS-Back-End/dbms/docs/build/html/index.html')
-
-    if ms == 'scms':
-        local('make -C SMS-Back-End/scms/docs html')
-        if open == 'yes':
-            local('firefox SMS-Back-End/scms/docs/build/html/index.html')
-
-    if ms == 'apigms':
-        local('make -C SMS-Back-End/apigms/docs html')
-        local('firefox SMS-Back-End/apigms/docs/build/html/index.html')
+            local('firefox SMS-Back-End/{}/docs/build/html/index.html'.format(ms))
 
     if ms == 'back-end':
         local('make -C SMS-Back-End/docs html')
