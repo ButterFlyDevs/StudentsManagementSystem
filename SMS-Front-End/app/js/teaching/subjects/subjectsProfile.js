@@ -156,6 +156,7 @@ angular.module('subjects')
 
                 $scope.subjectModelHasChanged = false;
 
+                // To make possible the changes detections pre-saved item to avoid or allow the save action.
                 $scope.$watch('vm.subject', function (newValue, oldValue) {
                     if (newValue != oldValue) {
                         $scope.subjectModelHasChanged = !angular.equals(vm.subject, vm.subjectOriginalCopy);

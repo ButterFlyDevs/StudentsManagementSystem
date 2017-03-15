@@ -58,7 +58,7 @@ This is the section of API that manage the resources related with this kind of o
 
     Example:
 
-    >>> curl -H "Content-Type: application/json" -X POST -d '...' localhost:8003/association
+    >>> curl -H "Content-Type: application/json" -X POST -d '...' localhost:8003/mark
 
     Post with example file:
 

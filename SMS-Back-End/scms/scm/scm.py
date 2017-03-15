@@ -445,7 +445,7 @@ class MarksManager(object):
                     return {'status': 204, 'data': None, 'log': None}
             else:
 
-                if len(marks) == 1 and  mark_id is not None:
+                if len(marks) == 1 and  mark_id is None:
                     marks = marks[0]
 
                 return {'status': 200, 'data': marks, 'log': None}

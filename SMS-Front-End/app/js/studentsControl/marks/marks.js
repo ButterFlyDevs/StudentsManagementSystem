@@ -32,7 +32,6 @@ angular.module('marks')
                     }
                 );
                 vm.dataIsReady = true;
-                console.log(vm.teachersList)
 
             }, function (error) {
                 console.log('Any problem found when was retrieved the teachers list.');
@@ -57,7 +56,6 @@ angular.module('marks')
          */
         vm.itemToString = function itemToString(item, type) {
 
-
             if (type == 'student') {
                 return item.name + ' ' + item.surname
             }
@@ -67,10 +65,6 @@ angular.module('marks')
 
         }
         vm.itemQuerySearch = function itemQuerySearch(query, type) {
-
-            console.log('BASTAR')
-            console.log('QUERY')
-            console.log(query)
 
             var selectedArray = null;
 
@@ -84,16 +78,11 @@ angular.module('marks')
             // If there are query return the list filtered with the query.
             // Filter create a new array with all elements that pass the test
             var results = query ? selectedArray.filter(createFilterFor(query)) : selectedArray;
-            console.log('RESULTADOS');
-            console.log(results);
             return results;
-
         }
         vm.selectedItemChange = function selectedItemChange(item, type) {
             // when a teacher is selected the list of classes must be loaded
             // and show the selector.
-
-            console.log('CAMBIO')
 
             if (item && type == 'class')
                 loadStudents(item);
@@ -120,12 +109,9 @@ angular.module('marks')
          * @param item
          */
         function loadStudents(item) {
-            console.log('loadStudents')
-            console.log(item);
 
             vm.studentsList = AssociationsService.get({id: item.associationId}, function () {
 
-                console.log(vm.studentsList);
                 vm.studentsList = vm.studentsList.students;
 
                 vm.studentsList = vm.studentsList.map(function (item) {
@@ -134,42 +120,64 @@ angular.module('marks')
                     }
                 );
 
-                console.log(vm.studentsList);
                 vm.studentsIsReady = true;
 
             }, function (error) {
-                console.log('Any problem found when was retrieved the teachers list.');
+                console.log('Any problem found when was retrieved the students list.');
                 console.log(error);
             })
 
         }
 
         function loadMark(item){
-            console.log('LOADING MARK');
-            console.log(item);
-            console.log(vm.studentSelected);
 
             // Request to get the marks of this student, using his enrollmentId.
             vm.mark = MarksService.get({enrollmentId: item.enrollmentId}, function(){
-                console.log('HOOO');
-                console.log(vm.mark);
+
+                // ### To restore a original copy if the update process is canceled. ###
+                vm.markOriginalCopy = angular.copy(vm.mark);
+
+                /* TODO: Present some problems with parser to float, to solve in background.
+                $scope.markModelHasChanged = false;
+
+                // To make possible the changes detections pre-saved item to avoid or allow the save action.
+                $scope.$watch('vm.mark', function (newValue, oldValue) {
+                    if (newValue != oldValue) {
+                        parseMarks(vm.mark.marks);
+                        $scope.markModelHasChanged = !angular.equals(vm.mark.marks, vm.markOriginalCopy);
+                    }
+                    compare();
+                }, true);*/
+
+
+                vm.isANewMark =false;
                 vm.marksAreReady=true;
             }, function(error){
                 console.log('Any problem found when was retrieved the marks of student.');
                 console.log(error);
-                console.log(error.status);
+                console.log('Status error: ' + error.status);
 
                 if (error.status == 404){
                     // Means that user haven't any mark yet.
-                    console.log('ok');
                     vm.mark = new MarksService();
                     vm.marksAreReady=true;
                     vm.isANewMark =true;
-                    console.log(vm.mark);
+                    // ### To restore a original copy if the update process is canceled. ###
+                     vm.markOriginalCopy = angular.copy(vm.mark);
                 }
             });
 
         }
+
+        /* TODO: Related with changes detection.
+        function compare() {
+            if ($scope.markModelHasChanged) {
+                vm.updateButtonEnable = true;
+            } else {
+                vm.updateButtonEnable = false;
+            }
+
+        }*/
 
         /**
          *
@@ -178,10 +186,13 @@ angular.module('marks')
          */
         function parseMarks(marks){
 
+
+
             marks.preFirstEv = parseFloat(marks.preFirstEv);
             marks.firstEv    = parseFloat(marks.firstEv );
             marks.preSecondEv    = parseFloat(marks.preSecondEv );
-            marks.thirdEv    = parseFloat(marks.firstEv );
+            marks.secondEv    = parseFloat(marks.secondEv );
+            marks.thirdEv    = parseFloat(marks.thirdEv );
             marks.final    = parseFloat(marks.final );
 
             return marks
@@ -191,16 +202,16 @@ angular.module('marks')
          * Call to server with PUT method ($update = PUT) using vm.subject that is
          * a instance of SubjectsService.*/
         vm.updateMark = function updateMark() {
-            console.log('Calling updateSubject() function.');
+            console.log('Calling updateMark() function.');
+
+            var promise = null;
 
             if (vm.isANewMark){
 
-                // We need complete a bit of data before.
-
-                console.log('DATA FILL');
-                console.log(vm.studentSelected);
-                console.log(vm.classSelected);
-                console.log(vm.subjectSelected);
+                /*
+                When is a new mark there are a lot of fields that are empty but that is necessary to save with
+                the marks, like info about class, subject, etc that the object hasn't when is new.
+                */
 
                 vm.mark.studentId = vm.studentSelected.studentId;
                 vm.mark.enrollment = {};
@@ -211,37 +222,39 @@ angular.module('marks')
 
                 vm.mark.marks = parseMarks(vm.mark.marks);
 
-                vm.mark.$save(
-                    function () {
-                        console.log('COOL');
-                        vm.isANewMark = false;
-                    },function(){
-                        console.log('FAIL');
-                        vm.isANewMark = false;
-                    })
+                vm.SPECIALCOPY = angular.copy(vm.mark);
+                promise = vm.mark.$save();
+
 
                 }
-
+                
+            // When is a existing mark.    
             else{
 
                 vm.mark.marks = parseMarks(vm.mark.marks);
 
-            vm.mark.$update(
+                promise = vm.mark.$update();
+            }
+
+            promise.then(
                 function () { // Success
-                    console.log('Subject updated successfully.')
-                    toastService.showToast('Asignatura actualizada con éxito.')
+                    console.log('Mark updated successfully.')
+                    toastService.showToast('Notas actualizadas con éxito.')
                     vm.editValuesEnabled = false;
                     vm.updateButtonEnable = false;
 
                     // ### Do a copy to save process. ###
-                    vm.subjectOriginalCopy = angular.copy(vm.subject);
+                    vm.markOriginalCopy = angular.copy(vm.mark);
+
+                    if (vm.isANewMark){
+                        vm.mark = angular.copy(vm.SPECIALCOPY);
+                    }
                 },
                 function (error) { // Fail
-                    console.log('Error updating the subject.')
+                    console.log('Error updating the mark.')
                     console.log(error)
-                    toastService.showToast('Error actualizando la asignatura.')
-                });
-            }
+                    toastService.showToast('Error actualizando lsa notas.')
+                })
         }
 
         /**
@@ -250,6 +263,27 @@ angular.module('marks')
         vm.modValues = function modValues() {
             vm.editValuesEnabled = true;
         }
+
+
+        /**
+         * Show the floating dialog to ask user if it actually want to delete the relation.
+         * @param associationId The id of the association that come from subjectTeaching data block.
+         */
+        vm.showDeleteMarkConfirm = function showDeleteMarkConfirm() {
+            var confirm = $mdDialog.confirm()
+                .title('¿Está seguro de que quiere eliminar esta grupo?')
+                .textContent('Si lo hace, también eliminará las matrículas de los estudiantes matriculados a esta.')
+                .ok('Estoy seguro')
+                .cancel('Cancelar');
+
+            $mdDialog.show(confirm).then(function () {
+                deleteClass(associationId);
+            }, function () {
+                console.log('Operacion cancelada.')
+            });
+
+        }
+
 
         /**
          * Set all values to null to reset the "Mark Searcher"
@@ -282,15 +316,13 @@ angular.module('marks')
             // Do all fields not editables.
             vm.editValuesEnabled = false;
             // Back to previous state without new request:
-            //vm.subject = angular.copy(vm.subjectOriginalCopy);
+            vm.mark = angular.copy(vm.markOriginalCopy);
         };
 
         function loadClasses(item) {
 
             //Now we load the classes from the teaching data block to the selected subject.
             vm.classesList = [];
-            console.log('loadClasses')
-            console.log(vm.subjectSelected);
 
             vm.classesList = SubjectsService.getTeaching({id: vm.subjectSelected.subjectId}, function () {
 
@@ -311,7 +343,6 @@ angular.module('marks')
                     }
                 );
 
-                console.log(vm.classesList);
                 vm.classesIsReady = true;
 
             }, function (error) {

@@ -64,11 +64,9 @@
 
                                         <!-- STUDENT selector
                                         Available only when subject has been selected and classes list related received-->
-                                        <md-autocomplete flex    ng-if="vm.studentsIsReady"
+                                        <md-autocomplete flex ng-if="vm.studentsIsReady"
                                                          md-input-name="autocompleteField"
-                                                         md-input-minlength="2"
                                                          md-selected-item-change="vm.selectedItemChange(item, 'student')"
-                                                         md-input-maxlength="5"
                                                          md-no-cache="vm.noCache"
                                                          md-selected-item="vm.studentSelected"
                                                          md-search-text="vm.studentSearchText"
@@ -104,7 +102,9 @@
                                                     </md-button>
                                                 </md-menu-item>
                                                 <md-menu-item>
-                                                    <md-button ng-click="vm.modValues()">
+                                                    <md-button
+                                                            ng-disabled="true"
+                                                            ng-click="vm.showDeleteMarkConfirm()">
                                                         <md-icon>delete</md-icon>
                                                         Eliminar
                                                     </md-button>
@@ -113,72 +113,80 @@
                                             </md-menu-content>
 
                                         </md-menu>
-<form name="marksForm">
-                                        <div layout layout-margin layout-sm="row">
+                                        <form name="marksForm">
+                                            <div layout layout-margin layout-sm="row">
 
-                                            <small>1er Trimestre</small>
+                                                <small>1er Trimestre</small>
 
-                                            <md-input-container flex="15">
-                                                <label layout="">Pre.</label>
-                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/" cast-to-integer="true"
-                                                       ng-model="vm.mark.marks.preFirstEv"
-                                                       ng-disabled="!vm.editValuesEnabled">
-                                            </md-input-container>
+                                                <md-input-container flex="15">
+                                                    <label layout="">Pre.</label>
+                                                    <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                           cast-to-integer="true"
+                                                           ng-model="vm.mark.marks.preFirstEv"
+                                                           ng-disabled="!vm.editValuesEnabled">
+                                                </md-input-container>
 
-                                            <md-input-container flex="15">
-                                                <label layout="">Final</label>
-                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
-                                                       ng-model="vm.mark.marks.firstEv"
-                                                       ng-disabled="!vm.editValuesEnabled">
-                                            </md-input-container>
+                                                <md-input-container flex="15">
+                                                    <label layout="">Final</label>
+                                                    <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                           ng-model="vm.mark.marks.firstEv"
+                                                           ng-disabled="!vm.editValuesEnabled">
+                                                </md-input-container>
 
-                                        </div>
+                                            </div>
 
-                                        <div layout layout-margin layout-sm="row">
+                                            <div layout layout-margin layout-sm="row">
 
-                                            <small>2o Trimestre</small>
+                                                <small>2o Trimestre</small>
 
+
+                                                <md-input-container flex>
+                                                    <label layout="">Preevaluación</label>
+                                                    <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                           ng-model="vm.mark.marks.preSecondEv"
+                                                           ng-disabled="!vm.editValuesEnabled">
+                                                </md-input-container>
+
+                                                <md-input-container flex>
+                                                    <label layout="">Final</label>
+                                                    <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                           ng-model="vm.mark.marks.secondEv"
+                                                           ng-disabled="!vm.editValuesEnabled">
+                                                </md-input-container>
+
+                                            </div>
+
+
+                                            <div layout layout-margin layout-sm="row">
+
+                                                <small>3er Trimestre</small>
+
+                                                <md-input-container flex>
+                                                    <label layout="">Final</label>
+                                                    <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                           ng-model="vm.mark.marks.thirdEv"
+                                                           ng-disabled="!vm.editValuesEnabled">
+                                                </md-input-container>
+
+                                            </div>
+
+                                            <small>Evaluación final</small>
+                                            <br>
 
                                             <md-input-container flex>
-                                                <label layout="">Preevaluación</label>
-                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
-                                                       ng-model="vm.mark.marks.preSecondEv"
-                                                       ng-disabled="!vm.editValuesEnabled">
-                                            </md-input-container>
-
-                                            <md-input-container flex>
                                                 <label layout="">Final</label>
-                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
-                                                       ng-model="vm.mark.marks.secondEv"
+                                                <input type="text"  ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
+                                                       ng-model="vm.mark.marks.final"
                                                        ng-disabled="!vm.editValuesEnabled">
                                             </md-input-container>
 
-                                        </div>
+                                            <div ng-messages="marksForm.$error">
+                                                <div ng-message="pattern">
+                                                    Las notas deben ser enteros o decimales separados por punto.
+                                                </div>
+                                            </div>
 
-
-                                        <div layout layout-margin layout-sm="row">
-
-                                            <small>3er Trimestre</small>
-
-                                            <md-input-container flex>
-                                                <label layout="">Final</label>
-                                                <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
-                                                       ng-model="vm.mark.marks.thirdEv"
-                                                       ng-disabled="!vm.editValuesEnabled">
-                                            </md-input-container>
-
-                                        </div>
-
-                                        <small>Evalucación final</small>
-                                        <br>
-
-                                        <md-input-container flex>
-                                            <label layout="">Final</label>
-                                            <input type="text" ng-pattern="/^(\d|(\d\.\d)|10){1}$/"
-                                                   ng-model="vm.mark.marks.final"
-                                                   ng-disabled="!vm.editValuesEnabled">
-                                        </md-input-container>
-</form>
+                                        </form>
                                         <!-- Options in edition mode -->
                                         <div layout="row" flex flex="70" layout-align="center">
 
