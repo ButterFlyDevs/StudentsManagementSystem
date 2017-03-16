@@ -29,6 +29,9 @@ from google.appengine.ext import ndb
 requests_toolbelt.adapters.appengine.monkeypatch()
 
 
+
+
+
 def get_item_from_tdbms(kind, id, params):
     """
     Call to TDBmS to get info about a specific item.
@@ -47,7 +50,18 @@ def get_item_from_tdbms(kind, id, params):
             url += param+','
     url = url[:-1]
 
+    time_before = datetime.datetime.now()
     response = requests.get(url)
+    time_after = datetime.datetime.now()
+
+    info = {
+        'url': url,
+        'time': '{} sec'.format((time_after-time_before).total_seconds())
+    }
+
+    print colored(info, 'red', 'on_grey')
+
+
     status = response.status_code
 
     if status == 200:
@@ -399,7 +413,7 @@ class MarksManager(object):
         return True
 
     @classmethod
-    def get_mark(cls, mark_id, args):
+    def get_mark(cls, mark_id=None, args=None):
         """
         Return a mark or a list of them from data store.
         :param mark_id: Id of mark that will be returned.
@@ -407,20 +421,14 @@ class MarksManager(object):
         """
 
         # If isn't passed mark_id is requests all marks from the data store.
-        enrollmentId = None
-        if mark_id is None:
+        # If is used the enrollmentId value it is pased like params
+        enrollment_id = None
+        if args:
+            enrollment_id = args.get('enrollmentId', None)
 
-            if args:
-                enrollmentId = args.get('enrollmentId', None)
-                if enrollmentId:
-                    # Query without params: the simplest way to get all items.
-                    query = Mark.query(Mark.enrollment.enrollmentId == int(enrollmentId))
-                else:
-                    return {'status': 400, 'data': None, 'log': 'Only param available is enrollmentId as /?enrollmentId=<int>'}
+        if not mark_id and not enrollment_id:
 
-
-            else:
-                query = Mark.query()
+            query = Mark.query()
 
             marks = []  # Used to return all marks at end.
 
@@ -439,22 +447,20 @@ class MarksManager(object):
                     marks.append(dict_tmp)
 
             if len(marks) == 0:
-                if enrollmentId:
-                    return {'status': 404, 'data': None, 'log': None}
-                else:
-                    return {'status': 204, 'data': None, 'log': None}
+                return {'status': 204, 'data': None, 'log': None}
+
             else:
-
-                if len(marks) == 1 and  mark_id is None:
-                    marks = marks[0]
-
                 return {'status': 200, 'data': marks, 'log': None}
 
+        # The request is about one mark, searched my enrollmentId or markId.
         else:
 
-            key = ndb.Key('Mark', long(mark_id))
+            if enrollment_id:
+                mark = Mark.query(Mark.enrollment.enrollmentId == int(enrollment_id), Mark.deleted == False).get()
 
-            mark = Mark.query(Mark.key == key, Mark.deleted == False).get()
+            elif mark_id:
+                key = ndb.Key('Mark', long(mark_id))
+                mark = Mark.query(Mark.key == key, Mark.deleted == False).get()
 
             if mark:
 

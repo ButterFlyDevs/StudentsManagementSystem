@@ -15,13 +15,13 @@ threadsafe: true
 
 automatic_scaling:
   min_idle_instances: 2
-  max_pending_latency: 1s
+  max_pending_latency: 10s
 
 # Handlers tell App Engine how to route requests to your application.
 handlers:
 
 - url: /.*
-  script: apigms_api.app
+  script: api.apigms_api.app
 
 libraries:
 # The pycrypto library is used for OAuth 2, and is also a requirement for

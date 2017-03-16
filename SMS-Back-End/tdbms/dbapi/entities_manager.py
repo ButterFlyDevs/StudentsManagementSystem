@@ -259,8 +259,6 @@ class EntitiesManager:
         # association/n return all info about a association like class, subject, teachers and students list.
         if kind == 'association' and entity_id is not None:
 
-            print 'PETARDO'
-
             return_dic = {}
 
             association_query = 'select a.*, c.course as \'classCourse\', c.level as \'classLevel\', c.word as \'classWord\', ' \

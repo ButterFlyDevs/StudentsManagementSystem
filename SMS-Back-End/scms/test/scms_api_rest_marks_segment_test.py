@@ -1,16 +1,32 @@
 """
 ##########################################################
-###         SCmS marks api segment test suite          ###
+###         SCmS marks api segment TEST SUITE          ###
 ##########################################################
 """
 import requests
 from time import sleep
 import json
 
-url = 'http://localhost:8003/mark'
+def pytest_generate_tests(metafunc):
+    """
+    Config function to make the test to several scenarios.
+    """
+    idlist = []
+    argvalues = []
+    for scenario in metafunc.cls.scenarios:
+        idlist.append(scenario[0])
+        items = scenario[1].items()
+        argnames = [x[0] for x in items]
+        argvalues.append(([x[1] for x in items]))
+    metafunc.parametrize(argnames, argvalues, ids=idlist, scope="class")
+
+scenario1 = ('calling mService directly', {'port': '8003'})
+scenario2 = ('calling mService through APIG', {'port': '8001'})
 
 
 class TestClass(object):
+
+    scenarios = [scenario1, scenario2]
 
     @classmethod
     def check_mark_with_original(cls, mark, mark2):
@@ -25,7 +41,10 @@ class TestClass(object):
         for k, v in mark2.items():
             assert mark[k] == v
 
-    def test_empty_mark_items_in_data_store(self):
+    def test_empty_mark_items_in_data_store(self, port):
+
+        url = 'http://localhost:{}/mark'.format(port)
+
         result = requests.get(url)
         assert result.status_code == 204
 
@@ -37,7 +56,9 @@ class TestClass(object):
         result = requests.get(url + '?enrollmentId=423')
         assert result.status_code == 404
 
-    def test_post_and_delete(self):
+    def test_post_and_delete(self, port):
+
+        url = 'http://localhost:{}/mark'.format(port)
 
         # Open JSON from file
         with open('test/mark_example_1.json') as data_file:
@@ -45,14 +66,14 @@ class TestClass(object):
         response = requests.post(url=url, json=data)
         assert response.status_code == 200
 
-        # Because the Asynchrony of the server.
+        # Because the Asynchronously of the server.
         sleep(0.5)  # Time in seconds.
 
         result = requests.get(url)
         assert result.status_code == 200
         assert len(result.json()) == 1
 
-        # Item searched with enrollmentId doesn't exists.
+        # Item searched with enrollmentId exists.
         result = requests.get(url='{}{}{}'.format(url,'?enrollmentId=',data['enrollment']['enrollmentId']))
         assert result.status_code == 200
 
@@ -64,7 +85,9 @@ class TestClass(object):
         result = requests.get(url)
         assert result.status_code == 204
 
-    def test_update(self):
+    def test_update(self, port):
+
+        url = 'http://localhost:{}/mark'.format(port)
 
         with open('test/mark_example_1.json') as data_file:
             data = json.load(data_file)
@@ -89,3 +112,5 @@ class TestClass(object):
 
         response = requests.delete(url='{}/{}'.format(url, ac_id))
         assert response.status_code == 200
+
+        sleep(0.5)
