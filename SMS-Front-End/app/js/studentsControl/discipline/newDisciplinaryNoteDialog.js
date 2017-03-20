@@ -12,7 +12,7 @@ angular.module('discipline')
 
         vm.disciplinaryNote = new DisciplineService();
         vm.defaultAvatar = globalService.defaultAvatar;
-        vm.currentDate = new Date();
+        vm.disciplinaryNote.dateTime = new Date();
         vm.thereAreStudents = false;
 
         ///////////////////////////////////////////////////////////
@@ -58,7 +58,17 @@ angular.module('discipline')
          * Call to server with POST method ($save = POST) using vm.disciplinaryNote that is
          * a instance of TeachersService.*/
         function saveDisciplinaryNote() {
-            console.log('Calling saveTeacher() function.')
+            console.log('Calling saveDisciplinaryNote() function.')
+
+
+    
+            // Formating date:
+            dt = vm.disciplinaryNote.dateTime;
+            new_format = dt.getFullYear()+'-'+dt.getMonth()+'-'+dt.getDate()+' '+dt.getHours()+':'+dt.getMinutes();
+
+            vm.disciplinaryNote.dateTime = new_format;
+
+            console.log(vm.disciplinaryNote.dateTime);
 
             vm.disciplinaryNote.$save(
                 function () { // Success

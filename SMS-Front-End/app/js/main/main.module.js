@@ -72,7 +72,11 @@ angular.module('main').config(function ($stateProvider, $urlRouterProvider) {
 
         .state('discipline', {
                 url: '/discipline',
-                templateUrl: 'app/views/studentsControl/discipline/discipline.html'
+                templateUrl: 'app/views/studentsControl/discipline/disciplineList.html'
+            })
+        .state('disciplinaryNoteProfile', {
+                url: '/discipline/:disciplinaryNoteId',
+                templateUrl: 'app/views/studentsControl/discipline/disciplinaryNoteProfile.html'
             })
 
 });

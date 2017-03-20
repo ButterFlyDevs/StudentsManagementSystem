@@ -67,14 +67,14 @@
                         <mdp-date-picker mdp-open-on-click required name="dateFormat"
                                          mdp-placeholder="Fecha"
                                          mdp-format="DD/MM/YYYY"
-                                         ng-model="vm.currentDate"
-                                         mdp-max-date=vm.currentDate>
+                                         ng-model="vm.disciplinaryNote.dateTime  "
+                                         mdp-max-date=vm.disciplinaryNote.dateTime   >
                             <div ng-messages="demoForm.dateFormat.$error">
                                 <div ng-message="required">This is required</div>
                                 <div ng-message="format">Invalid format</div>
                             </div>
                         </mdp-date-picker>
-                        <mdp-time-picker mdp-auto-switch="true" ng-model="vm.currentDate"></mdp-time-picker>
+                        <mdp-time-picker mdp-auto-switch="true" ng-model="vm.disciplinaryNote.dateTime   "></mdp-time-picker>
                     </div>
 
                     <span class="md-body-2  ">Detalles </span>
@@ -121,7 +121,7 @@
         <md-button class="" ng-click="vm.closeDialog()">
             Cancelar
         </md-button>
-        <md-button class="md-primary md-raised" ng-disabled="newTeacherForm.$invalid" ng-click="vm.saveTeacher()"
+        <md-button class="md-primary md-raised" ng-disabled="newTeacherForm.$invalid" ng-click="vm.saveDisciplinaryNote()"
                    style="margin-right:20px;">
             Guardar
         </md-button>
