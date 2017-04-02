@@ -31,7 +31,7 @@ angular.module('students')
 
 
                 // A dirty solution to problem that does that the date is saved with a day minus.
-                vm.student.data.birthdate.setDate(vm.student.data.birthdate.getDate() + 1);
+                vm.student.birthdate.setDate(vm.student.birthdate.getDate() + 1);
 
                 vm.student.$save(
                     function(){ // Success
@@ -42,8 +42,7 @@ angular.module('students')
                     },
                     function(error){ // Fail
                         toastService.showToast('Error al dar de alta al alumno.')
-                        console.log('Error while student was saved.')
-                        console.log(error)
+                        console.log('Error while student was saved.', error);
                     }
                 );
             }

@@ -9,19 +9,12 @@ angular.module('attendanceControls')
             // Param url passed to CREATE a new Attendance Control
             vm.associationId = $stateParams.associationId;
 
-            console.log('acId');
-            console.log(vm.acId);
-
-            console.log('associationId')
-            console.log(vm.associationId)
-
             vm.action = null;
 
             if (vm.associationId)
                 vm.action = 'new';
             else
                 vm.action = 'loaded';
-            console.log(vm.action);
 
             vm.defaultAvatar = globalService.defaultAvatar;
 
@@ -50,30 +43,28 @@ angular.module('attendanceControls')
                     vm.acBase.$getBase({id: vm.associationId},
                         function () {
                             console.log('Attendance Control Base Data Block received:');
-                            console.log(vm.acBase);
+
+                            for (var i = 0; i < vm.acBase.students.length; i++)
+                                vm.acBase.students[i].control = vm.acBase.control;
+
                             vm.dataIsReady = true;
 
+
                         }, function (error) {
-                            console.log('Get ac base process fail.');
-                            console.log(error);
+                            console.log('Get ac base process fail.', error);
                             toastService.showToast('Error obteniendo la base para el control de asistencia.')
                         });
                 }
                 // We want to see a existing ac.
-                if (vm.action == 'loaded'){
-                    console.log('Loading existing');
+                if(vm.action == 'loaded'){
 
                     vm.ac = attendanceControlsService.get({id: vm.acId},
                         function () {
                             console.log('Attendance Control Base Data Block received:');
-                            console.log(vm.ac);
                             vm.dataIsReady = true;
-
                             vm.acBase = vm.ac;
-
                         }, function (error) {
-                            console.log('Get ac base process fail.');
-                            console.log(error);
+                            console.log('Get ac base process fail.', error);
                             toastService.showToast('Error obteniendo la base para el control de asistencia.')
                         })
                 }
@@ -88,31 +79,30 @@ angular.module('attendanceControls')
             }
 
             function checkIfJustifiedDelayIsEnabled(delayValue) {
-              if (delayValue == null)
+                if (delayValue == null)
                     return false;
-              else
+                else
                     return true;
             }
 
 
-            vm.changeDelay = function changeDelay(studentId, delay){
+            vm.changeDelay = function changeDelay(studentId, delay) {
 
-                 if (delay == 'Sin retraso'){
-                     delay = 0;
-                 }
-                 for (var a = 0; a < vm.acBase.students.length; a++) {
+                if (delay == 'Sin retraso') {
+                    delay = 0;
+                }
+                for (var a = 0; a < vm.acBase.students.length; a++) {
                     if (vm.acBase.students[a].studentId == studentId) {
-                            vm.acBase.students[a].control.delay = delay;
-                            console.log(vm.acBase.students[a].control.delay);
-                            if (delay !=0)
-                                vm.acBase.students[a].control.justifiedDelay = 0;
-                            else
-                                vm.acBase.students[a].control.justifiedDelay = null;
+                        vm.acBase.students[a].control.delay = delay;
+                        if (delay != 0)
+                            vm.acBase.students[a].control.justifiedDelay = 0;
+                        else
+                            vm.acBase.students[a].control.justifiedDelay = null;
                     }
                 }
-            }
+            };
 
-            vm.changeJustifiedDelay = function changeJustifiedDelay(studentId){
+            vm.changeJustifiedDelay = function changeJustifiedDelay(studentId) {
                 for (var a = 0; a < vm.acBase.students.length; a++) {
                     if (vm.acBase.students[a].studentId == studentId) {
                         if (vm.acBase.students[a].control.justifiedDelay == true) {
@@ -122,7 +112,7 @@ angular.module('attendanceControls')
                         }
                     }
                 }
-            }
+            };
 
             function changeUniformForStudent(studentId) {
                 for (var a = 0; a < vm.acBase.students.length; a++) {
@@ -134,22 +124,19 @@ angular.module('attendanceControls')
                         }
                     }
                 }
-            }
+            };
 
             function changeAssistanceForStudent(studentId) {
 
                 for (var a = 0; a < vm.acBase.students.length; a++) {
-                    if (vm.acBase.students[a].studentId == studentId) {
+                    if (vm.acBase.students[a].studentId == studentId)
                         if (vm.acBase.students[a].control.assistance == true) {
-
                             // Set the student to fault.
                             vm.acBase.students[a].control.assistance = false;
                             // It changed to null the rest of values:
                             vm.acBase.students[a].control.delay = null;
                             vm.acBase.students[a].control.justifiedDelay = false;
                             vm.acBase.students[a].control.uniform = null;
-
-                            console.log(vm.acBase.students[a].control);
 
 
                         } else {
@@ -158,28 +145,35 @@ angular.module('attendanceControls')
                             vm.acBase.students[a].control.justifiedDelay = null;
                             vm.acBase.students[a].control.uniform = true;
                         }
-                    }
+
                 }
 
             }
 
-            vm.saveCA = function saveCA(){
+            vm.saveCA = function saveCA() {
 
                 console.log('Saving CA');
-                console.log(vm.acBase);
+                // First we adjust the data block to correct input format to the server.
+                vm.acBase.association.classId = vm.acBase.association.class.classId;
+                delete vm.acBase.association.class;
+                vm.acBase.association.subjectId = vm.acBase.association.subject.subjectId;
+                delete vm.acBase.association.subject;
+                delete vm.acBase.control;
+
+                vm.acBase.teacherId = vm.acBase.teachers[0].teacherId;
+                delete vm.acBase.teachers;
 
                 vm.acBase.$save(
-                    function(){ // Success
+                    function () { // Success
                         console.log('ac saved successfully');
                         $state.go('attendanceControls');
                         toastService.showToast('Control de asistencia realizado con éxito.');
                     },
-                    function(error){ // Fail
+                    function (error) { // Fail
                         toastService.showToast('Error al enviar control de asistencia.');
-                        console.log('Error while ac was saved.');
-                        console.log(error);
+                        console.log('Error while ac was saved.', error);
                     });
             }
 
         }
-    )
+    );

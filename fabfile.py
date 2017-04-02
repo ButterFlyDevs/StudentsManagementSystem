@@ -297,7 +297,7 @@ def requirements(ms=None):
             'sudo pip install -r requirements.txt ',
             'mysql -u root -p\'root\' < SMS-Back-End/tdbms/dbapi/DBCreator.sql ',
             'sudo apt-get install nodejs',
-            'sudo apt - get install npm',
+            'sudo apt-get install npm',
             'sudo ln -s /usr/bin/nodejs /usr/bin/node',
             'sudo npm install -g bower'
             'sudo apt-get install python-sphinx'

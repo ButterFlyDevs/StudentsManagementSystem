@@ -18,6 +18,19 @@ from services import CRUD
 disciplinary_notes_api = Blueprint('disciplinary_notes_api', __name__)
 
 
+@disciplinary_notes_api.route('/disciplinarynote/schema', methods=['GET', 'PUT'])
+def CRU_disciplinary_note_schema():
+    """
+    It call to SCmS to get a schema with options to ve showed in UI form to do a disciplinary note.
+    :return: A dict
+    """
+    if request.method == 'GET':
+        return CRUD.get(service='scms', resource='disciplinarynote/schema')
+
+    if request.method == 'PUT':
+        return CRUD.put(service='scms', resource='disciplinarynote/schema', id=None, json=request.get_json())
+
+
 @disciplinary_notes_api.route('/disciplinarynote', methods=['GET'])
 @disciplinary_notes_api.route('/disciplinarynote/<int:dn_id>', methods=['GET'])
 def get_disciplinary_note(dn_id=None):

@@ -58,7 +58,7 @@ These specifications must be understanding **like a contract** with the function
 
     Example:
 
-    >>> curl -H "Content-Type: application/json" -X POST -d '...' localhost:8003/association
+    >>> curl -H "Content-Type: application/json" -X POST -d '...' localhost:8003/ac
 
     Post with example file:
 
@@ -66,7 +66,7 @@ These specifications must be understanding **like a contract** with the function
     {"acId": 6333186975989760}j
 
     An example of the data is:
-
+    
     .. code-block:: json
 
         {

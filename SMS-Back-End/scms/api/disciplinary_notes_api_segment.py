@@ -65,6 +65,57 @@ This is the section of API that manage the resources related with this kind of o
                 "description": "A little problem with new boy."
             }
 
+
+/disciplinarynote/schema
+
+    **GET**
+    
+    Return the schema with data necesary to buil the form in the UI to make a disciplinary note.
+    
+    Example:
+        
+    >>> curl -i -X GET localhost:8003/disciplinarynote/schema
+    
+    {
+        "gravities": [
+            {
+                "code": 1,
+                "meaning": 1
+            },
+            {
+                "code": 2,
+                "meaning": 2
+            },
+            {
+                "code": 3,
+                "meaning": 3
+            },
+            {
+                "code": 4,
+                "meaning": 4
+            },
+            {
+                "code": 5,
+                "meaning": 5
+            }
+        ],
+        "kinds": [
+            {
+                "code": 1,
+                "meaning": "Acoso"
+            },
+            {
+                "code": 2,
+                "meaning": "Falta de respeto"
+            },
+            {
+                "code": 2,
+                "meaning": "Violencia de genero"
+            }
+        ]
+    }
+
+
 /disciplinarynote/{id}
 --------
 
@@ -144,6 +195,13 @@ sys.path.append("../")
 from scm.scm import DisciplinaryNotesManager
 
 disciplinary_notes_api = Blueprint('disciplinary_notes_api', __name__)
+
+
+@disciplinary_notes_api.route('/disciplinarynote/schema', methods=['GET', 'PUT'])
+def get_disciplinary_note_schema():
+
+    return process_response(DisciplinaryNotesManager.cru_dn_schema(schema=request.get_json(),
+                                                                   action=request.method))
 
 
 @disciplinary_notes_api.route('/disciplinarynote', methods=['POST'])

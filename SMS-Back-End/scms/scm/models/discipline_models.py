@@ -14,6 +14,19 @@ from google.appengine.ext import ndb
 # the api manage and the conversion to json is directly using the same name used here.
 
 
+class OptionItem(ndb.Model):
+    id = ndb.IntegerProperty()
+    meaning = ndb.StringProperty()
+
+
+# This is a singleton MODEL
+class DNOptions(ndb.Model):
+    kinds = ndb.StructuredProperty(OptionItem, repeated=True)
+    gravities = ndb.StructuredProperty(OptionItem, repeated=True)
+    modifiedBy = ndb.IntegerProperty()
+    modifiedAt = ndb.DateTimeProperty()
+
+
 class DisciplinaryNote(ndb.Model):
     """
     Model of a disciplinary note. We save only the id of students and teacher. One disciplinary note

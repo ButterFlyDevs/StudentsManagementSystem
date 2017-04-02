@@ -7,6 +7,14 @@ angular.module('discipline')
                     method: 'GET',
                     url: restPath,
                     isArray: true
+                },
+                'getSchema': {
+                    method: 'GET',
+                    url: restPath +='schema'
+                },
+                'updateSchema':{
+                    method: 'PUT',
+                    url: restPath += 'schema'
                 }
             });
      });

@@ -1,5 +1,5 @@
 angular.module('discipline')
-    .controller('newDisciplinaryNoteDialogController', function ($scope, $state, $mdDialog, $mdpDatePicker, toastService, StudentsService, DisciplineService, globalService) {
+    .controller('newDisciplinaryNoteDialogController', function ($scope, $state, $q, $mdDialog, $mdpDatePicker, toastService, StudentsService, DisciplineService, globalService) {
 
         var vm = this;
 
@@ -15,16 +15,25 @@ angular.module('discipline')
         vm.disciplinaryNote.dateTime = new Date();
         vm.thereAreStudents = false;
 
+        // To control when all data from serve is received and must be stopped the spinner.
+        vm.dataIsReady = false;
+
         ///////////////////////////////////////////////////////////
         function activate() {
-            console.log('Activating newDisciplinaryNoteDialogController controller.')
+            console.log('Activating newDisciplinaryNoteDialogController controller.');
 
-            // List of student formated to be used in md-autocomplete.
+            var promises = [];
+
+            var deferredA = $q.defer();
+            promises.push(deferredA.promise);
+            var deferredB = $q.defer();
+            promises.push(deferredB.promise);
+
+
+            // List of student formatted to be used in md-autocomplete.
             vm.studentsList = StudentsService.query({}, function () {
                 console.log('StudentsList received');
-                console.log(vm.studentsList);
                 if (vm.studentsList.length >0){
-                    vm.thereAreStudents = true;
 
                 // Transform the list (adding a field called 'value' to be used in the search process).
                 vm.studentsList = vm.studentsList.map(function (student) {
@@ -32,21 +41,51 @@ angular.module('discipline')
                         if (student.surname)
                             student.value += ' ' + student.surname.toLowerCase();
                         return student;
-
                     }
                 );
+                deferredA.resolve('Success getting students list.');
+                }else{
+                    vm.errorMsg = 'Algun problema extrayendo la lista de estudiantes';
+                    deferredA.reject(vm.errorMsg);
                 }
 
-                console.log(vm.studentsList);
 
 
             }, function (error) {
-                console.log('Any problem found when was retrieved the students list.');
-                console.log(error);
-            })
+                deferredA.reject('Any problem found when was retrieved the students list.', error);
+            });
+
+
+
+
+            // Schema with data that must be selected to send the form and must be received before.
+            vm.dnSchema = DisciplineService.getSchema(function () {
+                deferredB.resolve('Success getting disciplinary notes schema');
+            }, function(error){
+                console.log('Any problem found when was retrieved disciplinary note schema.', error);
+                deferredB.reject('Any problem found when was retrieved disciplinary note schema.', error);
+            });
+
+
+
+
+            $q.all(promises).then(
+                function(value){
+                    console.log('Resolving all promises, SUCCESS,  value: ', value);
+                    vm.dataIsReady = true;
+
+                    // It deleted old promises for next iteration (if it exists)
+                    promises = [];
+
+                },function(reason){
+                    console.log('Resolving all promises, FAIL, reason: ', reason);
+                    vm.dataIsReady = false;
+                }
+            );
 
 
         }
+
 
         // Function to close the dialog
         function closeDialog() {
@@ -68,7 +107,6 @@ angular.module('discipline')
 
             vm.disciplinaryNote.dateTime = new_format;
 
-            console.log(vm.disciplinaryNote.dateTime);
 
             vm.disciplinaryNote.$save(
                 function () { // Success
@@ -79,8 +117,7 @@ angular.module('discipline')
                 },
                 function (error) { // Fail
                     toastService.showToast('Error al guardar el parte disciplinario.');
-                    console.log('Error while disciplinary note is saved.')
-                    console.log(error)
+                    console.log('Error while disciplinary note is saved.', error)
                 });
 
         }
@@ -117,6 +154,8 @@ angular.module('discipline')
             return nameSurname;
 
         }
+
+
 
 
         vm.items = ['Urgente al Tutor de los implicados.',

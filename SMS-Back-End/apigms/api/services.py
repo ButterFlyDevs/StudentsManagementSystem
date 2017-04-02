@@ -61,13 +61,18 @@ class CRUD(object):
 
         :param service: The name of the service (used for google services auto discovering).
         :param resource: The url segment of the service.
-        :param id: The id of the request item.
+        :param id: The id of the request item. **CAN BE NONE TO SINGLETON RESOURCES**
         :param json: The payload where are the data to put in a dict format.
         :return: Exactly the same response of the service.
         """
-        response = requests.put(
-            url='http://{}/{}/{}'.format(modules.get_hostname(module=service),resource, id),
-            json=json)
+
+        # For singleton resources.
+        url = 'http://{}/{}'.format(modules.get_hostname(module=service), resource)
+
+        if id:
+            url += '/{}'.format(id)
+
+        response = requests.put(url=url, json=json)
         response.headers['Access-Control-Allow-Origin'] = "*"
         return make_response(response.content, response.status_code)
 

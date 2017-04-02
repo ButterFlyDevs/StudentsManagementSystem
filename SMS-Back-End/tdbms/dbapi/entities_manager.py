@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import datetime
+from datetime import datetime
 import pytz
 
 import db_params
@@ -167,12 +167,21 @@ class EntitiesManager:
         if v:
             print colored(locals(), 'blue')
 
+
         return_dic = {}
 
-        now = datetime.datetime.utcnow()
+        # Datetime adjusts
+
+        # Adjusting the right format to the datetime which data is saved.
+        now = datetime.utcnow()
         tz = pytz.timezone('Europe/Madrid')
         tzoffset = tz.utcoffset(now)
         mynow = now + tzoffset
+
+        # Adjusting the right format to the data object that is received form request.
+        if data.get('birthdate', None):
+            data['birthdate'] = datetime.strptime(data['birthdate'], '%Y-%m-%dT%H:%M:%S.%fZ')
+            print colored(type(data['birthdate']), 'blue')
 
         control_fields = {'createdBy': 1, 'createdAt': mynow, 'deleted': 0}
 

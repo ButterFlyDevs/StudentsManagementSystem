@@ -61,9 +61,6 @@ def process_response(response):
     :return:
     """
 
-    print 'In process response'
-    print response
-
     """
     Function to build a response with sense.
     :param self:
@@ -207,18 +204,11 @@ def post_entity(kind):
         abort(400)  # Bad request.
 
     else:
-        for key, value in received_json.iteritems():
-            if type(value) is not int and type(value) is not list: # Because we accept a list of associationIds in enrollment resource.
-                received_json[key] = value.encode('utf-8')
-
-    # When are really saved data in database
-
-
-    # Special multiple enrollment checking:
-    if 'associationsIds' in received_json:
-        return process_response(EntitiesManager.multiple_enrollment(kind, received_json))
-    else:
-        return process_response(EntitiesManager.post(kind, received_json))
+        # Special multiple enrollment checking:
+        if 'associationsIds' in received_json:
+            return process_response(EntitiesManager.multiple_enrollment(kind, received_json))
+        else:
+            return process_response(EntitiesManager.post(kind, received_json))
 
 
 @app.route('/entities/<string:kind>', methods=['GET'])  # Si pedimos todas las entidades de un tipo

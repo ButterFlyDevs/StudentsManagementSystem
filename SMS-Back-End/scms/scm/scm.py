@@ -59,9 +59,6 @@ def get_item_from_tdbms(kind, id, params):
         'time': '{} sec'.format((time_after-time_before).total_seconds())
     }
 
-    print colored(info, 'red', 'on_grey')
-
-
     status = response.status_code
 
     if status == 200:
@@ -194,7 +191,7 @@ class AttendanceControlsManager(object):
                         student_info = get_item_from_tdbms('student',
                                                            student['studentId'], ['name', 'surname', 'profileImageUrl'])
                         del (student['studentId'])
-                        student['student'] = student_info
+                        student.update(student_info)
 
                         populated_students.append(student)
 
@@ -487,8 +484,6 @@ class MarksManager(object):
         # If mark has the required format:
         if cls.validate_mark(mark):
 
-            print colored('Posted mark')
-            print colored(mark, 'red')
 
             # Is created the object
             enrollment = mark['enrollment']
@@ -531,8 +526,6 @@ class MarksManager(object):
 
             if cls.validate_mark(received_mark):
 
-                print colored('Posted mark')
-                print colored(received_mark, 'red')
 
                 # Is created the object
                 enrollment = received_mark['enrollment']
@@ -595,8 +588,8 @@ class DisciplinaryNotesManager(object):
         """
         Validate the format of item based of data store model.
 
-        :param disciplinary_note: Item dict.
-        :return: True if format is ok and false in other hand.
+        :param disciplinary_note: data block, dict.
+        :return: True if format is ok and false in other hand, boolean.
         """
         # TODO: Implement.
         return True
@@ -769,3 +762,42 @@ class DisciplinaryNotesManager(object):
 
         else:  # If it doesn't exists:
             return {'status': 404, 'data': None, 'log': 'Disciplinary Note required seem like doesn\'t exists or was deleted.'}
+
+    @classmethod
+    def cru_dn_schema(cls, schema, action):
+        """
+        Do all functionality about schemas (all together because is very simple).
+        :param schema: Dict, data block to work with it.
+        :param action: String, action (HTTP verb) to realise with the singleton shema
+        in the database.
+        :return: Standard info dict (without data, only status code)
+        """
+
+        if action == 'GET' and not schema:
+            dn_options_saved = DNOptions.get_by_id('dn_options_saved')
+            if not dn_options_saved:
+                DNOptions.get_or_insert('dn_options_saved',
+                                        kinds=[OptionItem(id=1, meaning='Tipo base')],
+                                        gravities=[OptionItem(id=1, meaning='Gravedad base')])
+                dn_options_saved = DNOptions.get_by_id('dn_options_saved')
+            return {'status': 200, 'data': dn_options_saved.to_dict(), 'log': None }
+
+        if action == 'PUT' and schema:
+
+            kinds = []
+            gravities = []
+            for kind in schema['kinds']:
+                kinds.append(OptionItem(id=kind['id'], meaning=kind['meaning']))
+
+            for gravity in schema['gravities']:
+                gravities.append(OptionItem(id=gravity['id'], meaning=gravity['meaning']))
+
+            dn_options_saved = DNOptions.get_or_insert('dn_options_saved')
+
+            dn_options_saved.kinds = kinds
+            dn_options_saved.gravities = gravities
+            dn_options_saved.modifiedAt = time_now()
+
+            dn_options_saved.put()
+
+            return {'status': 200, 'data': dn_options_saved.to_dict(), 'log': None}

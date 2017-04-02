@@ -96,6 +96,42 @@ class TestClass(object):
 
         sleep(0.5)
 
+
+class TestClassOptions(object):
+
+    scenarios = [scenario2, scenario1]
+
+    def test_get_initial_options(self, port):
+        """
+        $ pytest scms_api_rest_disciplinary_notes_segment_test.py::TestClassOptions::test_get_options -vv -s 
+        """
+
+        url = 'http://localhost:{}/disciplinarynote/schema'.format(port)
+        result = requests.get(url)
+        assert result.status_code == 200
+
+    def test_update_options(self, port):
+        """
+        $ pytest scms_api_rest_disciplinary_notes_segment_test.py::TestClassOptions::test_get_options -vv -s 
+        """
+
+        url = 'http://localhost:{}/disciplinarynote/schema'.format(port)
+
+        data = {
+            'kinds': [
+                {'id': 1, 'meaning': 'Tipo 1'},
+                {'id': 2, 'meaning': 'Tipo 2'},
+                {'id': 3, 'meaning': 'Tipo 3'}
+            ],
+            'gravities': [
+                {'id': 1, 'meaning': 'Gravedad 1'},
+                {'id': 2, 'meaning': 'Gravedad 2'},
+                {'id': 3, 'meaning': 'Gravedad 3'},
+            ]
+        }
+        response = requests.put(url=url, json=data)
+        assert response.status_code == 200
+
     """
 
 

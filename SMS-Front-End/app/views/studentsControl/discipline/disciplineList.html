@@ -10,11 +10,11 @@
                 <md-tab label="GESTION">
                     <md-content class="md-padding">
 
-                                              <md-button ng-click="vm.openNewDisciplinaryNoteDialog()"
-                                                   class="md-primary md-raised">
-                                            <md-icon>add</md-icon>
-                                            Insertar
-                                        </md-button>
+                        <md-button ng-click="vm.openNewDisciplinaryNoteDialog()"
+                                   class="md-primary md-raised">
+                            <md-icon>add</md-icon>
+                            Insertar
+                        </md-button>
 
                         <md-card flex md-theme="{{ showDarkTheme ? 'dark-grey' : 'default' }}" md-theme-watch>
 
@@ -100,7 +100,7 @@
 
                                                 <!-- 3. Date -->
                                                 <td md-cell>
-                                                    {{ note.dateTime | date : 'EEEE  dd-LLLL-yyyy' }}
+                                                    {{ note.dateTime | date : 'EEEE dd-LLLL-yyyy' }}
                                                 </td>
 
                                                 <!-- 4. Gravity -->
@@ -110,8 +110,9 @@
 
                                                 <!-- 4. View details icon button -->
                                                 <td md-cell>
-                                                    <md-button ui-sref="disciplinaryNoteProfile({disciplinaryNoteId: note.disciplinaryNoteId})"
-                                                               class="md-fab md-mini md-primary">
+                                                    <md-button
+                                                            ui-sref="disciplinaryNoteProfile({disciplinaryNoteId: note.disciplinaryNoteId})"
+                                                            class="md-fab md-mini md-primary">
                                                         <md-icon>forward</md-icon>
                                                     </md-button>
 
@@ -163,6 +164,126 @@
                             erat, at posuere mi. Cras eu fermentum nunc. Sed id ante eu orci commodo volutpat non ac
                             est. Praesent ligula diam, congue eu enim scelerisque, finibus commodo lectus.</p>
                     </md-content>
+                </md-tab>
+                <md-tab id="tab4" md-on-select="vm.loadSettings()" md-active="true">
+                    <md-tab-label>
+                        <md-icon>settings</md-icon>
+                    </md-tab-label>
+                    <md-tab-body>
+
+
+                        <div layout="row" flex>
+                            <!--
+                            <div flex>
+                                <md-icon>more_vert</md-icon>
+                                <h3 class="md-headline">Gravedad</h3>
+
+                                <md-list-item class="md-3-line" ng-repeat="gravity in vm.dnSchema.gravities"
+                                              ng-click="null">
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ gravity.meaning}}</h3>
+                                    </div>
+                                    <md-icon ng-click="doSecondaryAction($event)" aria-label="Send Email"
+                                             class="md-secondary md-hue-3">clear
+                                    </md-icon>
+                                    <md-divider></md-divider>
+                                </md-list-item>
+                            </div>
+                            -->
+                            <div flex>
+
+                                <md-menu>
+
+                                    <md-button aria-label="Open phone interactions menu"
+                                               class="md-icon-button"
+                                               ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                        <md-icon md-menu-origin>more_vert</md-icon>
+                                    </md-button>
+
+                                    <md-menu-content width="4">
+
+                                        <md-menu-item>
+                                            <md-button
+                                                    ng-disabled="vm.modificationStatus"
+                                                    ng-click="vm.modValues()">
+                                                <md-icon>cached</md-icon>
+                                                Modificar
+                                            </md-button>
+                                        </md-menu-item>
+                                        <md-menu-item>
+                                            <md-button
+                                                    ng-disabled="true"
+                                                    ng-click="vm.showDeleteMarkConfirm()">
+                                                <md-icon>delete</md-icon>
+                                                Eliminar
+                                            </md-button>
+                                        </md-menu-item>
+
+                                    </md-menu-content>
+
+                                </md-menu>
+
+                                <h3 class="md-headline">Tipos</h3>
+
+                                <md-list-item class="md-3-line" ng-repeat="kind in vm.dnSchema.kinds" ng-click="null">
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ kind.meaning}}</h3>
+                                        <md-icon
+                                                ng-click="vm.openNewItemDialog('kind', 'update', kind)"
+                                                aria-label="Update type"
+                                                ng-if="vm.modificationStatus"
+                                                class="md-secondary md-hue-3">
+                                            mode_edit
+                                        </md-icon>
+                                        <md-icon
+                                                ng-click="vm.deleteOption('kind',kind)"
+                                                aria-label="Eliminar opción."
+                                                ng-if="vm.modificationStatus"
+                                                class="md-secondary md-hue-3">
+                                            clear
+                                        </md-icon>
+                                    </div>
+                                    <md-divider></md-divider>
+                                </md-list-item>
+
+                                <md-button
+                                        ng-if="vm.modificationStatus"
+                                        title="Añadir nuevo tipo"
+                                        ng-click="vm.openNewItemDialog('kind', 'create')"
+                                        class="md-icon-button">
+                                    <md-icon>add</md-icon>
+                                </md-button>
+
+
+                            </div>
+
+                        </div>
+
+                        <!-- Options in edition mode -->
+                        <div layout="row"
+                             flex flex="70"
+                             layout-align="center"
+                             ng-if="vm.modificationStatus">
+
+                            <md-button
+                                    title="Cancelar"
+                                    ng-click="vm.cancelModValues()"
+                                    class="md-icon-button md-accent">
+                                <md-icon>cancel</md-icon>
+                            </md-button>
+
+                            <md-button
+                                    title="Guardar cambios"
+                                    ng-click="vm.updateOptions()"
+                                    ng-disabled="!vm.updateButtonEnable"
+                                    class="md-icon-button md-primary">
+                                <md-icon>save</md-icon>
+                            </md-button>
+
+                        </div>
+
+
+                    </md-tab-body>
                 </md-tab>
             </md-tabs>
 
