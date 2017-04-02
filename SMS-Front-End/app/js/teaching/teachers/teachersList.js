@@ -16,6 +16,7 @@ angular.module('teachers')
             console.log('Activating teachersListController controller.')
             vm.teachersList = TeachersService.query({}, function () {
                 vm.dataIsReady = true;
+                console.log(vm.teachersList)
             }, function (error) {
                 console.log('Any problem found when was retrieved the teachers list.');
                 console.log(error);

@@ -6,7 +6,7 @@ angular.module('students')
         vm.defaultAvatar = globalService.defaultAvatar;
         vm.openNewStudentDialog = openNewStudentDialog;
 
-        // To control the loading spinner.
+        // To control the loading spinner while de data is loading.
         vm.dataIsReady = false;
 
         activate();

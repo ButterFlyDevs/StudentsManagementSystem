@@ -1,0 +1,153 @@
+<md-dialog ng-cloak>
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>Nuevo parte disciplinario</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="vm.closeDialog()">
+                    <md-icon>close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content>
+
+        <!-- 1/3. In the normal case. -->
+        <div class="md-dialog-content" ng-if="vm.dataIsReady">
+            <form name="vm.newDisciplinaryNoteForm">
+
+                <div layout="column">
+
+                    <div flex>
+                        <span class="md-body-2  ">Estudiante: </span>
+                        <md-divider></md-divider>
+                        <br>
+                        <!-- Student autocomplete -->
+                        <md-autocomplete
+                                md-no-cache="vm.noCache"
+                                md-selected-item="vm.studentSelected"
+                                md-search-text-change="vm.searchTextChange(vm.studentSearchText)"
+                                md-search-text="vm.studentSearchText"
+                                md-selected-item-change="vm.selectedItemChange(item)"
+                                md-items="item in vm.itemQuerySearch(vm.studentdSearchText)"
+                                md-item-text="vm.itemToString(item)"
+                                md-min-length="0"
+                                placeholder="Buscador"
+                                md-menu-class="autocomplete-custom-template">
+
+                            <md-item-template>
+                              <span>
+                                  <!--
+                                <div ng-switch="item.profileImageUrl || '_undefined_'">
+                                    <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
+                                    <img ng-switch-default class="img-profile" src="{{ item.profileImageUrl }}">
+                                </div>-->
+                                <img class="img-profile" src="{{ vm.defaultAvatar }}">
+                                <span> {{item.name}}  {{item.surname}}</span>
+
+                              </span>
+                            </md-item-template>
+
+                        </md-autocomplete>
+                    </div>
+
+                    <div flex>
+                        <br>
+                        <span class="md-body-2  ">¿Dónde y cuándo? </span>
+                        <md-divider></md-divider>
+
+                        <!-- Place -->
+                        <md-input-container flex="100">
+                            <md-icon style="color:gray;">location_on</md-icon>
+                            <label layout="">Lugar</label>
+                            <input ng-model="vm.disciplinaryNote.place" required>
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row">
+                        <mdp-date-picker mdp-open-on-click required name="dateFormat"
+                                         mdp-placeholder="Fecha"
+                                         mdp-format="DD/MM/YYYY"
+                                         ng-model="vm.disciplinaryNote.dateTime  "
+                                         mdp-max-date=vm.disciplinaryNote.dateTime>
+                            <div ng-messages="demoForm.dateFormat.$error">
+                                <div ng-message="required">This is required</div>
+                                <div ng-message="format">Invalid format</div>
+                            </div>
+                        </mdp-date-picker>
+                        <mdp-time-picker mdp-auto-switch="true"
+                                         ng-model="vm.disciplinaryNote.dateTime   "></mdp-time-picker>
+                    </div>
+
+                    <span class="md-body-2  ">Detalles </span>
+                    <md-divider></md-divider>
+
+                </div>
+
+                <!-- Kind and gravity -->
+                <div layout="row">
+                    <br>
+                    <md-input-container flex>
+                        <!-- Kind -->
+                        <md-input-container flex>
+                            <label>Tipo</label>
+                            <md-select ng-model="vm.kindSelected" required>
+                                <md-option ng-repeat="kind in vm.dnSchema.kinds"
+                                           value="{{kind.code}}">
+                                    {{kind.meaning}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <!-- Gravity -->
+                        <md-input-container flex>
+                            <label>Gravedad</label>
+                            <md-select ng-model="vm.gravitySelected" required>
+                                <md-option ng-repeat="gravity in vm.dnSchema.gravities"
+                                           value="{{gravity.code}}">
+                                    {{gravity.code}}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                    </md-input-container>
+                </div>
+
+                <!-- Description -->
+                <div layout layout-sm="row">
+                    <md-input-container flex>
+                        <label layout="">Descripcion de los hechos</label>
+                        <textarea ng-model="vm.disciplinaryNote.description" required></textarea>
+                    </md-input-container>
+                </div>
+
+
+            </form>
+        </div>
+
+        <!-- 2/3. When data isn't loaded yet. -->
+        <div ng-if="!vm.dataIsReady">
+            <spinner></spinner>
+        </div>
+
+        <!-- 3/3. When an error appear. -->
+        <div ng-if="vm.errorMsg">
+            {{ vm.errorMsg }}
+        </div>
+
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+        <span flex></span>
+        <md-button class="" ng-click="vm.closeDialog()">
+            Cancelar
+        </md-button>
+
+        <md-button class="md-primary md-raised" ng-disabled="vm.newDisciplinaryNoteForm.$invalid"
+                   ng-click="vm.saveDisciplinaryNote()"
+                   style="margin-right:20px;">
+            Guardar
+        </md-button>
+    </md-dialog-actions>
+
+
+</md-dialog>

@@ -53,6 +53,7 @@ angular.module('subjects')
                 function () {
                     vm.dataIsReady = true;
                     vm.teachingDataIsReady = true;
+                    console.log(vm.subjectTeaching);
                 }, function (error) {
                     console.log('Get subject teaching process fail.');
                     console.log(error);
@@ -155,6 +156,7 @@ angular.module('subjects')
 
                 $scope.subjectModelHasChanged = false;
 
+                // To make possible the changes detections pre-saved item to avoid or allow the save action.
                 $scope.$watch('vm.subject', function (newValue, oldValue) {
                     if (newValue != oldValue) {
                         $scope.subjectModelHasChanged = !angular.equals(vm.subject, vm.subjectOriginalCopy);
@@ -174,12 +176,20 @@ angular.module('subjects')
 
         }
 
+        /**
+         * Enable all fields to can change attributes of item.
+         */
         function modValues() {
             vm.editValuesEnabled = true;
         }
 
+        /**
+         * Cancel all mods over the subject attributes.
+         */
         function cancelModValues() {
+            // Do all fields not editables.
             vm.editValuesEnabled = false;
+            // Back to previous state without new request:
             vm.subject = angular.copy(vm.subjectOriginalCopy);
         }
 

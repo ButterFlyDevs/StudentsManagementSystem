@@ -1,0 +1,10 @@
+{
+    "studentId": 5,
+    "teacherId": 42,
+    "classId": 3,
+    "subjectId": 21,
+    "dateTime": "2000-12-03 10:30",
+    "kind": 1,
+    "gravity": 5,
+    "description": "A little problem with new boy. María"
+}

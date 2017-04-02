@@ -12,6 +12,7 @@ angular.module('subjects')
             vm.subject =  new SubjectsService();
 
 
+
             ///////////////////////////////////////////////////////////
             function activate() {
                 console.log('Activating newSubjectDialogController controller.')

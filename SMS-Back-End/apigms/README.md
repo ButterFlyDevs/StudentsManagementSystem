@@ -10,5 +10,3 @@ of microservicios, to doing see at UI only one.
 
 This configuration is based in [API Gateway](http://microservices.io/patterns/apigateway.html) software design pattern.
 
-
-![](apigateway.png)

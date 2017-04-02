@@ -1,0 +1,19 @@
+application: 65748238734626
+module: scms
+version: uno
+runtime: python27
+env: flex
+api_version: 1
+threadsafe: true
+
+automatic_scaling:
+  min_idle_instances: 2
+  max_pending_latency: 10s
+
+handlers:
+- url: /.*
+  script: api.scms_api_rest.app
+
+
+
+

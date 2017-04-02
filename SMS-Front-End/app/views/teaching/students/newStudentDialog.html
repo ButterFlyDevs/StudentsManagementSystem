@@ -41,14 +41,14 @@
 
                         <md-input-container flex>
                             <label layout="">Nombre</label>
-                            <input ng-model="vm.student.data.name" required>
+                            <input ng-model="vm.student.name" required>
                         </md-input-container>
                     </div>
 
                     <div layout layout-sm="row">
                         <md-input-container flex>
                             <label layout="">Apellidos</label>
-                            <input ng-model="vm.student.data.surname" required>
+                            <input ng-model="vm.student.surname" required>
                         </md-input-container>
 
                     </div>
@@ -59,7 +59,7 @@
                         <md-input-container flex>
                             <md-icon style="color:gray;">location_on</md-icon>
                             <label layout="">Dirección</label>
-                            <input ng-model="vm.student.data.address" required>
+                            <input ng-model="vm.student.address" required>
                         </md-input-container>
                     </div>
 
@@ -67,12 +67,12 @@
 
                         <md-input-container flex="50">
                             <label layout="">Provincia</label>
-                            <input ng-model="vm.student.data.province" required>
+                            <input ng-model="vm.student.province" required>
                         </md-input-container>
 
                         <md-input-container flex="50">
                             <label layout="">Localidad</label>
-                            <input ng-model="vm.student.data.locality" required>
+                            <input ng-model="vm.student.locality" required>
                         </md-input-container>
 
                     </div>
@@ -82,7 +82,7 @@
 
                         <md-input-container flex="50">
                             <md-datepicker
-                                    ng-model="vm.student.data.birthdate"
+                                    ng-model="vm.student.birthdate"
                                     md-placeholder="Fecha de nacimiento">
                             </md-datepicker>
                         </md-input-container>
@@ -90,7 +90,7 @@
                         <md-input-container flex="50">
                             <md-icon style="color:gray;">phone</md-icon>
                             <label layout="">Teléfono</label>
-                            <input ng-model="vm.student.data.phone" required>
+                            <input ng-model="vm.student.phone" required>
                         </md-input-container>
 
                     </div>
@@ -100,14 +100,14 @@
                         <md-input-container flex>
                             <md-icon style="color:gray;">email</md-icon>
                             <label layout="">Email</label>
-                            <input ng-model="vm.student.data.email" type="email">
+                            <input ng-model="vm.student.email" type="email">
                         </md-input-container>
                     </div>
 
                     <div layout layout-sm="column">
                         <md-input-container flex="50">
                             <label layout="">Dni</label>
-                            <input ng-model="vm.student.data.dni">
+                            <input ng-model="vm.student.dni">
                         </md-input-container>
                     </div>
 

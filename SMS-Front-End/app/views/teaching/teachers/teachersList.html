@@ -62,14 +62,15 @@
                     </md-card-title>
                 </md-toolbar>
 
+
                 <!-- Teachers list table -->
-                <md-table-container>
+                <md-table-container >
 
                     <table md-table md-progress="vm.promise">
                         <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
                         <tr md-row>
-                            <th md-column><span>Imagen</span></th>
-                            <th md-column md-order-by="name"><span>Nombre</span></th>
+                            <th md-column><span>Profesor</span></th>
+                            <th md-column md-order-by="name"><span></span></th>
                             <th md-column><span>Perfil</span></th>
                         </tr>
                         </thead>
@@ -82,9 +83,9 @@
                             <!-- 1. User profile image -->
                             <td md-cell>
 
-                                <div ng-switch="item.img || '_undefined_'">
+                                <div ng-switch="item.profileImageUrl || '_undefined_'">
                                     <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
-                                    <img ng-switch-default class="img-profile" src="{{ item.img }}">
+                                    <img ng-switch-default class="img-profile" src="{{ item.profileImageUrl }}">
                                 </div>
 
 

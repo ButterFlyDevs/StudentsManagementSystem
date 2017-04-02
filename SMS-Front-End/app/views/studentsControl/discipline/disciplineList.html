@@ -1,0 +1,293 @@
+<div flex ng-controller="disciplineController as vm">
+
+    <div layout="row" layout-align="center" ng-cloak>
+        <div flex="90" layout-padding>
+
+
+            <span class="md-headline">Disciplina</span>
+
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="GESTION">
+                    <md-content class="md-padding">
+
+                        <md-button ng-click="vm.openNewDisciplinaryNoteDialog()"
+                                   class="md-primary md-raised">
+                            <md-icon>add</md-icon>
+                            Insertar
+                        </md-button>
+
+                        <md-card flex md-theme="{{ showDarkTheme ? 'dark-grey' : 'default' }}" md-theme-watch>
+
+
+                            <md-card-content>
+
+                                <div layout-margin layout-padding ng-if="vm.disciplinaryNotes.length == 0">
+
+                                    <p class="md-headline"> Aún no se ha registrado ningun parte disciplinario.</p>
+                                    <h3 class="md-subhead"> ¿Desea insertar uno? </h3>
+
+                                </div>
+
+                                <div ng-if="vm.disciplinaryNotes.length > 0">
+
+
+                                    <md-toolbar class="md-table-toolbar md-default">
+
+                                        <!-- search -->
+                                        <md-card-title>
+                                            <md-card-title-text>
+
+                                                <md-input-container>
+                                                    <md-icon>search</md-icon>
+                                                    <!-- layout="" to avoid parent layout -->
+                                                    <label layout="">"Buscar"</label>
+                                                    <input type="text" ng-model="vm.query">
+                                                </md-input-container>
+
+
+                                            </md-card-title-text>
+                                        </md-card-title>
+                                    </md-toolbar>
+
+                                    <!-- Disciplinary Notes list table -->
+                                    <md-table-container>
+
+                                        <table md-table md-progress="vm.promise">
+                                            <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
+                                            <tr md-row>
+                                                <th md-column><span>Estudiante</span></th>
+                                                <th md-column md-order-by="name"><span>Profesor</span></th>
+                                                <th md-column>Fecha</th>
+                                                <th md-column>Gravedad</th>
+                                                <th md-column>Detalles</th>
+                                            </tr>
+                                            </thead>
+
+                                            <tbody md-body>
+
+                                            <!-- Where we iterate through items list -->
+                                            <tr md-row ng-repeat="note in vm.disciplinaryNotes">
+
+                                                <!-- 1. Student info -->
+                                                <td md-cell>
+
+                                                    <div ng-switch="note.student.urlProfilePic || '_undefined_'">
+                                                        <img ng-switch-when="_undefined_" class="img-profile"
+                                                             src="{{ vm.defaultAvatar }}">
+                                                        <img ng-switch-default class="img-profile"
+                                                             src="{{ note.student.urlProfilePic }}">
+                                                    </div>
+
+                                                    {{ note.student.name }}
+                                                    {{ note.student.surname }}
+
+
+                                                </td>
+
+                                                <!-- 2. Teacher info -->
+                                                <td md-cell>
+                                                    <div ng-switch="note.teacher.urlProfilePic || '_undefined_'">
+                                                        <img ng-switch-when="_undefined_" class="img-profile"
+                                                             src="{{ vm.defaultAvatar }}">
+                                                        <img ng-switch-default class="img-profile"
+                                                             src="{{ note.teacher.urlProfilePic }}">
+                                                    </div>
+
+                                                    {{ note.teacher.name }}
+                                                    {{ note.teacher.surname }}
+
+                                                </td>
+
+                                                <!-- 3. Date -->
+                                                <td md-cell>
+                                                    {{ note.dateTime | date : 'EEEE dd-LLLL-yyyy' }}
+                                                </td>
+
+                                                <!-- 4. Gravity -->
+                                                <td md-cell>
+                                                    {{ note.gravity }}
+                                                </td>
+
+                                                <!-- 4. View details icon button -->
+                                                <td md-cell>
+                                                    <md-button
+                                                            ui-sref="disciplinaryNoteProfile({disciplinaryNoteId: note.disciplinaryNoteId})"
+                                                            class="md-fab md-mini md-primary">
+                                                        <md-icon>forward</md-icon>
+                                                    </md-button>
+
+                                                </td>
+
+                                            </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </md-table-container>
+
+                                </div>
+
+                            </md-card-content>
+
+
+                        </md-card>
+
+
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue.
+                            Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales
+                            pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies
+                            mi.</p>
+
+
+                    </md-content>
+                </md-tab>
+                <md-tab label="INFORMES">
+                    <md-content class="md-padding">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue.
+                            Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales
+                            pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies
+                            mi. Aliquam erat volutpat. Nam placerat, tortor in ultrices porttitor, orci enim rutrum
+                            enim, vel tempor sapien arcu a tellus. Vivamus convallis sodales ante varius gravida.
+                            Curabitur a purus vel augue ultrices ultricies id a nisl. Nullam malesuada consequat diam, a
+                            facilisis tortor volutpat et. Sed urna dolor, aliquet vitae posuere vulputate, euismod ac
+                            lorem. Sed felis risus, pulvinar at interdum quis, vehicula sed odio. Phasellus in enim
+                            venenatis, iaculis tortor eu, bibendum ante. Donec ac tellus dictum neque volutpat blandit.
+                            Praesent efficitur faucibus risus, ac auctor purus porttitor vitae. Phasellus ornare dui nec
+                            orci posuere, nec luctus mauris semper.</p>
+                        <p>Morbi viverra, ante vel aliquet tincidunt, leo dolor pharetra quam, at semper massa orci nec
+                            magna. Donec posuere nec sapien sed laoreet. Etiam cursus nunc in condimentum facilisis.
+                            Etiam in tempor tortor. Vivamus faucibus egestas enim, at convallis diam pulvinar vel. Cras
+                            ac orci eget nisi maximus cursus. Nunc urna libero, viverra sit amet nisl at, hendrerit
+                            tempor turpis. Maecenas facilisis convallis mi vel tempor. Nullam vitae nunc leo. Cras sed
+                            nisl consectetur, rhoncus sapien sit amet, tempus sapien.</p>
+                        <p>Integer turpis erat, porttitor vitae mi faucibus, laoreet interdum tellus. Curabitur posuere
+                            molestie dictum. Morbi eget congue risus, quis rhoncus quam. Suspendisse vitae hendrerit
+                            erat, at posuere mi. Cras eu fermentum nunc. Sed id ante eu orci commodo volutpat non ac
+                            est. Praesent ligula diam, congue eu enim scelerisque, finibus commodo lectus.</p>
+                    </md-content>
+                </md-tab>
+                <md-tab id="tab4" md-on-select="vm.loadSettings()" md-active="true">
+                    <md-tab-label>
+                        <md-icon>settings</md-icon>
+                    </md-tab-label>
+                    <md-tab-body>
+
+
+                        <div layout="row" flex>
+                            <!--
+                            <div flex>
+                                <md-icon>more_vert</md-icon>
+                                <h3 class="md-headline">Gravedad</h3>
+
+                                <md-list-item class="md-3-line" ng-repeat="gravity in vm.dnSchema.gravities"
+                                              ng-click="null">
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ gravity.meaning}}</h3>
+                                    </div>
+                                    <md-icon ng-click="doSecondaryAction($event)" aria-label="Send Email"
+                                             class="md-secondary md-hue-3">clear
+                                    </md-icon>
+                                    <md-divider></md-divider>
+                                </md-list-item>
+                            </div>
+                            -->
+                            <div flex>
+
+                                <md-menu>
+
+                                    <md-button aria-label="Open phone interactions menu"
+                                               class="md-icon-button"
+                                               ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                        <md-icon md-menu-origin>more_vert</md-icon>
+                                    </md-button>
+
+                                    <md-menu-content width="4">
+
+                                        <md-menu-item>
+                                            <md-button
+                                                    ng-disabled="vm.modificationStatus"
+                                                    ng-click="vm.modValues()">
+                                                <md-icon>cached</md-icon>
+                                                Modificar
+                                            </md-button>
+                                        </md-menu-item>
+                                        <md-menu-item>
+                                            <md-button
+                                                    ng-disabled="true"
+                                                    ng-click="vm.showDeleteMarkConfirm()">
+                                                <md-icon>delete</md-icon>
+                                                Eliminar
+                                            </md-button>
+                                        </md-menu-item>
+
+                                    </md-menu-content>
+
+                                </md-menu>
+
+                                <h3 class="md-headline">Tipos</h3>
+
+                                <md-list-item class="md-3-line" ng-repeat="kind in vm.dnSchema.kinds" ng-click="null">
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ kind.meaning}}</h3>
+                                        <md-icon
+                                                ng-click="vm.openNewItemDialog('kind', 'update', kind)"
+                                                aria-label="Update type"
+                                                ng-if="vm.modificationStatus"
+                                                class="md-secondary md-hue-3">
+                                            mode_edit
+                                        </md-icon>
+                                        <md-icon
+                                                ng-click="vm.deleteOption('kind',kind)"
+                                                aria-label="Eliminar opción."
+                                                ng-if="vm.modificationStatus"
+                                                class="md-secondary md-hue-3">
+                                            clear
+                                        </md-icon>
+                                    </div>
+                                    <md-divider></md-divider>
+                                </md-list-item>
+
+                                <md-button
+                                        ng-if="vm.modificationStatus"
+                                        title="Añadir nuevo tipo"
+                                        ng-click="vm.openNewItemDialog('kind', 'create')"
+                                        class="md-icon-button">
+                                    <md-icon>add</md-icon>
+                                </md-button>
+
+
+                            </div>
+
+                        </div>
+
+                        <!-- Options in edition mode -->
+                        <div layout="row"
+                             flex flex="70"
+                             layout-align="center"
+                             ng-if="vm.modificationStatus">
+
+                            <md-button
+                                    title="Cancelar"
+                                    ng-click="vm.cancelModValues()"
+                                    class="md-icon-button md-accent">
+                                <md-icon>cancel</md-icon>
+                            </md-button>
+
+                            <md-button
+                                    title="Guardar cambios"
+                                    ng-click="vm.updateOptions()"
+                                    ng-disabled="!vm.updateButtonEnable"
+                                    class="md-icon-button md-primary">
+                                <md-icon>save</md-icon>
+                            </md-button>
+
+                        </div>
+
+
+                    </md-tab-body>
+                </md-tab>
+            </md-tabs>
+
+
+        </div>
+
+

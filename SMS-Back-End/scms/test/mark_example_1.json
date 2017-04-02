@@ -1,0 +1,17 @@
+{
+  "studentId": 5,
+  "enrollment": {
+    "enrollmentId": 42,
+    "classId":4,
+    "subjectId": 5,
+    "teacherId": 8
+  },
+  "marks":{
+    "preFirstEv": 3,
+    "firstEv": 5,
+    "preSecondEv": 8,
+    "secondEv": 9,
+    "thirdEv": 10,
+    "final": 104
+  }
+}

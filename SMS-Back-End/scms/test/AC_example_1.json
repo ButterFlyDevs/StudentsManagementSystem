@@ -1,0 +1,28 @@
+{
+  "students": [
+    {
+      "control": {
+        "delay": 0,
+        "assistance": true,
+        "uniform": true,
+        "justifiedDelay": true
+      },
+      "studentId": 2
+    },
+    {
+      "control": {
+        "delay": 0,
+        "assistance": true,
+        "uniform": true,
+        "justifiedDelay": true
+      },
+      "studentId": 1
+    }
+  ],
+  "teacherId": 1,
+  "association": {
+    "associationId": 1,
+    "classId": 1,
+    "subjectId": 1
+  }
+}
