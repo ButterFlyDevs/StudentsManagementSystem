@@ -69,49 +69,24 @@ This is the section of API that manage the resources related with this kind of o
 /disciplinarynote/schema
 
     **GET**
-    
+
     Return the schema with data necesary to buil the form in the UI to make a disciplinary note.
-    
+
     Example:
-        
+
     >>> curl -i -X GET localhost:8003/disciplinarynote/schema
-    
+
     {
         "gravities": [
-            {
-                "code": 1,
-                "meaning": 1
-            },
-            {
-                "code": 2,
-                "meaning": 2
-            },
-            {
-                "code": 3,
-                "meaning": 3
-            },
-            {
-                "code": 4,
-                "meaning": 4
-            },
-            {
-                "code": 5,
-                "meaning": 5
-            }
+            {"code": 1,"meaning": "mild"},
+            {"code": 2,"meaning": "low"},
+            {"code": 3,"meaning": "medium"},
+            {"code": 4,"meaning": "high"}
         ],
         "kinds": [
-            {
-                "code": 1,
-                "meaning": "Acoso"
-            },
-            {
-                "code": 2,
-                "meaning": "Falta de respeto"
-            },
-            {
-                "code": 2,
-                "meaning": "Violencia de genero"
-            }
+            {"code": 1, "meaning": "Bullying"},
+            {"code": 2, "meaning": "Disrespect"},
+            {"code": 2,"meaning": "Gender violence"}
         ]
     }
 

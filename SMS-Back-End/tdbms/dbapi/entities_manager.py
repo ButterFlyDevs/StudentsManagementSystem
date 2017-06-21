@@ -437,7 +437,8 @@ class EntitiesManager:
         """
 
         return_dic = {}
-
+        # For example:
+        # kind = class, entity_id = 293, optional_nested_kind = student, onk_entity_id = 2934
         if kind in ['class', 'subject'] and entity_id != 0 and optional_nested_kind == 'student' and onk_entity_id != 0:
             data_block = cls.get_related(kind='student', entity_id=onk_entity_id, related_kind='teaching', internal_call=True)
             data_block = data_block.get('data',None)
@@ -475,7 +476,7 @@ class EntitiesManager:
 
 
         else:
-            # Los parámetros no son los correctos.
+            # Params are no correct.
             print 'ERROR'
 
     @classmethod
@@ -1016,4 +1017,3 @@ class EntitiesManager:
     def test(cls):
         return_data_block = sql_executor('SHOW TABLES;')
         return return_data_block
-

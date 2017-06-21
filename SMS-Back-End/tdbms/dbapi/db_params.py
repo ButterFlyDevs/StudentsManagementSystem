@@ -6,23 +6,23 @@ variables de conexión con la BD en el entorno de desarrollo y se define la func
 usan todas los subficheros de la API para conectarse con la base de datos.
 '''
 
-#Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
+# Doc here: http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
 import MySQLdb, MySQLdb.cursors
 
 import os
 
-#Variables de conexión de la BD en local
-host='localhost'
-user='root'
-password='root'
-db='sms'
+# Local DB connection vars.
+host = 'localhost'
+user = 'root'
+password = 'root'
+db = 'sms'
 
-#Variables de conexión a la instancia de Cloud SQL en producción, a partir de un fichero externo.
-#El fichero tiene el siguiente contenido: _INTANCE_NAME='your-project-id:your-instance-name'
+# Variables de conexión a la instancia de Cloud SQL en producción, a partir de un fichero externo.
+# El fichero tiene el siguiente contenido: _INTANCE_NAME='your-project-id:your-instance-name'
 import productionCloudSQLInstanceINFO as psqlinfo
 
 
-#Método de conexión, que se define de forma que sirva tanto en entorno DEV como en PRODUCCIÓN.
+# Método de conexión, que se define de forma que sirva tanto en entorno DEV como en PRODUCCIÓN.
 def conecta():
 
     if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine/'):

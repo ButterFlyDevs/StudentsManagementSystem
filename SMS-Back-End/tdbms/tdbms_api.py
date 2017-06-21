@@ -151,7 +151,6 @@ def test_mysql():
 #   Resources about entities    #
 #################################
 
-
 @app.route('/entities/<string:kind>', methods=['POST'])
 def post_entity(kind):
     """
@@ -210,20 +209,23 @@ def post_entity(kind):
         else:
             return process_response(EntitiesManager.post(kind, received_json))
 
-
-@app.route('/entities/<string:kind>', methods=['GET'])  # Si pedimos todas las entidades de un tipo
-@app.route('/entities/<string:kind>/<int:entity_id>', methods=['GET']) #Si pedimos una entidad concreta de un tipo
+@app.route('/entities/<string:kind>', methods=['GET'])
+@app.route('/entities/<string:kind>/<int:entity_id>', methods=['GET'])
 def get_entities(kind, entity_id=None):
     """
-    Retrieve info about entities, a list of all of them with all info or specific params or all data from one.
+    Retrieve items. A list of element of a kind or a specific item (given by id)
+    from a specific kind of item.
 
     Example of use:
-    Mode 1: all
-    curl  -i -X GET localhost:8002/entities/student  -> All items of student list with all data
-    Mode 2: all with params:
-    curl  -i -X GET localhost:8002/entities/student?params=name, surname  -> Only params sent from all students
-    Mode 3: only one
-    curl  -i -X GET  localhost:8002/entities/student/1  -> All data from student with id = 1
+        Mode 1: all
+            /entities/student
+            All items of student list with all data
+        Mode 2: all with params:
+            /entities/student?params=name, surname
+            Only params sent from all students.
+        Mode 3: only one:
+            entities/student/1
+            All data from student with id = 1
     """
     sleep(1)
     return process_response(EntitiesManager.get(kind, entity_id, request.args.get('params', None)))
@@ -232,27 +234,15 @@ def get_entities(kind, entity_id=None):
 @app.route('/entities/<string:kind>/<int:entity_id>', methods=['PUT'])
 def put_entities(kind, entity_id):
     """
-    UPDATE an entity in the data base of microService.
-
-    curl -H "Content-Type: application/json" -X PUT -d '{ "name": "NombreModificado" }' localhost:8002/entities/teacher/1
-
-
-
-    When we put a item on tdbms there are a metadata params that are saved too, in all cases in the inserction it are:
-    itemId, createdAt and createdBy.
-
-    We pass data into a dict
-
+    Update an item of specific kind.
+    Example of use, with curl:
+        curl -H "Content-Type: application/json" -X PUT -d '{ "name": "NombreModificado" }' localhost:8002/entities/teacher/1
     """
 
     raw_data = request.get_json()
 
     print colored('dbms.apigms_api.update_entities', 'green')
     print colored(request.headers, 'green')
-
-    app.logger.info('hi')
-
-    print colored(raw_data, 'red')
 
     if raw_data is None:
         abort(400) # Bad request.
@@ -268,11 +258,18 @@ def put_entities(kind, entity_id):
 @app.route('/entities/<string:kind>/<int:entity_id>/<string:optional_nested_kind>/<int:onk_entity_id>', methods=['DELETE'])
 def delete_entity(kind, entity_id, optional_nested_kind = None, onk_entity_id = None):
     """
-    curl  -i -X  DELETE localhost:8002/entities/subject/1
-    curl  -i -X  DELETE localhost:8002/entities/subject/1?action=dd
+    Delete an item of a specific kind and if you want relation with the rest of items. Nested deletings.
+    Examples of use:
+        DELETE entities/subject/1
+            Delete a subject with id 1
+        DELETE entities/subject/1/student/2
+            Delete the student 2 form subject 1 (only the relation)
+        DELETE entities/subject/1?action=dd
+            Delete a item with all their dependencies. (dd = delete dependencies)
     """
 
     # When we want delete a student from a all class in which is enrollment or in all subjects.
+    # /subject/
     if kind in ['class', 'subject'] and optional_nested_kind is not None and onk_entity_id is not None:
         response = EntitiesManager.nested_delete(kind, entity_id, optional_nested_kind, onk_entity_id)
     else:
@@ -287,28 +284,19 @@ def delete_entity(kind, entity_id, optional_nested_kind = None, onk_entity_id = 
 @app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>', methods=['GET'])
 @app.route('/entities/<string:kind>/<int:entity_id>/<string:related_kind>/<int:rk_entity_id>/<string:subrelated_kind>', methods=['GET'])
 def get_related_entities(kind, entity_id, related_kind, rk_entity_id=None, subrelated_kind=None):
-
     """
-    curl -i -X GET localhost:8002/entities/student/1/teacher
-
-    Mode 2: all with params:
-    curl  -i -X GET localhost:8002/entities/class/2/student?params=name, surname  -> Only params sent from all students
-
-    curl -X GET localhost:8002/entities/teacher/4/imparts | python -mjson.tool
-
+    To retrieve related kind of item from a specific item of a kind.
+    Example of use:
+        GET /entities/student/1/teacher
+        GET /entities/class/2/student?params=name, surname
+        GET/entities/teacher/4/imparts
     """
-    print locals()
-
-    #from time import sleep
-    #sleep(4)
     return process_response(EntitiesManager.get_related(kind=kind,
                                                         entity_id=entity_id,
                                                         related_kind=related_kind,
                                                         rk_entity_id=rk_entity_id,
                                                         subrelated_kind=subrelated_kind,
                                                         params=request.args.get('params', None)))
-
-
 
 
 @app.route('/entities/<string:kind>/<int:entity_id>/report', methods=['GET'])
@@ -323,4 +311,3 @@ if __name__ == '__main__':
     handler.setLevel(logging.INFO)
     app.logger.addHandler(handler)
     app.run(debug=True)
-

@@ -70,3 +70,6 @@ provisioner/aprovisionadorDatosEjemplo.sh
 provisioner/aprovisionadorDatosEjemplo.sh~
 provisioner/aprovisionadorDatosEjemploOld.sh
 provisioner/imagenes/
+venv
+*.tar.gz
+*.swp
