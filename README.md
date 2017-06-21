@@ -1,9 +1,10 @@
-![](docs/source/img/sms.png)
 
 ![License](http://img.shields.io/badge/license-GPLv3-blue.svg)
 ![Status](https://img.shields.io/badge/status-pre--alpha-red.svg)
 ![coverage](https://img.shields.io/badge/coverage-10%25-orange.svg)
 ![last release](https://img.shields.io/badge/last%20release-v0.1--pre--alpha-yellow.svg)
+
+![](docs/source/img/sms.png)
 
 #### What is **SMS**?
 
@@ -22,6 +23,8 @@ But anyway if you want deploy it in another place you will need make some change
 
 The design is based on microservices, splitting the logic work in few little services running in their own domain, all independent of the rest but with a close communication based on API REST.
 Basic idea bhind it is to can have the perfect space to work to each section of app, with the best language, database and pattern that her domain require.
+
+![](docs/source/img/GAE_final_architecture.png)
 
 In spite of this, this approach give the way to adjust the hardware requirements better for any service in each situation, being able to scal each one independently when the system have more users, trying to adjust the cost of the hardarware to the minimun, **thinked and developed to be deployed in the cloud**.
 
