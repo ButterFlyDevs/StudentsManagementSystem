@@ -1,0 +1,32 @@
+[
+  {
+    "class": {
+      "classId": 7,
+      "course": 1,
+      "word": "A",
+      "level": "ESO"
+    },
+    "subjects": [
+      {
+        "name": "Matemáticas",
+        "subjectId": 1,
+        "enrollmentId": 5
+      },
+      {
+        "name": "Calculo",
+        "subjectId": 2,
+        "enrollmentId": 53
+      },
+      {
+        "name": "Geografia",
+        "subjectId": 4,
+        "enrollmentId": 142
+      },
+      {
+        "name": "Historia",
+        "subjectId": 1,
+        "enrollmentId": 59
+      }
+    ]
+  }
+]

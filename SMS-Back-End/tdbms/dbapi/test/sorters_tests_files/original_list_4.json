@@ -1,0 +1,118 @@
+[
+  {
+    "subjectName": "Lengua",
+    "teacherId": 10,
+    "impartId": 60,
+    "teacherName": "Jose Carlos",
+    "associationId": 1,
+    "subjectId": 2
+  },
+  {
+    "subjectName": "Matemáticas",
+    "teacherId": 3,
+    "impartId": 7,
+    "teacherName": "Margarita",
+    "associationId": 11,
+    "subjectId": 1
+  },
+  {
+    "subjectName": "Matemáticas",
+    "teacherId": 10,
+    "impartId": 40,
+    "teacherName": "Jose Carlos",
+    "associationId": 11,
+    "subjectId": 1
+  },
+  {
+    "subjectName": "Matemáticas",
+    "teacherId": 14,
+    "impartId": 51,
+    "teacherName": "Felix",
+    "associationId": 11,
+    "subjectId": 1
+  },
+  {
+    "subjectName": "Matemáticas",
+    "teacherId": 6,
+    "impartId": 68,
+    "teacherName": "Enrique",
+    "associationId": 11,
+    "subjectId": 1
+  },
+  {
+    "subjectName": "Matemáticas",
+    "teacherId": 15,
+    "impartId": 90,
+    "teacherName": "Carmen",
+    "associationId": 11,
+    "subjectId": 1
+  },
+  {
+    "subjectName": "Música",
+    "teacherId": 7,
+    "impartId": 14,
+    "teacherName": "Santiago",
+    "associationId": 16,
+    "subjectId": 6
+  },
+  {
+    "subjectName": "Música",
+    "teacherId": 4,
+    "impartId": 52,
+    "teacherName": "Blanca",
+    "associationId": 16,
+    "subjectId": 6
+  },
+  {
+    "subjectName": "Sociales",
+    "teacherId": 3,
+    "impartId": 16,
+    "teacherName": "Margarita",
+    "associationId": 25,
+    "subjectId": 4
+  },
+  {
+    "subjectName": "Sociales",
+    "teacherId": 8,
+    "impartId": 44,
+    "teacherName": "Lorena",
+    "associationId": 25,
+    "subjectId": 4
+  },
+  {
+    "subjectName": "Sociales",
+    "teacherId": 16,
+    "impartId": 59,
+    "teacherName": "Esther",
+    "associationId": 25,
+    "subjectId": 4
+  },
+  {
+    "subjectName": "Sociales",
+    "teacherId": 2,
+    "impartId": 64,
+    "teacherName": "Francisco Javier",
+    "associationId": 25,
+    "subjectId": 4
+  },
+  {
+    "subjectName": "Lengua",
+    "associationId": 1,
+    "subjectId": 2
+  },
+  {
+    "subjectName": "Matemáticas",
+    "associationId": 11,
+    "subjectId": 1
+  },
+  {
+    "subjectName": "Música",
+    "associationId": 16,
+    "subjectId": 6
+  },
+  {
+    "subjectName": "Sociales",
+    "associationId": 25,
+    "subjectId": 4
+  }
+]

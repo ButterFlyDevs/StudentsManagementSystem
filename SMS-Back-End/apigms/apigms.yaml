@@ -1,0 +1,30 @@
+# This file specifies your Python application's runtime configuration
+# including URL routing, versions, static file uploads, etc. See
+# https://developers.google.com/appengine/docs/python/config/appconfig
+# for details.
+
+# TODO: Enter your application id below. If you have signed up
+# using cloud.google.com/console use the "project id" for your application
+# id.
+application: 65748238734626
+module: default
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+automatic_scaling:
+  min_idle_instances: 2
+  max_pending_latency: 10s
+
+# Handlers tell App Engine how to route requests to your application.
+handlers:
+
+- url: /.*
+  script: api.apigms_api.app
+
+libraries:
+# The pycrypto library is used for OAuth 2, and is also a requirement for
+# APIs that wish to authenticate users.
+- name: pycrypto
+  version: latest

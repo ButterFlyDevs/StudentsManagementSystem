@@ -1,0 +1,29 @@
+{
+  "association": {
+    "associationId": 13,
+    "class": {
+      "classId": 283,
+      "classWord": "A",
+      "classCourse": 2,
+      "classLevel": "Elementary"
+    },
+    "subject": {
+      "subjectId": 24,
+      "subjectName": "Pruebas"
+    }
+  },
+  "teacher": {
+    "teacherId": 213,
+    "teacherName": "teacherName",
+    "teacherSurname": "teacherSurname",
+    "teacherImgProfile": "www.google.es"
+  },
+  "students": [
+    {
+      "studentId": 581,
+      "studentName": "SuperName",
+      "studentSurname": "Surname",
+      "studentImgProfile": "www.google.es"
+    }
+  ]
+}

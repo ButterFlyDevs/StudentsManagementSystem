@@ -1,0 +1,124 @@
+<md-dialog ng-cloak>
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2><md-icon>add</md-icon>Nuevo Profesor</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="vm.closeDialog()">
+                <md-icon>close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content>
+        <div class="md-dialog-content">
+            <form name="newTeacherForm">
+
+
+                    <!-- First column, with a image inside. -->
+                    <div flex layout="column" layout-align="center center">
+                        <div ng-switch="vm.user.img || '_undefined_'">
+                                        <img ng-switch-when="_undefined_" class="img-profile-big" src="{{ vm.defaultAvatar }}">
+                                        <img ng-switch-default class="img-profile-big"  src="{{ vm.user.img }}">
+                                    </div>
+
+                        <div layout="row">
+                            <md-button class="md-primary md-fab md-mini" aria-label="Update photo">
+                                <md-icon>replay</md-icon>
+                            </md-button>
+
+                            <md-button class="md-primary md-fab md-mini" aria-label="Remove photo">
+                                <md-icon>delete</md-icon>
+                            </md-button>
+                        </div>
+
+                    </div>
+
+
+                    <div layout layout-sm="row">
+
+                        <md-input-container flex>
+                            <label layout="">Nombre</label>
+                            <input ng-model="vm.teacher.name" required>
+                        </md-input-container>
+                    </div>
+
+                    <div layout layout-sm="row">
+                        <md-input-container flex>
+                            <label layout="">Apellidos</label>
+                            <input ng-model="vm.teacher.surname" required>
+                        </md-input-container>
+
+                    </div>
+
+                    <div layout layout-sm="column">
+                        <md-input-container flex>
+                            <md-icon style="color:gray;">location_on</md-icon>
+                            <label layout="">Dirección</label>
+                            <input ng-model="vm.teacher.address" required>
+                        </md-input-container>
+                    </div>
+
+                    <div layout layout-sm="row">
+
+                        <md-input-container flex="50">
+                            <label layout="">Provincia</label>
+                            <input ng-model="vm.teacher.province" required>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <label layout="">Localidad</label>
+                            <input ng-model="vm.teacher.locality" required>
+                        </md-input-container>
+
+                    </div>
+
+                    <div layout layout-sm="row">
+
+                        <md-input-container flex="50">
+                            <md-datepicker
+                                    ng-model="vm.teacher.birthdate"
+                                    md-placeholder="Fecha de nacimiento">
+                            </md-datepicker>
+                        </md-input-container>
+
+                        <md-input-container flex="50">
+                            <md-icon style="color:gray;">phone</md-icon>
+                            <label layout="">Teléfono</label>
+                            <input ng-model="vm.teacher.phone" required>
+                        </md-input-container>
+
+                    </div>
+
+                    <div layout layout-sm="column">
+                        <md-input-container flex>
+                            <md-icon style="color:gray;">email</md-icon>
+                            <label layout="">Email</label>
+                            <input ng-model="vm.teacher.email" type="email">
+                        </md-input-container>
+                    </div>
+
+                    <div layout layout-sm="column">
+                        <md-input-container flex="50">
+                            <label layout="">Dni</label>
+                            <input ng-model="vm.teacher.dni">
+                        </md-input-container>
+                    </div>
+
+            </form>
+        </div>
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+        <span flex></span>
+        <md-button class="" ng-click="vm.closeDialog()">
+            Cancelar
+        </md-button>
+        <md-button class="md-primary md-raised" ng-disabled="newTeacherForm.$invalid" ng-click="vm.saveTeacher()"
+                   style="margin-right:20px;">
+            Guardar
+        </md-button>
+    </md-dialog-actions>
+
+
+</md-dialog>

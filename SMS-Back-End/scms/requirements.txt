@@ -1,0 +1,19 @@
+# This file install all requirements that python needs in this micro service to run in isolate mode.
+#
+# Run 'pip install -r requirements.txt -t lib/' to install dependencies in lib/ folder.
+#
+# Note: The `lib` directory is added to `sys.path` by `appengine_config.py`.
+Flask==0.10
+Flask-Testing>=0.4.1
+flask-cors
+unittest2>=0.5
+jsonpickle
+termcolor
+pytz
+requests
+requests-toolbelt
+
+# For data science
+#scipy
+#numpy
+pandas

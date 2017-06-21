@@ -1,0 +1,38 @@
+[
+  {
+    "classId": 7,
+    "course": 1,
+    "word": "A",
+    "level": "ESO",
+    "name": "Matemáticas",
+    "subjectId": 1,
+    "enrollmentId": 5
+  },
+  {
+    "classId": 7,
+    "course": 1,
+    "word": "A",
+    "level": "ESO",
+    "name": "Calculo",
+    "subjectId": 2,
+    "enrollmentId": 53
+  },
+  {
+    "classId": 7,
+    "course": 1,
+    "word": "A",
+    "level": "ESO",
+    "name": "Geografia",
+    "subjectId": 4,
+    "enrollmentId": 142
+  },
+  {
+    "classId": 7,
+    "course": 1,
+    "word": "A",
+    "level": "ESO",
+    "name": "Historia",
+    "subjectId": 1,
+    "enrollmentId": 59
+  }
+]

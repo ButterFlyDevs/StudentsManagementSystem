@@ -1,0 +1,53 @@
+[
+  {
+    "subject": {
+      "subjectId": 1,
+      "name": "Matem\u00e1ticas"
+    },
+    "classes": [
+      {
+        "classId": 7,
+        "course": 2,
+        "word": "A",
+        "level": "Bachillerato",
+        "impartId": 5
+      },
+      {
+        "classId": 8,
+        "course": 2,
+        "word": "B",
+        "level": "Bachillerato",
+        "impartId": 44
+      },
+      {
+        "classId": 1,
+        "course": 1,
+        "word": "A",
+        "level": "ESO",
+        "impartId": 141
+      }
+    ]
+  },
+  {
+    "subject": {
+      "subjectId": 7,
+      "name": "Franc\u00e9s"
+    },
+    "classes": [
+      {
+        "classId": 4,
+        "course": 1,
+        "word": "B",
+        "level": "Bachillerato",
+        "impartId": 154
+      },
+      {
+        "classId": 8,
+        "course": 2,
+        "word": "B",
+        "level": "Bachillerato",
+        "impartId": 186
+      }
+    ]
+  }
+]

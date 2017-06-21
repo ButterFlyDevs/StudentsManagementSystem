@@ -1,0 +1,335 @@
+<md-dialog ng-cloak>
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>
+                <!-- IT'S ABOUT CLASS -->
+                <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'subject' ">
+                    Añadir asignatura
+                </div>
+                <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'teacher' ">
+                    Añadir profesor
+                </div>
+                <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'student' ">
+                    Añadir estudiante
+                </div>
+
+                <!-- IT'S ABOUT SUBJECT -->
+                <div ng-if="vm.itsAboutSubject && vm.itemTypeToAdd == 'class' ">
+                    Añadir grupo
+                </div>
+                <div ng-if="vm.itsAboutSubject && vm.itemTypeToAdd == 'teacher' ">
+                    Añadir profesor
+                </div>
+                <div ng-if="vm.itsAboutSubject && vm.itemTypeToAdd == 'student' ">
+                    Añadir estudiante
+                </div>
+
+                <!-- IT'S ABOUT TEACHER -->
+                <div ng-if="vm.itsAboutTeacher && vm.itemTypeToAdd == 'subject' ">
+                    Añadir asignatura
+                </div>
+                <div ng-if="vm.itsAboutTeacher && vm.itemTypeToAdd == 'class' ">
+                    Añadir grupo
+                </div>
+
+                <!-- IT'S ABOUT STUDENT -->
+                <div ng-if="vm.itsAboutStudent && vm.itemTypeToAdd == 'class-subject' ">
+                    Añadir matrícula
+                </div>
+                <div ng-if="vm.itsAboutStudent && vm.itemTypeToAdd == 'subject' ">
+                    Añadir asignatura
+                </div>
+
+            </h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="vm.closeDialog()">
+                <md-icon>close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content>
+        <div class="md-dialog-content">
+
+            <div ng-if="vm.itsAboutTeacher && vm.itemTypeToAdd == 'subject'">
+
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Asignatura</label>
+                    <md-select ng-model="vm.subjectSelected"
+                               ng-change="vm.checkSelectedItem(vm.subjectSelected, vm.classSelected)">
+                        <md-option
+                                ng-repeat="item in vm.subjectsList"
+                                value="{{item.subjectId}}">
+                            {{item.name}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Grupo</label>
+                    <md-select ng-model="vm.classSelected"
+                               ng-change="vm.checkSelectedItem(vm.subjectSelected, vm.classSelected)">
+                        <md-option
+                                ng-repeat="item in vm.classesList"
+                                value="{{item.classId}}">
+                            {{item.course}}º
+                            {{item.word}}
+                            {{item.level}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+            <div ng-if="vm.itsAboutTeacher && vm.itemTypeToAdd == 'class'">
+
+                <!-- CLASS -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Grupo</label>
+                    <md-select ng-model="vm.classSelected"
+                               ng-change="vm.checkSelectedItem(vm.classSelected)">
+                        <md-option
+                                ng-repeat="item in vm.classesList"
+                                value="{{item.classId}}">
+                            {{item.course}}º {{item.word}} - {{item.level}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+
+            <div ng-if="vm.itsAboutStudent && vm.itemTypeToAdd == 'class-subject'">
+
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Asignatura</label>
+                    <md-select ng-model="vm.subjectSelected"
+                               ng-change="vm.checkSelectedItem(vm.subjectSelected, vm.classSelected)">
+                        <md-option
+                                ng-repeat="item in vm.subjectsList"
+                                value="{{item.subjectId}}">
+                            {{item.name}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Grupo</label>
+                    <md-select ng-model="vm.classSelected"
+                               ng-change="vm.checkSelectedItem(vm.subjectSelected, vm.classSelected)">
+                        <md-option
+                                ng-repeat="item in vm.classesList"
+                                value="{{item.classId}}">
+                            {{item.course}}º
+                            {{item.word}}
+                            {{item.level}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+
+            <div ng-if="vm.itsAboutSubject && vm.itemTypeToAdd == 'class'">
+
+                <!-- CLASS -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Grupo</label>
+                    <md-select ng-model="vm.classSelected"
+                               ng-change="vm.checkSelectedItem(vm.classSelected)">
+                        <md-option
+                                ng-repeat="item in vm.classesList"
+                                value="{{item.classId}}">
+                            {{item.course}}º {{item.word}} - {{item.level}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+            <div ng-if="vm.itsAboutSubject && vm.itemTypeToAdd == 'teacher'">
+
+                <!-- TEACHER -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Profesor</label>
+                    <md-select ng-model="vm.teacherSelected"
+                               ng-change="vm.checkSelectedItem(vm.teacherSelected)">
+                        <md-option
+                                ng-repeat="item in vm.teachersList"
+                                value="{{item.teacherId}}">
+                            {{item.name}} {{item.surname}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+            <div ng-if="vm.itsAboutSubject && vm.itemTypeToAdd == 'student' ">
+                <!-- Fields when the dialog is over CLASS PROFILE, inside of STUDENT
+                 VIEW and the process is add a new student to this class over a subject or over all. -->
+                <!-- CLASS -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Grupo</label>
+                    <md-select ng-model="vm.associationSelected"
+                               ng-change="vm.checkSelectedItem(vm.associationSelected, vm.studentSelected)">
+                        <md-option
+                                ng-repeat="item in vm.subjectTeaching"
+                                value="{{item.class.associationId}}">
+                            {{item.class.course}} {{item.class.word}} - {{item.class.level}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+
+                <!-- STUDENT -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Estudiante</label>
+                    <md-select ng-model="vm.studentSelected"
+                               ng-change="vm.checkSelectedItem(vm.associationSelected, vm.studentSelected)">
+                        <md-option
+                                ng-repeat="item in vm.studentsList"
+                                value="{{item.studentId}}">
+                            {{item.name}} {{item.surname}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+
+
+            <!-- Fields when the dialog is over CLASS PROFILE view and the process is add a new subject to this class. -->
+            <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'subject' ">
+
+                <!-- SUBJECT -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Asignatura</label>
+                    <md-select ng-model="vm.itemSelected"
+                               ng-change="vm.checkSelectedItem(vm.itemSelected)">
+                        <md-option
+                                ng-repeat="item in vm.subjectsList"
+                                value="{{item.subjectId}}">
+                            {{item.name}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+
+            <!-- Fields when the dialog is over CLASS PROFILE, inside of SUBJECT
+             VIEW and the process is add a new teacher to this subject inside a this class. -->
+            <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'teacher' ">
+
+                <!-- TEACHER -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Profesor</label>
+                    <md-select ng-model="vm.itemSelected"
+                               ng-change="vm.checkSelectedItem(vm.itemSelected)">
+                        <md-option
+                                ng-repeat="item in vm.teachersList"
+                                value="{{item.teacherId}}">
+                            {{item.name}} {{item.surname}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+
+            <!-- Fields when the dialog is over CLASS PROFILE, inside of STUDENT
+             VIEW and the process is add a new student to this class over a subject or over all. -->
+            <div ng-if="vm.itsAboutClass && vm.itemTypeToAdd == 'student' ">
+
+                <!-- SUBJECT -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Asignatura</label>
+                    <md-select ng-model="vm.associationSelected"
+                               ng-change="vm.checkSelectedItem(vm.associationSelected, vm.studentSelected)">
+                        <md-option value="0" ng-selected="true">Todas</md-option>
+                        <md-option
+                                ng-repeat="item in vm.classTeaching"
+                                value="{{item.subject.associationId}}">
+                            {{item.subject.subjectName}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+
+                <!-- STUDENT -->
+                <md-input-container class="md-block" flex-gt-sm>
+                    <label>Estudiante</label>
+                    <md-select ng-model="vm.studentSelected"
+                               ng-change="vm.checkSelectedItem(vm.associationSelected, vm.studentSelected)">
+                        <md-option
+                                ng-repeat="item in vm.studentsList"
+                                value="{{item.studentId}}">
+                            {{item.name}} {{item.surname}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+            </div>
+
+        </div>
+
+        <!-- MESSAGES and OPTIONS when is about teacher or student view -->
+
+        <div ng-if=" vm.itsAboutStudent">
+            <div ng-if="vm.associationRelationExists">
+                <p>La relación entre la asignatura y la clase no existe.</p>
+                ¿Deséa crearla al mismo tiempo que asignas a un profesor?
+                <md-checkbox ng-model="vm.createNewAssociationCheckboxValue"
+                             aria-label="Checkbox 1"
+                             ng-click="vm.addButtonEnable = !vm.createNewAssociationCheckboxValue">
+
+                </md-checkbox>
+
+            </div>
+
+            <div ng-if="vm.impartRelationExists">
+                <p>Este profesor ya imparte clase de esta asignatura a este grupo.</p>
+            </div>
+            <div ng-if="vm.enrollmentRelationExists">
+                <p>Este alumno ya está matriculado en esa asignatura y grupo.</p>
+            </div>
+        </div>
+
+        <!-- When the case is over SUBJECT view -->
+        <div ng-if="vm.itsAboutSubject">  <!-- All options -->
+
+            <div ng-if="vm.associationRelationExists && vm.teacherSelected == -1">
+                <p>Es necesario que seleccione un profesor.</p>
+            </div>
+
+            <div ng-if="vm.impartRelationExists">
+                <p>Esta relación ya existe.</p>
+            </div>
+
+        </div>
+
+
+        <!-- ITS ABOUT CLASS, SUBJECT or TEACHEr or Student -->
+        <div ng-if="vm.itsAboutClass || vm.itsAboutSubject || vm.itsAboutTeacher || vm.itsAboutStudent">
+            <div ng-if="vm.errorExists">
+                <!-- warn is red -->
+                <span md-colors="{color:'warn'}">{{vm.errorMessage}}</span>
+            </div>
+            <div ng-if="vm.infoExists">
+                <!-- primary is blue -->
+                <span md-colors="{color:'primary'}">{{vm.infoMessage}}</span>
+            </div>
+        </div>
+
+
+    </md-dialog-content>
+
+
+    <md-dialog-actions layout="row">
+
+        <span flex></span>
+
+        <md-button ng-click="vm.closeDialog()"> Cancelar</md-button>
+
+        <md-button ng-disabled="vm.errorExists"
+                   class="md-primary md-raised"
+                   style="margin-right:20px;"
+                   ng-click="vm.saveRelation()"> Añadir
+        </md-button>
+
+    </md-dialog-actions>
+
+</md-dialog>

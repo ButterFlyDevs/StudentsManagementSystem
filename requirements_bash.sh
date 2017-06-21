@@ -1,61 +1,70 @@
-echo -e "\033[32m \n\t ### SMS, un proyecto de \033[35m ButterFlyDevs \033[32m ### \033[0m"
-echo -e "\033[32m \n\t Gracias por contribuir \033[0m"
-
-echo "Preparando el entorno..."
-
-#Descargado el SDK de GAE
-
-echo -e "\n\033[32m 0.1 Instalando unzip \033[0m\n"
-sudo apt-get install -y unzip
-echo -e "\n\033[32m 0.2 Instalando curl \033[0m\n"
-sudo apt-get install -y curl
-echo -e "\n\033[31m 1. Descargando el SDK de Google App Engine \033[0m\n"
-curl -O https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.30.zip
-echo "Unzip SDK"
-unzip google_appengine_1.9.30.zip
-echo "Deleting .zip"
-rm google_appengine_1.9.30.zip
+#!/usr/bin/env bash
+echo -e "\033[32m \n\t ### SMS, a project of  \033[35m ButterFlyDevs \033[32m ### \033[0m"
+echo -e "\033[32m \n\t Thanks for contributing. \033[0m"
 
 
-#Instalación de MySQL de forma desatendida.
+echo -e "It will be installed a lot of required software.\n"
 
-echo -e "\n\033[31m 2. Instalando MySQL de forma desatendida \033[0m\n"
 
-sudo apt-get update
-sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
-sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
-sudo apt-get --force-yes -y install mysql-server
+read -p "Are you sure? [y/n]: " -n 1 -r
+echo    # (optional) move to a new line
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
 
-#Esto elimina todos los paquetes de mysql
-#sudo apt-get remove --purge mysql*
-#sudo apt-get autoremove
-#sudo apt-get autoclean
+    echo -e "\n\033[32m 1. Installing unzip \033[0m\n"
+    sudo apt-get install -y unzip
 
-echo -e "\033[31m"
-echo "Instalación MySQL finalizada:"
-mysql --version
-echo "Arrancando el demonio:"
-sudo /etc/init.d/mysql start
-echo -e "\033[0m"
+    echo -e "\n\033[32m 2. Installing curl \033[0m\n"
+    sudo apt-get install -y curl
 
-#Instalamos la librería de python
-echo -e "\n\033[31m 3. Instalando la librería de python para mysql \033[0m\n"
-sudo apt-get install -y python-mysqldb
+    echo -e "\n\033[31m 3. Downloading Google App Engine SDK v.1.9.30 \033[0m\n"
+    curl -O https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.30.zip
 
-#Instalando el gestor de paquetes de python.
-echo -e "\n\033[31m 4. Instaladon el gestor de paquetes de python \033[0m\n"
-sudo apt-get install -y python-pip
+    echo -e "\n\033[34m 4. Unzip SDK \033[0m\n"
+    unzip google_appengine_1.9.30.zip
 
-#Instalando dependencias de librerias de Python con pip
-echo -e "\n\033[32m Instalando dependencias de librerias de Python con pip \033[0m\n"
-echo -e "\n\033[32m Instalando dependencias del microservicio 1 \033[0m\n"
-sudo pip install -r SMS-Back-End/microservicio1/requirements.txt -t SMS-Back-End/microservicio1/lib/
+    echo -e "\n\033[34m 5. Deleting .zip \033[0m\n"
+    rm google_appengine_1.9.30.zip
 
-echo -e "\n\033[32m Instalando dependencias del microservicio 2 \033[0m\n"
-sudo pip install -r SMS-Back-End/microservicio2/requirements.txt -t SMS-Back-End/microservicio2/lib/
 
-echo -e "\n\033[32m Instalando dependencias del microservicio SCE \033[0m\n"
-sudo pip install -r SMS-Back-End/sce/requirements.txt -t SMS-Back-End/sce/lib/
-#Ayuda:
-echo "Si alguno de los paquetes no se ha instalado correctamente por favor inténtelo manualmente. Para conocer más
-información lea el fichero contributing.md, la sección [Entorno de desarrollo]."
+    echo -e "\n\033[31m 6. Instalando MySQL de forma desatendida \033[0m\n"
+
+    sudo apt-get update
+    sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
+    sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
+    sudo apt-get --force-yes -y install mysql-server
+
+    echo -e "\033[31m"
+    echo "MySQL installation finished"
+    mysql --version
+
+
+    echo -e "\n\033[31m 7. Installing python mysqldb library \033[0m\n"
+    sudo apt-get install -y python-mysqldb
+
+    echo -e "\n\033[31m 8. Installing python PIP packages manager \033[0m\n"
+    sudo apt-get install -y python-pip
+
+    echo -e "\n\033[32m ### Dependencies of MICROSERVICES ### \033[0m\n"
+
+    echo -e "\n\033[32m 9. Intalling  dependencies of API Gatewary micro Service using pip \033[0m\n"
+    sudo pip install -r SMS-Back-End/apigms/requirements.txt -t SMS-Back-End/apigms/lib/
+
+    echo -e "\n\033[32m 10. Intalling  dependencies of Teaching Data Base micro Service using pip \033[0m\n"
+    sudo pip install -r SMS-Back-End/tdbms/requirements.txt -t SMS-Back-End/tdbms/lib/
+
+    echo -e "\n\033[32m 11. Intalling  dependencies of Students Control micro Service using pip \033[0m\n"
+    sudo pip install -r SMS-Back-End/scms/requirements.txt -t SMS-Back-End/scms/lib/
+
+    # Info message:
+    echo "If any part of this automated proccess fail, please review requirementes_bash.sh to know more details about it."
+
+
+else
+
+    echo -e "\n\033[34m :( maybe in another moment \033[0m\n"
+
+fi
+
+
+

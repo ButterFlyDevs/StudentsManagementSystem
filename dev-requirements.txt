@@ -1,0 +1,4 @@
+# Developing requirements for python 2.7
+fabric
+requests
+

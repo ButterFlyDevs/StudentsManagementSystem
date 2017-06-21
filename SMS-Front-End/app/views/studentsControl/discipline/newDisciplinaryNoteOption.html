@@ -1,0 +1,37 @@
+<md-dialog ng-cloak>
+
+    <md-dialog-content>
+
+       <h2 class="md-headline">{{ vm.title }}</h2>
+       <span clas="md-subhead">{{ vm.subtitle}}</span>
+
+       <form name="newItemForm">
+
+      <md-input-container class="md-block">
+        <label>Tipo</label>
+        <input md-maxlength="20" required md-no-asterisk name="description" ng-model="vm.typeName">
+        <div ng-messages="projectForm.description.$error">
+          <div ng-message="required">El campo es necesario.</div>
+          <div ng-message="md-maxlength">No debe tener más de 20 caracteres.</div>
+        </div>
+      </md-input-container>
+       </form>
+
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+        <span flex></span>
+        <md-button class="" ng-click="vm.closeDialog()">
+            Cancelar
+        </md-button>
+
+        <md-button class="md-primary md-raised" ng-disabled="newItemForm.$invalid"
+                   ng-click="vm.saveOption()"
+                   style="margin-right:20px;">
+            <span ng-if="vm.mode == 'create'">Añadir</span>
+            <span ng-if="vm.mode == 'update'">Modificar</span>
+        </md-button>
+    </md-dialog-actions>
+
+
+</md-dialog>

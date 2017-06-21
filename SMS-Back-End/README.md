@@ -1,8 +1,14 @@
 ##SMS Back-End
 
-Conforma el conjunto de microservicios que forman el back end de la aplicación, que sigue el patrón [API Gateway](http://microservices.io/patterns/apigateway.html) y que están diseñados (de ahí la unión en esta carpeta) para desplegarse como una sola aplicación en *Google App Engine*  (allí módulos).
+It's the group of microservices that are part of SMS Back-End. We follow 
+API Gateway Microservices Architecture Pattern (see refs [A](http://microservices.io/patterns/apigateway.html) and [B](https://www.nginx.com/blog/building-microservices-using-an-api-gateway/))
+This is thinking 
 
-
+These are intended to be deployed in the same app in Google App Engine when each microservice is actually a "service".
 ![](backend.png)
 
-> Para lanzar todo el subsistema podemos ejecutar el script <code>run.sh</code>, que pone en ejecución cada servicio bajo el mismo sevidor de desarrollo asignando puertos de conexión específicos.
+
+
+> To run only the Back-End of app you can use fab with the option: 
+> To run functionality test of entire Back-End: 
+

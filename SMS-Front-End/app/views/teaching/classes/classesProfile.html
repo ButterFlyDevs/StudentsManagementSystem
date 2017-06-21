@@ -1,0 +1,506 @@
+<div flex ng-controller="classesProfileController as vm">
+
+
+    <div layout="row" layout-align="center" ng-cloak>
+        <div flex="90" layout-padding>
+            <div layout="row" layout-align="space-between start">
+                <md-button class="md-primary md-raised"
+                           ui-sref="classes">
+                    <md-icon>keyboard_arrow_left</md-icon>
+                    Atras
+                </md-button>
+            </div>
+
+
+            <div ng-if="!vm.dataIsReady">
+                <spinner></spinner>
+            </div>
+
+            <div ng-if="vm.dataIsReady">
+                <div ng-if="vm.class == null">
+                    Oups! Parece que este grupo no existe.
+                </div>
+
+                <md-card ng-if="vm.class != null" layout="column" layout-margin layout-padding>
+
+                    <!-- Class basic info section. -->
+
+                    <!-- We can see the layout like a row -->
+                    <div layout="row" flex flex="70" layout-align="center">
+                        <!-- Second column, with user data inside. -->
+                        <div flex="60" layout="column">
+                            <form name="userForm">
+                                <div layout layout-sm="column">
+                                    <md-input-container flex>
+                                        <label layout="">Curso</label>
+                                        <input
+                                                style="background-image:none;"
+                                                ng-model="vm.class.course"
+                                                required
+                                                ng-disabled="!vm.editValuesEnabled"
+                                                md-no-asterisk>
+                                    </md-input-container>
+                                    <md-input-container flex>
+                                        <label layout="">Grupo</label>
+                                        <input style="background-image:none;" ng-model="vm.class.word" required
+                                               ng-disabled="!vm.editValuesEnabled">
+                                    </md-input-container>
+                                    <md-input-container flex>
+                                        <label layout="">Nivel</label>
+                                        <input style="background-image:none;" ng-model="vm.class.level" required
+                                               ng-disabled="!vm.editValuesEnabled">
+                                    </md-input-container>
+                                    <md-input-container led flex ng-if="vm.class.description || vm.editValuesEnabled">
+                                        <label layout="">Descripcion</label>
+                                        <input style="background-image:none;" ng-model="vm.class.description"
+                                               ng-disabled="!vm.editValuesEnabled">
+                                    </md-input-container>
+                                </div>
+
+                            </form>
+
+                            <!-- Options in edition mode -->
+                            <div layout="row" flex flex="70" layout-align="center">
+
+                                <md-button
+                                        ng-show="vm.editValuesEnabled"
+                                        title="Cancelar"
+                                        ng-click="vm.cancelModValues()"
+                                        class="md-icon-button md-accent">
+                                    <md-icon>cancel</md-icon>
+                                </md-button>
+
+                                <md-button
+                                        ng-show="vm.editValuesEnabled"
+                                        title="Guardar cambios."
+                                        ng-disabled="!vm.updateButtonEnable"
+                                        ng-click="vm.updateClass()"
+                                        class="md-icon-button md-primary">
+                                    <md-icon>save</md-icon>
+                                </md-button>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <md-menu>
+
+                            <md-button aria-label="Open phone interactions menu"
+                                       class="md-icon-button"
+                                       ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                <md-icon md-menu-origin>more_vert</md-icon>
+                            </md-button>
+
+                            <md-menu-content width="4">
+
+                                <md-menu-item>
+                                    <md-button ng-click="vm.modValues()">
+                                        <md-icon>cached</md-icon>
+                                        Modificar
+                                    </md-button>
+                                </md-menu-item>
+
+                                <md-menu-item>
+                                    <md-button
+                                            ng-click="vm.showDeleteClassConfirm()">
+                                        <md-icon>delete</md-icon>
+                                        Eliminar grupo
+                                    </md-button>
+                                </md-menu-item>
+
+                                <md-menu-divider></md-menu-divider>
+
+                                <md-menu-item>
+                                    <md-button disabled="disabled"
+                                               ng-click="vm.showDeleteSubjectClassImpartConfirm(item.class.classId, teacher.teacherId)">
+                                        <md-icon>delete</md-icon>
+                                        Eliminar grupo
+                                    </md-button>
+                                </md-menu-item>
+
+                            </md-menu-content>
+
+                        </md-menu>
+
+
+                    </div>
+
+                    <!-- A line divisor -->
+                    <!-- <md-divider layout-margin></md-divider> -->
+
+
+                    <md-tabs md-dynamic-height md-border-bottom>
+
+                        <!-- SUBJECTS SECTION -->
+                        <md-tab label="Asignaturas" ng-click="vm.loadTeaching()">
+                            <md-content class="md-padding">
+
+                                <div ng-if="!vm.teachingDataIsReady">
+                                    <spinner></spinner>
+                                </div>
+
+                                <div ng-if="vm.teachingDataIsReady">
+                                    <div ng-repeat="item in vm.classTeaching">
+
+
+                                        <md-card>
+                                            <md-card-title>
+                                                <md-card-title-text>
+                                                    <span class="md-headline">{{ item.subject.subjectName }}</span>
+
+                                                </md-card-title-text>
+                                            </md-card-title>
+
+                                            <md-card-content>
+
+                                                <!-- If there aren't teachers -->
+                                                <div ng-if="item.teachers == undefined">
+                                                    <p>Aún no hay profesores que impartan esta asignatura en este
+                                                        grupo.</p>
+                                                </div>
+
+                                                <!-- If there are -->
+                                                <md-list class="md-dense">
+                                                    <md-list-item class="md-3-line" ng-repeat="teacher in item.teachers"
+                                                                  ng-click="null">
+                                                        <p>
+                                                        <div ng-switch="item.img || '_undefined_'">
+                                                            <img ng-switch-when="_undefined_" class="img-profile"
+                                                                 src="{{ vm.defaultAvatar }}">
+                                                            <img ng-switch-default class="img-profile"
+                                                                 src="{{ item.img }}">
+                                                        </div>
+
+                                                        {{ teacher.teacherName }} {{ teacher.teacherSurname }}</p>
+
+
+                                                        <md-menu>
+
+                                                            <md-button aria-label="Open phone interactions menu"
+                                                                       class="md-icon-button"
+                                                                       ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                                                <md-icon md-menu-origin>more_vert</md-icon>
+                                                            </md-button>
+
+                                                            <md-menu-content width="4">
+
+                                                                <md-menu-item>
+                                                                    <md-button
+                                                                            ui-sref="teachersProfile({teacherId: teacher.teacherId})">
+                                                                        <md-icon>list</md-icon>
+                                                                        Ver profesor
+                                                                    </md-button>
+                                                                </md-menu-item>
+
+                                                                <md-menu-item>
+                                                                    <md-button
+                                                                            ng-click="vm.showDeleteTeacherFromSubjectConfirm(teacher.impartId)">
+                                                                        <md-icon>delete</md-icon>
+                                                                        Eliminar profesor
+                                                                    </md-button>
+                                                                </md-menu-item>
+
+                                                                <md-menu-divider></md-menu-divider>
+
+                                                                <md-menu-item>
+                                                                    <md-button disabled="disabled"
+                                                                               ng-click="vm.showDeleteSubjectClassImpartConfirm(item.class.classId, teacher.teacherId)">
+                                                                        <md-icon>delete</md-icon>
+                                                                        Accion denegada
+                                                                    </md-button>
+                                                                </md-menu-item>
+
+                                                            </md-menu-content>
+
+                                                        </md-menu>
+
+
+                                                    </md-list-item>
+                                                </md-list>
+
+
+                                            </md-card-content>
+
+
+                                            <md-card-actions layout="row" layout-align="end center">
+
+                                                <md-menu>
+
+                                                    <md-button aria-label="Open phone interactions menu"
+                                                               class="md-icon-button"
+                                                               ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                                        <md-icon md-menu-origin>more_vert</md-icon>
+                                                    </md-button>
+
+                                                    <md-menu-content width="4">
+
+                                                        <md-menu-item>
+                                                            <md-button
+                                                                    ui-sref="subjectsProfile({subjectId: subject.subjectId})">
+                                                                <md-icon>list</md-icon>
+                                                                Ver asignatura
+                                                            </md-button>
+                                                        </md-menu-item>
+
+                                                        <md-menu-item>
+                                                            <!-- Call to addRelation to open this floating menu with teacher as type -->
+                                                            <md-button
+                                                                    ng-click="vm.addRelation('teacher', item.subject.associationId)">
+                                                                <md-icon>add</md-icon>
+                                                                Añadir profesor
+                                                            </md-button>
+                                                        </md-menu-item>
+
+                                                        <md-menu-item>
+                                                            <md-button
+                                                                    ng-click="vm.showDeleteSubjectConfirm(item.subject.associationId)">
+                                                                <md-icon>delete</md-icon>
+                                                                Eliminar asignatura
+                                                            </md-button>
+                                                        </md-menu-item>
+
+                                                    </md-menu-content>
+
+                                                </md-menu>
+                                            </md-card-actions>
+                                        </md-card>
+
+
+                                    </div>
+
+                                    <!-- Button to add a new subject to this group. -->
+                                    <div access='admin' layout="row">
+                                        <!-- Call to addRelation to open this floating menu with subject as type -->
+                                        <md-button class="md-primary md-raised" ng-click="vm.addRelation('subject')">
+                                            <md-icon>add</md-icon>
+                                            Añadir
+                                        </md-button>
+                                    </div>
+                                </div>
+                            </md-content>
+                        </md-tab>
+
+                        <!-- STUDENTS SECTION -->
+                        <md-tab label="Estudiantes" ng-click="vm.loadStudents()">
+                            <md-content class="md-padding">
+
+
+                                <md-input-container>
+                                    <label>Asignatura</label>
+                                    <md-select ng-model="vm.associationIdSelected"
+                                               ng-change="vm.loadStudents(vm.associationIdSelected)">
+                                        <md-option ng-value="null" ng-selected="true">Todas</md-option>
+                                        <md-option ng-repeat="object in vm.classTeaching"
+                                                   ng-value="object.subject.associationId">
+                                            {{object.subject.subjectName}}
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+
+
+                                <div ng-if="!vm.studentDataIsReady">
+                                    <spinner></spinner>
+                                </div>
+
+                                <div ng-if="vm.studentDataIsReady">
+
+                                    <div ng-if="vm.classStudents.length == 0">
+
+                                        <div ng-if="!vm.associationIdSelected">
+                                            <p>Aún no se ha matriculado a ningún estudiante en ninguna asignatura que se
+                                                imparta en este grupo.</p>
+                                            </p>¿Desea matricular uno en alguna asignatura?</p>
+                                        </div>
+
+                                        <div ng-if="vm.associationIdSelected">
+                                            <p>Aun no se ha matriculado a ningun estudiante en esta clase para esta
+                                                asignatura.</p>
+                                            <p>¿Desea matricular alguno ahora?</p>
+                                        </div>
+
+                                        <div access='admin' layout="row" layout-align="center" layout-margin>
+                                            <md-button ng-click="vm.addRelation('student', vm.associationIdSelected)"
+                                                       class="md-primary md-raised">
+                                                <md-icon>add</md-icon>
+                                                Matricular
+                                            </md-button>
+                                        </div>
+
+                                    </div>
+
+                                    <div ng-if="vm.classStudents.length > 0">
+
+                                        <!-- toolbar for the table -->
+                                        <md-toolbar class="md-table-toolbar md-default">
+
+                                            <!-- search -->
+                                            <md-card-title>
+                                                <md-card-title-text>
+
+                                                    <md-input-container>
+                                                        <md-icon>search</md-icon>
+                                                        <!-- layout="" to avoid parent layout -->
+                                                        <label layout="">"Buscar"</label>
+                                                        <input type="text" ng-model="vm.query">
+                                                    </md-input-container>
+
+
+                                                </md-card-title-text>
+                                            </md-card-title>
+                                        </md-toolbar>
+
+
+                                        <!-- Students list table -->
+                                        <md-table-container>
+
+                                            <table md-table md-progress="vm.promise">
+                                                <thead md-head md-order="vm.sortField" md-on-reorder="vm.onReorder">
+                                                <tr md-row>
+                                                    <th md-column><span>Imagen</span></th>
+                                                    <th md-column md-order-by="name"><span>Nombre</span></th>
+                                                    <th md-column><span></span></th>
+                                                </tr>
+                                                </thead>
+
+                                                <tbody md-body>
+
+                                                <!-- Where we iterate through items list -->
+                                                <tr md-row ng-repeat="item in vm.classStudents">
+
+                                                    <!-- 1. User profile image -->
+                                                    <td md-cell>
+
+                                                        <div ng-switch="item.img || '_undefined_'">
+                                                            <img ng-switch-when="_undefined_" class="img-profile"
+                                                                 src="{{ vm.defaultAvatar }}">
+                                                            <img ng-switch-default class="img-profile"
+                                                                 src="{{ item.img }}">
+                                                        </div>
+
+
+                                                    </td>
+
+                                                    <!-- 2. Name and surname -->
+                                                    <td md-cell>
+                                                        <span>{{ item.name }} {{ item.surname }}</span>
+                                                    </td>
+
+                                                    <!-- 3. Actions buttons. -->
+                                                    <td md-cell>
+
+                                                        <md-menu>
+
+                                                            <md-button aria-label="Open phone interactions menu"
+                                                                       class="md-icon-button"
+                                                                       ng-click="originatorEv = ev; $mdOpenMenu(ev);">
+                                                                <md-icon md-menu-origin>more_vert</md-icon>
+                                                            </md-button>
+
+                                                            <md-menu-content width="4">
+
+                                                                <md-menu-item>
+                                                                    <md-button
+                                                                            ui-sref="studentsProfile({studentId: item.studentId})">
+                                                                        <md-icon>person</md-icon>
+                                                                        Ver estudiante
+                                                                    </md-button>
+                                                                </md-menu-item>
+
+                                                                <md-menu-item>
+
+
+                                                                    <md-button ng-if="item.enrollmentId"
+                                                                               ng-click="vm.showDeleteStudentConfirm(item.enrollmentId, 'enrollment')">
+                                                                        <md-icon>delete</md-icon>
+                                                                        Eliminar estudiante
+                                                                    </md-button>
+
+                                                                    <md-button ng-if="!item.enrollmentId"
+                                                                               ng-click="vm.showDeleteStudentConfirm(item.studentId, 'student')">
+                                                                        <md-icon>delete</md-icon>
+                                                                        Eliminar estudiante
+                                                                    </md-button>
+
+                                                                </md-menu-item>
+
+                                                                <md-menu-divider></md-menu-divider>
+
+                                                                <md-menu-item>
+                                                                    <md-button disabled="disabled"
+                                                                               ng-click="vm.showDeleteSubjectClassImpartConfirm(item.class.classId, teacher.teacherId)">
+                                                                        <md-icon>delete</md-icon>
+                                                                        Accion denegada
+                                                                    </md-button>
+                                                                </md-menu-item>
+
+                                                            </md-menu-content>
+
+                                                        </md-menu>
+
+                                                    </td>
+
+
+                                                </tr>
+                                                </tbody>
+
+                                            </table>
+                                        </md-table-container>
+
+                                        <md-table-pagination md-limit="vm.limit"
+                                                             md-page="vm.page" md-total="{{vm.data.total}}"
+                                                             md-page-select md-boundary-links
+                                                             md-on-paginate="vm.onPaginate">
+                                        </md-table-pagination>
+
+
+                                        <div access='admin' layout="row" layout-align="center" layout-margin>
+                                            <md-button ng-click="vm.addRelation('student', vm.associationIdSelected)"
+                                                       class="md-primary md-raised">
+                                                <md-icon>add</md-icon>
+                                                Matricular
+                                            </md-button>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </md-content>
+                        </md-tab>
+
+                        <!-- GRAPHICS SECTION -->
+                        <md-tab label="Gráficas" ng-click="vm.loadReports()">
+                            <md-content class="md-padding">
+
+                                <div layout="column">
+
+                                     <div flex>
+                                        <!-- Using chartDirective.js -->
+                                        <chart config="vm.chartConfig"></chart>
+                                    </div>
+
+                                    <div flex>
+
+                                        <p class="md-subhead">
+                                            Numero total de estudiantes: {{ vm.subjectReport.students.count }}
+                                        </p>
+
+                                        <p class="md-subhead">
+                                            Edad media: {{ vm.subjectReport.students.medium_age }} años.
+                                        </p>
+
+                                    </div>
+
+                            </md-content>
+                        </md-tab>
+                    </md-tabs>
+
+
+                </md-card>
+            </div>
+        </div>
+    </div>
+
+</div>

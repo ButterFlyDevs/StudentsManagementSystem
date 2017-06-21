@@ -1,0 +1,48 @@
+<md-dialog ng-cloak>
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2><md-icon>add</md-icon>Nueva Asignatura</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="vm.closeDialog()">
+                <md-icon>close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content>
+        <div class="md-dialog-content">
+            <form name="newSubjectForm">
+
+                    <div layout layout-sm="column">
+
+                        <md-input-container flex>
+                            <label layout="">Nombre</label>
+                            <input ng-model="vm.subject.name" required>
+                        </md-input-container>
+
+                        <md-input-container flex>
+                            <label layout="">Descripción</label>
+                            <input ng-model="vm.subject.description" required>
+                        </md-input-container>
+
+                    </div>
+
+
+            </form>
+        </div>
+    </md-dialog-content>
+
+    <md-dialog-actions layout="row">
+        <span flex></span>
+        <md-button class="" ng-click="vm.closeDialog()">
+            Cancelar
+        </md-button>
+        <md-button class="md-primary md-raised" ng-disabled="newSubjectForm.$invalid" ng-click="vm.saveSubject()"
+                   style="margin-right:20px;">
+            Guardar
+        </md-button>
+    </md-dialog-actions>
+
+
+</md-dialog>

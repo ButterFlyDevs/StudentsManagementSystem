@@ -1,0 +1,39 @@
+{
+  "association": {
+
+    "associationId": 13,
+
+    "class": {
+      "classId": 283,
+      "word": "A",
+      "course": 2,
+      "level": "Elementary"
+    },
+
+    "subject": {
+      "subjectId": 24,
+      "name": "Pruebas"
+    }
+
+  },
+  "teacher": {
+    "teacherId": 23,
+    "name": "teacherA",
+    "surname": "teacherB",
+    "imgProfile": "picTeacher"
+  },
+  "students": [
+    {
+      "studentId": 113,
+      "name": "nameA",
+      "surname": "surnameA",
+      "imgProfile": "pic2"
+    },
+    {
+      "studentId": 213,
+      "name": "nameB",
+      "surname": "surnameB",
+      "imgProfile": "pic1"
+    }
+  ]
+}

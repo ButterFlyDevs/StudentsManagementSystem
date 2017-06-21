@@ -1,0 +1,206 @@
+<div flex ng-controller="attendanceControlController as vm">
+
+    <div layout="row" layout-align="center" ng-cloak>
+        <div flex="90" layout-padding>
+            <div layout="row" layout-align="space-between start">
+                <md-button class="md-primary md-raised"
+                           ui-sref="attendanceControls">
+                    <md-icon>keyboard_arrow_left</md-icon>
+                    Atras
+                </md-button>
+            </div>
+
+            <p class="md-headline">Controles de Asistencia  <strong ng-if="vm.action == 'new'"> -> Nuevo</strong></p>
+            <div ng-if="vm.action == 'loaded' ">
+                <small>control {{ vm.acId }}</small>
+                <p>Fecha de realización:</p>
+                <p> {{vm.acBase.createdAt | date : 'EEEE  dd-LLLL-yyyy'}}</p>
+                <p> {{vm.acBase.createdAt | date : 'h:mm a'}}</p>
+            </div>
+
+
+
+            <div ng-if="!vm.dataIsReady">
+                <spinner></spinner>
+            </div>
+
+            <div ng-if="vm.dataIsReady">
+
+
+                <md-card layout="column" layout-margin layout-padding>
+                    <!--Teacher info-->
+                    Profesor:
+
+                    <div flex="row">
+                        <div flex="30">
+                            <div layout="row">
+                                <div ng-switch="vm.acBase.teacher.imageProfileUrl || '_undefined_'">
+                                    <img ng-switch-when="_undefined_" class="img-profile"
+                                         src="{{ vm.defaultAvatar }}">
+                                    <img ng-switch-default class="img-profile-big" src="{{ vm.acBase.teacher.name }}">
+                                </div>
+                                <div flex>{{vm.acBase.teacher.name}}
+                                    <small>{{ vm.acBase.teacher.surname }}</small>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <!--Association info-->
+                        <div flex="70">
+                            <p>Asignatura: {{ vm.acBase.association.subject.name }}</p>
+                            <p>Grupo: {{ vm.acBase.association.class.course }} {{ vm.acBase.association.class.word }}
+                                {{
+                                vm.acBase.association.class.level }}</p>
+                        </div>
+
+                    </div>
+
+
+
+                    <md-list ng-disabled="true">
+                        <md-list-item class="md-3-line" ng-repeat="student in vm.acBase.students">
+
+                             <div ng-switch="student.profileImageUrl || '_undefined_'">
+                            <img ng-switch-when="_undefined_" class="img-profile" src="{{ vm.defaultAvatar }}">
+                            <img ng-switch-default class="img-profile" src="{{ student.profileImageUrl }}">
+                        </div>
+
+                            <!-- <img ng-src="{{vm.defaultAvatar}}" class="md-avatar">-->
+
+                            <div class="md-list-item-text">
+                                <h3>{{student.name}}</h3>
+                                <h4>{{student.surname}}</h4>
+                            </div>
+
+                            <div layout="row" layout-margin md-theme="specialtheme">
+
+                                <div class="md-toolbar-tools">
+
+                                    <!-- Assistance -->
+                                    <md-button
+                                            ng-click="vm.changeAssistanceForStudent(student.studentId)"
+                                            class="md-icon-button">
+                                        <md-icon ng-if="student.control.assistance == true"
+                                                 md-colors="{'color': 'specialpalette-pastelGreen'}">
+                                            check_circle
+                                        </md-icon>
+                                        <md-icon ng-if="!student.control.assistance"
+                                                 md-colors="{'color': 'specialpalette-pastelRed'}">
+                                            cancel
+                                        </md-icon>
+
+                                    </md-button>
+
+                                    <!-- Uniform -->
+                                    <md-button
+                                            ng-disabled="!vm.checkIfJustifiedDelayIsEnabled(student.control.uniform)"
+                                            ng-click="vm.changeUniformForStudent(student.studentId)"
+                                            class="md-icon-button">
+                                        <md-icon
+                                                ng-if="(student.control.uniform || student.control.uniform == null) && vm.checkIfJustifiedDelayIsEnabled(student.control.uniform)"
+                                                md-colors="{'color': 'specialpalette-pastelGreen'}">
+                                            visibility
+                                        </md-icon>
+
+                                        <md-icon ng-if="!vm.checkIfJustifiedDelayIsEnabled(student.control.uniform)"
+                                                 >
+                                            visibility
+                                        </md-icon>
+                                        <md-icon ng-if="student.control.uniform == false "
+                                                 md-colors="{'color': 'specialpalette-pastelRed'}">
+                                            visibility_off
+                                        </md-icon>
+                                    </md-button>
+
+                                    <!-- Delay -->
+                                    <md-menu>
+                                        <md-button
+                                                ng-disabled="!vm.checkIfDelayIsEnabled(student.control.delay)"
+                                                ng-click="$mdOpenMenu()"
+                                                class="md-icon-button">
+                                            <md-icon
+                                                    ng-if="student.control.delay == 0"
+                                                    md-colors="{'color': 'specialpalette-pastelGreen'}">
+                                                query_builder
+                                            </md-icon>
+
+                                            <md-icon ng-if="student.control.delay > 1 && student.control.delay < 50"
+                                                     md-colors="{'color': 'specialpalette-pastelOrange'}">
+                                                query_builder
+                                            </md-icon>
+
+                                            <md-icon ng-if="!vm.checkIfJustifiedDelayIsEnabled(student.control.delay)"
+                                                     >
+                                                query_builder
+                                            </md-icon>
+
+                                        </md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="item in ['Sin retraso','5','10','15','20','30']">
+                                                <md-button ng-click="vm.changeDelay(student.studentId, item)">
+                                                    {{item}}
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+
+
+                                    <div ng-if="student.control.delay != 0 && student.control.delay != null">
+                                        <p>{{ student.control.delay }} min</p>
+                                    </div>
+
+                                    <!-- Justified Delay or Fault -->
+                                    <md-button
+                                            ng-disabled="!vm.checkIfJustifiedDelayIsEnabled(student.control.justifiedDelay)"
+                                            ng-click="vm.changeJustifiedDelay(student.studentId)"
+                                            class="md-icon-button md-primary">
+
+                                        <md-icon
+                                                ng-if="student.control.justifiedDelay == 0"
+                                                md-colors="{'color': 'specialpalette-pastelRed'}">
+                                            verified_user
+                                        </md-icon>
+
+                                        <md-icon
+                                                ng-if="student.control.justifiedDelay == 1"
+                                                md-colors="{'color': 'specialpalette-pastelGreen'}">
+                                            verified_user
+                                        </md-icon>
+
+                                        <md-icon ng-if="student.control.justifiedDelay == null">
+                                            verified_user
+                                        </md-icon>
+
+
+                                    </md-button>
+
+                                </div>
+
+                            </div>
+
+                            <md-divider ng-if="!$last"></md-divider>
+                        </md-list-item>
+                    </md-list>
+
+
+
+
+                </md-card>
+
+                   <div layout="row">
+
+                        <md-button ng-if="vm.action == 'new'" class="md-primary md-raised" ng-click="vm.saveCA()">
+                            <md-icon>save</md-icon>
+                            Guardar
+                        </md-button>
+
+                    </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+

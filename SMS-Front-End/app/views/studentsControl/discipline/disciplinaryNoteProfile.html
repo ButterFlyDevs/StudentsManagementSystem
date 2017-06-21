@@ -1,0 +1,46 @@
+<div flex ng-controller="disciplinaryNoteController as vm">
+
+    <div layout="row" layout-align="center" ng-cloak>
+        <div flex="90" layout-padding>
+
+
+            <span class="md-headline">Disciplina</span>
+
+            <div layout="row" layout-align="space-between start">
+                <md-button class="md-primary md-raised"
+                           ui-sref="discipline">
+                    <md-icon>keyboard_arrow_left</md-icon>
+                    Atras
+                </md-button>
+            </div>
+
+            <md-content class="md-padding">
+
+
+                <md-card flex md-theme="{{ showDarkTheme ? 'dark-grey' : 'default' }}" md-theme-watch>
+
+
+                    <md-card-content>
+
+                        <h1 class="md-headline"> Detalles del parte disciplinario</h1>
+                        <span class="md-subhead"> Ref: {{vm.disciplinaryNoteId}}</span>
+
+
+                    </md-card-content>
+
+
+                </md-card>
+
+
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue.
+                    Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales
+                    pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies
+                    mi.</p>
+
+
+            </md-content>
+
+
+        </div>
+
+
